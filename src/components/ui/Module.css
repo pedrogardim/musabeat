@@ -1,0 +1,21 @@
+.module{
+    height:300px;
+    width:400px;
+    margin-bottom:16px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    /*
+    border-radius:12px;
+    text-align: center;
+    border:1px solid black;
+    box-shadow:0 1px 8px rgba(0,0,0,0.25);
+    */
+    
+}
+
+.module-title{
+    font-size:16px;
+
+}
