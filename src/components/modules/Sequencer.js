@@ -19,7 +19,8 @@ function Sequencer(props) {
 
   const [sequencerArray, changeSequence] = useState(loadeddata);
   const [currentBeat, setCurrentBeat] = useState(0);
-  const [loadedDrumSounds, setDrumSounds] = useState("");
+  const [loadedDrumSounds, setDrumSounds] = useState({});
+  const [scheduledEvents, setScheduledEvents] = useState([]);
 
   let loadedpatch = props.data.patch;
 
@@ -37,18 +38,24 @@ function Sequencer(props) {
   };
 
   const scheduleNotes = () => {
+
+    scheduledEvents.length > 0 && scheduledEvents.forEach((note) => Tone.Transport.clear(note));
+
+    let scheduledNotes = [];
     sequencerArray.forEach((beat, i) => {
       let beattimevalue = Tone.Time("1m").toSeconds() / sequencerArray.length;
       let beatscheduletime = beattimevalue * i;
-      Tone.Transport.schedule((time) => {
-        beat.forEach((note) => playDrumSound(note, time));
-        setCurrentBeat(i);
-      }, beatscheduletime);
+      scheduledNotes.push(
+        Tone.Transport.schedule((time) => {
+          beat.forEach((note) => playDrumSound(note, time));
+          setCurrentBeat(i);
+        }, beatscheduletime)
+      );
     });
+    setScheduledEvents(scheduledNotes);
   };
 
   const loadDrumPatch = () => {
-      
     //if(Drumdata.kits[loadedpatch].hasOwnProperty('sounds'))
     let soundsmap = Drumdata.labels.map((element, index) => {
       return (
@@ -70,11 +77,15 @@ function Sequencer(props) {
 
   useEffect(() => {
     loadDrumPatch();
-    scheduleNotes();
   }, []); // <-- empty dependency array
 
+  useEffect(() => {
+    scheduleNotes();
+    console.log(loadedDrumSounds, "SET");
+  }, [loadedDrumSounds]);
+
   return (
-    <div className="sequencer">
+    <div className="sequencer" onClick={() => console.log(loadedDrumSounds)}>
       {Drumdata.labels.map((drumsound, row) => (
         <div className="sequencer-row" key={row}>
           {sequencerArray.map((beat, column) => (
