@@ -14,13 +14,18 @@
 }
 
 .sequencer-tile{
-    outline: solid 1px #656565;
-    background-color:#c6c6c6;
+    outline: solid 1px #273379;
+    background-color:#3f51b5;
     flex: 1;
 
 }
 
 .active-sequencer-tile{
-    background-color:lightskyblue;
+    background-color:#212c68;
+
+}
+
+.cursor-sequencer-tile{
+    filter:brightness(1.1);
 
 }

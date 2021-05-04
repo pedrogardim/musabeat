@@ -1,5 +1,6 @@
 .workspace {
   background-color: #282c34;
+  background: radial-gradient(#ffffff, #fafaed);
   height:100%;
   min-height: 100vh;
   display: flex;
@@ -8,5 +9,5 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
-  padding:200px 0 200px 0;
+  padding:0px 0 200px 0;
 }

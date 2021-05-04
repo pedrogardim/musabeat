@@ -1,57 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import SequencerTile from "./SequencerTile";
 import * as Tone from "tone";
 
-
+import * as Drumdata from "../../assets/drumkits";
 
 //import { Paper, Icon, Card, Button } from '@material-ui/core';
 
-import './Sequencer.css';
+import "./Sequencer.css";
 
 function Sequencer(props) {
+  const loadeddata =
+    props.data.score.length === props.data.subdiv
+      ? props.data.score
+      : Array(props.data.subdiv)
+          .fill(0)
+          .map((x) => Array(0));
 
-    const [sequencerArray, changeSequence] = useState(Array(props.data.subdiv).fill(0).map(x => Array(0)));
+  const [sequencerArray, changeSequence] = useState(loadeddata);
+  const [currentBeat, setCurrentBeat] = useState(0);
+  const [loadedDrumSounds, setDrumSounds] = useState("");
 
-    const synth = new Tone.Synth().toDestination();
+  let loadedpatch = props.data.patch;
 
-    const inputNote = (x,y) => {
+  const inputNote = (x, y) => {
+    changeSequence((prevSequence) => {
+      let [newsequence, notesonstep] = [prevSequence, prevSequence[x]];
 
-        console.log(x,y);
-        changeSequence((prevSequence)=>{
-            let currentstepnotes = [...prevSequence[x]];
-            (currentstepnotes.indexOf(y) !== -1)?(currentstepnotes.filter(z => z != y)):(currentstepnotes.push(y));
-            let newarray = [...prevSequence];
-            newarray[x] = currentstepnotes;
-            console.log(newarray[0]);
-            return newarray;
-        })
+      notesonstep.indexOf(y) === -1
+        ? notesonstep.push(y)
+        : (notesonstep = [...notesonstep].filter((note) => note !== y));
 
-    }
+      newsequence[x] = notesonstep;
+      return newsequence;
+    });
+  };
 
-    const playSynth = () => {
-        synth.triggerAttackRelease("C4", "8n");
-    }
+  const scheduleNotes = () => {
+    sequencerArray.forEach((beat, i) => {
+      let beattimevalue = Tone.Time("1m").toSeconds() / sequencerArray.length;
+      let beatscheduletime = beattimevalue * i;
+      Tone.Transport.schedule((time) => {
+        beat.forEach((note) => playDrumSound(note, time));
+        setCurrentBeat(i);
+      }, beatscheduletime);
+    });
+  };
 
-    let sequencerrows = [];
-   
-    for(let seqrow = 0; seqrow < props.data.sounds; seqrow++){
+  const loadDrumPatch = () => {
+      
+    //if(Drumdata.kits[loadedpatch].hasOwnProperty('sounds'))
+    let soundsmap = Drumdata.labels.map((element, index) => {
+      return (
+        "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
+        Drumdata.kits[loadedpatch].baseUrl +
+        "/" +
+        index +
+        ".wav"
+      );
+    });
 
-        let tilesonrow = [];
-        
-        for(let seqcolumn = 0;seqcolumn < props.data.subdiv;seqcolumn++){
-            tilesonrow.push(<SequencerTile key={[seqcolumn,seqrow]} editNote={inputNote} synth={playSynth} x={seqcolumn} y={seqrow}/>)
-        }
+    setDrumSounds(new Tone.Players(soundsmap).toDestination());
+  };
 
-        sequencerrows.push(<div className="sequencer-row" key={seqrow}>{tilesonrow}</div>);
-    }
+  const playDrumSound = (note, time) => {
+    console.log(loadedDrumSounds, note);
+    loadedDrumSounds.player(note).start(time !== undefined ? time : 0);
+  };
 
-    return (
-     <div className="sequencer">
-           {sequencerrows}
-      </div>
-    );
-  }
-  
-  export default Sequencer;
-  
+  useEffect(() => {
+    loadDrumPatch();
+    scheduleNotes();
+  }, []); // <-- empty dependency array
+
+  return (
+    <div className="sequencer">
+      {Drumdata.labels.map((drumsound, row) => (
+        <div className="sequencer-row" key={row}>
+          {sequencerArray.map((beat, column) => (
+            <SequencerTile
+              key={[column, row]}
+              editNote={inputNote}
+              play={playDrumSound}
+              state={sequencerArray[column].indexOf(row) !== -1}
+              cursor={currentBeat == column}
+              x={column}
+              y={row}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default Sequencer;

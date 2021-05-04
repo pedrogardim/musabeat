@@ -17,7 +17,7 @@ function Module(props) {
 
   switch(props.data.type){
     case 0:
-      innerModule = <Sequencer data={props.data}/>;
+      innerModule = <Sequencer data={props.data} kit="0"/>;
       break;
   }
 
