@@ -1,0 +1,23 @@
+.module-picker{
+
+    position:fixed;
+    height:600px;
+    width:800px;
+    z-index:2;
+    background-color:white;
+    padding:8px;
+    left:calc(50% - 400px);
+    top:calc(50% - 300px);
+    display:flex;
+    flex-direction:row;
+    align-items: stretch;
+    justify-content:space-between;
+
+}
+
+.mp-closebtn{
+    position:absolute !important;
+    top:16px;
+    right:16px;
+
+}

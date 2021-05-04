@@ -1,0 +1,26 @@
+.sequencer{
+    display:flex;
+    flex-direction: column;
+    flex:1 0;
+
+
+}
+
+.sequencer-row{
+    display:flex;
+    flex: 1;
+    flex-direction: row;
+
+}
+
+.sequencer-tile{
+    outline: solid 1px #656565;
+    background-color:#c6c6c6;
+    flex: 1;
+
+}
+
+.active-sequencer-tile{
+    background-color:lightskyblue;
+
+}
