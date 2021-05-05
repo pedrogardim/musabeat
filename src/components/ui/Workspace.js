@@ -8,8 +8,7 @@ import "./Workspace.css";
 import Module from "./Module";
 import ModulePicker from "./ModulePicker";
 
-
-const loadedmodules = [
+const initialModules = [
   {
     id: 1,
     name: "Sequencer",
@@ -35,6 +34,14 @@ const loadedmodules = [
       [],
     ],
   },
+  {
+    id: 2,
+    name: "Chords",
+    type: 2,
+    subdiv: 16,
+    patch: 0,
+    chords: [],
+  },
 ];
 
 Tone.Transport.bpm.value = 90;
@@ -43,13 +50,13 @@ Tone.Transport.loopStart = 0;
 Tone.Transport.loopEnd = "1m";
 
 function Workspace(props) {
-  const [modules, setModules] = useState(loadedmodules);
+  const [modules, setModules] = useState(initialModules);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
 
   const addModule = (moduletype) => {
     let module = {
       id: modules.length + 1,
-      name: "Synth",
+      name: "New Module",
       type: moduletype,
       subdiv: 16,
       patch: 0,

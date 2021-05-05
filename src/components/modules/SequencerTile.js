@@ -6,11 +6,9 @@ import "./Sequencer.css";
 
 function SequencerTile(props) {
   // it's active or not
-  const [state, changeState] = useState(props.state);
-
+  const {active} = props;
   const clickedTile = () => {
-    state ? changeState(false) : changeState(true);
-    props.editNote(props.x, props.y);
+    props.inputNote(props.x, props.y);
     props.play(props.y);
   };
 
@@ -18,7 +16,7 @@ function SequencerTile(props) {
     <div
       className={
         "sequencer-tile " +
-        (state && "active-sequencer-tile") +
+        (active && "active-sequencer-tile") +
         " " +
         (props.cursor && "cursor-sequencer-tile")
       }

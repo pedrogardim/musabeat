@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Card } from '@material-ui/core';
 
 import Sequencer from "../modules/Sequencer";
+import ChordProgression from "../modules/ChordProgression";
+
 
 
 import './Module.css';
@@ -18,6 +20,9 @@ function Module(props) {
   switch(props.data.type){
     case 0:
       innerModule = <Sequencer data={props.data} kit="0"/>;
+      break;
+      case 2:
+      innerModule = <ChordProgression data={props.data}/>;
       break;
   }
 
