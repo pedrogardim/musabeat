@@ -40,7 +40,21 @@ const initialModules = [
     type: 2,
     subdiv: 16,
     patch: 0,
-    chords: [],
+    chords: [
+      {
+        notes: ["E1", "E3", "E4", "G4", "B4"],
+        duration: 0.5,
+        time: 0,
+        rhythm: [1, 1, 1, 1],
+      },
+      {
+        notes: ["C2", "C3", "D#4", "G4", "A#4", "D5"],
+        duration: 0.5,
+        time: 0.5,
+
+        rhythm: [1, 1, 1, 1],
+      },
+    ],
   },
 ];
 
