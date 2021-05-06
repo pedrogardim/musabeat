@@ -15,7 +15,7 @@ function Module(props) {
 
   //const getValue = (event) => console.log(event.target.value);
 
-  let innerModule = <p>Nothing Here</p>;
+  let innerModule = <span>Nothing Here</span>;
 
   switch(props.data.type){
     case 0:
@@ -30,9 +30,8 @@ function Module(props) {
   return (
    <Card className="module">
       <span className="module-title">{props.data.name}</span>
-      <div className="module-innerwrapper">
         {innerModule}     
-      </div>
+
     </Card>
   );
 }

@@ -6,9 +6,9 @@ import "./ChordProgression.css";
 
 function Chord(props) {
 
-  return <div className={
+  return <div onClick={props.onClick} className={
     "chord " +
-    (props.active && "active-chord")
+    (props.active && "selected-chord")
   }>{props.name}</div>;
 }
 

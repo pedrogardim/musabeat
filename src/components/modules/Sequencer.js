@@ -5,41 +5,36 @@ import * as Tone from "tone";
 
 import * as Drumdata from "../../assets/drumkits";
 
-//import { Paper, Icon, Card, Button } from '@material-ui/core';
+import {
+  CircularProgress,
+  BottomNavigation,
+  BottomNavigationAction,
+} from "@material-ui/core";
 
 import "./Sequencer.css";
+import "../ui/Module.css";
 
 function Sequencer(props) {
-  const loadeddata =
-    props.data.score.length === props.data.subdiv
-      ? props.data.score
-      : Array(props.data.subdiv)
-          .fill(0)
-          .map((x) => Array(0));
+  const loadeddata = props.data.score;
 
+  const [isBufferLoaded, setIsBufferLoaded] = useState(false);
+  const [loadedDrumSounds, setDrumSounds] = useState({});
   const [sequencerArray, changeSequence] = useState(loadeddata);
   const [currentBeat, setCurrentBeat] = useState(0);
-  const [loadedDrumSounds, setDrumSounds] = useState({});
+  const [currentMeasure, setCurrentMeasure] = useState(0);
   const [scheduledEvents, setScheduledEvents] = useState([]);
-
-  //   setCurrentBeat(currentbeat + 1);
-
-  //   setCurrentBeat((prevBeat) => {
-  //     return prevBeat + 1;
-  //   });
 
   let loadedpatch = props.data.patch;
 
   const inputNote = (x, y) => {
     changeSequence((previousSequence) => {
       let newsequence = [...previousSequence];
-      let notesonstep = [...previousSequence[x]]
+      let notesonstep = newsequence[currentMeasure][x];
 
       notesonstep.indexOf(y) === -1
         ? notesonstep.push(y)
-        : (notesonstep = [...notesonstep].filter((note) => note !== y));
+        : notesonstep.filter((note) => note !== y);
 
-      newsequence[x] = notesonstep;
       return newsequence;
     });
   };
@@ -50,16 +45,22 @@ function Sequencer(props) {
     //setScheduledEvents([]);
 
     let scheduledNotes = [];
-    sequencerArray.forEach((beat, i) => {
-      let beattimevalue = Tone.Time("1m").toSeconds() / sequencerArray.length;
-      let beatscheduletime = beattimevalue * i;
 
-      let thisevent = Tone.Transport.schedule((time) => {
-        beat.forEach((note) => playDrumSound(note, time));
-        setCurrentBeat(i);
-      }, beatscheduletime);
-      scheduledNotes.push(thisevent);
+    sequencerArray.forEach((measure, measureIndex) => {
+      measure.forEach((beat, i) => {
+        let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
+        let beatscheduletime =
+          beattimevalue * i + Tone.Time("1m").toSeconds() * measureIndex;
+
+        let thisevent = Tone.Transport.schedule((time) => {
+          beat.forEach((note) => playDrumSound(note, time));
+          setCurrentBeat(i);
+          setCurrentMeasure(measureIndex);
+        }, beatscheduletime);
+        scheduledNotes.push(thisevent);
+      });
     });
+
     setScheduledEvents(scheduledNotes);
   };
 
@@ -75,9 +76,9 @@ function Sequencer(props) {
       );
     });
 
-    console.log("LOADED");
-
-    setDrumSounds(new Tone.Players(soundsmap).toDestination());
+    setDrumSounds(
+      new Tone.Players(soundsmap, () => setIsBufferLoaded(true)).toDestination()
+    );
   };
 
   const playDrumSound = (note, time) =>
@@ -92,28 +93,47 @@ function Sequencer(props) {
 
   useEffect(() => {
     loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
-    console.log("changed");
+
+    console.log(sequencerArray);
   }, [loadedDrumSounds, sequencerArray]);
 
   //on changing sequence
 
   return (
-    <div className="sequencer">
-      {Drumdata.labels.map((drumsound, row) => (
-        <div className="sequencer-row" key={row}>
-          {sequencerArray.map((beat, column) => (
-            <SequencerTile
-              key={[column, row]}
-              inputNote={inputNote}
-              play={playDrumSound}
-              active={beat.indexOf(row) !== -1}
-              cursor={currentBeat == column}
-              x={column}
-              y={row}
-            />
+    <div className="module-innerwrapper">
+      {isBufferLoaded ? (
+        <div className="sequencer">
+          {Drumdata.labels.map((drumsound, row) => (
+            <div className="sequencer-row" key={row}>
+              {sequencerArray[currentMeasure].map((beat, column) => (
+                <SequencerTile
+                  key={[column, row]}
+                  inputNote={inputNote}
+                  play={playDrumSound}
+                  active={beat.indexOf(row) !== -1}
+                  cursor={currentBeat == column}
+                  x={column}
+                  y={row}
+                />
+              ))}
+            </div>
           ))}
         </div>
-      ))}
+      ) : (
+        <CircularProgress />
+      )}
+      <BottomNavigation
+        value={currentMeasure}
+        showLabels
+        onChange={(event, newValue) => {
+          setCurrentMeasure(newValue);
+        }}
+        className="sequencer-bottomnav"
+      >
+        {sequencerArray.map((measure, index) => (
+          <BottomNavigationAction key={index} label={index + 1} />
+        ))}
+      </BottomNavigation>
     </div>
   );
 }

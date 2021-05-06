@@ -29,3 +29,7 @@
     filter:brightness(1.1);
 
 }
+
+.sequencer-bottomnav{
+    height:30px !important;
+}

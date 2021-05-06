@@ -12,6 +12,7 @@
     width:64px;
     text-align:center;
     margin:8px;
+    user-select: none;
 
 }
 
@@ -20,3 +21,19 @@
     outline:solid 1px;
 
 }
+
+.selected-chord{
+    animation: flashing 0.8s infinite alternate;
+  
+  }
+  
+  @keyframes flashing {
+    from {background-color: white}
+    to {background-color: rgb(255, 102, 0)}
+  }
+
+.measure-divider{
+    max-height:32px;
+    background-color:black !important;
+}
+

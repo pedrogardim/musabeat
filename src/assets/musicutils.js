@@ -374,7 +374,7 @@ export const instrumentContructor = (input) => {
 	var patch = Instruments.instruments[input];
 	var instrfx = [];
 
-	if(patch.base == "Sampler"){
+	if(patch.base === "Sampler"){
 
 				
 		instr = new Tone.Sampler().toDestination()
@@ -385,16 +385,16 @@ export const instrumentContructor = (input) => {
 		instr.release = patch.asdr[1];
 
 	}
-	if(patch.base == "FM"){
+	if(patch.base === "FM"){
 		instr = new Tone.PolySynth(Tone.FMSynth,patch.options);
 	}
-	if(patch.base == "AM"){
+	if(patch.base === "AM"){
 		instr = new Tone.PolySynth(Tone.AMSynth,patch.options);
 	}
-	if(patch.base == "Mono"){
+	if(patch.base === "Mono"){
 		instr = new Tone.PolySynth(Tone.MonoSynth,patch.options);
 	}
-	if(patch.base == "Synth"){
+	if(patch.base === "Synth"){
 		instr = new Tone.PolySynth(Tone.Synth,patch.options);
 	}
 
@@ -403,27 +403,27 @@ export const instrumentContructor = (input) => {
 	if("fx" in patch){
 
 		patch.fx.forEach((e,i)=>{
-			if(e[0] == "vib"){
+			if(e[0] === "vib"){
 				instrfx[i] = new Tone.Vibrato(e[1],e[2]);
 			}
-			if(e[0] == "stwid"){
+			if(e[0] === "stwid"){
 				instrfx[i] = new Tone.StereoWidener(e[1]);
 			}
-			if(e[0] == "trem"){
+			if(e[0] === "trem"){
 				instrfx[i] = new Tone.Tremolo(e[1],e[2]).start();
 			}
-			if(e[0] == "phsr"){
+			if(e[0] === "phsr"){
 				instrfx[i] = new Tone.Phaser(e[1],e[2],e[3]);
 			}
-			if(e[0] == "rvb"){
+			if(e[0] === "rvb"){
 				instrfx[i] = new Tone.Reverb({decay:e[1],wet:e[2],predelay:[3]});
 			}
-			if(e[0] == "dly"){
+			if(e[0] === "dly"){
 				instrfx[i] = new Tone.FeedbackDelay({delayTime:e[1],feedback:e[2],wet:e[3]});
 			}
 			instr.connect(instrfx[i]);
 
-			i == patch.fx.length-1 && instrfx[i].toDestination()
+			i === patch.fx.length-1 && instrfx[i].toDestination()
 		})
 	}
 	else{

@@ -16,22 +16,42 @@ const initialModules = [
     subdiv: 16,
     patch: 0,
     score: [
-      [0, 3],
-      [],
-      [3],
-      [],
-      [1, 3],
-      [],
-      [3],
-      [],
-      [0, 3],
-      [],
-      [3],
-      [],
-      [1, 3],
-      [],
-      [3],
-      [],
+      [
+        [0, 3],
+        [],
+        [3],
+        [],
+        [1, 3],
+        [],
+        [3],
+        [],
+        [0, 3],
+        [],
+        [3],
+        [],
+        [1, 3],
+        [],
+        [3],
+        [],
+      ],
+      [
+        [0, 3],
+        [],
+        [3],
+        [],
+        [1, 3],
+        [],
+        [3],
+        [],
+        [0, 3],
+        [],
+        [3],
+        [],
+        [1, 3],
+        [],
+        [3],
+        [],
+      ],
     ],
   },
   {
@@ -42,17 +62,30 @@ const initialModules = [
     patch: 0,
     chords: [
       {
-        notes: ["E1", "E3", "E4", "G4", "B4"],
+        notes: ["E4", "G4", "B4"],
         duration: 0.5,
         time: 0,
-        rhythm: [1, 1, 1, 1],
+        measure: 0,
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
       {
-        notes: ["C2", "C3", "D#4", "G4", "A#4", "D5"],
+        notes: ["C4", "E4", "G4", "D5"],
         duration: 0.5,
         time: 0.5,
-
-        rhythm: [1, 1, 1, 1],
+        measure: 0,
+        rhythm: [0, 1, 1, 1, 0, 1, 1, 1],
+      },
+      {
+        notes: ["A4", "C4", "E4"],
+        duration: 0.5,
+        time: 1,
+        rhythm: [1, 0, 1, 0, 1, 0,0,1],
+      },
+      {
+        notes: ["G4", "B4", "D5"],
+        duration: 0.5,
+        time: 1.5,
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
     ],
   },
@@ -61,7 +94,7 @@ const initialModules = [
 Tone.Transport.bpm.value = 90;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
-Tone.Transport.loopEnd = "1m";
+Tone.Transport.loopEnd = "2m";
 
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);

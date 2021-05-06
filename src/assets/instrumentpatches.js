@@ -1,4 +1,4 @@
-const instrcategories = ["Drums", "Keys", "Synth"];
+//const instrcategories = ["Drums", "Keys", "Synth"];
 
 export const instruments = [
 	{
