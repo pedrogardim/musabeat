@@ -9,7 +9,7 @@ import * as Tone from "tone";
 
 export const bounceSessionExport = (modules, sessionData, setIsReady) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
-  let exportDuration = 2;
+  let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
   let instrumentBuffers = modules.map((module, i) => 
    (module.instrument.name == "Players" || module.instrument.name == "Sampler")

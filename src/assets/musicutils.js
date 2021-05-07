@@ -6,7 +6,7 @@ import * as Tone from "tone";
 
 import * as Instruments from "./instrumentpatches";
 
-export const notes = [
+export const musicalNotes = [
   "C",
   "C#/D♭",
   "D",
@@ -118,17 +118,17 @@ export const scales = [
 ];
 
 export const chordNametoNotes = (arg) => {
-  var chordroot,
+  let chordroot,
     chordtype,
     chordbass = null;
-  var chordinput = arg.replace(" ", "");
+  let chordinput = arg.replace(" ", "");
 
   if (chordinput.indexOf("/") !== -1) {
     chordbass = chordinput.split("/")[1];
     chordinput = chordinput.split("/")[0];
   } else if (chordinput[1] === "b") {
-    var includecomma = chordinput.replace("b", "b,");
-    var rootandtypearray = includecomma.split(",");
+    let includecomma = chordinput.replace("b", "b,");
+    let rootandtypearray = includecomma.split(",");
     chordroot = rootandtypearray[0];
     chordtype = rootandtypearray[1];
   } else {
@@ -146,10 +146,10 @@ export const chordNametoNotes = (arg) => {
     //append bass
   }
 
-  var harmonizedchord = Tone.Frequency(chordroot + "3").harmonize(
+  let harmonizedchord = Tone.Frequency(chordroot + "3").harmonize(
     chordtypes[chordtype]
   );
-  var finishedchord = [];
+  let finishedchord = [];
   harmonizedchord.forEach((e) =>
     finishedchord.push(Tone.Frequency(e).toNote())
   );
@@ -162,20 +162,20 @@ export const chordNotestoName = (arg) => {
     return "N.C";
   }
 
-  var chordroot = Tone.Frequency(arg[0]).toFrequency();
-  var chordtype = "...";
-  var additionalnotes = [];
-  var additionalnotesstring = "";
+  let chordroot = Tone.Frequency(arg[0]).toFrequency();
+  let chordtype = "...";
+  let additionalnotes = [];
+  let additionalnotesstring = "";
 
-  var chordintervals = [0];
+  let chordintervals = [0];
 
   //transform the note array into intervals array, putting everyone inside the same octave and removing duplicated.
 
   arg.forEach(function (element, index) {
     if (index === 0) return;
-    var thisinterval;
-    var thisfrequency = Tone.Frequency(element).toFrequency();
-    var thisrelation =
+    let thisinterval;
+    let thisfrequency = Tone.Frequency(element).toFrequency();
+    let thisrelation =
       Math.round((thisfrequency / chordroot + Number.EPSILON) * 10000) / 10000;
     while (thisrelation < 1) {
       thisrelation *= 2;
@@ -202,12 +202,12 @@ export const chordNotestoName = (arg) => {
 
   //This array will store the common intervals with each of the "chordtypes" type
 
-  var typepossibilities = [];
+  let typepossibilities = [];
 
   //For each chordtype:
 
   chordtypes.forEach(function (element, index) {
-    var commonintervals = [];
+    let commonintervals = [];
     commonintervals = chordintervals.filter((el) => element.includes(el));
     typepossibilities.push(commonintervals.length - 1);
 
@@ -216,7 +216,7 @@ export const chordNotestoName = (arg) => {
 
   //Now, chose the one type with most common intervals (if are more than 1, pick the first)
 
-  var typechosen = typepossibilities.reduce(
+  let typechosen = typepossibilities.reduce(
     (iMax, x, i, arr) => (x > arr[iMax] ? i : iMax),
     0
   );
@@ -256,13 +256,13 @@ export const chordNotestoName = (arg) => {
 };
 /*
 function noteArraytoMidi(arg){
-  var newarray = []
+  let newarray = []
   arg.map((e)=>{Tone.Frequency(e).toMidi()});
   return newarray;
 }
 
 function midiArraytoNote(arg){
-  var newarray = []
+  let newarray = []
   arg.forEach((e)=>{newarray.push(Tone.Frequency(e,"midi").toNote())});
   return newarray;
 }
@@ -273,18 +273,18 @@ function gcd_two_numbers(x, y) {
   x = Math.abs(x);
   y = Math.abs(y);
   while (y) {
-    var t = y;
+    let t = y;
     y = x % y;
     x = t;
   }
   return x;
 }
 
-export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
-  var difference = newsubdivision / oldarray.length;
-  var gdc = gcd_two_numbers(newsubdivision, oldarray.length);
+export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
+  let difference = newsubdivision / oldarray.length;
+  let gdc = gcd_two_numbers(newsubdivision, oldarray.length);
 
-  var newsubdivarray = [];
+  let newsubdivarray = [];
 
   //POSSIBLE SCENARIOS:
 
@@ -298,9 +298,9 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
 
   else if (difference % 2 === 0 || difference % 3 === 0){ 
 
-    for(var x = 0; x < oldarray.length; x++){
+    for(let x = 0; x < oldarray.length; x++){
       newsubdivarray.push(oldarray[x]);
-      for(var y = 0; y < (difference-1); y++){
+      for(let y = 0; y < (difference-1); y++){
         newsubdivarray.push([]);
       }
     }
@@ -310,7 +310,7 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
 
   else if (difference > 1 && difference < 2){ 
 
-    for(var x = 0; x < oldarray.length; x++){
+    for(let x = 0; x < oldarray.length; x++){
         newsubdivarray.push(oldarray[x]);
         if(x%((difference*2)-1) === 1){
           newsubdivarray.push([]);
@@ -322,7 +322,7 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
 
   else if (difference < 1 && ((1/difference) % 2 === 0 || (1/difference) % 3 === 0)){ 
 
-    for(var x = 0; x < newsubdivision; x++){
+    for(let x = 0; x < newsubdivision; x++){
         newsubdivarray.push(oldarray[x/difference]);
     }
   } 
@@ -334,12 +334,12 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
   if (difference > 1) {
     console.log("gdccase+", gdc, oldarray.length);
 
-    for (var x = 0; x < oldarray.length; x++) {
+    for (let x = 0; x < oldarray.length; x++) {
       newsubdivarray.push(oldarray[x]);
       console.log((x + 1) % (oldarray.length / gdc));
 
       if ((x + 1) % (oldarray.length / gdc) === 0) {
-        for (var y = 0; y < difference - 1; y++) {
+        for (let y = 0; y < difference - 1; y++) {
           newsubdivarray.push([]);
         }
       }
@@ -349,13 +349,13 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
 
     //works if gdc = new newsubdivision
 
-    for (var x = 0; x < oldarray.length; x++) {
+    for (let x = 0; x < oldarray.length; x++) {
       if (x % (oldarray.length / gdc) === 0) {
         newsubdivarray.push(oldarray[x]);
       }
     }
     /*
-    for(var x = 0; x < drumseq.length; x++){
+    for(let x = 0; x < drumseq.length; x++){
       if (x % (drumseq.length/gdc) === 0){
         newsubdivarray.push(drumseq[x]);
       }
@@ -367,69 +367,90 @@ export const adaptSequencetoSubdiv = (oldarray,newsubdivision) => {
   return newsubdivarray;
 };
 
+export const getChordsFromScale = (scale, root, complexity) => {
+  let scalechords = [];
+  for (let x = 0; x < 7; x++) {
+    let thischord = [];
+    //bassnote
+    thischord.push(scales[scale][0][x] - 12);
+
+    for (let y = 0; y < complexity; y++) {
+      let noteindex = x + y * 2;
+      if (noteindex > scales[scale][0].length - 1) {
+        noteindex = noteindex - scales[scale][0].length;
+      }
+      thischord.push(scales[scale][0][noteindex]);
+    }
+    scalechords.push(
+      Tone.Frequency(musicalNotes[root].split("/")[0] + "4").harmonize(thischord)
+    );
+    scalechords[x] = scalechords[x].map((e) => {
+      return Tone.Frequency(e).toNote();
+    });
+  }
+
+  return scalechords;
+};
 
 export const instrumentContructor = (input) => {
-	
-	var instr;
-	var patch = Instruments.instruments[input];
-	var instrfx = [];
+  let instr;
+  let patch = Instruments.instruments[input];
+  let instrfx = [];
 
-	if(patch.base === "Sampler"){
+  if (patch.base === "Sampler") {
+    instr = new Tone.Sampler().toDestination();
+    //instr._buffers = rhythminstrumentbuffers;
 
-				
-		instr = new Tone.Sampler().toDestination()
-		//instr._buffers = rhythminstrumentbuffers;
+    //instr = new Tone.Sampler(patch.urls,patch.options).toDestination()
+    instr.attack = patch.asdr[0];
+    instr.release = patch.asdr[1];
+  }
+  if (patch.base === "FM") {
+    instr = new Tone.PolySynth(Tone.FMSynth, patch.options);
+  }
+  if (patch.base === "AM") {
+    instr = new Tone.PolySynth(Tone.AMSynth, patch.options);
+  }
+  if (patch.base === "Mono") {
+    instr = new Tone.PolySynth(Tone.MonoSynth, patch.options);
+  }
+  if (patch.base === "Synth") {
+    instr = new Tone.PolySynth(Tone.Synth, patch.options);
+  }
 
-		//instr = new Tone.Sampler(patch.urls,patch.options).toDestination()
-		instr.attack = patch.asdr[0];
-		instr.release = patch.asdr[1];
+  instr.volume.value = patch.gain;
 
-	}
-	if(patch.base === "FM"){
-		instr = new Tone.PolySynth(Tone.FMSynth,patch.options);
-	}
-	if(patch.base === "AM"){
-		instr = new Tone.PolySynth(Tone.AMSynth,patch.options);
-	}
-	if(patch.base === "Mono"){
-		instr = new Tone.PolySynth(Tone.MonoSynth,patch.options);
-	}
-	if(patch.base === "Synth"){
-		instr = new Tone.PolySynth(Tone.Synth,patch.options);
-	}
+  if ("fx" in patch) {
+    patch.fx.forEach((e, i) => {
+      if (e[0] === "vib") {
+        instrfx[i] = new Tone.Vibrato(e[1], e[2]);
+      }
+      if (e[0] === "stwid") {
+        instrfx[i] = new Tone.StereoWidener(e[1]);
+      }
+      if (e[0] === "trem") {
+        instrfx[i] = new Tone.Tremolo(e[1], e[2]).start();
+      }
+      if (e[0] === "phsr") {
+        instrfx[i] = new Tone.Phaser(e[1], e[2], e[3]);
+      }
+      if (e[0] === "rvb") {
+        instrfx[i] = new Tone.Reverb({ decay: e[1], wet: e[2], predelay: [3] });
+      }
+      if (e[0] === "dly") {
+        instrfx[i] = new Tone.FeedbackDelay({
+          delayTime: e[1],
+          feedback: e[2],
+          wet: e[3],
+        });
+      }
+      instr.connect(instrfx[i]);
 
-	instr.volume.value = patch.gain;
+      i === patch.fx.length - 1 && instrfx[i].toDestination();
+    });
+  } else {
+    instr.toDestination();
+  }
 
-	if("fx" in patch){
-
-		patch.fx.forEach((e,i)=>{
-			if(e[0] === "vib"){
-				instrfx[i] = new Tone.Vibrato(e[1],e[2]);
-			}
-			if(e[0] === "stwid"){
-				instrfx[i] = new Tone.StereoWidener(e[1]);
-			}
-			if(e[0] === "trem"){
-				instrfx[i] = new Tone.Tremolo(e[1],e[2]).start();
-			}
-			if(e[0] === "phsr"){
-				instrfx[i] = new Tone.Phaser(e[1],e[2],e[3]);
-			}
-			if(e[0] === "rvb"){
-				instrfx[i] = new Tone.Reverb({decay:e[1],wet:e[2],predelay:[3]});
-			}
-			if(e[0] === "dly"){
-				instrfx[i] = new Tone.FeedbackDelay({delayTime:e[1],feedback:e[2],wet:e[3]});
-			}
-			instr.connect(instrfx[i]);
-
-			i === patch.fx.length-1 && instrfx[i].toDestination()
-		})
-	}
-	else{
-		instr.toDestination();
-	}
-
-	return instr;
-
-}
+  return instr;
+};

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import Chord from "./Chord";
+import ChordPicker from "./ChordPicker";
+
 import * as Tone from "tone";
 
 import * as MusicUtils from "../../assets/musicutils";
@@ -18,6 +20,7 @@ function ChordProgression(props) {
   const [activeChord, setActiveChord] = useState(null);
   const [instrument, setInstrument] = useState(defaultIntrument);
   const [scheduledEvents, setScheduledEvents] = useState([]);
+  const [selectedChord, setSelectedChord] = useState(null);
 
   const scheduleChords = () => {
     let scheduledChords = [];
@@ -35,6 +38,9 @@ function ChordProgression(props) {
 
   const handleClick = (chordindex) => {
     setActiveChord((prevChord) =>
+      chordindex == prevChord ? null : chordindex
+    );
+    setSelectedChord((prevChord) =>
       chordindex == prevChord ? null : chordindex
     );
     instrument.releaseAll();
@@ -78,6 +84,7 @@ function ChordProgression(props) {
         />
       ))}
       <Divider className="measure-divider" orientation="vertical" />
+      <ChordPicker selectedChord={selectedChord} chords={chords} setChords={setChords}/>
     </div>
   );
 }
