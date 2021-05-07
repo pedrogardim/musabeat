@@ -9,7 +9,6 @@ function SequencerTile(props) {
   const {active} = props;
   const clickedTile = () => {
     props.inputNote(props.x, props.y);
-    props.play(props.y);
   };
 
   return (

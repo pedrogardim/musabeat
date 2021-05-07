@@ -5,8 +5,6 @@ import { Card } from '@material-ui/core';
 import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
 
-
-
 import './Module.css';
 
 function Module(props) {

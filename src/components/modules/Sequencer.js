@@ -5,6 +5,9 @@ import * as Tone from "tone";
 
 import * as Drumdata from "../../assets/drumkits";
 
+import { scheduleDrumSequence } from "../../utils/TransportSchedule";
+
+
 import {
   CircularProgress,
   BottomNavigation,
@@ -28,38 +31,27 @@ function Sequencer(props) {
 
   const inputNote = (x, y) => {
     changeSequence((previousSequence) => {
-      let newsequence = [...previousSequence];
-      let notesonstep = newsequence[currentMeasure][x];
+      let newSequence = [...previousSequence];
+      let notesOnStep = newSequence[currentMeasure][x];
 
-      notesonstep.indexOf(y) === -1
-        ? notesonstep.push(y)
-        : notesonstep.filter((note) => note !== y);
+      let noteIndex = notesOnStep.indexOf(y);
 
-      return newsequence;
+      notesOnStep.includes(y)
+        ? notesOnStep.splice(noteIndex, 1)
+        : notesOnStep.push(y);
+
+      return newSequence;
     });
+    playDrumSound(y);
   };
 
   const scheduleNotes = () => {
-    scheduledEvents.length > 0 &&
-      scheduledEvents.forEach((event) => Tone.Transport.clear(event));
+
     //setScheduledEvents([]);
 
     let scheduledNotes = [];
 
-    sequencerArray.forEach((measure, measureIndex) => {
-      measure.forEach((beat, i) => {
-        let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
-        let beatscheduletime =
-          beattimevalue * i + Tone.Time("1m").toSeconds() * measureIndex;
-
-        let thisevent = Tone.Transport.schedule((time) => {
-          beat.forEach((note) => playDrumSound(note, time));
-          setCurrentBeat(i);
-          setCurrentMeasure(measureIndex);
-        }, beatscheduletime);
-        scheduledNotes.push(thisevent);
-      });
-    });
+    scheduledNotes = scheduleDrumSequence(sequencerArray,loadedDrumSounds,Tone.Transport,scheduledEvents,setCurrentBeat,setCurrentMeasure)
 
     setScheduledEvents(scheduledNotes);
   };
@@ -84,17 +76,26 @@ function Sequencer(props) {
   const playDrumSound = (note, time) =>
     loadedDrumSounds.player(note).start(time !== undefined ? time : 0);
 
+    const handleBottomNavClick = (value) => {
+      setCurrentMeasure(value);
+      Tone.Transport.seconds = value * Tone.Time("1m").toSeconds();
+      setCurrentBeat(0);
+
+    }
   //on startup
   useEffect(() => {
     loadDrumPatch();
   }, []); // <-- empty dependency array
 
+   //on startup
+   useEffect(() => {
+    
+  }, [currentMeasure]); // <-- empty dependency array
+
   //after loading sounds
 
   useEffect(() => {
     loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
-
-    console.log(sequencerArray);
   }, [loadedDrumSounds, sequencerArray]);
 
   //on changing sequence
@@ -109,8 +110,7 @@ function Sequencer(props) {
                 <SequencerTile
                   key={[column, row]}
                   inputNote={inputNote}
-                  play={playDrumSound}
-                  active={beat.indexOf(row) !== -1}
+                  active={beat.includes(row)}
                   cursor={currentBeat == column}
                   x={column}
                   y={row}
@@ -126,7 +126,7 @@ function Sequencer(props) {
         value={currentMeasure}
         showLabels
         onChange={(event, newValue) => {
-          setCurrentMeasure(newValue);
+          handleBottomNavClick(newValue);
         }}
         className="sequencer-bottomnav"
       >

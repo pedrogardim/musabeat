@@ -62,7 +62,7 @@ export const instruments = [
 		name: "Organ",
 		base: "Synth",
 		type: 2,
-		gain: -18,
+		gain: -12,
 		options:{
 			"oscillator": {
 				"type":"sine6",

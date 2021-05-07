@@ -9,6 +9,8 @@ import { Divider } from "@material-ui/core";
 
 import "./ChordProgression.css";
 
+import { scheduleChordProgression } from "../../utils/TransportSchedule";
+
 const defaultIntrument = MusicUtils.instrumentContructor(2);
 
 function ChordProgression(props) {
@@ -18,46 +20,26 @@ function ChordProgression(props) {
   const [scheduledEvents, setScheduledEvents] = useState([]);
 
   const scheduleChords = () => {
-    console.log("scheduled");
-    scheduledEvents.length > 0 &&
-      scheduledEvents.forEach((event) => Tone.Transport.clear(event));
-    //setScheduledEvents([]);
-
     let scheduledChords = [];
-    chords.forEach((chord, chordIndex) => {
-      let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
-      let chordtimetostart = Tone.Time("1m").toSeconds() * chord.time;
-      let rhythmduration = chordduration / chord.rhythm.length;
 
-      chord.rhythm.forEach((rhythm, rhythmIndex) => {
-        let rhythmscheduletime =
-          rhythmduration * rhythmIndex + chordtimetostart;
-        let thisevent = Tone.Transport.schedule((time) => {
+    scheduledChords = scheduleChordProgression(
+      chords,
+      instrument,
+      Tone.Transport,
+      scheduledEvents,
+      setActiveChord
+    );
 
-          switch(rhythm){
-            case 0:
-          instrument.triggerRelease(time);
-          break;
-            case 1:
-          instrument.triggerAttackRelease(chord.notes, rhythmduration, time);
-          break;
-
-        }
-
-          //console.log(chord.notes);
-          setActiveChord(chordIndex);
-        }, rhythmscheduletime);
-        scheduledChords.push(thisevent);
-      });
-    });
     setScheduledEvents(scheduledChords);
   };
 
   const handleClick = (chordindex) => {
-    setActiveChord((prevChord) => (chordindex == prevChord ? null : chordindex));
-    instrument.releaseAll()
+    setActiveChord((prevChord) =>
+      chordindex == prevChord ? null : chordindex
+    );
+    instrument.releaseAll();
 
-    instrument.triggerAttackRelease(chords[chordindex].notes,"4n")
+    instrument.triggerAttackRelease(chords[chordindex].notes, "4n");
   };
 
   useEffect(() => {

@@ -7,6 +7,9 @@ import "./Workspace.css";
 
 import Module from "./Module";
 import ModulePicker from "./ModulePicker";
+import Exporter from "./Exporter";
+//import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
+
 
 const initialModules = [
   {
@@ -140,6 +143,7 @@ function Workspace(props) {
           addNewModule={addModule}
         />
       )}
+    <Exporter/>
     </div>
   );
 }
