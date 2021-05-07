@@ -1,70 +1,87 @@
-import { scheduleDrumSequence, scheduleChordProgression } from "./TransportSchedule";
+import {
+  scheduleDrumSequence,
+  scheduleChordProgression,
+} from "./TransportSchedule";
+import { audioBufferToWav } from "audiobuffer-to-wav";
+
+import * as MusicUtils from "../assets/musicutils";
 import * as Tone from "tone";
 
+export const bounceSessionExport = (modules, sessionData, setIsReady) => {
+  //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
+  let exportDuration = 2;
 
-export const bounceSessionExport = (modules,sessionData) => {
-      //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
-      let exportDuration = 2;
+  let instrumentBuffers = modules.map((module, i) => 
+   (module.instrument.name == "Players" || module.instrument.name == "Sampler")
+      ? module.instrument._buffers
+      : module.instrument.name == "Player"
+      ? module.instrument._buffer
+      : ""
+  );
 
+  console.log(instrumentBuffers);
 
-      Tone.Offline(({ transport }) => {
+  Tone.Offline(({ transport }) => {
+    console.log(transport);
 
-      transport.bpm.value = sessionData.bpm;
+    let offlineLimiter = new Tone.Limiter(-3).toDestination();
 
-      modules.forEach((module,moduleIndex)=>{
-      	let thisinstrument = {}.toDestination();
+    transport.bpm.value = sessionData.bpm;
 
-        switch(module.type){
-          case 0:
-            scheduleDrumSequence(module.score,thisinstrument,transport);
-            break;
-          case 2:
-            scheduleChordProgression(module.score,thisinstrument,transport);
-            break;
-        }
-      })
+    modules.map((module, moduleIndex) => {
+      //let thisinstrument = module.instrument.connect(transport);
+      let thisinstrument = MusicUtils.instrumentContructor(3);
 
-      transport.start();
+      //let thisinstrument = module.instrument;
+      //thisinstrument.context = transport.context;
+      //thisinstrument.toDestination();
 
-    }, exportDuration).then((e) => {
+      switch (module.type) {
+        case 0:
+          //let thisbuffers = module.instrument._buffers._buffers;
+          //console.log(thisbuffers);
 
-    var blob = audioBufferToWaveBlob(e);
+          thisinstrument = new Tone.Players().toDestination();
+          thisinstrument._buffers = instrumentBuffers[moduleIndex];
 
-    var promiseB = blob.then(function(result) {
-        var url  = window.URL.createObjectURL(result);
-       	downloadURI(url, "Session.wav");
+          console.log(thisinstrument);
 
-     });
-    
+          //for(var x=0; x<10 ;x++){thisinstrument.add(module.instrument.player(x))}
+
+          scheduleDrumSequence(
+            module.score,
+            thisinstrument,
+            transport,
+            [],
+            () => {},
+            () => {}
+          );
+          break;
+        case 2:
+          scheduleChordProgression(
+            module.chords,
+            thisinstrument,
+            transport,
+            [],
+            () => {}
+          );
+          break;
+      }
     });
 
+    transport.start();
+  }, exportDuration).then((e) => {
+    let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
+    //console.log(blob);
 
-  };
+    //let promiseB = blob.then(function(result) {
+    let url = window.URL.createObjectURL(blob);
+    downloadURI(url, "Session.wav");
+    setIsReady(true);
 
-export async function audioBufferToWaveBlob(audioBuffer) {
-
-  return new Promise(function(resolve, reject) {
-
-    var worker = new Worker('./libs/waveWorker.js');
-
-    worker.onmessage = function( e ) {
-      var blob = new Blob([e.data.buffer], {type:"audio/wav"});
-      resolve(blob);
-    };
-
-    let pcmArrays = [];
-    for(let i = 0; i < audioBuffer.numberOfChannels; i++) {
-      pcmArrays.push(audioBuffer.getChannelData(i));
-    }
-
-    worker.postMessage({
-      pcmArrays,
-      config: {sampleRate: audioBuffer.sampleRate}
-    });
-
+    //});
   });
-
-}
+};
 
 const downloadURI = (uri, name) => {
   var link = document.createElement("a");
@@ -74,4 +91,4 @@ const downloadURI = (uri, name) => {
   link.click();
   document.body.removeChild(link);
   //delete link;
-}
+};

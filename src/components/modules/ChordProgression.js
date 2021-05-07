@@ -38,13 +38,33 @@ function ChordProgression(props) {
       chordindex == prevChord ? null : chordindex
     );
     instrument.releaseAll();
-
     instrument.triggerAttackRelease(chords[chordindex].notes, "4n");
+  };
+
+  const updateChords = () => {
+    props.updateModule((previousModules) => {
+      let newmodules = previousModules;
+      newmodules[props.data.id].chords = chords;
+      return newmodules;
+    });
+  };
+
+  const updateInstrument = () => {
+    props.updateModule((previousModules) => {
+      let newmodules = [...previousModules];
+      newmodules[props.data.id].instrument = instrument;
+      return newmodules;
+    });
   };
 
   useEffect(() => {
     scheduleChords();
+    updateChords();
   }, [chords]);
+
+  useEffect(() => {
+    updateInstrument();
+  }, [instrument]);
 
   return (
     <div className="chord-prog">

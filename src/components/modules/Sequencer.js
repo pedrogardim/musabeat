@@ -7,7 +7,6 @@ import * as Drumdata from "../../assets/drumkits";
 
 import { scheduleDrumSequence } from "../../utils/TransportSchedule";
 
-
 import {
   CircularProgress,
   BottomNavigation,
@@ -46,12 +45,18 @@ function Sequencer(props) {
   };
 
   const scheduleNotes = () => {
-
     //setScheduledEvents([]);
 
     let scheduledNotes = [];
 
-    scheduledNotes = scheduleDrumSequence(sequencerArray,loadedDrumSounds,Tone.Transport,scheduledEvents,setCurrentBeat,setCurrentMeasure)
+    scheduledNotes = scheduleDrumSequence(
+      sequencerArray,
+      loadedDrumSounds,
+      Tone.Transport,
+      scheduledEvents,
+      setCurrentBeat,
+      setCurrentMeasure
+    );
 
     setScheduledEvents(scheduledNotes);
   };
@@ -76,29 +81,38 @@ function Sequencer(props) {
   const playDrumSound = (note, time) =>
     loadedDrumSounds.player(note).start(time !== undefined ? time : 0);
 
-    const handleBottomNavClick = (value) => {
-      setCurrentMeasure(value);
-      Tone.Transport.seconds = value * Tone.Time("1m").toSeconds();
-      setCurrentBeat(0);
+  const handleBottomNavClick = (value) => {
+    setCurrentMeasure(value);
+    Tone.Transport.seconds = value * Tone.Time("1m").toSeconds();
+    setCurrentBeat(0);
+  };
 
-    }
-  //on startup
+  const updateSequence = () => {
+    props.updateModule((previousModules) => {
+      let newmodules = previousModules;
+      newmodules[props.data.id].score = sequencerArray;
+      return newmodules;
+    });
+  };
+
+  const updateInstrument = () => {
+    props.updateModule((previousModules) => {
+      let newmodules = [...previousModules];
+      newmodules[props.data.id].instrument = loadedDrumSounds;
+      return newmodules;
+    });
+  };
+
   useEffect(() => {
     loadDrumPatch();
-  }, []); // <-- empty dependency array
-
-   //on startup
-   useEffect(() => {
-    
-  }, [currentMeasure]); // <-- empty dependency array
-
-  //after loading sounds
+  }, []);
 
   useEffect(() => {
     loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
+    updateSequence();
+    updateInstrument();
   }, [loadedDrumSounds, sequencerArray]);
 
-  //on changing sequence
 
   return (
     <div className="module-innerwrapper">

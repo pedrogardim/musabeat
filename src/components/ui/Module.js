@@ -17,10 +17,10 @@ function Module(props) {
 
   switch(props.data.type){
     case 0:
-      innerModule = <Sequencer data={props.data} kit="0"/>;
+      innerModule = <Sequencer data={props.data} kit="0" updateModule={props.updateModule}/>;
       break;
       case 2:
-      innerModule = <ChordProgression data={props.data}/>;
+      innerModule = <ChordProgression data={props.data} updateModule={props.updateModule}/>;
       break;
   }
 
