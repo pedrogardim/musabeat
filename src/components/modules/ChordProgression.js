@@ -18,9 +18,9 @@ const defaultIntrument = MusicUtils.instrumentContructor(2);
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.data.chords);
   const [activeChord, setActiveChord] = useState(null);
+  const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(defaultIntrument);
   const [scheduledEvents, setScheduledEvents] = useState([]);
-  const [selectedChord, setSelectedChord] = useState(null);
 
   const scheduleChords = () => {
     let scheduledChords = [];
@@ -37,14 +37,19 @@ function ChordProgression(props) {
   };
 
   const handleClick = (chordindex) => {
-    setActiveChord((prevChord) =>
-      chordindex == prevChord ? null : chordindex
-    );
-    setSelectedChord((prevChord) =>
-      chordindex == prevChord ? null : chordindex
-    );
-    instrument.releaseAll();
-    instrument.triggerAttackRelease(chords[chordindex].notes, "4n");
+    setSelectedChord((prevChord) => {
+      instrument.releaseAll();
+
+      if (chordindex === prevChord) {
+        return null;
+      } else {
+        playChordPreview(chordindex);
+
+        return chordindex;
+      }
+    });
+    Tone.Transport.seconds =
+      chords[chordindex].time * Tone.Time("1m").toSeconds();
   };
 
   const updateChords = () => {
@@ -54,6 +59,12 @@ function ChordProgression(props) {
       return newmodules;
     });
   };
+
+  const playChordPreview = (chordindex) =>
+    instrument.triggerAttackRelease(
+      chords[chordindex].notes,
+      chords[chordindex].duration * Tone.Time("1m").toSeconds()
+    );
 
   const updateInstrument = () => {
     props.updateModule((previousModules) => {
@@ -66,14 +77,37 @@ function ChordProgression(props) {
   useEffect(() => {
     scheduleChords();
     updateChords();
-  }, [chords]);
+  }, [chords]); 
 
   useEffect(() => {
     updateInstrument();
   }, [instrument]);
 
+  useEffect(() => {
+    (selectedChord !== null &&
+      Tone.Transport.state !== "started") &&
+      setSelectedChord(activeChord);
+  }, [activeChord]);
+
+  useEffect(() => {
+    setActiveChord(selectedChord);
+    props.setDrawer(() =>
+      selectedChord === null ? null : (
+        <ChordPicker
+          selectedChord={selectedChord}
+          chords={chords}
+          setChords={setChords}
+          instrument={instrument}
+        />
+      )
+    );
+  }, [selectedChord]);
+
   return (
-    <div className="chord-prog">
+    <div
+      className="chord-prog"
+      onBlur={() => console.log("chord prog unfocused")}
+    >
       <Divider className="measure-divider" orientation="vertical" />
       {chords.map((chord, i) => (
         <Chord
@@ -84,7 +118,6 @@ function ChordProgression(props) {
         />
       ))}
       <Divider className="measure-divider" orientation="vertical" />
-      <ChordPicker selectedChord={selectedChord} chords={chords} setChords={setChords}/>
     </div>
   );
 }

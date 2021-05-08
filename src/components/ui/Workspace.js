@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as Tone from "tone";
 
 import { Fab, Icon } from "@material-ui/core";
@@ -8,8 +8,9 @@ import "./Workspace.css";
 import Module from "./Module";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
-//import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
+import Drawer from "./Drawer";
 
+//import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
 const initialModules = [
   {
@@ -18,7 +19,7 @@ const initialModules = [
     type: 0,
     subdiv: 16,
     patch: 0,
-    instrument:{},
+    instrument: {},
     score: [
       [
         [0, 3],
@@ -64,7 +65,7 @@ const initialModules = [
     type: 2,
     subdiv: 16,
     patch: 0,
-    instrument:{},
+    instrument: {},
     chords: [
       {
         notes: ["E4", "G4", "B4"],
@@ -84,7 +85,7 @@ const initialModules = [
         notes: ["A4", "C4", "E4"],
         duration: 0.5,
         time: 1,
-        rhythm: [1, 0, 1, 0, 1, 0,0,1],
+        rhythm: [1, 0, 1, 0, 1, 0, 0, 1],
       },
       {
         notes: ["G4", "B4", "D5"],
@@ -97,9 +98,9 @@ const initialModules = [
 ];
 
 const initialSessionData = {
-  name:"",
-  bpm:90
-}
+  name: "",
+  bpm: 90,
+};
 Tone.Transport.bpm.value = initialSessionData.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
@@ -108,6 +109,7 @@ Tone.Transport.loopEnd = "2m";
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
+  const [drawerCont, setDrawerCont] = useState(null);
 
   const addModule = (moduletype) => {
     let module = {
@@ -117,7 +119,7 @@ function Workspace(props) {
       subdiv: 16,
       patch: 0,
       score: [],
-      instrument:{}
+      instrument: {},
     };
     setModules((prevModules) => [...prevModules, module]);
     chooseNewModule(false);
@@ -135,12 +137,31 @@ function Workspace(props) {
     }
   };
 
-  useEffect(()=> console.log(modules),[modules])
+  const handleClick = (event) => {
+    let targetClass = "ClassName" in event.target ? event.target.ClassName : "";
+    let drawer = document.querySelector(".adjustments-drawer");
+    //console.log(targetClassName,!targetClassName.includes("chord"))
+    !drawer.contains(event.target) && 
+      !targetClass.includes("chord") &&
+      setDrawerCont(null);
+  };
+
+  useEffect(() => console.log(modules), [modules]);
 
   return (
-    <div className="workspace" tabIndex="0" onKeyDown={handleKeyPress}>
+    <div
+      className="workspace"
+      tabIndex="0"
+      onClick={handleClick}
+      onKeyDown={handleKeyPress}
+    >
       {modules.map((module) => (
-        <Module key={module.id} data={module} updateModule={setModules}/>
+        <Module
+          key={module.id}
+          data={module}
+          updateModule={setModules}
+          setDrawer={setDrawerCont}
+        />
       ))}
       <Fab color="primary" onClick={() => chooseNewModule(true)}>
         <Icon>add</Icon>
@@ -152,7 +173,8 @@ function Workspace(props) {
           addNewModule={addModule}
         />
       )}
-    <Exporter sessionData={initialSessionData} modules={modules}/>
+      <Exporter sessionData={initialSessionData} modules={modules} />
+      <Drawer>{drawerCont}</Drawer>
     </div>
   );
 }

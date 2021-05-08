@@ -16,6 +16,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Typography,
 } from "@material-ui/core";
 
 import "./ChordPicker.css";
@@ -30,11 +31,18 @@ function ChordPicker(props) {
   //{props.selectedChord !== null}
 
   const setChords = props.setChords;
+  let instrument = props.instrument;
 
   const clickHandler = (index) => {
     setChords((previousChords) => {
       let newChords = [...previousChords];
       newChords[props.selectedChord].notes = scaleChords[index];
+      instrument.releaseAll();
+      Tone.Transport.state !== "started" &&
+         instrument.triggerAttackRelease(
+          scaleChords[index],
+          newChords[props.selectedChord].duration * Tone.Time("1m").toSeconds()
+        );
       return newChords;
     });
   };
@@ -45,25 +53,22 @@ function ChordPicker(props) {
 
   const handleScaleChange = (event) => {
     setChosenScale(event.target.value);
-
   };
 
-  useEffect(()=>{
-    setScaleChords(getChordsFromScale(chosenScale, chosenRoot, chosenComplexity))
-  },[chosenScale,chosenRoot,chosenComplexity])
+  useEffect(() => {
+    setScaleChords(
+      getChordsFromScale(chosenScale, chosenRoot, chosenComplexity)
+    );
+  }, [chosenScale, chosenRoot, chosenComplexity]);
 
   return (
-    <div
-      className={
-        "chord-picker " +
-        (props.selectedChord !== null && "chord-picker-active")
-      }
-    >
+    <div className="chord-picker">
       {scaleChords.map((chord, i) => (
         <Fab
           color="primary"
           onClick={() => clickHandler(i)}
           className="chord-picker-button"
+          key={i}
         >
           {chordNotestoName(chord)}
         </Fab>
@@ -77,7 +82,9 @@ function ChordPicker(props) {
           onChange={handleRootChange}
         >
           {musicalNotes.map((note, noteIndex) => (
-            <MenuItem key={noteIndex} value={noteIndex}>{note}</MenuItem>
+            <MenuItem key={noteIndex} value={noteIndex}>
+              {note}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>
@@ -89,7 +96,9 @@ function ChordPicker(props) {
           onChange={handleScaleChange}
         >
           {scales.map((scale, scaleIndex) => (
-            <MenuItem key={scaleIndex} value={scaleIndex}>{scale[1]}</MenuItem>
+            <MenuItem key={scaleIndex} value={scaleIndex}>
+              {scale[1]}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

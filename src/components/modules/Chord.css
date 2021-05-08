@@ -1,0 +1,31 @@
+
+.chord{
+    height:32px;
+    width:64px;
+    text-align:center;
+    margin:8px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color:gray;
+    font-size: 1.8rem;
+    font-weight:300;
+
+
+}
+
+.selected-chord{
+    /* animation: flashing 2s infinite alternate; */
+    color:#3f51b5;
+    text-decoration: bold;
+    outline:1px solid #4b61dd;
+
+
+  
+  }
+  
+  @keyframes flashing {
+    from {outline-color: #4b61dd}
+    to {outline-color: white}
+  }

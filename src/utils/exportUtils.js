@@ -12,25 +12,25 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
   let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
   let instrumentBuffers = modules.map((module, i) => 
-   (module.instrument.name == "Players" || module.instrument.name == "Sampler")
+   (module.instrument.name === "Players" || module.instrument.name === "Sampler")
       ? module.instrument._buffers
-      : module.instrument.name == "Player"
+      : module.instrument.name === "Player"
       ? module.instrument._buffer
       : ""
   );
 
-  console.log(instrumentBuffers);
+  //console.log(instrumentBuffers);
 
   Tone.Offline(({ transport }) => {
-    console.log(transport);
-
-    let offlineLimiter = new Tone.Limiter(-3).toDestination();
+    
+    //console.log(transport);
+    //let offlineLimiter = new Tone.Limiter(-3).toDestination();
 
     transport.bpm.value = sessionData.bpm;
 
     modules.map((module, moduleIndex) => {
       //let thisinstrument = module.instrument.connect(transport);
-      let thisinstrument = MusicUtils.instrumentContructor(3);
+      let thisinstrument = MusicUtils.instrumentContructor(2);
 
       //let thisinstrument = module.instrument;
       //thisinstrument.context = transport.context;
@@ -44,7 +44,7 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
           thisinstrument = new Tone.Players().toDestination();
           thisinstrument._buffers = instrumentBuffers[moduleIndex];
 
-          console.log(thisinstrument);
+          //console.log(thisinstrument);
 
           //for(var x=0; x<10 ;x++){thisinstrument.add(module.instrument.player(x))}
 
