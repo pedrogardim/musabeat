@@ -17,11 +17,11 @@ import "./Sequencer.css";
 import "../ui/Module.css";
 
 function Sequencer(props) {
-  const loadeddata = props.data.score;
+  const loadedSequence = props.data.score;
 
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [loadedDrumSounds, setDrumSounds] = useState({});
-  const [sequencerArray, changeSequence] = useState(loadeddata);
+  const [sequencerArray, changeSequence] = useState(loadedSequence);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [scheduledEvents, setScheduledEvents] = useState([]);
@@ -29,18 +29,21 @@ function Sequencer(props) {
   let loadedpatch = props.data.patch;
 
   const inputNote = (x, y) => {
-    changeSequence((previousSequence) => {
-      let newSequence = [...previousSequence];
-      let notesOnStep = newSequence[currentMeasure][x];
-
-      let noteIndex = notesOnStep.indexOf(y);
-
-      notesOnStep.includes(y)
-        ? notesOnStep.splice(noteIndex, 1)
-        : notesOnStep.push(y);
-
-      return newSequence;
-    });
+    changeSequence((previousSequence) =>
+      previousSequence.map((measure, measureIndex) =>
+        measure.map((beat, beatIndex) =>
+          measureIndex == currentMeasure && beatIndex == x
+            ? beat.includes(y)
+              ? beat.filter((note) => note != y)
+              : (() => {
+                  let newbeat = [...beat];
+                  newbeat.push(y);
+                  return newbeat;
+                })()
+            : beat
+        )
+      )
+    );
     playDrumSound(y);
   };
 
@@ -111,8 +114,8 @@ function Sequencer(props) {
     loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
     updateSequence();
     updateInstrument();
+    console.log(sequencerArray);
   }, [loadedDrumSounds, sequencerArray]);
-
 
   return (
     <div className="module-innerwrapper">
