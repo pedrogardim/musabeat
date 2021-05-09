@@ -5,7 +5,7 @@ export const instruments = [
 	name: "Musa Electric Piano",
 	base: "FM",
 	categ: 1,
-	gain: -6,
+	gain: 0,
 	options:{
 		"harmonicity":50,
 		"modulationIndex": 20,
@@ -33,7 +33,7 @@ export const instruments = [
 		name: "Square Lead",
 		base: "AM",
 		categ: 2,
-		gain: -16,
+		gain: -6,
 		options:{
 			"harmonicity": 3.999,
 			"oscillator": {

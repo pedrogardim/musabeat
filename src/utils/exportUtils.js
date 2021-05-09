@@ -1,6 +1,7 @@
 import {
   scheduleDrumSequence,
   scheduleChordProgression,
+  scheduleMelodyGrid
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
@@ -38,17 +39,22 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
 
       switch (module.type) {
         case 0:
-          //let thisbuffers = module.instrument._buffers._buffers;
-          //console.log(thisbuffers);
 
           thisinstrument = new Tone.Players().toDestination();
           thisinstrument._buffers = instrumentBuffers[moduleIndex];
 
-          //console.log(thisinstrument);
-
-          //for(var x=0; x<10 ;x++){thisinstrument.add(module.instrument.player(x))}
-
           scheduleDrumSequence(
+            module.score,
+            thisinstrument,
+            transport,
+            [],
+            () => {},
+            () => {}
+          );
+          break;
+          case 1:
+
+          scheduleMelodyGrid(
             module.score,
             thisinstrument,
             transport,

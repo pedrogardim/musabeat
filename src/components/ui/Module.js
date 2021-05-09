@@ -4,9 +4,8 @@ import { Card, IconButton, Icon } from "@material-ui/core";
 
 import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
+import MelodyGrid from "../modules/MelodyGrid";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
-
-
 
 import "./Module.css";
 
@@ -27,7 +26,16 @@ function Module(props) {
         <Sequencer
           style={{ display: instrumentEditorMode ? "none" : "flex" }}
           module={props.module}
-          kit="0"
+          kit={0}
+          updateModules={props.updateModules}
+        />
+      );
+      break;
+    case 1:
+      innerModule = (
+        <MelodyGrid
+          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          module={props.module}
           updateModules={props.updateModules}
         />
       );
@@ -46,16 +54,22 @@ function Module(props) {
 
   return (
     <Card className="module">
-      <span className="module-title">{props.module.name}</span>
-      <IconButton
-        className="module-instrument-mode-button"
-        onClick={handleSwitchButtonMode}
-      >
-        <Icon style={{ color: "white" }}>piano</Icon>
-      </IconButton>
+      <div className="module-header">
+        <span className="module-title">{props.module.name}</span>
+        <IconButton
+          className="module-instrument-mode-button"
+          onClick={handleSwitchButtonMode}
+        >
+          <Icon style={{ color: "white" }}>piano</Icon>
+        </IconButton>
+      </div>
 
       {instrumentEditorMode && (
-        <InstrumentEditor instrument={props.module.instrument} updateModules={props.updateModules} index={props.index}/>
+        <InstrumentEditor
+          instrument={props.module.instrument}
+          updateModules={props.updateModules}
+          index={props.index}
+        />
       )}
       {innerModule}
     </Card>

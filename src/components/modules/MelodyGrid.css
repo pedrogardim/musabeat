@@ -1,0 +1,37 @@
+.melody-grid {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0;
+}
+
+.melody-grid-row {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.melody-grid-tile {
+  outline: solid 1px #8b6a2c;
+  background-color: #b18637;
+  flex: 1;
+}
+
+.active-melody-grid-tile {
+  background-color: #9c762e !important;
+}
+
+.cursor-melody-grid-tile {
+  background-color: #daa441;
+}
+
+.melody-grid-bottomnav {
+  height: 30px !important;
+}
+
+.melody-grid-row-label{
+    position:absolute;
+    text-align:right !important;
+    line-height: calc(200%)!important;
+    margin-left: -72px !important;
+    width:64px;
+}
