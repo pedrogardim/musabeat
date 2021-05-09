@@ -31,7 +31,7 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
 
     modules.map((module, moduleIndex) => {
       //let thisinstrument = module.instrument.connect(transport);
-      let thisinstrument = MusicUtils.instrumentContructor(2);
+      let thisinstrument = MusicUtils.instrumentContructor(0);
 
       //let thisinstrument = module.instrument;
       //thisinstrument.context = transport.context;

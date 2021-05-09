@@ -11,21 +11,12 @@
 }
 
 .sequencer-tile {
-  outline: solid 1px #2c3b8b;
-  background-color: #4357c5;
   flex: 1;
-}
-
-.active-sequencer-tile {
-  background-color: #26337c !important;
-}
-
-.cursor-sequencer-tile {
-  background-color: #5167e4;
 }
 
 .sequencer-bottomnav {
   height: 30px !important;
+  justify-self: flex-end;
 }
 
 .sequencer-row-label{

@@ -5,7 +5,7 @@ export const instruments = [
 	name: "Musa Electric Piano",
 	base: "FM",
 	categ: 1,
-	gain: 0,
+	gain: -6,
 	options:{
 		"harmonicity":50,
 		"modulationIndex": 20,

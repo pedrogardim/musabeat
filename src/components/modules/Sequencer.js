@@ -140,6 +140,7 @@ function Sequencer(props) {
                   inputNote={inputNote}
                   active={beat.includes(row)}
                   cursor={currentBeat == column}
+                  color={props.module.color}
                   x={column}
                   y={row}
                 />
@@ -151,6 +152,7 @@ function Sequencer(props) {
         <CircularProgress />
       )}
       <BottomNavigation
+        style={{ color: props.module.color[900] }}
         value={currentMeasure}
         showLabels
         onChange={(event, newValue) => {
@@ -158,9 +160,10 @@ function Sequencer(props) {
         }}
         className="sequencer-bottomnav"
       >
-        {sequencerArray.map((measure, index) => (
-          <BottomNavigationAction key={index} label={index + 1} />
-        ))}
+        {sequencerArray.length > 1 &&
+          sequencerArray.map((measure, index) => (
+            <BottomNavigationAction key={index} label={index + 1} />
+          ))}
       </BottomNavigation>
     </div>
   );

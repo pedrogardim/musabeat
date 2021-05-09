@@ -53,7 +53,7 @@ function Module(props) {
   }
 
   return (
-    <Card className="module">
+    <Card style={{backgroundColor:props.module.color[700]}} className="module">
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>
         <IconButton

@@ -10,10 +10,40 @@ import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Drawer from "./Drawer";
 
+import {
+  red,
+  pink,
+  purple,
+  deepPurple,
+  indigo,
+  blue,
+  lightBlue,
+  cyan,
+  teal,
+  green,
+  lightGreen,
+  lime,
+  yellow,
+  amber,
+  orange,
+  deepOrange,
+} from "@material-ui/core/colors";
 import { instrumentContructor } from "../../assets/musicutils";
 
-
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
+
+const colors = [
+  red,
+  deepPurple,
+  indigo,
+  blue,
+  cyan,
+  teal,
+  lightGreen,
+  lime,
+  amber,
+  orange
+];
 
 const initialModules = [
   {
@@ -23,6 +53,7 @@ const initialModules = [
     subdiv: 16,
     patch: 0,
     instrument: {},
+    color:colors[2],
     score: [
       [
         [0, 3],
@@ -68,6 +99,7 @@ const initialModules = [
     type: 1,
     subdiv: 16,
     instrument: instrumentContructor(2),
+    color:colors[2],
     score: [
       [
         ["C3", "E3"],
@@ -113,7 +145,8 @@ const initialModules = [
     type: 2,
     subdiv: 16,
     patch: 0,
-    instrument: instrumentContructor(2),
+    instrument: instrumentContructor(0),
+    color:colors[2],
     chords: [
       {
         notes: ["E4", "G4", "B4"],
@@ -154,6 +187,8 @@ Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 Tone.Transport.loopEnd = "2m";
 
+
+
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
@@ -168,6 +203,7 @@ function Workspace(props) {
       patch: 0,
       score: [],
       instrument: {},
+      color:colors[Math.floor(Math.random() * colors.length)]
     };
     setModules((prevModules) => [...prevModules, module]);
     chooseNewModule(false);
@@ -189,7 +225,7 @@ function Workspace(props) {
     let targetClass = "ClassName" in event.target ? event.target.ClassName : "";
     let drawer = document.querySelector(".adjustments-drawer");
     //console.log(targetClassName,!targetClassName.includes("chord"))
-    !drawer.contains(event.target) && 
+    !drawer.contains(event.target) &&
       !targetClass.includes("chord") &&
       setDrawerCont(null);
   };

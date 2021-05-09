@@ -23,7 +23,14 @@ function MelodyGrid(props) {
   const [isBufferLoaded, setIsBufferLoaded] = useState(true);
   const [instrument, setInstrument] = useState(props.module.instrument);
   const [melodyArray, setMelodyArray] = useState(loadedSequence);
-  const [gridScale, setGridScale] = useState(["C3","D3","E3","G3","A3","C4"]);
+  const [gridScale, setGridScale] = useState([
+    "C3",
+    "D3",
+    "E3",
+    "G3",
+    "A3",
+    "C4",
+  ]);
 
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
@@ -33,7 +40,7 @@ function MelodyGrid(props) {
   let loadedpatch = props.module.patch;
 
   const inputNote = (x, y) => {
-    let note = gridScale[y]
+    let note = gridScale[y];
     setMelodyArray((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
@@ -69,9 +76,12 @@ function MelodyGrid(props) {
     setScheduledEvents(scheduledNotes);
   };
 
-
   const playNote = (note, time) =>
-    instrument.triggerAttackRelease(note, Tone.Time("1m").toSeconds()/melodyArray[currentMeasure].length, time);
+    instrument.triggerAttackRelease(
+      note,
+      Tone.Time("1m").toSeconds() / melodyArray[currentMeasure].length,
+      time
+    );
 
   const handleBottomNavClick = (value) => {
     setCurrentMeasure(value);
@@ -86,7 +96,6 @@ function MelodyGrid(props) {
       return newmodules;
     });
   };
-
 
   useEffect(() => {
     instrument.hasOwnProperty("name") && scheduleNotes();
@@ -105,7 +114,10 @@ function MelodyGrid(props) {
           {gridScale.map((drumsound, row) => (
             <div className="melody-grid-row" key={row}>
               {hovered && (
-                <Typography className="melody-grid-row-label" variant="overline">
+                <Typography
+                  className="melody-grid-row-label"
+                  variant="overline"
+                >
                   {drumsound}
                 </Typography>
               )}
@@ -115,6 +127,7 @@ function MelodyGrid(props) {
                   inputNote={inputNote}
                   active={beat.includes(gridScale[row])}
                   cursor={currentBeat == column}
+                  color={props.module.color}
                   x={column}
                   y={row}
                 />
@@ -133,9 +146,10 @@ function MelodyGrid(props) {
         }}
         className="melody-grid-bottomnav"
       >
-        {melodyArray.map((measure, index) => (
-          <BottomNavigationAction key={index} label={index + 1} />
-        ))}
+        {melodyArray.length > 1 &&
+          melodyArray.map((measure, index) => (
+            <BottomNavigationAction key={index} label={index + 1} />
+          ))}
       </BottomNavigation>
     </div>
   );
