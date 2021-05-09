@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
+  Slider,
+  Icon,
   Typography,
 } from "@material-ui/core";
 
@@ -36,10 +37,11 @@ function ChordPicker(props) {
   const clickHandler = (index) => {
     setChords((previousChords) => {
       let newChords = [...previousChords];
-      newChords[props.selectedChord].notes = scaleChords[index];
+      newChords[props.selectedChord].notes =
+        index === null ? [] : scaleChords[index];
       instrument.releaseAll();
       Tone.Transport.state !== "started" &&
-         instrument.triggerAttackRelease(
+        instrument.triggerAttackRelease(
           scaleChords[index],
           newChords[props.selectedChord].duration * Tone.Time("1m").toSeconds()
         );
@@ -73,35 +75,64 @@ function ChordPicker(props) {
           {chordNotestoName(chord)}
         </Fab>
       ))}
+      <Fab
+        color="secondary"
+        onClick={() => clickHandler(null)}
+        className="chord-picker-button"
+      >
+        <Icon>highlight_off</Icon>
+      </Fab>
       <div className="break" />
       <FormControl>
         <InputLabel id="root-select-label">Root</InputLabel>
         <Select
+          native
           labelId="root-select-label"
           value={chosenRoot}
           onChange={handleRootChange}
         >
           {musicalNotes.map((note, noteIndex) => (
-            <MenuItem key={noteIndex} value={noteIndex}>
+            <option key={noteIndex} value={noteIndex}>
               {note}
-            </MenuItem>
+            </option>
           ))}
         </Select>
       </FormControl>
       <FormControl>
         <InputLabel id="scale-select-label">Scales</InputLabel>
         <Select
+          native
           labelId="scale-select-label"
           value={chosenScale}
           onChange={handleScaleChange}
         >
           {scales.map((scale, scaleIndex) => (
-            <MenuItem key={scaleIndex} value={scaleIndex}>
+            <option key={scaleIndex} value={scaleIndex}>
               {scale[1]}
-            </MenuItem>
+            </option>
           ))}
         </Select>
       </FormControl>
+      <div className="break" />
+      <Typography variant="body2">Extentions</Typography>
+      <Slider
+        className="chord-picker-slider"
+        defaultValue={3}
+        labelId="complexity-slide-label"
+        step={1}
+        min={2}
+        max={7}
+      />
+      <div className="break" />
+      <Typography variant="body2">Width</Typography>
+      <Slider
+        className="chord-picker-slider"
+        defaultValue={3}
+        labelId="complexity-slide-label"
+        step={1}
+        min={2}
+        max={7}
+      />
     </div>
   );
 }

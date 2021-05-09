@@ -4,7 +4,7 @@
 
 import * as Tone from "tone";
 
-import * as Instruments from "./instrumentpatches";
+import {instruments} from "./instrumentpatches";
 
 export const musicalNotes = [
   "C",
@@ -394,7 +394,7 @@ export const getChordsFromScale = (scale, root, complexity) => {
 
 export const instrumentContructor = (input) => {
   let instr;
-  let patch = Instruments.instruments[input];
+  let patch = instruments[input];
   let instrfx = [];
 
   if (patch.base === "Sampler") {

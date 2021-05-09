@@ -10,6 +10,9 @@ import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Drawer from "./Drawer";
 
+import { instrumentContructor } from "../../assets/musicutils";
+
+
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
 const initialModules = [
@@ -65,7 +68,7 @@ const initialModules = [
     type: 2,
     subdiv: 16,
     patch: 0,
-    instrument: {},
+    instrument: instrumentContructor(2),
     chords: [
       {
         notes: ["E4", "G4", "B4"],
@@ -158,8 +161,9 @@ function Workspace(props) {
       {modules.map((module) => (
         <Module
           key={module.id}
-          data={module}
-          updateModule={setModules}
+          index={module.id}
+          module={module}
+          updateModules={setModules}
           setDrawer={setDrawerCont}
         />
       ))}

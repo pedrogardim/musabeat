@@ -16,10 +16,10 @@ import { scheduleChordProgression } from "../../utils/TransportSchedule";
 const defaultIntrument = MusicUtils.instrumentContructor(2);
 
 function ChordProgression(props) {
-  const [chords, setChords] = useState(props.data.chords);
+  const [chords, setChords] = useState(props.module.chords);
   const [activeChord, setActiveChord] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
-  const [instrument, setInstrument] = useState(defaultIntrument);
+  const [instrument, setInstrument] = useState(props.module.instrument);
   const [scheduledEvents, setScheduledEvents] = useState([]);
 
   const scheduleChords = () => {
@@ -53,9 +53,9 @@ function ChordProgression(props) {
   };
 
   const updateChords = () => {
-    props.updateModule((previousModules) => {
+    props.updateModules((previousModules) => {
       let newmodules = previousModules;
-      newmodules[props.data.id].chords = chords;
+      newmodules[props.module.id].chords = chords;
       return newmodules;
     });
   };
@@ -66,21 +66,17 @@ function ChordProgression(props) {
       chords[chordindex].duration * Tone.Time("1m").toSeconds()
     );
 
-  const updateInstrument = () => {
-    props.updateModule((previousModules) => {
-      let newmodules = [...previousModules];
-      newmodules[props.data.id].instrument = instrument;
-      return newmodules;
-    });
-  };
-
   useEffect(() => {
     scheduleChords();
     updateChords();
   }, [chords]); 
 
   useEffect(() => {
-    updateInstrument();
+    setInstrument(props.module.instrument);
+  }, [props.module.instrument]);
+
+  useEffect(() => {
+    scheduleChords()
   }, [instrument]);
 
   useEffect(() => {
@@ -106,6 +102,7 @@ function ChordProgression(props) {
   return (
     <div
       className="chord-prog"
+      style={props.style}
       onBlur={() => console.log("chord prog unfocused")}
     >
       <Divider className="measure-divider" orientation="vertical" />

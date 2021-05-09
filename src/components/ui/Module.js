@@ -1,35 +1,63 @@
 import React, { useState } from "react";
 
-import { Card } from '@material-ui/core';
+import { Card, IconButton, Icon } from "@material-ui/core";
 
 import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
+import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 
-import './Module.css';
+
+
+import "./Module.css";
 
 function Module(props) {
-
-  //const [number,setNumber] = useState(props.data.number);
+  const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
 
   //const getValue = (event) => console.log(event.target.value);
 
   let innerModule = <span>Nothing Here</span>;
 
-  switch(props.data.type){
+  const handleSwitchButtonMode = () => {
+    setInstrumentEditorMode((prev) => (prev ? false : true));
+  };
+
+  switch (props.module.type) {
     case 0:
-      innerModule = <Sequencer data={props.data} kit="0" updateModule={props.updateModule}/>;
+      innerModule = (
+        <Sequencer
+          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          module={props.module}
+          kit="0"
+          updateModules={props.updateModules}
+        />
+      );
       break;
-      case 2:
-      innerModule = <ChordProgression data={props.data} updateModule={props.updateModule} setDrawer={props.setDrawer}/>;
+    case 2:
+      innerModule = (
+        <ChordProgression
+          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          module={props.module}
+          updateModules={props.updateModules}
+          setDrawer={props.setDrawer}
+        />
+      );
       break;
   }
 
-
   return (
-   <Card className="module">
-      <span className="module-title">{props.data.name}</span>
-        {innerModule}     
+    <Card className="module">
+      <span className="module-title">{props.module.name}</span>
+      <IconButton
+        className="module-instrument-mode-button"
+        onClick={handleSwitchButtonMode}
+      >
+        <Icon style={{ color: "white" }}>piano</Icon>
+      </IconButton>
 
+      {instrumentEditorMode && (
+        <InstrumentEditor instrument={props.module.instrument} updateModules={props.updateModules} index={props.index}/>
+      )}
+      {innerModule}
     </Card>
   );
 }

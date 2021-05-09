@@ -1,0 +1,20 @@
+.instrument-editor {
+  background-color: white;
+  flex: 1 0;
+  display: flex;
+  overflow-y: scroll;
+
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.instrument-editor-patch-select {
+  width: calc(100% - 16px);
+  margin: 8px;
+}
+
+.break {
+  width: 100%;
+  height: 0px;
+}

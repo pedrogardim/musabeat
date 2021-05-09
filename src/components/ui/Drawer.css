@@ -14,9 +14,8 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    align-content: center;
+    align-items: stretch;
+    flex-wrap: nowrap;
     overflow: hidden;
     transition: 0.25s;
   }

@@ -11,13 +11,14 @@ import {
   CircularProgress,
   BottomNavigation,
   BottomNavigationAction,
+  Typography,
 } from "@material-ui/core";
 
 import "./Sequencer.css";
 import "../ui/Module.css";
 
 function Sequencer(props) {
-  const loadedSequence = props.data.score;
+  const loadedSequence = props.module.score;
 
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [loadedDrumSounds, setDrumSounds] = useState({});
@@ -25,8 +26,9 @@ function Sequencer(props) {
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [scheduledEvents, setScheduledEvents] = useState([]);
+  const [hovered, setHovered] = useState(false);
 
-  let loadedpatch = props.data.patch;
+  let loadedpatch = props.module.patch;
 
   const inputNote = (x, y) => {
     changeSequence((previousSequence) =>
@@ -91,17 +93,17 @@ function Sequencer(props) {
   };
 
   const updateSequence = () => {
-    props.updateModule((previousModules) => {
+    props.updateModules((previousModules) => {
       let newmodules = previousModules;
-      newmodules[props.data.id].score = sequencerArray;
+      newmodules[props.module.id].score = sequencerArray;
       return newmodules;
     });
   };
 
   const updateInstrument = () => {
-    props.updateModule((previousModules) => {
+    props.updateModules((previousModules) => {
       let newmodules = [...previousModules];
-      newmodules[props.data.id].instrument = loadedDrumSounds;
+      newmodules[props.module.id].instrument = loadedDrumSounds;
       return newmodules;
     });
   };
@@ -114,15 +116,24 @@ function Sequencer(props) {
     loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
     updateSequence();
     updateInstrument();
-    console.log(sequencerArray);
   }, [loadedDrumSounds, sequencerArray]);
 
   return (
-    <div className="module-innerwrapper">
+    <div
+      className="module-innerwrapper"
+      style={props.style}
+      onMouseOver={() => setHovered(true)}
+      onMouseOut={() => setHovered(false)}
+    >
       {isBufferLoaded ? (
         <div className="sequencer">
           {Drumdata.labels.map((drumsound, row) => (
             <div className="sequencer-row" key={row}>
+              {hovered && (
+                <Typography className="sequencer-row-label" variant="overline">
+                  {drumsound}
+                </Typography>
+              )}
               {sequencerArray[currentMeasure].map((beat, column) => (
                 <SequencerTile
                   key={[column, row]}

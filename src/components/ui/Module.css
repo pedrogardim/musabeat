@@ -22,12 +22,25 @@
     font-size:16px;
     text-align: center;
     color:white;
+    align-self: center !important;
 
 
+}
+
+.hidden{
+    display:none;
 }
 
 .module-innerwrapper{
     display:flex;
     flex-grow: 1;
     flex-direction: column;
+}
+
+.module-instrument-mode-button{
+    height:20px !important;
+    margin-left:350px !important;
+    align-self: flex-start !important;
+
+    
 }
