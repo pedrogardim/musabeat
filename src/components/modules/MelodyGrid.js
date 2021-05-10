@@ -98,6 +98,10 @@ function MelodyGrid(props) {
   };
 
   useEffect(() => {
+    setInstrument(props.module.instrument);
+  }, [props.module.instrument]);
+
+  useEffect(() => {
     instrument.hasOwnProperty("name") && scheduleNotes();
     updateSequence();
   }, [instrument, melodyArray]);

@@ -12,6 +12,9 @@
 .instrument-editor-patch-select {
   width: calc(100% - 16px);
   margin: 8px;
+  height:32px;
+  max-height:32px;
+
 }
 
 .break {

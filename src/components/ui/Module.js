@@ -47,6 +47,8 @@ function Module(props) {
           module={props.module}
           updateModules={props.updateModules}
           setDrawer={props.setDrawer}
+          drawerCont={props.drawerCont}
+
         />
       );
       break;

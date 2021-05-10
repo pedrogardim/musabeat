@@ -27,13 +27,13 @@ function InstrumentEditor(props) {
     setSelectedPatch(event.target.value);
     switch (instrument.name) {
       case "PolySynth":
-        //setSelectedPatch(event.target.value);
+        setSelectedPatch(event.target.value);
         props.updateModules((previous) =>
           previous.map((module, i) => {
             if (i === props.index) {
               let newModule = { ...module }
               newModule.instrument = {};
-              newModule.instrument = instrumentContructor(selectedPatch);
+              newModule.instrument = instrumentContructor(event.target.value);
               return newModule;
             } else {
               return module;

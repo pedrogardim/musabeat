@@ -243,6 +243,8 @@ function Workspace(props) {
           module={module}
           updateModules={setModules}
           setDrawer={setDrawerCont}
+          drawerCont={drawerCont}
+
         />
       ))}
       <Fab color="primary" onClick={() => chooseNewModule(true)}>

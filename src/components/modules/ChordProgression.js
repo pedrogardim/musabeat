@@ -76,7 +76,7 @@ function ChordProgression(props) {
 
   useEffect(() => {
     selectedChord !== null &&
-      Tone.Transport.state !== "started" &&
+      Tone.Transport.state === "started" &&
       setSelectedChord(activeChord);
   }, [activeChord]);
 
@@ -93,6 +93,10 @@ function ChordProgression(props) {
       )
     );
   }, [selectedChord]);
+
+  useEffect(() => {
+    props.drawerCont == null && setSelectedChord(null)
+  }, [props.drawerCont]);
 
   return (
     <div
