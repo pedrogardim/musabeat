@@ -5,7 +5,7 @@ import { Fab, Icon } from "@material-ui/core";
 
 import "./Workspace.css";
 
-import Module from "./Module";
+import Module from "./../module/Module";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Drawer from "./Drawer";

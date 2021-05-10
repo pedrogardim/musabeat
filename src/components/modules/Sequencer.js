@@ -15,7 +15,6 @@ import {
 } from "@material-ui/core";
 
 import "./Sequencer.css";
-import "../ui/Module.css";
 
 function Sequencer(props) {
   const loadedSequence = props.module.score;

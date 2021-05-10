@@ -15,7 +15,6 @@ import {
 } from "@material-ui/core";
 
 import "./MelodyGrid.css";
-import "../ui/Module.css";
 
 function MelodyGrid(props) {
   const loadedSequence = props.module.score;
