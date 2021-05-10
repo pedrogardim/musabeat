@@ -1,7 +1,7 @@
 import {
   scheduleDrumSequence,
   scheduleChordProgression,
-  scheduleMelodyGrid
+  scheduleMelodyGrid,
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
@@ -12,8 +12,8 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
   let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
-  let instrumentBuffers = modules.map((module, i) => 
-   (module.instrument.name === "Players" || module.instrument.name === "Sampler")
+  let instrumentBuffers = modules.map((module, i) =>
+    module.instrument.name === "Players" || module.instrument.name === "Sampler"
       ? module.instrument._buffers
       : module.instrument.name === "Player"
       ? module.instrument._buffer
@@ -23,7 +23,6 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
   //console.log(instrumentBuffers);
 
   Tone.Offline(({ transport }) => {
-    
     //console.log(transport);
     //let offlineLimiter = new Tone.Limiter(-3).toDestination();
 
@@ -32,6 +31,11 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
     modules.map((module, moduleIndex) => {
       //let thisinstrument = module.instrument.connect(transport);
       let thisinstrument = MusicUtils.instrumentContructor(0);
+      if(module.instrument.name=="Sampler"){
+        thisinstrument = new Tone.Sampler().toDestination();
+        thisinstrument._buffers = instrumentBuffers[moduleIndex];
+
+      }
 
       //let thisinstrument = module.instrument;
       //thisinstrument.context = transport.context;
@@ -39,7 +43,6 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
 
       switch (module.type) {
         case 0:
-
           thisinstrument = new Tone.Players().toDestination();
           thisinstrument._buffers = instrumentBuffers[moduleIndex];
 
@@ -48,11 +51,10 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             thisinstrument,
             transport,
             () => {},
-            () => {},
+            () => {}
           );
           break;
-          case 1:
-
+        case 1:
           scheduleMelodyGrid(
             module.score,
             thisinstrument,

@@ -398,10 +398,11 @@ export const instrumentContructor = (input) => {
   let instrfx = [];
 
   if (patch.base === "Sampler") {
-    instr = new Tone.Sampler().toDestination();
-    //instr._buffers = rhythminstrumentbuffers;
+    instr = new Tone.Sampler({
+      urls: patch.urls,
+      baseUrl: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" + patch.baseUrl
+    }).toDestination();
 
-    //instr = new Tone.Sampler(patch.urls,patch.options).toDestination()
     instr.attack = patch.asdr[0];
     instr.release = patch.asdr[1];
   }
