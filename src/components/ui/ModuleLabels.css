@@ -1,0 +1,17 @@
+.module-labels{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    position:absolute;
+    height: calc(300px - 60px);
+    margin-left: -64px;
+}
+
+.module-labels-item{
+    text-align:right !important;
+    flex: 1 1;
+    text-transform: uppercase;
+    font-size: 12px;
+
+
+}
