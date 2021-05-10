@@ -46,7 +46,7 @@ const colors = [
 ];
 
 const initialModules = [
-  {
+   {
     id: 0,
     name: "Sequencer",
     type: 0,
@@ -138,7 +138,7 @@ const initialModules = [
         ["C3"],
       ],
     ],
-  },
+  }, 
   {
     id: 2,
     name: "Chords",
@@ -153,26 +153,26 @@ const initialModules = [
         duration: 0.5,
         time: 0,
         measure: 0,
-        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
+        rhythm: [1,0,1,0,1,0,1,0],
       },
       {
         notes: ["C4", "E4", "G4", "D5"],
         duration: 0.5,
         time: 0.5,
         measure: 0,
-        rhythm: [0, 1, 1, 1, 0, 1, 1, 1],
+        rhythm: [1,0,1,0,1,0,1,0],
       },
       {
         notes: ["A4", "C4", "E4"],
         duration: 0.5,
         time: 1,
-        rhythm: [1, 0, 1, 0, 1, 0, 0, 1],
+        rhythm: [1,0,1,0,1,0,1,0],
       },
       {
         notes: ["G4", "B4", "D5"],
         duration: 0.5,
         time: 1.5,
-        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
+        rhythm: [1,0,1,0,1,0,1,0],
       },
     ],
   },

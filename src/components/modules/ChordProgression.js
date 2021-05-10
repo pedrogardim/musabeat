@@ -20,20 +20,15 @@ function ChordProgression(props) {
   const [activeChord, setActiveChord] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.module.instrument);
-  const [scheduledEvents, setScheduledEvents] = useState([]);
 
   const scheduleChords = () => {
-    let scheduledChords = [];
-
-    scheduledChords = scheduleChordProgression(
+    scheduleChordProgression(
       chords,
       instrument,
       Tone.Transport,
-      scheduledEvents,
-      setActiveChord
+      setActiveChord,
+      props.module.id
     );
-
-    setScheduledEvents(scheduledChords);
   };
 
   const handleClick = (chordindex) => {

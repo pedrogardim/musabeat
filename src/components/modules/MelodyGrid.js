@@ -68,9 +68,9 @@ function MelodyGrid(props) {
       melodyArray,
       instrument,
       Tone.Transport,
-      scheduledEvents,
       setCurrentBeat,
-      setCurrentMeasure
+      setCurrentMeasure,
+      props.module.id
     );
 
     setScheduledEvents(scheduledNotes);

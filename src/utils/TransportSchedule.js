@@ -1,15 +1,23 @@
 import * as Tone from "tone";
 
+let scheduledEvents = [];
+
+const clearEvents = (moduleId) => {
+  typeof scheduledEvents[moduleId] !== "undefined" &&
+    scheduledEvents[moduleId].length > 0 &&
+    scheduledEvents[moduleId].forEach((event) => Tone.Transport.clear(event));
+};
+
 export const scheduleDrumSequence = (
   sequence,
   instrument,
   transport,
-  previousEvents,
   updateBeat,
-  updateMeasure
+  updateMeasure,
+  moduleId
 ) => {
-  previousEvents.length > 0 &&
-    previousEvents.forEach((event) => transport.clear(event));
+
+  moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledNotes = [];
 
@@ -35,12 +43,12 @@ export const scheduleMelodyGrid = (
   sequence,
   instrument,
   transport,
-  previousEvents,
   updateBeat,
-  updateMeasure
+  updateMeasure,
+  moduleId
 ) => {
-  previousEvents.length > 0 &&
-    previousEvents.forEach((event) => transport.clear(event));
+
+  moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledNotes = [];
 
@@ -51,7 +59,13 @@ export const scheduleMelodyGrid = (
         beattimevalue * beatIndex + Tone.Time("1m").toSeconds() * measureIndex;
 
       let thisevent = transport.schedule((time) => {
-        beat.forEach((note) => instrument.triggerAttackRelease(note, Tone.Time("1m").toSeconds()/sequence[measureIndex].length, time));
+        beat.forEach((note) =>
+          instrument.triggerAttackRelease(
+            note,
+            Tone.Time("1m").toSeconds() / sequence[measureIndex].length,
+            time
+          )
+        );
         updateBeat(beatIndex);
         updateMeasure(measureIndex);
       }, beatscheduletime);
@@ -66,11 +80,11 @@ export const scheduleChordProgression = (
   chords,
   instrument,
   transport,
-  previousEvents,
-  updateChord
+  updateChord,
+  moduleId
 ) => {
-  previousEvents.length > 0 &&
-    previousEvents.forEach((event) => transport.clear(event));
+
+  moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledChords = [];
 
@@ -97,5 +111,5 @@ export const scheduleChordProgression = (
       scheduledChords.push(thisevent);
     });
   });
-  return scheduledChords;
+  scheduledEvents[moduleId] = scheduledChords;
 };

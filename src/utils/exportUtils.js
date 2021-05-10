@@ -47,9 +47,8 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             module.score,
             thisinstrument,
             transport,
-            [],
             () => {},
-            () => {}
+            () => {},
           );
           break;
           case 1:
@@ -58,7 +57,6 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             module.score,
             thisinstrument,
             transport,
-            [],
             () => {},
             () => {}
           );
@@ -68,7 +66,6 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             module.chords,
             thisinstrument,
             transport,
-            [],
             () => {}
           );
           break;

@@ -58,9 +58,9 @@ function Sequencer(props) {
       sequencerArray,
       loadedDrumSounds,
       Tone.Transport,
-      scheduledEvents,
       setCurrentBeat,
-      setCurrentMeasure
+      setCurrentMeasure,
+      props.module.id
     );
 
     setScheduledEvents(scheduledNotes);
