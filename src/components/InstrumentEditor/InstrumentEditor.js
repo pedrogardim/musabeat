@@ -1,18 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import {
-  Card,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@material-ui/core";
+import { Select } from "@material-ui/core";
 
-import Sequencer from "../modules/Sequencer";
-import ChordProgression from "../modules/ChordProgression";
 import AudioFileItem from "./AudioFileItem";
 
-import { kits } from "../../assets/drumkits";
 import { instruments } from "../../assets/instrumentpatches";
 import { instrumentContructor } from "../../assets/musicutils";
 
@@ -27,11 +18,10 @@ function InstrumentEditor(props) {
     setSelectedPatch(event.target.value);
     switch (instrument.name) {
       case "PolySynth":
-        setSelectedPatch(event.target.value);
         props.updateModules((previous) =>
           previous.map((module, i) => {
             if (i === props.index) {
-              let newModule = { ...module }
+              let newModule = { ...module };
               newModule.instrument = {};
               newModule.instrument = instrumentContructor(event.target.value);
               return newModule;

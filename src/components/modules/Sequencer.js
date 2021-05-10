@@ -118,6 +118,10 @@ function Sequencer(props) {
     updateInstrument();
   }, [loadedDrumSounds, sequencerArray]);
 
+  useEffect(() => {
+    changeSequence(props.module.score);
+  },[props.module.score])
+
   return (
     <div
       className="module-innerwrapper"

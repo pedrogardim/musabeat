@@ -102,6 +102,10 @@ function MelodyGrid(props) {
   }, [props.module.instrument]);
 
   useEffect(() => {
+    setMelodyArray(props.module.score);
+  },[props.module.score])
+
+  useEffect(() => {
     instrument.hasOwnProperty("name") && scheduleNotes();
     updateSequence();
   }, [instrument, melodyArray]);

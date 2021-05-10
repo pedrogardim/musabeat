@@ -6,25 +6,37 @@ import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
 import MelodyGrid from "../modules/MelodyGrid";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
+import ModuleSettings from "./ModuleSettings";
+
 
 import "./Module.css";
 
 function Module(props) {
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
+  const [settingsMode, setSettingsMode] = useState(false);
+
 
   //const getValue = (event) => console.log(event.target.value);
 
   let innerModule = <span>Nothing Here</span>;
 
-  const handleSwitchButtonMode = () => {
+  const handleInstrumentButtonMode = () => {
     setInstrumentEditorMode((prev) => (prev ? false : true));
+    setSettingsMode(false);
+
+  };
+
+  const handleSettingsButtonMode = () => {
+    setSettingsMode((prev) => (prev ? false : true));
+    setInstrumentEditorMode(false);
+
   };
 
   switch (props.module.type) {
     case 0:
       innerModule = (
         <Sequencer
-          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          style={{ display: instrumentEditorMode || settingsMode ? "none" : "flex" }}
           module={props.module}
           kit={0}
           updateModules={props.updateModules}
@@ -34,7 +46,7 @@ function Module(props) {
     case 1:
       innerModule = (
         <MelodyGrid
-          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          style={{ display: instrumentEditorMode || settingsMode ? "none" : "flex" }}
           module={props.module}
           updateModules={props.updateModules}
         />
@@ -43,7 +55,7 @@ function Module(props) {
     case 2:
       innerModule = (
         <ChordProgression
-          style={{ display: instrumentEditorMode ? "none" : "flex" }}
+          style={{ display: instrumentEditorMode || settingsMode ? "none" : "flex" }}
           module={props.module}
           updateModules={props.updateModules}
           setDrawer={props.setDrawer}
@@ -59,16 +71,29 @@ function Module(props) {
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>
         <IconButton
-          className="module-instrument-mode-button"
-          onClick={handleSwitchButtonMode}
+          className="module-instrument-icon-button"
+          onClick={handleInstrumentButtonMode}
         >
           <Icon style={{ color: "white" }}>piano</Icon>
+        </IconButton>
+        <IconButton
+          className="module-instrument-icon-button"
+          onClick={handleSettingsButtonMode}
+        >
+          <Icon style={{ color: "white" }}>settings</Icon>
         </IconButton>
       </div>
 
       {instrumentEditorMode && (
         <InstrumentEditor
           instrument={props.module.instrument}
+          updateModules={props.updateModules}
+          index={props.index}
+        />
+      )}
+      {settingsMode && (
+        <ModuleSettings
+          module={props.module}
           updateModules={props.updateModules}
           index={props.index}
         />

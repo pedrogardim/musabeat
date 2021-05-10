@@ -118,7 +118,7 @@ export const instruments = [
     fx: [["dly", "16n", 0.6, 0.2]],
     asdr: [0, 0.5],
   },
-  {
+  /* {
     name: "Pizzicato",
     base: "Sampler",
     type: 2,
@@ -140,5 +140,5 @@ export const instruments = [
     baseUrl: "assets/samples/instruments/vlnpzz/",
 
     asdr: [0, 0.5],
-  },
+  }, */
 ];

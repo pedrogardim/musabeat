@@ -1,0 +1,17 @@
+.module-settings {
+    background-color: white;
+    flex: 1 0;
+    display: flex;
+    overflow-y: scroll;
+  
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+  }
+  
+  .break {
+    width: 100%;
+    height: 0px;
+  }

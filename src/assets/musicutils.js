@@ -286,6 +286,8 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
 
   let newsubdivarray = [];
 
+  console.log(oldarray,newsubdivision)
+
   //POSSIBLE SCENARIOS:
 
   //no difference

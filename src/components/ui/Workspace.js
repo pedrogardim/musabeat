@@ -50,7 +50,7 @@ const initialModules = [
     id: 0,
     name: "Sequencer",
     type: 0,
-    subdiv: 16,
+    steps: 16,
     patch: 0,
     instrument: {},
     color: colors[2],
@@ -97,7 +97,7 @@ const initialModules = [
     id: 1,
     name: "Melody",
     type: 1,
-    subdiv: 16,
+    steps: 16,
     instrument: instrumentContructor(2),
     color: colors[2],
     score: [
@@ -143,8 +143,6 @@ const initialModules = [
     id: 2,
     name: "Chords",
     type: 2,
-    subdiv: 16,
-    patch: 0,
     instrument: instrumentContructor(0),
     color: colors[2],
     chords: [
