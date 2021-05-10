@@ -35,6 +35,8 @@
 
 .module-instrument-icon-button {
   height: 100%;
+  width:30px !important
+
 }
 
 .hidden {
@@ -45,4 +47,22 @@
   display: flex;
   flex-grow: 1;
   flex-direction: column;
+}
+
+.expand-bar{
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.expand-bar:hover{
+  filter: brightness(1.3);
+  cursor: pointer;
+
+}
+
+.expand-bar-icon{
+  color:white !important;
+
 }
