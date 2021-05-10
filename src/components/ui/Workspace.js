@@ -136,7 +136,7 @@ const initialModules = [
         [],
         ["D3"],
         ["G3"],
-      ],
+      ], 
     ],
   },
   {
@@ -220,11 +220,10 @@ function Workspace(props) {
   };
 
   const handleClick = (event) => {
-    let targetClass = "ClassName" in event.target ? event.target.ClassName : "";
+    let targetClass = "classList" in event.target ? event.target.classList[0] : "";
     let drawer = document.querySelector(".adjustments-drawer");
-    //console.log(targetClassName,!targetClassName.includes("chord"))
-    !drawer.contains(event.target) &&
-      !targetClass.includes("chord") &&
+    (!drawer.contains(event.target) &&
+      !targetClass.includes("chord")) &&
       setDrawerCont(null);
   };
 

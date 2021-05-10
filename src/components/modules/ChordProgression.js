@@ -102,12 +102,12 @@ function ChordProgression(props) {
     >
       <Divider className="measure-divider" orientation="vertical" />
       {chords.map((chord, i) => (
-        <Fragment>
+        <Fragment key={i}>
           {i > 0 && Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
-            <Divider className="measure-divider" orientation="vertical" />
+            <Divider key={"divider"+i} className="measure-divider" orientation="vertical" />
           )}
           <Chord
-            key={i}
+            key={"chord"+i}
             active={activeChord === i}
             name={MusicUtils.chordNotestoName(chord.notes)}
             onClick={() => handleClick(i)}
