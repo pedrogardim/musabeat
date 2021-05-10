@@ -25,9 +25,9 @@ import "./ChordPicker.css";
 function ChordPicker(props) {
   const [chosenScale, setChosenScale] = useState(0);
   const [chosenRoot, setChosenRoot] = useState(0);
-  const [chosenComplexity, setChosenComplexity] = useState(3);
+  const [chosenExtentions, setChosenExtentions] = useState(3);
   const [scaleChords, setScaleChords] = useState(
-    getChordsFromScale(chosenScale, chosenRoot, chosenComplexity)
+    getChordsFromScale(chosenScale, chosenRoot, chosenExtentions)
   );
   //{props.selectedChord !== null}
 
@@ -57,11 +57,17 @@ function ChordPicker(props) {
     setChosenScale(event.target.value);
   };
 
+  const handleExtentionsSelect = (event) => {
+    setChosenExtentions(event.target.value);
+  };
+
+
+
   useEffect(() => {
     setScaleChords(
-      getChordsFromScale(chosenScale, chosenRoot, chosenComplexity)
+      getChordsFromScale(chosenScale, chosenRoot, chosenExtentions)
     );
-  }, [chosenScale, chosenRoot, chosenComplexity]);
+  }, [chosenScale, chosenRoot, chosenExtentions]);
 
   return (
     <div className="chord-picker">
@@ -113,26 +119,21 @@ function ChordPicker(props) {
           ))}
         </Select>
       </FormControl>
-      <div className="break" />
-      <Typography variant="body2">Extentions</Typography>
-      <Slider
-        className="chord-picker-slider"
-        defaultValue={3}
-        labelId="complexity-slide-label"
-        step={1}
-        min={2}
-        max={7}
-      />
-      <div className="break" />
-      <Typography variant="body2">Width</Typography>
-      <Slider
-        className="chord-picker-slider"
-        defaultValue={3}
-        labelId="complexity-slide-label"
-        step={1}
-        min={2}
-        max={7}
-      />
+      <FormControl>
+        <InputLabel id="scale-select-label">Extentions</InputLabel>
+        <Select
+          native
+          labelId="scale-select-label"
+          value={chosenExtentions}
+          onChange={handleExtentionsSelect}
+        >
+          <option value={3}>None</option>
+          <option value={4}>7ths</option>
+          <option value={5}>7ths + 9ths</option>
+
+
+        </Select>
+      </FormControl>
     </div>
   );
 }

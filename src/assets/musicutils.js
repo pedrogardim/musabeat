@@ -367,14 +367,14 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
   return newsubdivarray;
 };
 
-export const getChordsFromScale = (scale, root, complexity) => {
+export const getChordsFromScale = (scale, root, extentions) => {
   let scalechords = [];
   for (let x = 0; x < 7; x++) {
     let thischord = [];
     //bassnote
     thischord.push(scales[scale][0][x] - 12);
 
-    for (let y = 0; y < complexity; y++) {
+    for (let y = 0; y < extentions; y++) {
       let noteindex = x + y * 2;
       if (noteindex > scales[scale][0].length - 1) {
         noteindex = noteindex - scales[scale][0].length;
