@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import Chord from "./Chord";
 import ChordPicker from "./ChordPicker";
@@ -64,19 +64,19 @@ function ChordProgression(props) {
   useEffect(() => {
     scheduleChords();
     updateChords();
-  }, [chords]); 
+  }, [chords]);
 
   useEffect(() => {
     setInstrument(props.module.instrument);
   }, [props.module.instrument]);
 
   useEffect(() => {
-    scheduleChords()
+    scheduleChords();
   }, [instrument]);
 
   useEffect(() => {
-    (selectedChord !== null &&
-      Tone.Transport.state !== "started") &&
+    selectedChord !== null &&
+      Tone.Transport.state !== "started" &&
       setSelectedChord(activeChord);
   }, [activeChord]);
 
@@ -102,12 +102,17 @@ function ChordProgression(props) {
     >
       <Divider className="measure-divider" orientation="vertical" />
       {chords.map((chord, i) => (
-        <Chord
-          key={i}
-          active={activeChord === i}
-          name={MusicUtils.chordNotestoName(chord.notes)}
-          onClick={() => handleClick(i)}
-        />
+        <Fragment>
+          {i > 0 && Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
+            <Divider className="measure-divider" orientation="vertical" />
+          )}
+          <Chord
+            key={i}
+            active={activeChord === i}
+            name={MusicUtils.chordNotestoName(chord.notes)}
+            onClick={() => handleClick(i)}
+          />
+        </Fragment>
       ))}
       <Divider className="measure-divider" orientation="vertical" />
     </div>

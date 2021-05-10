@@ -35,8 +35,7 @@ export const scheduleDrumSequence = (
       scheduledNotes.push(thisevent);
     });
   });
-
-  return scheduledNotes;
+  scheduledEvents[moduleId] = scheduledNotes;
 };
 
 export const scheduleMelodyGrid = (
@@ -72,8 +71,7 @@ export const scheduleMelodyGrid = (
       scheduledNotes.push(thisevent);
     });
   });
-
-  return scheduledNotes;
+  scheduledEvents[moduleId] = scheduledNotes;
 };
 
 export const scheduleChordProgression = (

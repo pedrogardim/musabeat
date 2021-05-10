@@ -42,18 +42,18 @@ const colors = [
   lightGreen,
   lime,
   amber,
-  orange
+  orange,
 ];
 
 const initialModules = [
-   {
+  {
     id: 0,
     name: "Sequencer",
     type: 0,
     subdiv: 16,
     patch: 0,
     instrument: {},
-    color:colors[2],
+    color: colors[2],
     score: [
       [
         [0, 3],
@@ -99,7 +99,7 @@ const initialModules = [
     type: 1,
     subdiv: 16,
     instrument: instrumentContructor(2),
-    color:colors[2],
+    color: colors[2],
     score: [
       [
         ["C3", "E3"],
@@ -120,25 +120,25 @@ const initialModules = [
         ["C3"],
       ],
       [
-        ["C3", "E3"],
+        ["A3"],
+        [],
+        [],
+        ["G3"],
+        [],
+        [],
+        ["E3"],
+        [],
+        ["G3"],
+        ["E3"],
+        ["D3"],
+        ["E3"],
+        ["A3"],
         [],
         ["D3"],
-        [],
-        ["C3", "E3"],
-        ["A3"],
-        ["C4"],
-        [],
-        [],
-        ["A3"],
-        [],
-        [],
-        ["A3"],
-        [],
-        ["D3"],
-        ["C3"],
+        ["G3"],
       ],
     ],
-  }, 
+  },
   {
     id: 2,
     name: "Chords",
@@ -146,33 +146,33 @@ const initialModules = [
     subdiv: 16,
     patch: 0,
     instrument: instrumentContructor(0),
-    color:colors[2],
+    color: colors[2],
     chords: [
       {
         notes: ["E4", "G4", "B4"],
         duration: 0.5,
         time: 0,
         measure: 0,
-        rhythm: [1,0,1,0,1,0,1,0],
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
       {
         notes: ["C4", "E4", "G4", "D5"],
         duration: 0.5,
         time: 0.5,
         measure: 0,
-        rhythm: [1,0,1,0,1,0,1,0],
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
       {
         notes: ["A4", "C4", "E4"],
         duration: 0.5,
         time: 1,
-        rhythm: [1,0,1,0,1,0,1,0],
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
       {
         notes: ["G4", "B4", "D5"],
         duration: 0.5,
         time: 1.5,
-        rhythm: [1,0,1,0,1,0,1,0],
+        rhythm: [1, 0, 1, 0, 1, 0, 1, 0],
       },
     ],
   },
@@ -186,8 +186,6 @@ Tone.Transport.bpm.value = initialSessionData.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 Tone.Transport.loopEnd = "2m";
-
-
 
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
@@ -203,7 +201,7 @@ function Workspace(props) {
       patch: 0,
       score: [],
       instrument: {},
-      color:colors[Math.floor(Math.random() * colors.length)]
+      color: colors[Math.floor(Math.random() * colors.length)],
     };
     setModules((prevModules) => [...prevModules, module]);
     chooseNewModule(false);
