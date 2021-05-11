@@ -72,8 +72,8 @@ function Module(props) {
     <Card
       style={{
         backgroundColor: props.module.color[700],
-        height: expanded ? "450px" : "300px",
-        width: expanded ? "600px" : "400px",
+        height: expanded && "90%",
+        width: expanded && "90%",
       }}
       className="module"
     >
@@ -110,17 +110,17 @@ function Module(props) {
       )}
 
       {innerModule}
-
-      <div
-        className="expand-bar"
-        onClick={() => setExpanded(expanded ? false : true)}
-      >
-        <Icon className="expand-bar-icon">
-          {expanded ? "expand_less" : "expand_more"}
-        </Icon>
-      </div>
     </Card>
   );
 }
 
 export default Module;
+
+{/* <div
+  className="expand-bar"
+  onClick={() => setExpanded(expanded ? false : true)}
+>
+  <Icon className="expand-bar-icon">
+    {expanded ? "expand_less" : "expand_more"}
+  </Icon>
+</div>; */}

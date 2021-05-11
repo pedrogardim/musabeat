@@ -10,20 +10,6 @@
   flex-direction: row;
 }
 
-.melody-grid-tile {
-  outline: solid 1px #8b6a2c;
-  background-color: #b18637;
-  flex: 1;
-}
-
-.active-melody-grid-tile {
-  background-color: #9c762e !important;
-}
-
-.cursor-melody-grid-tile {
-  background-color: #daa441;
-}
-
 .melody-grid-bottomnav {
   height: 30px !important;
 }

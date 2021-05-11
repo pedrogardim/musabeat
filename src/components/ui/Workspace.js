@@ -102,11 +102,11 @@ const initialModules = [
     color: colors[2],
     score: [
       [
-        ["C3", "E3"],
+        ["C3"],
         [],
         ["D3"],
         [],
-        ["C3", "E3"],
+        ["E3"],
         ["A3"],
         ["C4"],
         [],
