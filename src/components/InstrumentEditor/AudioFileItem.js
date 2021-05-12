@@ -1,49 +1,90 @@
 import React, { useEffect, useState } from "react";
 import { labels } from "../../assets/drumkits";
+import { waveTypes } from "../../assets/musicutils";
 
 import "./AudioFileItem.css";
 
-import { Card, Typography } from "@material-ui/core";
+import { Card, Typography, Select } from "@material-ui/core";
 
 function AudioFileItem(props) {
+  const isSynth = props.instrument.name === "PolySynth";
+
   const [waveZoomX, setWaveZoomX] = useState(400);
-  const [wave, setWave] = useState(drawWave(props.buffer.toArray(), waveZoomX));
-  
+  const [wavePath, setWavePath] = useState("");
+  const [wave, setWave] = useState("");
 
   const handleClick = () => {
-    props.instrument.player(props.index).start(0);
-
+    !isSynth && props.instrument.player(props.index).start(0);
   };
 
-  useEffect(()=>{
-    console.log(props.instrument.player(props.index).state)
+  const handleWaveChange = (event) => {
+    var newWave = event.target.value;
+    props.instrument.set({ oscillator: { type: newWave } });
+    drawWave(props.buffer.asArray(128), 0, isSynth, setWavePath);
+  };
 
-  },[props.instrument.player(props.index)])
+  useEffect(
+    () =>
+      drawWave(
+        isSynth ? props.buffer.asArray(128) : props.buffer.toArray(),
+        0,
+        isSynth,
+        setWavePath
+      ),
+    []
+  );
+
+  console.log(props.instrument.get());
 
   return (
-    <Card onClick={handleClick} className={"audio-file-item "+ (props.instrument.player(props.index).state === "started" ? "active-audio-file-item" : "")}>
+    <Card onClick={handleClick} className={"audio-file-item"}>
       <svg
         width="64px"
         height="64px"
         viewBow={"0 0 64 64"}
         id="ie-mainosc-wave"
       >
-        {wave}
+        <path d={wavePath} stroke="#05386b" fill="none" />
       </svg>
-      <Typography variant="overline">
-        {props.name === undefined ? labels[props.index] : props.name}
-      </Typography>
+      {isSynth ? (
+        <Select
+          native
+          value={props.instrument.get().oscillator.type}
+          onChange={handleWaveChange}
+        >
+          {waveTypes.map((e, i) => (
+            <option value={e}>{e}</option>
+          ))}
+        </Select>
+      ) : (
+        <Typography variant="overline">
+          {props.name === undefined ? labels[props.index] : props.name}
+        </Typography>
+      )}
     </Card>
   );
 }
 
-const drawWave = (wavearray, scale) => {
+const drawWave = (wavearray, scale, isSynth, setWavePath) => {
   let pathstring = "M 0 32 ";
 
-  for (let x = 0; x < wavearray.length; x++) {
-    pathstring += "L " + x + " " + (wavearray[x * scale] * 32 + 32) + " ";
+  let wave = isSynth
+    ? wavearray.then((r) => {
+        wave = r;
+
+        for (let x = 0; x < wave.length; x++) {
+          pathstring += "L " + x + " " + (wave[x * 1] * 32 + 32) + " ";
+        }
+        setWavePath(pathstring);
+      })
+    : wavearray;
+  console.log(wave);
+
+  for (let x = 0; x < wave.length; x++) {
+    pathstring += "L " + x + " " + (wave[x * scale] * 32 + 32) + " ";
   }
 
-  return <path d={pathstring} stroke="#05386b" fill="none" />;
+  setWavePath(pathstring);
 };
+
 export default AudioFileItem;

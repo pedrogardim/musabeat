@@ -111,7 +111,7 @@ function Module(props) {
           onClick={handleMuteButton}
         >
           <Icon style={{ color: "white" }}>
-            {muted ? "volume_up" : "volume_off"}
+            {muted ? "volume_off" : "volume_up"}
           </Icon>
         </IconButton>
       </div>

@@ -35,15 +35,18 @@ function InstrumentEditor(props) {
         break;
     }
     //auto close
-    props.setInstrumentEditorMode(false)
+    props.setInstrumentEditorMode(false);
     //
   };
 
   let mainContent = "Nothing Here";
 
+  console.log(instrument);
+
+  let list = [];
+
   switch (instrument.name) {
     case "Players":
-      let list = [];
       instrument._buffers._buffers.forEach((e, i) =>
         list.push(
           <AudioFileItem
@@ -57,7 +60,17 @@ function InstrumentEditor(props) {
       );
       mainContent = list;
       break;
-    case 2:
+    case "PolySynth":
+        list.push(
+          <AudioFileItem
+            instrument={instrument}
+            buffer={instrument._dummyVoice.oscillator}
+            name={instrument._dummyVoice.oscillator.type}
+          />
+        )
+        
+      
+      mainContent = list;
       break;
   }
 
