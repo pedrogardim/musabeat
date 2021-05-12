@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, IconButton, Icon } from "@material-ui/core";
 
@@ -8,10 +8,13 @@ import MelodyGrid from "../modules/MelodyGrid";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 
+import { clearEvents } from "../../utils/TransportSchedule";
+
 import "./Module.css";
 
 function Module(props) {
   const [expanded, setExpanded] = useState(false);
+  const [muted, setMuted] = useState(false);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
 
@@ -29,6 +32,10 @@ function Module(props) {
     setInstrumentEditorMode(false);
   };
 
+  const handleMuteButton = () => {
+    setMuted(muted ? false : true);
+  };
+
   switch (props.module.type) {
     case 0:
       innerModule = (
@@ -36,6 +43,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          muted={muted}
           module={props.module}
           kit={0}
           updateModules={props.updateModules}
@@ -48,6 +56,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          muted={muted}
           module={props.module}
           updateModules={props.updateModules}
         />
@@ -59,6 +68,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          muted={muted}
           module={props.module}
           updateModules={props.updateModules}
           setDrawer={props.setDrawer}
@@ -68,12 +78,17 @@ function Module(props) {
       break;
   }
 
+  useEffect(() => 
+    props.module.instrument._volume !== undefined
+      ? (props.module.instrument._volume.mute = muted)
+      : ""
+  , [muted]);
+
   return (
     <Card
       style={{
         backgroundColor: props.module.color[700],
-        height: expanded && "90%",
-        width: expanded && "90%",
+        filter: muted && "saturate(0)",
       }}
       className="module"
     >
@@ -90,6 +105,14 @@ function Module(props) {
           onClick={handleInstrumentButtonMode}
         >
           <Icon style={{ color: "white" }}>piano</Icon>
+        </IconButton>
+        <IconButton
+          className="module-instrument-icon-button"
+          onClick={handleMuteButton}
+        >
+          <Icon style={{ color: "white" }}>
+            {muted ? "volume_up" : "volume_off"}
+          </Icon>
         </IconButton>
       </div>
 
@@ -117,11 +140,13 @@ function Module(props) {
 
 export default Module;
 
-{/* <div
+{
+  /* <div
   className="expand-bar"
   onClick={() => setExpanded(expanded ? false : true)}
 >
   <Icon className="expand-bar-icon">
     {expanded ? "expand_less" : "expand_more"}
   </Icon>
-</div>; */}
+</div>; */
+}
