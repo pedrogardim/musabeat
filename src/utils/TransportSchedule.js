@@ -96,10 +96,11 @@ export const scheduleChordProgression = (
       let thisevent = transport.schedule((time) => {
         switch (rhythm) {
           case 0:
-            instrument.triggerRelease(time);
+            instrument.releaseAll(time);
             break;
           case 1:
             instrument.triggerAttackRelease(chord.notes, rhythmduration, time);
+            //console.log(chord.notes);
             break;
         }
 

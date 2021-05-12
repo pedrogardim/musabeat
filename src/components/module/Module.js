@@ -97,6 +97,7 @@ function Module(props) {
         <InstrumentEditor
           instrument={props.module.instrument}
           updateModules={props.updateModules}
+          setInstrumentEditorMode={setInstrumentEditorMode}
           index={props.index}
         />
       )}

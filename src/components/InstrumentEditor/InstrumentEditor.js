@@ -30,11 +30,13 @@ function InstrumentEditor(props) {
             }
           })
         );
-        //props.updateModules((previous) => previous.map((e,i)=>{return { ...previous, instrument:instrumentContructor(event.target.value)}}));
         break;
       case 2:
         break;
     }
+    //auto close
+    props.setInstrumentEditorMode(false)
+    //
   };
 
   let mainContent = "Nothing Here";

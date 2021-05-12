@@ -4,7 +4,7 @@
 
 import * as Tone from "tone";
 
-import {instruments} from "./instrumentpatches";
+import { instruments } from "./instrumentpatches";
 
 export const musicalNotes = [
   "C",
@@ -286,7 +286,7 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
 
   let newsubdivarray = [];
 
-  console.log(oldarray,newsubdivision)
+  console.log(oldarray, newsubdivision);
 
   //POSSIBLE SCENARIOS:
 
@@ -384,7 +384,9 @@ export const getChordsFromScale = (scale, root, extentions) => {
       thischord.push(scales[scale][0][noteindex]);
     }
     scalechords.push(
-      Tone.Frequency(musicalNotes[root].split("/")[0] + "4").harmonize(thischord)
+      Tone.Frequency(musicalNotes[root].split("/")[0] + "4").harmonize(
+        thischord
+      )
     );
     scalechords[x] = scalechords[x].map((e) => {
       return Tone.Frequency(e).toNote();
@@ -402,7 +404,9 @@ export const instrumentContructor = (input) => {
   if (patch.base === "Sampler") {
     instr = new Tone.Sampler({
       urls: patch.urls,
-      baseUrl: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" + patch.baseUrl
+      baseUrl:
+        "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" +
+        patch.baseUrl,
     }).toDestination();
 
     instr.attack = patch.asdr[0];
