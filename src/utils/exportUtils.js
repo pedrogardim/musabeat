@@ -34,16 +34,13 @@ export const bounceSessionExport = (
     transport.bpm.value = sessionData.bpm;
 
     modules.map((module, moduleIndex) => {
-      //let thisinstrument = module.instrument.connect(transport);
-      let thisinstrument = MusicUtils.instrumentContructor(0);
+      let thisinstrument = MusicUtils.instrumentContructor(
+        module.instrument.get()
+      );
       if (module.instrument.name == "Sampler") {
         thisinstrument = new Tone.Sampler().toDestination();
         thisinstrument._buffers = instrumentBuffers[moduleIndex];
       }
-
-      //let thisinstrument = module.instrument;
-      //thisinstrument.context = transport.context;
-      //thisinstrument.toDestination();
 
       switch (module.type) {
         case 0:

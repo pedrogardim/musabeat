@@ -59,7 +59,7 @@ export const instruments = [
   },
   {
     name: "Organ",
-    base: "Synth",
+    base: "Mono",
     type: 2,
     gain: -12,
     options: {
@@ -111,7 +111,7 @@ export const instruments = [
   },
   {
     name: "String Pad",
-    base: "Synth",
+    base: "Mono",
     type: 2,
     gain: -18,
     options: {

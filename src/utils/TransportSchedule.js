@@ -104,7 +104,7 @@ export const scheduleChordProgression = (
   let moduleLength = Math.ceil(chords[chords.length - 1].time);
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
-  console.log(sessionSize, moduleLength,loopTimes)
+  //console.log(sessionSize, moduleLength,loopTimes)
 
   for (let x = 0; x < loopTimes; x++) {
     chords.map((chord, chordIndex) => {

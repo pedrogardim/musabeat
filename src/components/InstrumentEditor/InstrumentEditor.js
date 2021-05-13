@@ -15,7 +15,7 @@ function InstrumentEditor(props) {
   //const [selectedFile, setSelectedFile] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
 
-  console.log(instrument.get());
+  //console.log(instrument.get());
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);

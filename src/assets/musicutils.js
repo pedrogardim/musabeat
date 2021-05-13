@@ -536,8 +536,10 @@ export const getChordsFromScale = (scale, root, extentions) => {
 
 export const instrumentContructor = (input) => {
   let instr;
-  let patch = instruments[input];
+  let patch = !isNaN(input) ? instruments[input] : input;
   let instrfx = [];
+
+  console.log(input);
 
   if (patch.base === "Sampler") {
     instr = new Tone.Sampler({
@@ -562,8 +564,13 @@ export const instrumentContructor = (input) => {
   if (patch.base === "Synth") {
     instr = new Tone.PolySynth(Tone.Synth, patch.options);
   }
+  if (patch.base === undefined) {
+    instr = new Tone.PolySynth(patch);
+    instr.set(patch)
+    console.log(instr)
+  }
 
-  instr.volume.value = patch.gain;
+  "gain" in patch ? instr.volume.value = patch.gain : instr.volume.value = -18;
 
   if ("fx" in patch) {
     patch.fx.forEach((e, i) => {
