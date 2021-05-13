@@ -64,7 +64,7 @@ function InstrumentEditor(props) {
       break;
     case "PolySynth":
       list.push(
-        <div className="instrument-editor-column">
+        <div className="instrument-editor-column" key={0}>
           <AudioFileItem
             instrument={instrument}
             buffer={instrument._dummyVoice.oscillator}
@@ -73,7 +73,7 @@ function InstrumentEditor(props) {
         </div>
       );
       list.push(
-        <div className="instrument-editor-column">
+        <div className="instrument-editor-column" key={1}>
           {Object.keys(instrument.get()).map(
             (envelope, envelopeIndex) =>
               (envelope.toLowerCase().includes("envelope")) && (
@@ -82,7 +82,7 @@ function InstrumentEditor(props) {
           )}
         </div>
       );
-      list.push(<div className="instrument-editor-column"></div>);
+      list.push(<div className="instrument-editor-column" key={2}></div>);
       mainContent = list;
       break;
   }

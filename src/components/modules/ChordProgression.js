@@ -16,7 +16,7 @@ import { scheduleChordProgression } from "../../utils/TransportSchedule";
 const defaultIntrument = MusicUtils.instrumentContructor(2);
 
 function ChordProgression(props) {
-  const [chords, setChords] = useState(props.module.chords);
+  const [chords, setChords] = useState(props.module.score);
   const [activeChord, setActiveChord] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.module.instrument);
@@ -27,7 +27,8 @@ function ChordProgression(props) {
       instrument,
       Tone.Transport,
       setActiveChord,
-      props.module.id
+      props.module.id,
+      props.sessionSize
     );
   };
 

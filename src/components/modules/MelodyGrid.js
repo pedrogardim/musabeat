@@ -69,7 +69,8 @@ function MelodyGrid(props) {
       Tone.Transport,
       setCurrentBeat,
       setCurrentMeasure,
-      props.module.id
+      props.module.id,
+      props.sessionSize
     );
 
     setScheduledEvents(scheduledNotes);
@@ -145,6 +146,7 @@ function MelodyGrid(props) {
       ) : (
         <CircularProgress />
       )}
+      {melodyArray.length > 1 && 
       <BottomNavigation
         value={currentMeasure}
         showLabels
@@ -157,7 +159,7 @@ function MelodyGrid(props) {
           melodyArray.map((measure, index) => (
             <BottomNavigationAction key={index} label={index + 1} />
           ))}
-      </BottomNavigation>
+      </BottomNavigation>}
     </div>
   );
 }

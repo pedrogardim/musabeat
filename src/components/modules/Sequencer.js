@@ -59,7 +59,8 @@ function Sequencer(props) {
       Tone.Transport,
       setCurrentBeat,
       setCurrentMeasure,
-      props.module.id
+      props.module.id,
+      props.sessionSize
     );
 
     setScheduledEvents(scheduledNotes);
@@ -154,6 +155,7 @@ function Sequencer(props) {
       ) : (
         <CircularProgress />
       )}
+      {sequencerArray.length > 1 &&
       <BottomNavigation
         style={{ color: props.module.color[900] }}
         value={currentMeasure}
@@ -167,7 +169,7 @@ function Sequencer(props) {
           sequencerArray.map((measure, index) => (
             <BottomNavigationAction key={index} label={index + 1} />
           ))}
-      </BottomNavigation>
+      </BottomNavigation>}
     </div>
   );
 }

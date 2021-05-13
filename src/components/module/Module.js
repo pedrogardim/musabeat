@@ -43,6 +43,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
           kit={0}
@@ -56,6 +57,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
           updateModules={props.updateModules}
@@ -68,7 +70,9 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
-          muted={muted}
+
+          sessionSize={props.sessionSize}
+          muted={muted} 
           module={props.module}
           updateModules={props.updateModules}
           setDrawer={props.setDrawer}

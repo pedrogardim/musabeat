@@ -72,25 +72,7 @@ const initialModules = [
         [],
         [3],
         [],
-      ],
-      [
-        [0, 3],
-        [],
-        [3],
-        [],
-        [1, 3],
-        [],
-        [3],
-        [],
-        [0, 3],
-        [],
-        [3],
-        [],
-        [1, 3],
-        [],
-        [3],
-        [],
-      ],
+      ]
     ],
   },
   {
@@ -136,7 +118,7 @@ const initialModules = [
         [],
         ["D3"],
         ["G3"],
-      ], 
+      ],
     ],
   },
   {
@@ -145,7 +127,7 @@ const initialModules = [
     type: 2,
     instrument: instrumentContructor(0),
     color: colors[2],
-    chords: [
+    score: [
       {
         notes: ["E4", "G4", "B4"],
         duration: 0.5,
@@ -183,10 +165,10 @@ const initialSessionData = {
 Tone.Transport.bpm.value = initialSessionData.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
-Tone.Transport.loopEnd = "2m";
 
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
+  const [sessionSize, setSessionSize] = useState(4);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [drawerCont, setDrawerCont] = useState(null);
 
@@ -205,6 +187,18 @@ function Workspace(props) {
     chooseNewModule(false);
   };
 
+  const adaptSessionSize = () => {
+    let lengths = modules.map((module) =>
+      module.type === 2
+        ? Math.ceil(module.score[module.score.length - 1].time)
+        : module.score.length
+    );
+    let longestModule = Math.max(...lengths);
+    setSessionSize(longestModule);
+    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * longestModule;
+
+  };
+
   const handleKeyPress = (event) => {
     Tone.start();
     switch (event.code) {
@@ -218,14 +212,18 @@ function Workspace(props) {
   };
 
   const handleClick = (event) => {
-    let targetClass = "classList" in event.target ? event.target.classList[0] : "";
+    let targetClass =
+      "classList" in event.target ? event.target.classList[0] : "";
     let drawer = document.querySelector(".adjustments-drawer");
-    (!drawer.contains(event.target) &&
-      !targetClass.includes("chord")) &&
+    !drawer.contains(event.target) &&
+      !targetClass.includes("chord") &&
       setDrawerCont(null);
   };
 
-  useEffect(() => console.log(modules), [modules]);
+  useEffect(() => {
+    adaptSessionSize();
+    console.log(modules);
+  }, [modules]);
 
   return (
     <div
@@ -239,10 +237,10 @@ function Workspace(props) {
           key={module.id}
           index={module.id}
           module={module}
+          sessionSize={sessionSize}
           updateModules={setModules}
           setDrawer={setDrawerCont}
           drawerCont={drawerCont}
-
         />
       ))}
       <Fab color="primary" onClick={() => chooseNewModule(true)}>
@@ -255,7 +253,11 @@ function Workspace(props) {
           addNewModule={addModule}
         />
       )}
-      <Exporter sessionData={initialSessionData} modules={modules} />
+      <Exporter
+        sessionSize={sessionSize}
+        sessionData={initialSessionData}
+        modules={modules}
+      />
       <Drawer>{drawerCont}</Drawer>
     </div>
   );

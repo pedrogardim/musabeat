@@ -26,6 +26,7 @@ function EnvelopeControl(props) {
             element === "sustain" ||
             element === "release") && (
             <Slider
+              key={index}
               className={"instrument-editor-vertical-slider " + element}
               orientation="vertical"
               value={envelope[element]}

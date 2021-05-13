@@ -51,7 +51,7 @@ function AudioFileItem(props) {
           onChange={handleWaveChange}
         >
           {waveTypes.map((e, i) => (
-            <option value={e}>{e}</option>
+            <option key={i} value={e}>{e}</option>
           ))}
         </Select>
       ) : (
