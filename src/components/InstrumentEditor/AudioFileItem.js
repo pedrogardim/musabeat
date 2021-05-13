@@ -27,14 +27,12 @@ function AudioFileItem(props) {
     () =>
       drawWave(
         isSynth ? props.buffer.asArray(128) : props.buffer.toArray(),
-        0,
+        waveZoomX,
         isSynth,
         setWavePath
       ),
     []
   );
-
-  console.log(props.instrument.get());
 
   return (
     <Card onClick={handleClick} className={"audio-file-item"}>
@@ -78,7 +76,6 @@ const drawWave = (wavearray, scale, isSynth, setWavePath) => {
         setWavePath(pathstring);
       })
     : wavearray;
-  console.log(wave);
 
   for (let x = 0; x < wave.length; x++) {
     pathstring += "L " + x + " " + (wave[x * scale] * 32 + 32) + " ";

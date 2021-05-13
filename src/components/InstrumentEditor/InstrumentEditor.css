@@ -17,6 +17,24 @@
 
 }
 
+.instrument-editor-column {
+  height: calc(100% - 50px);
+  width:calc(33.33% - 16px);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  padding: 0 8px
+}
+
+.instrument-editor-vertical-slider{
+  height:30%!important ;
+  padding: 0 10% !important;
+  width:2px !important; 
+}
+
 .break {
   width: 100%;
   height: 0px;

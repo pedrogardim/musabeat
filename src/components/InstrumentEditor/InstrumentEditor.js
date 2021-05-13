@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 
-import { Select } from "@material-ui/core";
+import { Select, Typography, Slider } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
+import EnvelopeControl from "./EnvelopeControl";
 
 import { instruments } from "../../assets/instrumentpatches";
 import { instrumentContructor } from "../../assets/musicutils";
@@ -13,6 +14,8 @@ function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState(0);
   //const [selectedFile, setSelectedFile] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
+
+  console.log(instrument.get());
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
@@ -39,9 +42,8 @@ function InstrumentEditor(props) {
     //
   };
 
-  let mainContent = "Nothing Here";
 
-  console.log(instrument);
+  let mainContent = "Nothing Here";
 
   let list = [];
 
@@ -61,15 +63,26 @@ function InstrumentEditor(props) {
       mainContent = list;
       break;
     case "PolySynth":
-        list.push(
+      list.push(
+        <div className="instrument-editor-column">
           <AudioFileItem
             instrument={instrument}
             buffer={instrument._dummyVoice.oscillator}
-            name={instrument._dummyVoice.oscillator.type}
+            name={instrument.get().oscillator.type}
           />
-        )
-        
-      
+        </div>
+      );
+      list.push(
+        <div className="instrument-editor-column">
+          {Object.keys(instrument.get()).map(
+            (envelope, envelopeIndex) =>
+              (envelope.toLowerCase().includes("envelope")) && (
+                <EnvelopeControl instrument={instrument} envelopeType={envelope}/>
+              )
+          )}
+        </div>
+      );
+      list.push(<div className="instrument-editor-column"></div>);
       mainContent = list;
       break;
   }
