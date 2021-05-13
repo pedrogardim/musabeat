@@ -8,7 +8,12 @@ import { audioBufferToWav } from "audiobuffer-to-wav";
 import * as MusicUtils from "../assets/musicutils";
 import * as Tone from "tone";
 
-export const bounceSessionExport = (modules, sessionData, setIsReady) => {
+export const bounceSessionExport = (
+  modules,
+  sessionData,
+  setIsReady,
+  sessionSize
+) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
   let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
@@ -31,10 +36,9 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
     modules.map((module, moduleIndex) => {
       //let thisinstrument = module.instrument.connect(transport);
       let thisinstrument = MusicUtils.instrumentContructor(0);
-      if(module.instrument.name=="Sampler"){
+      if (module.instrument.name == "Sampler") {
         thisinstrument = new Tone.Sampler().toDestination();
         thisinstrument._buffers = instrumentBuffers[moduleIndex];
-
       }
 
       //let thisinstrument = module.instrument;
@@ -51,7 +55,9 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             thisinstrument,
             transport,
             () => {},
-            () => {}
+            () => {},
+            "",
+            sessionSize
           );
           break;
         case 1:
@@ -60,7 +66,9 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             thisinstrument,
             transport,
             () => {},
-            () => {}
+            () => {},
+            "",
+            sessionSize
           );
           break;
         case 2:
@@ -68,7 +76,9 @@ export const bounceSessionExport = (modules, sessionData, setIsReady) => {
             module.chords,
             thisinstrument,
             transport,
-            () => {}
+            () => {},
+            "",
+            sessionSize
           );
           break;
       }
