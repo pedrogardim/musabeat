@@ -122,6 +122,10 @@ function Sequencer(props) {
     changeSequence(props.module.score);
   },[props.module.score])
 
+  useEffect(() => {
+    scheduleNotes();
+  },[props.sessionSize])
+
   return (
     <div
       className="module-innerwrapper"
@@ -167,7 +171,7 @@ function Sequencer(props) {
       >
         {sequencerArray.length > 1 &&
           sequencerArray.map((measure, index) => (
-            <BottomNavigationAction key={index} label={index + 1} />
+            <BottomNavigationAction style={{minWidth:"0px"}}key={index} label={index + 1} />
           ))}
       </BottomNavigation>}
     </div>

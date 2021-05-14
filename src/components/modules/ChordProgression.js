@@ -99,6 +99,10 @@ function ChordProgression(props) {
     props.drawerCont == null && setSelectedChord(null)
   }, [props.drawerCont]);
 
+  useEffect(() => {
+    scheduleChords();
+  },[props.sessionSize])
+
   return (
     <div
       className="chord-prog"

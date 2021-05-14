@@ -110,6 +110,10 @@ function MelodyGrid(props) {
     updateSequence();
   }, [instrument, melodyArray]);
 
+  useEffect(() => {
+    scheduleNotes();
+  },[props.sessionSize])
+
   return (
     <div
       className="module-innerwrapper"
@@ -157,7 +161,7 @@ function MelodyGrid(props) {
       >
         {melodyArray.length > 1 &&
           melodyArray.map((measure, index) => (
-            <BottomNavigationAction key={index} label={index + 1} />
+            <BottomNavigationAction style={{minWidth:"0px"}}key={index} label={index + 1} />
           ))}
       </BottomNavigation>}
     </div>
