@@ -15,6 +15,8 @@ function ChannelStrip(props) {
   const [muted, setMuted] = useState(module.instrument._volume.mute);
 
   const handleFaderMove = (value) => {
+    setMuted(false);
+    module.instrument._volume.mute = false;
     setFaderVolume(value);
     module.instrument.volume.value = value;
   };
@@ -23,16 +25,15 @@ function ChannelStrip(props) {
   };
   useEffect(() => {
     module.instrument._volume.mute = muted;
+    setFaderVolume(module.instrument.volume.value.toFixed(2))
   }, [muted]);
-  useEffect(() => {
-    setMuted(module.instrument._volume.mute);
-  }, [module.instrument._volume.mute]);
+  
 
   return (
     <div className="mixer-channel-strip" style={props.style,{filter:muted?"saturate(0)":"none"}}>
       <Slider
         value={faderVolume}
-        min={-60}
+        min={-80}
         step={0.1}
         max={0}
         scale={(x) => Math.log(x)}
@@ -47,7 +48,7 @@ function ChannelStrip(props) {
             {muted ? "volume_off" : "volume_up"}
           </Icon>
         </IconButton>
-      <Typography variant="overline"> {faderVolume} </Typography>
+      <Typography variant="overline" style={{textTransform:"none"}}> {faderVolume === "-Infinity" ? "MUTED" : faderVolume + " dB"} </Typography>
       <Typography variant="overline"> {module.name} </Typography>
     </div>
   );

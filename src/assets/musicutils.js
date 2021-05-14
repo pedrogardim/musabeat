@@ -550,8 +550,6 @@ export const instrumentContructor = (input) => {
   let patch = !isNaN(input) ? instruments[input] : input;
   let instrfx = [];
 
-  console.log(input);
-
   if (patch.base === "Sampler") {
     instr = new Tone.Sampler({
       urls: patch.urls,

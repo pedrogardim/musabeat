@@ -20,7 +20,7 @@ function Sequencer(props) {
   const loadedSequence = props.module.score;
 
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
-  const [loadedDrumSounds, setDrumSounds] = useState({});
+  const [drumPlayers, setDrumPlayers] = useState(props.module.instrument);
   const [sequencerArray, changeSequence] = useState(loadedSequence);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
@@ -55,7 +55,7 @@ function Sequencer(props) {
 
     scheduledNotes = scheduleDrumSequence(
       sequencerArray,
-      loadedDrumSounds,
+      drumPlayers,
       Tone.Transport,
       setCurrentBeat,
       setCurrentMeasure,
@@ -68,23 +68,22 @@ function Sequencer(props) {
 
   const loadDrumPatch = () => {
     //if(Drumdata.kits[loadedpatch].hasOwnProperty('sounds'))
-    let soundsmap = Drumdata.labels.map((element, index) => {
-      return (
+    Drumdata.labels.forEach((element, index) => {
+      drumPlayers.add(index,
         "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
-        Drumdata.kits[loadedpatch].baseUrl +
-        "/" +
-        index +
-        ".wav"
+          Drumdata.kits[loadedpatch].baseUrl +
+          "/" +
+          index +
+          ".wav",
+        () => {
+          index === Drumdata.labels.length - 1 && setIsBufferLoaded(true);
+        }
       );
     });
-
-    setDrumSounds(
-      new Tone.Players(soundsmap, () => setIsBufferLoaded(true)).toDestination()
-    );
   };
 
   const playDrumSound = (note, time) =>
-    loadedDrumSounds.player(note).start(time !== undefined ? time : 0);
+    drumPlayers.player(note).start(time !== undefined ? time : 0);
 
   const handleBottomNavClick = (value) => {
     setCurrentMeasure(value);
@@ -103,7 +102,7 @@ function Sequencer(props) {
   const updateInstrument = () => {
     props.updateModules((previousModules) => {
       let newmodules = [...previousModules];
-      newmodules[props.module.id].instrument = loadedDrumSounds;
+      newmodules[props.module.id].instrument = drumPlayers;
       return newmodules;
     });
   };
@@ -113,18 +112,18 @@ function Sequencer(props) {
   }, []);
 
   useEffect(() => {
-    loadedDrumSounds.hasOwnProperty("name") && scheduleNotes();
+    drumPlayers.loaded && scheduleNotes();
     updateSequence();
-    updateInstrument();
-  }, [loadedDrumSounds, sequencerArray]);
+    //updateInstrument();
+  }, [drumPlayers, sequencerArray]);
 
   useEffect(() => {
     changeSequence(props.module.score);
-  },[props.module.score])
+  }, [props.module.score]);
 
   useEffect(() => {
     scheduleNotes();
-  },[props.sessionSize])
+  }, [props.sessionSize]);
 
   return (
     <div
@@ -159,21 +158,26 @@ function Sequencer(props) {
       ) : (
         <CircularProgress />
       )}
-      {sequencerArray.length > 1 &&
-      <BottomNavigation
-        style={{ color: props.module.color[900] }}
-        value={currentMeasure}
-        showLabels
-        onChange={(event, newValue) => {
-          handleBottomNavClick(newValue);
-        }}
-        className="sequencer-bottomnav"
-      >
-        {sequencerArray.length > 1 &&
-          sequencerArray.map((measure, index) => (
-            <BottomNavigationAction style={{minWidth:"0px"}}key={index} label={index + 1} />
-          ))}
-      </BottomNavigation>}
+      {sequencerArray.length > 1 && (
+        <BottomNavigation
+          style={{ color: props.module.color[900] }}
+          value={currentMeasure}
+          showLabels
+          onChange={(event, newValue) => {
+            handleBottomNavClick(newValue);
+          }}
+          className="sequencer-bottomnav"
+        >
+          {sequencerArray.length > 1 &&
+            sequencerArray.map((measure, index) => (
+              <BottomNavigationAction
+                style={{ minWidth: "0px" }}
+                key={index}
+                label={index + 1}
+              />
+            ))}
+        </BottomNavigation>
+      )}
     </div>
   );
 }

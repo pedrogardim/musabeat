@@ -53,7 +53,7 @@ const initialModules = [
     type: 0,
     steps: 16,
     patch: 0,
-    instrument: {},
+    instrument: new Tone.Players({ "-1": "" }).toDestination(),
     color: colors[2],
     score: [
       [
@@ -261,10 +261,8 @@ function Workspace(props) {
         modules={modules}
       />
       <Drawer>{drawerCont}</Drawer>
-      {mixerOpened && <Mixer
-        style={{ display: mixerOpened ? "flex" : "none" }}
-        modules={modules}
-      />}
+
+      {mixerOpened && <Mixer modules={modules} />}
 
       <Fab
         className="fixed-fab"

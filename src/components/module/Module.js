@@ -14,7 +14,7 @@ import "./Module.css";
 
 function Module(props) {
   const [expanded, setExpanded] = useState(false);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(props.module.instrument._volume.mute);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
 
@@ -30,10 +30,6 @@ function Module(props) {
   const handleSettingsButtonMode = () => {
     setSettingsMode((prev) => (prev ? false : true));
     setInstrumentEditorMode(false);
-  };
-
-  const handleMuteButton = () => {
-    setMuted(muted ? false : true);
   };
 
   switch (props.module.type) {
@@ -82,17 +78,21 @@ function Module(props) {
       break;
   }
 
-  useEffect(() => 
-    props.module.instrument._volume !== undefined
-      ? (props.module.instrument._volume.mute = muted)
-      : ""
-  , [muted]);
+  //TO DO
+  /*
+  useEffect(() =>{ 
+    setMuted(props.module.instrument.volume.value === -Infinity ? true : false);
+    console.log(props.module.instrument.volume.value)
+  }
+  , [props.module.instrument.volume.value]);
+
+  */
 
   return (
     <Card
       style={{
         backgroundColor: props.module.color[700],
-        filter: muted && "saturate(0)",
+        filter: muted && "saturate(0) brightness(1.5) constrast(0.5)",
       }}
       className="module"
     >
@@ -109,14 +109,6 @@ function Module(props) {
           onClick={handleInstrumentButtonMode}
         >
           <Icon style={{ color: "white" }}>piano</Icon>
-        </IconButton>
-        <IconButton
-          className="module-instrument-icon-button"
-          onClick={handleMuteButton}
-        >
-          <Icon style={{ color: "white" }}>
-            {muted ? "volume_off" : "volume_up"}
-          </Icon>
         </IconButton>
       </div>
 

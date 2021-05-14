@@ -14,7 +14,6 @@ import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState(0);
-  //const [selectedFile, setSelectedFile] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
 
   //console.log(instrument.get());
@@ -52,7 +51,9 @@ function InstrumentEditor(props) {
 
   switch (instrument.name) {
     case "Players":
+      //temp solution
       instrument._buffers._buffers.forEach((e, i) =>
+        i > -1 && 
         list.push(
           <AudioFileItem
             active={instrument.player(i).state === "started"}
