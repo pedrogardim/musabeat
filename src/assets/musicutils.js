@@ -255,6 +255,17 @@ export const waveTypes = [
   "pwm",
 ];
 
+export const filterTypes = [
+  "lowpass",
+  "highpass",
+  "bandpass",
+  "lowshelf",
+  "highshelf",
+  "notch",
+  "allpass",
+  "peaking",
+];
+
 export const chordNametoNotes = (arg) => {
   let chordroot,
     chordtype,
@@ -566,11 +577,13 @@ export const instrumentContructor = (input) => {
   }
   if (patch.base === undefined) {
     instr = new Tone.PolySynth(patch);
-    instr.set(patch)
-    console.log(instr)
+    instr.set(patch);
+    console.log(instr);
   }
 
-  "gain" in patch ? instr.volume.value = patch.gain : instr.volume.value = -18;
+  "gain" in patch
+    ? (instr.volume.value = patch.gain)
+    : (instr.volume.value = -18);
 
   if ("fx" in patch) {
     patch.fx.forEach((e, i) => {

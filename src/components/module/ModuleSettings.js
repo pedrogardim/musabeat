@@ -48,7 +48,7 @@ function ModuleSettings(props) {
       mainContent = [
         <FormControl>
           <InputLabel id="subdivision-select-label">Steps</InputLabel>
-          <Select native labelId="subdivision" value={props.module.score[0].length} onChange={handleStepsSelect}>
+          <Select native labelId="subdivision-select-label" value={props.module.score[0].length} onChange={handleStepsSelect}>
             {subdivisionValues.map((value, index) => (
               <option key={index} value={value}>
                 {value}

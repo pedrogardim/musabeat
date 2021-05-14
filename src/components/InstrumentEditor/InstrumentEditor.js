@@ -1,9 +1,11 @@
-import React, { useState, Fragment } from "react";
+import React, { useState } from "react";
 
 import { Select, Typography, Slider } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
+import SynthParameters from "./SynthParameters";
+
 
 import { instruments } from "../../assets/instrumentpatches";
 import { instrumentContructor } from "../../assets/musicutils";
@@ -39,6 +41,7 @@ function InstrumentEditor(props) {
     }
     //auto close
     props.setInstrumentEditorMode(false);
+
     //
   };
 
@@ -72,8 +75,11 @@ function InstrumentEditor(props) {
           />
         </div>
       );
+      list.push(<div className="instrument-editor-column" key={1}>
+        <SynthParameters instrument={instrument}/>
+      </div>);
       list.push(
-        <div className="instrument-editor-column" key={1}>
+        <div className="instrument-editor-column" key={2}>
           {Object.keys(instrument.get()).map(
             (envelope, envelopeIndex) =>
               (envelope.toLowerCase().includes("envelope")) && (
@@ -82,7 +88,6 @@ function InstrumentEditor(props) {
           )}
         </div>
       );
-      list.push(<div className="instrument-editor-column" key={2}></div>);
       mainContent = list;
       break;
   }
