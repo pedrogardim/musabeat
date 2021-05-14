@@ -9,6 +9,7 @@ import Module from "./../module/Module";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Drawer from "./Drawer";
+import Mixer from "./mixer/Mixer";
 
 import {
   red,
@@ -72,7 +73,7 @@ const initialModules = [
         [],
         [3],
         [],
-      ]
+      ],
     ],
   },
   {
@@ -172,6 +173,8 @@ function Workspace(props) {
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [drawerCont, setDrawerCont] = useState(null);
 
+  const [mixerOpened, setMixerOpened] = useState(false);
+
   const addModule = (moduletype) => {
     let module = {
       id: modules.length,
@@ -196,7 +199,6 @@ function Workspace(props) {
     let longestModule = Math.max(...lengths);
     setSessionSize(longestModule);
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * longestModule;
-
   };
 
   const handleKeyPress = (event) => {
@@ -259,6 +261,18 @@ function Workspace(props) {
         modules={modules}
       />
       <Drawer>{drawerCont}</Drawer>
+      {mixerOpened && <Mixer
+        style={{ display: mixerOpened ? "flex" : "none" }}
+        modules={modules}
+      />}
+
+      <Fab
+        className="fixed-fab"
+        color="primary"
+        onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+      >
+        <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+      </Fab>
     </div>
   );
 }

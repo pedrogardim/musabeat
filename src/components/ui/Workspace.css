@@ -7,6 +7,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: white;
   padding:200px 0 200px 0;
+}
+
+.fixed-fab{
+  position:fixed !important;
+  bottom:16px;
+  right:16px;
+  z-index:2
 }

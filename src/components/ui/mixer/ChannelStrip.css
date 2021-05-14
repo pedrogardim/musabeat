@@ -1,0 +1,10 @@
+.mixer-channel-strip{
+    width:10%;
+    height:60%;
+    /* outline:1px solid black; */
+    display:flex;
+    flex-direction:column;
+    justify-content:space-around;
+    align-items: center;
+    margin:16px;
+}
