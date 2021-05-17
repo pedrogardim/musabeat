@@ -6,13 +6,15 @@ import AudioClip from "./AudioClip";
 
 import { CircularProgress, Typography } from "@material-ui/core";
 
+import { scheduleSamples } from "../../utils/TransportSchedule";
+
 import "./Sampler.css";
 
 //TODO
 
 function Sampler(props) {
-  const [loadedAudios, setLoadedAudios] = useState(props.module.players);
-  const [players, setPlayers] = useState(props.module.audios);
+  const [score, setScore] = useState(props.module.score);
+  const [players, setPlayers] = useState(props.module.players);
   const [cursorPosition, setCursorPosition] = useState(0);
 
   const startCursor = () => {
@@ -27,12 +29,21 @@ function Sampler(props) {
     }, 100);
   };
 
+  const scheduleEvents  = () => {
+    scheduleSamples(score,players,Tone.Transport,props.module.id)
+
+  }
+
+  useEffect(()=>{
+    scheduleEvents()
+  },[])
+
   return (
     <div
       className="module-innerwrapper"
       style={(props.style, { backgroundColor: props.module.color["400"] })}
     >
-      {loadedAudios.map((e, i) => (
+      {players.map((e, i) => (
         <AudioClip key={i} index={i} color={props.module.color} buffer={e.buffer} />
       ))}
     </div>

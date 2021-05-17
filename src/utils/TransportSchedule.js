@@ -142,3 +142,20 @@ export const scheduleChordProgression = (
 
   scheduledEvents[moduleId] = scheduledChords;
 };
+
+export const scheduleSamples = (score,players, transport, moduleId) => {
+  moduleId !== undefined && clearEvents(moduleId);
+
+  let scheduledEvents = [];
+
+  score.map((event, eventIndex) => {
+    let thisevent = transport.schedule((time) => {
+      players[event.instrument].start(time,0,event.duration)
+      //console.log(chord.notes);
+    }, event.time);
+    scheduledEvents.push(thisevent);
+    
+  });
+
+  scheduledEvents[moduleId] = scheduledEvents;
+};
