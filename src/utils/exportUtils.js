@@ -2,6 +2,7 @@ import {
   scheduleDrumSequence,
   scheduleChordProgression,
   scheduleMelodyGrid,
+  scheduleSamples
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
@@ -76,6 +77,15 @@ export const bounceSessionExport = (
             () => {},
             "",
             sessionSize
+          );
+          break;
+          case 3:
+            thisinstrument = module.players.map((e)=>new Tone.GrainPlayer(e.buffer).toDestination())
+            scheduleSamples(
+            module.score,
+            thisinstrument,
+            transport,
+            ""
           );
           break;
       }
