@@ -1,0 +1,15 @@
+.sampler{
+    background-color:"";
+    height:calc(100%);
+    width:calc(100%);
+
+}
+
+.sampler-cursor{
+    position:relative;
+    background-color:white;
+    height:100%;
+    width:1px;
+    top:0px;
+ 
+}

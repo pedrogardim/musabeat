@@ -5,6 +5,7 @@ import { Card, IconButton, Icon } from "@material-ui/core";
 import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
 import MelodyGrid from "../modules/MelodyGrid";
+import Sampler from "../modules/Sampler";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 
@@ -73,6 +74,20 @@ function Module(props) {
           updateModules={props.updateModules}
           setDrawer={props.setDrawer}
           drawerCont={props.drawerCont}
+        />
+      );
+      break;
+
+      case 3:
+      innerModule = (
+        <Sampler
+          style={{
+            display: instrumentEditorMode || settingsMode ? "none" : "flex",
+          }}
+          sessionSize={props.sessionSize}
+          muted={muted} 
+          module={props.module}
+          updateModules={props.updateModules}
         />
       );
       break;

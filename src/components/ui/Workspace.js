@@ -30,6 +30,7 @@ import {
   deepOrange,
 } from "@material-ui/core/colors";
 import { instrumentContructor } from "../../assets/musicutils";
+import { GrainPlayer } from "tone";
 
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
@@ -157,6 +158,16 @@ const initialModules = [
       },
     ],
   },
+  {
+    id: 3,
+    name: "Sampler",
+    type: 3,
+    length: 1,
+    players: [new Tone.GrainPlayer("https://tonejs.github.io/audio/berklee/gong_1.mp3").toDestination()],
+    instrument: new Tone.GrainPlayer("https://tonejs.github.io/audio/berklee/gong_1.mp3").toDestination(),
+
+    color: colors[2],
+  },
 ];
 
 const initialSessionData = {
@@ -194,6 +205,8 @@ function Workspace(props) {
     let lengths = modules.map((module) =>
       module.type === 2
         ? Math.ceil(module.score[module.score.length - 1].time)
+        : module.type === 3
+        ? module.length
         : module.score.length
     );
     let longestModule = Math.max(...lengths);
