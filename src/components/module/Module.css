@@ -19,6 +19,13 @@
     */
 }
 
+.module-compact{
+  max-height: 300px !important;
+  min-height: 150px !important;
+  height: 12.5vw !important;
+
+}
+
 .module-header {
   height: 30px;
   width: 100%;

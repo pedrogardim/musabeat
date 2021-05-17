@@ -13,9 +13,12 @@ import "./Sampler.css";
 //TODO
 
 function Sampler(props) {
+  const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [score, setScore] = useState(props.module.score);
-  const [players, setPlayers] = useState(props.module.players);
+  const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
+
+  let buffersChecker;
 
   const startCursor = () => {
     setInterval(() => {
@@ -29,23 +32,37 @@ function Sampler(props) {
     }, 100);
   };
 
-  const scheduleEvents  = () => {
-    scheduleSamples(score,players,Tone.Transport,props.module.id)
+  const checkForLoadedBuffers = () => {
+    let check = instrument.buffer.duration !== 0;
 
-  }
+    if (check) {
+      setIsBufferLoaded(true);
+      clearInterval(buffersChecker);
+    }
+  };
 
-  useEffect(()=>{
-    scheduleEvents()
-  },[])
+  const scheduleEvents = () => {
+    scheduleSamples(score, instrument, Tone.Transport, props.module.id);
+  };
+
+  useEffect(() => {
+    buffersChecker = setInterval(checkForLoadedBuffers, 20);
+    scheduleEvents();
+  }, []);
 
   return (
     <div
       className="module-innerwrapper"
       style={(props.style, { backgroundColor: props.module.color["400"] })}
     >
-      {players.map((e, i) => (
-        <AudioClip key={i} index={i} color={props.module.color} buffer={e.buffer} />
-      ))}
+      {isBufferLoaded ? (
+        <AudioClip
+          color={props.module.color}
+          buffer={instrument.buffer}
+        />
+      ) : (
+        <CircularProgress />
+      )}
     </div>
   );
 }

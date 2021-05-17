@@ -12,6 +12,9 @@
     "jquery": "^3.6.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-draggable": "^4.4.3",
+    "react-resizable": "^3.0.1",
+    "react-rnd": "^10.2.4",
     "react-scripts": "4.0.3",
     "tone": "^14.7.77",
     "web-vitals": "^1.1.1"

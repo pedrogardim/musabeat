@@ -80,7 +80,7 @@ export const bounceSessionExport = (
           );
           break;
           case 3:
-            thisinstrument = module.players.map((e)=>new Tone.GrainPlayer(e.buffer).toDestination())
+            thisinstrument = new Tone.GrainPlayer(module.instrument).toDestination()
             scheduleSamples(
             module.score,
             thisinstrument,

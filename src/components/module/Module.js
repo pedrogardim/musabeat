@@ -109,7 +109,7 @@ function Module(props) {
         backgroundColor: props.module.color[700],
         filter: muted && "saturate(0) brightness(1.5) constrast(0.5)",
       }}
-      className="module"
+      className={"module " + (props.module.type === 3 && "module-compact")}
     >
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>
