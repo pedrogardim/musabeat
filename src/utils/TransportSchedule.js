@@ -3,6 +3,7 @@ import * as Tone from "tone";
 let scheduledEvents = [];
 
 const clearEvents = (moduleId) => {
+  //console.log(moduleId)
   typeof scheduledEvents[moduleId] !== "undefined" &&
     scheduledEvents[moduleId].length > 0 &&
     scheduledEvents[moduleId].forEach((event) => Tone.Transport.clear(event));
@@ -146,16 +147,16 @@ export const scheduleChordProgression = (
 export const scheduleSamples = (score,instrument, transport, moduleId) => {
   moduleId !== undefined && clearEvents(moduleId);
 
-  let scheduledEvents = [];
+  let scheduledSounds = [];
 
   score.map((event, eventIndex) => {
     let thisevent = transport.schedule((time) => {
       instrument.start(time,0,event.duration)
       //console.log(chord.notes);
     }, event.time);
-    scheduledEvents.push(thisevent);
+    scheduledSounds.push(thisevent);
     
   });
 
-  scheduledEvents[moduleId] = scheduledEvents;
+  scheduledEvents[moduleId] = scheduledSounds;
 };

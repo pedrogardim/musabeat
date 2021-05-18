@@ -46,19 +46,29 @@ function Sampler(props) {
   };
 
   useEffect(() => {
-    buffersChecker = setInterval(checkForLoadedBuffers, 20);
     scheduleEvents();
+    console.log(score);
+  }, [score]);
+
+  useEffect(() => {
+    buffersChecker = setInterval(checkForLoadedBuffers, 20);
   }, []);
+
 
   return (
     <div
       className="module-innerwrapper"
+      id={"sampler-"+props.module.id}
       style={(props.style, { backgroundColor: props.module.color["400"] })}
     >
       {isBufferLoaded ? (
         <AudioClip
+          index={0}
+          parentId={"sampler-"+props.module.id}
           color={props.module.color}
           buffer={instrument.buffer}
+          scheduleEvents={scheduleEvents}
+          setScore={setScore}
         />
       ) : (
         <CircularProgress />

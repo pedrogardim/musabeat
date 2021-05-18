@@ -72,6 +72,13 @@ export const instruments = [
         sustain: 1,
         release: 0.01,
       },
+      filterEnvelope: {
+        attack: 0,
+        decay: 0,
+        sustain: 1,
+        release: 0,
+
+      }
     },
     fx: [
       ["vib", 6, 0.05],

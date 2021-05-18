@@ -23,16 +23,26 @@ function AudioClip(props) {
     setClipWidth(size.width);
   };
 
+  const handleDrag = (event, element) => {
+    props.setScore((prev) => {
+      let newScore = [...prev];
+      let newTime =
+        (element.x / document.getElementById(props.parentId).clientWidth) *
+        Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      newScore[props.index].time = newTime;
+      return newScore;
+    });
+  };
+
   useEffect(() => {
     updateLine();
-  }, [props.buffer]);
+  }, []);
 
   return (
-    <Draggable
-    axis="x">
+    <Draggable axis="x" onStop={handleDrag}>
       <Resizable
-        resizeHandles={["e"]}
-        height={"100%"}
+        //resizeHandles={["e"]}
+        height={document.getElementById(props.parentId).clientHeight}
         width={clipWidth}
         onResize={handleResize}
       >
@@ -40,15 +50,21 @@ function AudioClip(props) {
           className="sampler-audio-clip"
           id={"clip" + props.index}
           style={{
-            width: clipWidth +"px",
+            width: clipWidth + "px",
             backgroundColor: props.color[100],
           }}
         >
           <svg
             className="sampler-audio-clip-wave"
-            viewBow={"0 0 " + clipHeight + " " + clipHeight}
+            height={clipHeight}
+            width={clipWidth}
           >
-            {drawClipWave(props.buffer.toArray(), clipHeight, props.color)}
+            {drawClipWave(
+              props.buffer.toArray(),
+              clipHeight,
+              clipWidth,
+              props.color
+            )}
           </svg>
         </div>
       </Resizable>
@@ -56,11 +72,11 @@ function AudioClip(props) {
   );
 }
 
-const drawClipWave = (wavearray, clipHeight, color) => {
+const drawClipWave = (wavearray, clipHeight, clipWidth, color) => {
   let pathstring = "M 0 " + clipHeight / 2 + " ";
   let scale = 450;
 
-  for (let x = 0; x < wavearray.length / 2; x++) {
+  for (let x = 0; x < clipWidth; x++) {
     pathstring +=
       "L " +
       x +

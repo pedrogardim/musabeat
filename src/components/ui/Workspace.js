@@ -228,6 +228,8 @@ function Workspace(props) {
     }
   };
 
+  //disabled
+ /*  
   const handleClick = (event) => {
     let targetClass =
       "classList" in event.target ? event.target.classList[0] : "";
@@ -236,7 +238,7 @@ function Workspace(props) {
       !targetClass.includes("chord") &&
       setDrawerCont(null);
   };
-
+ */
   useEffect(() => {
     adaptSessionSize();
     console.log(modules);
@@ -246,7 +248,6 @@ function Workspace(props) {
     <div
       className="workspace"
       tabIndex="0"
-      onClick={handleClick}
       onKeyDown={handleKeyPress}
     >
       {modules.map((module) => (
@@ -275,7 +276,7 @@ function Workspace(props) {
         sessionData={initialSessionData}
         modules={modules}
       />
-      <Drawer>{drawerCont}</Drawer>
+      {/*<Drawer>{drawerCont}</Drawer>*/}
 
       {mixerOpened && <Mixer modules={modules} />}
 

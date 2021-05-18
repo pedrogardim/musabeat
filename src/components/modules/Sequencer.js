@@ -112,7 +112,7 @@ function Sequencer(props) {
   }, []);
 
   useEffect(() => {
-    drumPlayers.loaded && scheduleNotes();
+    scheduleNotes();
     updateSequence();
     //updateInstrument();
   }, [drumPlayers, sequencerArray]);
