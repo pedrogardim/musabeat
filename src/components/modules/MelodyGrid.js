@@ -7,6 +7,8 @@ import * as Drumdata from "../../assets/drumkits";
 
 import { scheduleMelodyGrid } from "../../utils/TransportSchedule";
 
+import { scales, musicalNotes } from "../../assets/musicutils";
+
 import {
   CircularProgress,
   BottomNavigation,
@@ -97,13 +99,25 @@ function MelodyGrid(props) {
     });
   };
 
+  const updateGridRows = () => {
+    let newNotes = [];
+    for (let x = 0; x < props.module.range[1] - props.module.range[0] +1; x++) {
+      let root = musicalNotes[props.module.root] + "" + (props.module.range[0] + x);
+      //console.log(root,scales[props.module.scale][0])
+      Tone.Frequency(root).harmonize(scales[props.module.scale][0]).map((e)=>newNotes.push(e.toNote()));
+    }
+    newNotes.push(Tone.Frequency(musicalNotes[props.module.root]+""+(props.module.range[1]+1)).toNote())
+    setGridScale(newNotes);
+    //TODO: Handle Hidden Notes
+  };
+
   useEffect(() => {
     setInstrument(props.module.instrument);
   }, [props.module.instrument]);
 
   useEffect(() => {
     setMelodyArray(props.module.score);
-  },[props.module.score])
+  }, [props.module.score]);
 
   useEffect(() => {
     instrument.hasOwnProperty("name") && scheduleNotes();
@@ -112,7 +126,12 @@ function MelodyGrid(props) {
 
   useEffect(() => {
     scheduleNotes();
-  },[props.sessionSize])
+  }, [props.sessionSize]);
+
+  useEffect(() => {
+    updateGridRows();
+    //console.log(gridScale);
+  }, [props.module.root, props.module.scale, props.module.range]);
 
   return (
     <div
@@ -150,20 +169,25 @@ function MelodyGrid(props) {
       ) : (
         <CircularProgress />
       )}
-      {melodyArray.length > 1 && 
-      <BottomNavigation
-        value={currentMeasure}
-        showLabels
-        onChange={(event, newValue) => {
-          handleBottomNavClick(newValue);
-        }}
-        className="melody-grid-bottomnav"
-      >
-        {melodyArray.length > 1 &&
-          melodyArray.map((measure, index) => (
-            <BottomNavigationAction style={{minWidth:"0px"}}key={index} label={index + 1} />
-          ))}
-      </BottomNavigation>}
+      {melodyArray.length > 1 && (
+        <BottomNavigation
+          value={currentMeasure}
+          showLabels
+          onChange={(event, newValue) => {
+            handleBottomNavClick(newValue);
+          }}
+          className="melody-grid-bottomnav"
+        >
+          {melodyArray.length > 1 &&
+            melodyArray.map((measure, index) => (
+              <BottomNavigationAction
+                style={{ minWidth: "0px" }}
+                key={index}
+                label={index + 1}
+              />
+            ))}
+        </BottomNavigation>
+      )}
     </div>
   );
 }

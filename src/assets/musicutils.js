@@ -97,6 +97,8 @@ export const musicalintervals = [
 export const scales = [
   //[[0,1,2,3,4,5,6,7,8,9,10,11],"Chromatic"],
   [[0, 2, 4, 5, 7, 9, 11], "Major"],
+  [[0, 2, 4, 7, 9], "Major Pentatonic"],
+
   [[0, 2, 3, 5, 7, 8, 10], "Minor"],
   [[0, 2, 3, 5, 7, 8, 11], "Harm Minor"],
 
@@ -576,7 +578,7 @@ export const instrumentContructor = (input) => {
   if (patch.base === undefined) {
     instr = new Tone.PolySynth(patch);
     instr.set(patch);
-    console.log(instr);
+    //console.log(instr);
   }
 
   "gain" in patch

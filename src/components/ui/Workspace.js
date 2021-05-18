@@ -82,6 +82,9 @@ const initialModules = [
     name: "Melody",
     type: 1,
     steps: 16,
+    root: 0,
+    scale:1,
+    range:[3,4],
     instrument: instrumentContructor(2),
     color: colors[2],
     score: [
@@ -163,10 +166,9 @@ const initialModules = [
     name: "Sampler",
     type: 3,
     length: 1,
-    score:[{time:0,duration:1}],
     instrument: new Tone.GrainPlayer("https://tonejs.github.io/audio/berklee/gong_1.mp3").toDestination(),
-
     color: colors[2],
+    score:[{time:0,duration:1}],
   },
 ];
 
