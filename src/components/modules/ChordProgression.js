@@ -7,6 +7,13 @@ import * as Tone from "tone";
 
 import * as MusicUtils from "../../assets/musicutils";
 
+import {
+  getChordsFromScale,
+  chordNotestoName,
+  scales,
+  musicalNotes,
+} from "../../assets/musicutils";
+
 import { Divider } from "@material-ui/core";
 
 import "./ChordProgression.css";
@@ -56,11 +63,13 @@ function ChordProgression(props) {
     });
   };
 
-  const playChordPreview = (chordindex) =>
+  const playChordPreview = (chordindex) => {
+    instrument.releaseAll();
     instrument.triggerAttackRelease(
       chords[chordindex].notes,
       chords[chordindex].duration * Tone.Time("1m").toSeconds()
     );
+  };
 
   useEffect(() => {
     scheduleChords();
@@ -83,40 +92,26 @@ function ChordProgression(props) {
 
   useEffect(() => {
     setActiveChord(selectedChord);
-    props.setDrawer(() =>
-      selectedChord === null ? null : (
-        <ChordPicker
-          selectedChord={selectedChord}
-          chords={chords}
-          setChords={setChords}
-          instrument={instrument}
-        />
-      )
-    );
   }, [selectedChord]);
 
   useEffect(() => {
-    props.drawerCont == null && setSelectedChord(null)
-  }, [props.drawerCont]);
-
-  useEffect(() => {
     scheduleChords();
-  },[props.sessionSize])
+  }, [props.sessionSize]);
 
   return (
-    <div
-      className="chord-prog"
-      style={props.style}
-      onBlur={() => console.log("chord prog unfocused")}
-    >
+    <div className="chord-prog" style={props.style}>
       <Divider className="measure-divider" orientation="vertical" />
       {chords.map((chord, i) => (
         <Fragment key={i}>
           {i > 0 && Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
-            <Divider key={"divider"+i} className="measure-divider" orientation="vertical" />
+            <Divider
+              key={"divider" + i}
+              className="measure-divider"
+              orientation="vertical"
+            />
           )}
           <Chord
-            key={"chord"+i}
+            key={"chord" + i}
             active={activeChord === i}
             name={MusicUtils.chordNotestoName(chord.notes)}
             onClick={() => handleClick(i)}
@@ -124,6 +119,18 @@ function ChordProgression(props) {
         </Fragment>
       ))}
       <Divider className="measure-divider" orientation="vertical" />
+      <div style={{ height: 0, width: "100%" }} />
+      {selectedChord !== null && (
+        <ChordPicker
+          selectedChord={selectedChord}
+          scaleChords={getChordsFromScale(
+            props.module.scale,
+            props.module.root,
+            props.module.complexity
+          )}
+          setChords={setChords}
+        />
+      )}
     </div>
   );
 }

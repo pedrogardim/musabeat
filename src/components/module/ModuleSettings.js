@@ -97,6 +97,22 @@ function ModuleSettings(props) {
     props.setSettingsMode(false);
   };
 
+  const handleComplexityChange = (event) => {
+    let newValue = parseInt(event.target.value);
+    props.updateModules((previous) =>
+      previous.map((module, i) => {
+        if (i === props.index) {
+          let newModule = { ...module, complexity:newValue };
+
+          return newModule;
+        } else {
+          return module;
+        }
+      })
+    );
+    props.setSettingsMode(false);
+  };
+
   const handleOctaveRangeSelect = (e,v) => {
     let newValue = v
     props.updateModules((previous) =>
@@ -212,6 +228,8 @@ function ModuleSettings(props) {
             ))}
           </Select>
         </FormControl>,
+                <div style={{ width: "100%", height: "16px" }} />,
+
         <Slider
           style={{width:"50%"}}
           value={props.module.range}
@@ -223,6 +241,54 @@ function ModuleSettings(props) {
       ];
       break;
     case 2:
+      mainContent = [
+        <FormControl>
+        <InputLabel id="root-select-label">Root</InputLabel>
+        <Select
+          native
+          labelId="root-select-label"
+          value={props.module.root}
+          onChange={handleRootChange}
+        >
+          {musicalNotes.map((note, noteIndex) => (
+            <option key={noteIndex} value={noteIndex}>
+              {note}
+            </option>
+          ))}
+        </Select>
+      </FormControl>,
+      <FormControl>
+        <InputLabel id="scale-select-label">Scales</InputLabel>
+        <Select
+          native
+          labelId="scale-select-label"
+          value={props.module.scale}
+          onChange={handleScaleChange}
+        >
+          {scales.map((scale, scaleIndex) => (
+            <option key={scaleIndex} value={scaleIndex}>
+              {scale[1]}
+            </option>
+          ))}
+        </Select>
+      </FormControl>,
+      <FormControl>
+        <InputLabel id="complexity-select-label">Extentions</InputLabel>
+        <Select
+          native
+          labelId="complexity-select-label"
+          value={props.module.complexity}
+          onChange={handleComplexityChange}
+        >
+          <option value={3}>None</option>
+          <option value={4}>7ths</option>
+          <option value={5}>7ths + 9ths</option>
+
+
+        </Select>
+      </FormControl>
+      ];
+
       break;
   }
 

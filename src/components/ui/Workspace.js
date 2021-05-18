@@ -131,6 +131,9 @@ const initialModules = [
     name: "Chords",
     type: 2,
     instrument: instrumentContructor(0),
+    root: 0,
+    scale:0,
+    complexity:3,
     color: colors[2],
     score: [
       {
@@ -184,8 +187,6 @@ function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
   const [sessionSize, setSessionSize] = useState(4);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
-  const [drawerCont, setDrawerCont] = useState(null);
-
   const [mixerOpened, setMixerOpened] = useState(false);
 
   const addModule = (moduletype) => {
@@ -257,8 +258,7 @@ function Workspace(props) {
           module={module}
           sessionSize={sessionSize}
           updateModules={setModules}
-          setDrawer={setDrawerCont}
-          drawerCont={drawerCont}
+
         />
       ))}
       <Fab color="primary" onClick={() => chooseNewModule(true)}>

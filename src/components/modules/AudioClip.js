@@ -5,9 +5,11 @@ import * as Tone from "tone";
 import { Resizable, ResizableBox } from "react-resizable";
 import Draggable from "react-draggable";
 
+
 import "./AudioClip.css";
 
 function AudioClip(props) {
+  const nodeRef = React.useRef(null);
   const [clipHeight, setClipHeight] = useState(0);
   const [clipWidth, setClipWidth] = useState(
     (props.buffer.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
@@ -20,6 +22,7 @@ function AudioClip(props) {
   };
 
   const handleResize = (event, { element, size, handle }) => {
+    console.log(size)
     setClipWidth(size.width);
   };
 
@@ -39,7 +42,8 @@ function AudioClip(props) {
   }, []);
 
   return (
-    <Draggable axis="x" onStop={handleDrag}>
+    <Draggable axis="x" onStop={handleDrag} >
+      {/*TODO: bounds={'parent'}*/}
       <Resizable
         //resizeHandles={["e"]}
         height={document.getElementById(props.parentId).clientHeight}
@@ -50,14 +54,15 @@ function AudioClip(props) {
           className="sampler-audio-clip"
           id={"clip" + props.index}
           style={{
+            height:"100%",
             width: clipWidth + "px",
-            backgroundColor: props.color[100],
+            backgroundColor: "white",
           }}
         >
           <svg
             className="sampler-audio-clip-wave"
-            height={clipHeight}
-            width={clipWidth}
+            preserveAspectRatio="xMinYMin slice"
+
           >
             {drawClipWave(
               props.buffer.toArray(),

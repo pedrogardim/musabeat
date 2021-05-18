@@ -47,7 +47,6 @@ function Sampler(props) {
 
   useEffect(() => {
     scheduleEvents();
-    console.log(score);
   }, [score]);
 
   useEffect(() => {
