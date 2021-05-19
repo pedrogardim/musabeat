@@ -55,6 +55,7 @@ function AudioClip(props) {
           id={"clip" + props.index}
           style={{
             width: clipWidth + "px",
+            backgroundColor:props.color[900]
           }}
         >
           <svg
@@ -83,10 +84,10 @@ const drawClipWave = (wavearray, clipHeight, clipWidth, color) => {
       "L " +
       x +
       " " +
-      (wavearray[Math.floor(x)] * clipHeight * 2 + clipHeight / 2) +
+      (wavearray[Math.floor(x*520)] * clipHeight * 2 + clipHeight / 2) +
       " ";
   }
-  return <path d={pathstring} stroke={color[900]} fill="none" />;
+  return <path d={pathstring} stroke={color[100]} fill="none" />;
 };
 
 export default AudioClip;

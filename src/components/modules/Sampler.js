@@ -4,6 +4,8 @@ import * as Tone from "tone";
 
 import AudioClip from "./AudioClip";
 
+import Draggable from "react-draggable";
+
 import { CircularProgress, Typography } from "@material-ui/core";
 
 import { scheduleSamples } from "../../utils/TransportSchedule";
@@ -26,8 +28,7 @@ function Sampler(props) {
       setCursorPosition(
         (Tone.Transport.seconds /
           Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-          document.getElementById("module-"+props.module.id).clientWidth
-
+          document.getElementById("module-" + props.module.id).clientWidth
       );
     }, 16);
   };
@@ -45,6 +46,9 @@ function Sampler(props) {
     scheduleSamples(score, instrument, Tone.Transport, props.module.id);
   };
 
+  const handleCursorDrag = (event,element) => {
+    Tone.Transport.seconds = (element.x/document.getElementById("module-" + props.module.id).clientWidth) * Tone.Time(Tone.Transport.loopEnd).toSeconds();
+  }
 
   useEffect(() => {
     scheduleEvents();
@@ -53,9 +57,7 @@ function Sampler(props) {
   useEffect(() => {
     buffersChecker = setInterval(checkForLoadedBuffers, 20);
     startCursor();
-
   }, []);
-
 
   return (
     <div
@@ -63,19 +65,24 @@ function Sampler(props) {
       style={(props.style, { backgroundColor: props.module.color["400"] })}
     >
       <div className="sampler">
-      {isBufferLoaded ? (
-        <AudioClip
-          index={0}
-          parentId={props.module.id}
-          color={props.module.color}
-          buffer={instrument.buffer}
-          scheduleEvents={scheduleEvents}
-          setScore={setScore}
-        />
-      ) : (
-        <CircularProgress />
-      )}
-      <div className="sampler-cursor" style={{left:cursorPosition,backgroundColor: props.module.color["900"]}}/>
+        {isBufferLoaded ? (
+          <AudioClip
+            index={0}
+            parentId={props.module.id}
+            color={props.module.color}
+            buffer={instrument.buffer}
+            scheduleEvents={scheduleEvents}
+            setScore={setScore}
+          />
+        ) : (
+          <CircularProgress />
+        )}
+        <Draggable axis="x" onDrag={handleCursorDrag} position={{x: cursorPosition, y: 0}}>
+          <div
+            className="sampler-cursor"
+            style={{backgroundColor: "white" }}
+          />
+        </Draggable>
       </div>
     </div>
   );

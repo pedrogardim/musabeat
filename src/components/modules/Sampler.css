@@ -12,5 +12,11 @@
     height:100%;
     width:1px;
     top:0px;
- 
+    transition: width 0.3s;
+}
+
+.sampler-cursor:hover{
+    width:3px;
+    margin-left:-1px;
+
 }
