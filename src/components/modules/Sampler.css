@@ -2,11 +2,12 @@
     background-color:"";
     height:calc(100%);
     width:calc(100%);
+    overflow:hidden !important;
 
 }
 
 .sampler-cursor{
-    position:relative;
+    position:absolute;
     background-color:white;
     height:100%;
     width:1px;

@@ -25,7 +25,10 @@ function SequencerTile(props) {
           : props.cursor
           ? thisColor[400]
           : thisColor[500],
-        outline: "solid 1px "+ thisColor[800]
+        borderBottom: "solid 1px "+ thisColor[800],
+        borderRight: "solid 1px "+ thisColor[800],
+
+
       }}
     ></div>
   );

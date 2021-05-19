@@ -26,10 +26,10 @@ function Sampler(props) {
       setCursorPosition(
         (Tone.Transport.seconds /
           Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-          100 +
-          "%"
+          document.getElementById("module-"+props.module.id).clientWidth
+
       );
-    }, 100);
+    }, 16);
   };
 
   const checkForLoadedBuffers = () => {
@@ -45,25 +45,28 @@ function Sampler(props) {
     scheduleSamples(score, instrument, Tone.Transport, props.module.id);
   };
 
+
   useEffect(() => {
     scheduleEvents();
   }, [score]);
 
   useEffect(() => {
     buffersChecker = setInterval(checkForLoadedBuffers, 20);
+    startCursor();
+
   }, []);
 
 
   return (
     <div
       className="module-innerwrapper"
-      id={"sampler-"+props.module.id}
       style={(props.style, { backgroundColor: props.module.color["400"] })}
     >
+      <div className="sampler">
       {isBufferLoaded ? (
         <AudioClip
           index={0}
-          parentId={"sampler-"+props.module.id}
+          parentId={props.module.id}
           color={props.module.color}
           buffer={instrument.buffer}
           scheduleEvents={scheduleEvents}
@@ -72,6 +75,8 @@ function Sampler(props) {
       ) : (
         <CircularProgress />
       )}
+      <div className="sampler-cursor" style={{left:cursorPosition,backgroundColor: props.module.color["900"]}}/>
+      </div>
     </div>
   );
 }

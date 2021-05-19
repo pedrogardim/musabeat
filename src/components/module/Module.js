@@ -67,24 +67,22 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
-
           sessionSize={props.sessionSize}
-          muted={muted} 
+          muted={muted}
           module={props.module}
           updateModules={props.updateModules}
-
         />
       );
       break;
 
-      case 3:
+    case 3:
       innerModule = (
         <Sampler
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
           sessionSize={props.sessionSize}
-          muted={muted} 
+          muted={muted}
           module={props.module}
           updateModules={props.updateModules}
         />
@@ -104,6 +102,7 @@ function Module(props) {
 
   return (
     <Card
+      id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
         filter: muted && "saturate(0) brightness(1.5) constrast(0.5)",

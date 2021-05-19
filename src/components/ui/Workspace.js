@@ -8,7 +8,6 @@ import "./Workspace.css";
 import Module from "./../module/Module";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
-import Drawer from "./Drawer";
 import Mixer from "./mixer/Mixer";
 
 import {

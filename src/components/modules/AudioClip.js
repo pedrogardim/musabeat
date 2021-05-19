@@ -5,7 +5,6 @@ import * as Tone from "tone";
 import { Resizable, ResizableBox } from "react-resizable";
 import Draggable from "react-draggable";
 
-
 import "./AudioClip.css";
 
 function AudioClip(props) {
@@ -13,7 +12,8 @@ function AudioClip(props) {
   const [clipHeight, setClipHeight] = useState(0);
   const [clipWidth, setClipWidth] = useState(
     (props.buffer.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-      100
+    document.getElementById("module-"+props.parentId).clientWidth
+
   );
 
   const updateLine = () => {
@@ -22,7 +22,7 @@ function AudioClip(props) {
   };
 
   const handleResize = (event, { element, size, handle }) => {
-    console.log(size)
+    console.log(size);
     setClipWidth(size.width);
   };
 
@@ -30,7 +30,7 @@ function AudioClip(props) {
     props.setScore((prev) => {
       let newScore = [...prev];
       let newTime =
-        (element.x / document.getElementById(props.parentId).clientWidth) *
+        (element.x / document.getElementById("module-"+props.parentId).clientWidth)  *
         Tone.Time(Tone.Transport.loopEnd).toSeconds();
       newScore[props.index].time = newTime;
       return newScore;
@@ -42,11 +42,11 @@ function AudioClip(props) {
   }, []);
 
   return (
-    <Draggable axis="x" onStop={handleDrag} >
+    <Draggable axis="x" onStop={handleDrag}>
       {/*TODO: bounds={'parent'}*/}
       <Resizable
         //resizeHandles={["e"]}
-        height={document.getElementById(props.parentId).clientHeight}
+        height={document.getElementById("module-"+props.parentId).clientHeight}
         width={clipWidth}
         onResize={handleResize}
       >
@@ -54,15 +54,12 @@ function AudioClip(props) {
           className="sampler-audio-clip"
           id={"clip" + props.index}
           style={{
-            height:"100%",
             width: clipWidth + "px",
-            backgroundColor: "white",
           }}
         >
           <svg
             className="sampler-audio-clip-wave"
             preserveAspectRatio="xMinYMin slice"
-
           >
             {drawClipWave(
               props.buffer.toArray(),
@@ -79,14 +76,14 @@ function AudioClip(props) {
 
 const drawClipWave = (wavearray, clipHeight, clipWidth, color) => {
   let pathstring = "M 0 " + clipHeight / 2 + " ";
-  let scale = 450;
+  let scale = 1;
 
   for (let x = 0; x < clipWidth; x++) {
     pathstring +=
       "L " +
       x +
       " " +
-      (wavearray[Math.floor(x * scale)] * clipHeight * 2 + clipHeight / 2) +
+      (wavearray[Math.floor(x)] * clipHeight * 2 + clipHeight / 2) +
       " ";
   }
   return <path d={pathstring} stroke={color[900]} fill="none" />;

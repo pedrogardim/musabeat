@@ -119,7 +119,6 @@ function ChordProgression(props) {
         </Fragment>
       ))}
       <Divider className="measure-divider" orientation="vertical" />
-      <div style={{ height: 0, width: "100%" }} />
       {selectedChord !== null && (
         <ChordPicker
           selectedChord={selectedChord}

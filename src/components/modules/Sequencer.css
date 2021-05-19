@@ -20,9 +20,9 @@
 }
 
 .sequencer-row-label{
-    position:relative;
-    text-align:right !important;
-    line-height: calc(200%)!important;
-    white-space:nowrap;
-    width:0px;
+  position:absolute;
+  text-align:right !important;
+  line-height: calc(200%)!important;
+  margin-left: -72px !important;
+  width:64px;
 }

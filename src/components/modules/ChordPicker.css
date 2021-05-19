@@ -6,8 +6,8 @@
   align-items: center;
   flex-wrap: wrap;
   align-content: center;
-  position:relative;
-  bottom:0;
+  justify-self: flex-end;
+  margin-bottom:0;
 }
 
 .chord-picker-button {
