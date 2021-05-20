@@ -16,7 +16,8 @@
 }
 
 .sampler-cursor:hover{
-    width:3px;
+    width:2px;
     margin-left:-1px;
+    cursor:pointer;
 
 }

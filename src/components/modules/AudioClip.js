@@ -9,7 +9,7 @@ import "./AudioClip.css";
 
 function AudioClip(props) {
   const nodeRef = React.useRef(null);
-  const [clipHeight, setClipHeight] = useState(0);
+  const [clipHeight, setClipHeight] = useState(document.getElementById("module-"+props.parentId).clientWidth);
   const [clipWidth, setClipWidth] = useState(
     (props.buffer.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
     document.getElementById("module-"+props.parentId).clientWidth
@@ -46,7 +46,7 @@ function AudioClip(props) {
       {/*TODO: bounds={'parent'}*/}
       <Resizable
         //resizeHandles={["e"]}
-        height={document.getElementById("module-"+props.parentId).clientHeight}
+        height={clipHeight}
         width={clipWidth}
         onResize={handleResize}
       >
@@ -54,6 +54,7 @@ function AudioClip(props) {
           className="sampler-audio-clip"
           id={"clip" + props.index}
           style={{
+            height:"100%",
             width: clipWidth + "px",
             backgroundColor:props.color[900]
           }}

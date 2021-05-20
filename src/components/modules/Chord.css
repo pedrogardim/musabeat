@@ -1,7 +1,7 @@
-
 .chord{
     height:32px;
-    width:64px;
+    width:5vw;
+    min-width:48px;
     text-align:center;
     margin:8px;
     user-select: none;

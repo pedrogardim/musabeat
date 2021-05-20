@@ -54,6 +54,8 @@ function ChordPicker(props) {
           onClick={() => clickHandler(i)}
           className="chord-picker-button"
           key={i}
+          boxShadow={1}
+
         >
           {chordNotestoName(chord)}
         </Fab>
@@ -62,6 +64,7 @@ function ChordPicker(props) {
         color="secondary"
         onClick={() => clickHandler(null)}
         className="chord-picker-button"
+        boxShadow={1}
       >
         <Icon>highlight_off</Icon>
       </Fab>     

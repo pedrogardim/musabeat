@@ -187,6 +187,9 @@ function Workspace(props) {
   const [sessionSize, setSessionSize] = useState(4);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
+  //temp: muted modules array as workspace state
+  const [mutedModules, setMutedModules] = useState([]);
+
 
   const addModule = (moduletype) => {
     let module = {
@@ -244,19 +247,21 @@ function Workspace(props) {
     console.log(modules);
   }, [modules]);
 
+
   return (
     <div
       className="workspace"
       tabIndex="0"
       onKeyDown={handleKeyPress}
     >
-      {modules.map((module) => (
+      {modules.map((module,moduleIndex) => (
         <Module
           key={module.id}
           index={module.id}
           module={module}
           sessionSize={sessionSize}
           updateModules={setModules}
+          muted={mutedModules.includes(moduleIndex)}
 
         />
       ))}
@@ -277,7 +282,7 @@ function Workspace(props) {
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
-      {mixerOpened && <Mixer modules={modules} />}
+      {mixerOpened && <Mixer setMutedModules={setMutedModules} modules={modules} />}
 
       <Fab
         className="fixed-fab"

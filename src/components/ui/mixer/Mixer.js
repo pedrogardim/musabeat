@@ -18,7 +18,7 @@ function Mixer(props) {
   return (
     <div className="mixer" style={props.style}>
       {modules.map((module, index) => (
-        <ChannelStrip index={index} key={index} module={module} />
+        <ChannelStrip index={index} key={index} module={module} setMutedModules={props.setMutedModules}/>
       ))}
     </div>
   );

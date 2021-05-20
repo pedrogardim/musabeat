@@ -99,26 +99,29 @@ function ChordProgression(props) {
   }, [props.sessionSize]);
 
   return (
-    <div className="chord-prog" style={props.style}>
-      <Divider className="measure-divider" orientation="vertical" />
-      {chords.map((chord, i) => (
-        <Fragment key={i}>
-          {i > 0 && Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
-            <Divider
-              key={"divider" + i}
-              className="measure-divider"
-              orientation="vertical"
+    <div className="module-innerwrapper">
+      <div className="chord-prog" style={props.style}>
+        <Divider className="measure-divider" orientation="vertical" />
+        {chords.map((chord, i) => (
+          <Fragment key={i}>
+            {i > 0 &&
+              Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
+                <Divider
+                  key={"divider" + i}
+                  className="measure-divider"
+                  orientation="vertical"
+                />
+              )}
+            <Chord
+              key={"chord" + i}
+              active={activeChord === i}
+              name={MusicUtils.chordNotestoName(chord.notes)}
+              onClick={() => handleClick(i)}
             />
-          )}
-          <Chord
-            key={"chord" + i}
-            active={activeChord === i}
-            name={MusicUtils.chordNotestoName(chord.notes)}
-            onClick={() => handleClick(i)}
-          />
-        </Fragment>
-      ))}
-      <Divider className="measure-divider" orientation="vertical" />
+          </Fragment>
+        ))}
+        <Divider className="measure-divider" orientation="vertical" />
+      </div>
       {selectedChord !== null && (
         <ChordPicker
           selectedChord={selectedChord}

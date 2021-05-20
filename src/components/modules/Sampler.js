@@ -20,7 +20,7 @@ function Sampler(props) {
   const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
 
-  let buffersChecker;
+  let buffersChecker, cursorAnimator;
 
   const startCursor = () => {
     setInterval(() => {
@@ -30,7 +30,7 @@ function Sampler(props) {
           Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
           document.getElementById("module-" + props.module.id).clientWidth
       );
-    }, 16);
+    }, 36);
   };
 
   const checkForLoadedBuffers = () => {
@@ -46,9 +46,12 @@ function Sampler(props) {
     scheduleSamples(score, instrument, Tone.Transport, props.module.id);
   };
 
-  const handleCursorDrag = (event,element) => {
-    Tone.Transport.seconds = (element.x/document.getElementById("module-" + props.module.id).clientWidth) * Tone.Time(Tone.Transport.loopEnd).toSeconds();
-  }
+  const handleCursorDrag = (event, element) => {
+    Tone.Transport.seconds =
+      (element.x /
+        document.getElementById("module-" + props.module.id).clientWidth) *
+      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+  };
 
   useEffect(() => {
     scheduleEvents();
@@ -77,10 +80,14 @@ function Sampler(props) {
         ) : (
           <CircularProgress />
         )}
-        <Draggable axis="x" onDrag={handleCursorDrag} position={{x: cursorPosition, y: 0}}>
+        <Draggable
+          axis="x"
+          onDrag={handleCursorDrag}
+          position={{ x: cursorPosition, y: 0 }}
+        >
           <div
             className="sampler-cursor"
-            style={{backgroundColor: "white" }}
+            style={{ backgroundColor: "white" }}
           />
         </Draggable>
       </div>

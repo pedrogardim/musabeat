@@ -16,7 +16,6 @@
 
 .sequencer-bottomnav {
   height: 30px !important;
-  justify-self: flex-end;
 }
 
 .sequencer-row-label{

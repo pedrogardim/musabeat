@@ -171,7 +171,7 @@ function Sequencer(props) {
           {sequencerArray.length > 1 &&
             sequencerArray.map((measure, index) => (
               <BottomNavigationAction
-                style={{ minWidth: "0px" }}
+                style={{ minWidth: 0, maxWidth:"100%"}}
                 key={index}
                 label={index + 1}
               />

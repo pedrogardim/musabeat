@@ -181,7 +181,7 @@ function MelodyGrid(props) {
           {melodyArray.length > 1 &&
             melodyArray.map((measure, index) => (
               <BottomNavigationAction
-                style={{ minWidth: "0px" }}
+                style={{ minWidth: 0, maxWidth:"100%"}}
                 key={index}
                 label={index + 1}
               />

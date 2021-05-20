@@ -15,7 +15,7 @@ import "./Module.css";
 
 function Module(props) {
   const [expanded, setExpanded] = useState(false);
-  const [muted, setMuted] = useState(props.module.instrument._volume.mute);
+  const [muted, setMuted] = useState(props.muted);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
 
@@ -90,24 +90,22 @@ function Module(props) {
       break;
   }
 
-  //TO DO
-  /*
-  useEffect(() =>{ 
-    setMuted(props.module.instrument.volume.value === -Infinity ? true : false);
-    console.log(props.module.instrument.volume.value)
-  }
-  , [props.module.instrument.volume.value]);
-
-  */
+  useEffect(() => {
+    setMuted(props.module.instrument._volume.mute);
+    console.log(props.module.instrument._volume.mute);
+  }, [props.module.instrument._volume.mute]);
 
   return (
     <Card
       id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
-        filter: muted && "saturate(0) brightness(1.5) constrast(0.5)",
       }}
-      className={"module " + (props.module.type === 3 && "module-compact")}
+      className={
+        "module " +
+        (props.module.type === 3 && " module-compact ") +
+        (muted && " module-muted")
+      }
     >
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>

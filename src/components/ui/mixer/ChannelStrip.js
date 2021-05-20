@@ -23,14 +23,22 @@ function ChannelStrip(props) {
   const handleMuteButton = () => {
     setMuted(muted ? false : true);
   };
+
   useEffect(() => {
     module.instrument._volume.mute = muted;
-    setFaderVolume(module.instrument.volume.value.toFixed(2))
+    setFaderVolume(module.instrument.volume.value.toFixed(2));
+    props.setMutedModules(prev =>
+      prev.includes(props.index)
+        ? prev.filter((x) => x != props.index)
+        : [...prev, props.index]
+    );
   }, [muted]);
-  
 
   return (
-    <div className="mixer-channel-strip" style={props.style,{filter:muted?"saturate(0)":"none"}}>
+    <div
+      className="mixer-channel-strip"
+      style={(props.style, { filter: muted ? "saturate(0)" : "none" })}
+    >
       <Slider
         value={faderVolume}
         min={-80}
@@ -41,14 +49,13 @@ function ChannelStrip(props) {
         orientation="vertical"
         className="channel-strip-fader"
       />{" "}
-      <IconButton
-          onClick={handleMuteButton}
-        >
-          <Icon >
-            {muted ? "volume_off" : "volume_up"}
-          </Icon>
-        </IconButton>
-      <Typography variant="overline" style={{textTransform:"none"}}> {faderVolume === "-Infinity" ? "MUTED" : faderVolume + " dB"} </Typography>
+      <IconButton onClick={handleMuteButton}>
+        <Icon>{muted ? "volume_off" : "volume_up"}</Icon>
+      </IconButton>
+      <Typography variant="overline" style={{ textTransform: "none" }}>
+        {" "}
+        {faderVolume === "-Infinity" ? "MUTED" : faderVolume + " dB"}{" "}
+      </Typography>
       <Typography variant="overline"> {module.name} </Typography>
     </div>
   );
