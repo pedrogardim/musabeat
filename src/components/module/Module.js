@@ -80,6 +80,7 @@ function Module(props) {
         <Sampler
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
+           
           }}
           sessionSize={props.sessionSize}
           muted={muted}
@@ -96,10 +97,13 @@ function Module(props) {
   }, [props.module.instrument._volume.mute]);
 
   return (
-    <Card
+    <div
       id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
+        overflow: props.module.type === 3 && "hidden"
+
+
       }}
       className={
         "module " +
@@ -141,7 +145,7 @@ function Module(props) {
       )}
 
       {innerModule}
-    </Card>
+    </div>
   );
 }
 

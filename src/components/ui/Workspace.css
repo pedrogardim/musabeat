@@ -1,11 +1,13 @@
 .workspace {
   background-color: #282c34;
   background: radial-gradient(#ffffff, #fafaed);
-  /* height:calc(100%); */
-  /* min-height: 100vh; */
+  height:100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+
   align-items: center;
+  align-content: center;
   justify-content: center;
   padding:200px 0 200px 0;
   overflow-y: hidden;

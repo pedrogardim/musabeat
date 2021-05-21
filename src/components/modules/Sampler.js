@@ -65,7 +65,7 @@ function Sampler(props) {
   return (
     <div
       className="module-innerwrapper"
-      style={(props.style, { backgroundColor: props.module.color["400"] })}
+      style={(props.style, { backgroundColor: props.module.color["900"] })}
     >
       <div className="sampler">
         {isBufferLoaded ? (

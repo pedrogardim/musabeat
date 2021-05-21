@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
 import { Fab, Icon } from "@material-ui/core";
@@ -54,7 +54,7 @@ const initialModules = [
     steps: 16,
     patch: 0,
     instrument: new Tone.Players({ "-1": "" }).toDestination(),
-    color: colors[2],
+    color: colors[1],
     score: [
       [
         [0, 3],
@@ -133,7 +133,7 @@ const initialModules = [
     root: 0,
     scale:0,
     complexity:3,
-    color: colors[2],
+    color: colors[3],
     score: [
       {
         notes: ["E4", "G4", "B4"],
@@ -169,7 +169,7 @@ const initialModules = [
     type: 3,
     length: 1,
     instrument: new Tone.GrainPlayer("https://tonejs.github.io/audio/berklee/gong_1.mp3").toDestination(),
-    color: colors[2],
+    color: colors[6],
     score:[{time:0,duration:1}],
   },
 ];
@@ -255,6 +255,7 @@ function Workspace(props) {
       onKeyDown={handleKeyPress}
     >
       {modules.map((module,moduleIndex) => (
+        <Fragment>
         <Module
           key={module.id}
           index={module.id}
@@ -262,9 +263,11 @@ function Workspace(props) {
           sessionSize={sessionSize}
           updateModules={setModules}
           muted={mutedModules.includes(moduleIndex)}
-
         />
+        {moduleIndex % 3 == 1 && <div className="break"/>}
+        </Fragment>
       ))}
+      <div className="break"/>
       <Fab color="primary" onClick={() => chooseNewModule(true)}>
         <Icon>add</Icon>
       </Fab>
