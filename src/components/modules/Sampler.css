@@ -1,23 +1,25 @@
-.sampler{
-    background-color:"";
-    height:calc(100%);
-    width:calc(100%);
-    overflow:hidden !important;
-
+.sampler {
+  background-color: "";
+  height: calc(100%);
+  width: calc(100%);
+  overflow: hidden !important;
 }
 
-.sampler-cursor{
-    position:absolute;
-    background-color:white;
-    height:100%;
-    width:1px;
-    top:0px;
-    transition: width 0.3s;
+.sampler-cursor {
+  position: absolute;
+  background-color: white;
+  height: 100%;
+  width: 1px;
+  top: 0px;
+  transition: width 0.3s;
 }
 
-.sampler-cursor:hover{
-    width:2px;
-    margin-left:-1px;
-    cursor:pointer;
+.sampler-cursor:hover {
+  width: 2px;
+  margin-left: -1px;
+  cursor: grab;
+}
 
+.sampler-cursor:hover {
+  cursor: grabbing;
 }

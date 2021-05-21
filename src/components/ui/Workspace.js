@@ -168,10 +168,11 @@ const initialModules = [
     name: "Sampler",
     type: 3,
     length: 1,
-    instrument: new Tone.GrainPlayer("https://tonejs.github.io/audio/berklee/gong_1.mp3").toDestination(),
+    instrument: new Tone.GrainPlayer("https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav").toDestination(),
     color: colors[6],
     score:[{time:0,duration:1}],
   },
+  
 ];
 
 const initialSessionData = {
@@ -231,17 +232,6 @@ function Workspace(props) {
     }
   };
 
-  //disabled
- /*  
-  const handleClick = (event) => {
-    let targetClass =
-      "classList" in event.target ? event.target.classList[0] : "";
-    let drawer = document.querySelector(".adjustments-drawer");
-    !drawer.contains(event.target) &&
-      !targetClass.includes("chord") &&
-      setDrawerCont(null);
-  };
- */
   useEffect(() => {
     adaptSessionSize();
     console.log(modules);

@@ -2,6 +2,7 @@
     height:32px;
     width:5vw;
     min-width:48px;
+    max-width:128px;
     text-align:center;
     margin:8px;
     user-select: none;

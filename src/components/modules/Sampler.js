@@ -36,9 +36,8 @@ function Sampler(props) {
   };
 
   const checkForLoadedBuffers = () => {
-    let check = instrument.buffer.duration !== 0;
-
-    if (check) {
+    console.log(instrument);
+    if (instrument.buffer.loaded) {
       setIsBufferLoaded(true);
       clearInterval(buffersChecker);
     }
@@ -60,8 +59,11 @@ function Sampler(props) {
   }, [score]);
 
   useEffect(() => {
-    buffersChecker = setInterval(checkForLoadedBuffers, 20);
+    buffersChecker = setInterval(checkForLoadedBuffers, 1000);
     startCursor();
+    //watch to window resize to update clips position
+    //window.addEventListener("resize", displayWindowSize);
+
   }, []);
 
   return (
@@ -78,6 +80,7 @@ function Sampler(props) {
             color={props.module.color}
             buffer={instrument.buffer}
             scheduleEvents={scheduleEvents}
+            score={score[0]}
             setScore={setScore}
           />
         ) : (
