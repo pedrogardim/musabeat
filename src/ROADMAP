@@ -1,0 +1,53 @@
+-Fix Chord Prog. instrument and module editor bug
+
+-Load sample by dragging
+
+-Fix loader style
+
+-Chord rhythm editor
+
+-Work on instrument editor
+    -better filter control
+    -choose drum patch
+    -edit drum patch(related to load sample)
+
+-Ctrl + Z, Ctrl + C,  Ctrl + V
+
+-Update modules at sampler cursor drag
+
+-Screen Controls
+
+-Remove modules option
+
+-Work on adapt subdivision algorhythm
+-Generate chord on Chord Progression
+
+-Input module "name" and color 
+-(Manual Chord input) ?
+-Sampler instrument, instrument editor (not module)
+
+-Change session bpm and timesig (+/- easy)
+
+(Different samples into sampler module)?
+
+-Effects controller
+
+-Piano Roll module
+
+...
+
+-(((More patches)))
+
+==Add Backend
+
+-Host user samples
+
+-lightweight preview
+
+-Cloud sharing
+-Colaborative editing
+
+-Synth patch from comunity
+
+-Add funny modules
+
