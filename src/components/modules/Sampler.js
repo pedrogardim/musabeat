@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import * as Tone from "tone";
 
 import AudioClip from "./AudioClip";
+import BackgroundGrid from "./BackgroundGrid";
+
 
 import Draggable from "react-draggable";
 
@@ -68,6 +70,7 @@ function Sampler(props) {
       style={(props.style, { backgroundColor: props.module.color["900"] })}
     >
       <div className="sampler">
+        <BackgroundGrid sessionSize={props.sessionSize} color={props.module.color}/>
         {isBufferLoaded ? (
           <AudioClip
             index={0}

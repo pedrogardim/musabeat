@@ -1,0 +1,17 @@
+.background-grid {
+  height:100%;
+  width:100%;
+  position: absolute;
+  display:flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  top:0;
+  left:0;
+
+}
+
+.background-grid-item{
+  flex: 1 1 1px;
+
+  
+}
