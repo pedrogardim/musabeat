@@ -28,7 +28,7 @@ function AudioClip(props) {
     );
   };
   
-  const handleWindowResize = () => {
+  const updateClipPosition = () => {
     setClipWidth((props.buffer.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
     document.getElementById("module-" + props.parentId).clientWidth);
     setClipPosition((props.score.time / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
@@ -50,8 +50,13 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    window.addEventListener("resize", handleWindowResize);
+    window.addEventListener("resize", updateClipPosition);
   }, []);
+
+  useEffect(() => {
+    //watch to window resize to update clips position
+    updateClipPosition();
+  }, [props.sessionSize]);
 
   return (
     <Draggable axis="x" onDrag={handleDrag} position={{ x: clipPosition, y:0 }}>

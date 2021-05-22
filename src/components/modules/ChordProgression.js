@@ -99,8 +99,8 @@ function ChordProgression(props) {
   }, [props.sessionSize]);
 
   return (
-    <div className="module-innerwrapper">
-      <div className="chord-prog" style={props.style}>
+    <div className="module-innerwrapper" style={props.style}>
+      <div className="chord-prog">
         <Divider className="measure-divider" orientation="vertical" />
         {chords.map((chord, i) => (
           <Fragment key={i}>

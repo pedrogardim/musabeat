@@ -15,8 +15,7 @@ import {
 import "./ModuleSettings.css";
 
 const subdivisionValues = [4, 8, 12, 16, 24, 32];
-const lengthValues = [4, 8, 12, 16, 24, 32];
-
+const lengthValues = [1, 2, 4, 8, 16];
 
 function ModuleSettings(props) {
   let mainContent = "No Settings";
@@ -70,7 +69,7 @@ function ModuleSettings(props) {
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
-          let newModule = { ...module, root:newValue };
+          let newModule = { ...module, root: newValue };
 
           return newModule;
         } else {
@@ -86,7 +85,7 @@ function ModuleSettings(props) {
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
-          let newModule = { ...module, scale:newValue };
+          let newModule = { ...module, scale: newValue };
 
           return newModule;
         } else {
@@ -102,7 +101,7 @@ function ModuleSettings(props) {
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
-          let newModule = { ...module, complexity:newValue };
+          let newModule = { ...module, complexity: newValue };
 
           return newModule;
         } else {
@@ -113,12 +112,12 @@ function ModuleSettings(props) {
     props.setSettingsMode(false);
   };
 
-  const handleOctaveRangeSelect = (e,v) => {
-    let newValue = v
+  const handleOctaveRangeSelect = (e, v) => {
+    let newValue = v;
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
-          let newModule = { ...module, range:newValue };
+          let newModule = { ...module, range: newValue };
 
           return newModule;
         } else {
@@ -127,7 +126,6 @@ function ModuleSettings(props) {
       })
     );
   };
-
 
   switch (props.module.type) {
     case 0:
@@ -228,10 +226,10 @@ function ModuleSettings(props) {
             ))}
           </Select>
         </FormControl>,
-                <div style={{ width: "100%", height: "16px" }} />,
+        <div style={{ width: "100%", height: "16px" }} />,
 
         <Slider
-          style={{width:"50%"}}
+          style={{ width: "50%" }}
           value={props.module.range}
           onChangeCommitted={handleOctaveRangeSelect}
           valueLabelDisplay="auto"
@@ -243,50 +241,48 @@ function ModuleSettings(props) {
     case 2:
       mainContent = [
         <FormControl>
-        <InputLabel id="root-select-label">Root</InputLabel>
-        <Select
-          native
-          labelId="root-select-label"
-          value={props.module.root}
-          onChange={handleRootChange}
-        >
-          {musicalNotes.map((note, noteIndex) => (
-            <option key={noteIndex} value={noteIndex}>
-              {note}
-            </option>
-          ))}
-        </Select>
-      </FormControl>,
-      <FormControl>
-        <InputLabel id="scale-select-label">Scales</InputLabel>
-        <Select
-          native
-          labelId="scale-select-label"
-          value={props.module.scale}
-          onChange={handleScaleChange}
-        >
-          {scales.map((scale, scaleIndex) => (
-            <option key={scaleIndex} value={scaleIndex}>
-              {scale[1]}
-            </option>
-          ))}
-        </Select>
-      </FormControl>,
-      <FormControl>
-        <InputLabel id="complexity-select-label">Extentions</InputLabel>
-        <Select
-          native
-          labelId="complexity-select-label"
-          value={props.module.complexity}
-          onChange={handleComplexityChange}
-        >
-          <option value={3}>None</option>
-          <option value={4}>7ths</option>
-          <option value={5}>7ths + 9ths</option>
-
-
-        </Select>
-      </FormControl>
+          <InputLabel id="root-select-label">Root</InputLabel>
+          <Select
+            native
+            labelId="root-select-label"
+            value={props.module.root}
+            onChange={handleRootChange}
+          >
+            {musicalNotes.map((note, noteIndex) => (
+              <option key={noteIndex} value={noteIndex}>
+                {note}
+              </option>
+            ))}
+          </Select>
+        </FormControl>,
+        <FormControl>
+          <InputLabel id="scale-select-label">Scales</InputLabel>
+          <Select
+            native
+            labelId="scale-select-label"
+            value={props.module.scale}
+            onChange={handleScaleChange}
+          >
+            {scales.map((scale, scaleIndex) => (
+              <option key={scaleIndex} value={scaleIndex}>
+                {scale[1]}
+              </option>
+            ))}
+          </Select>
+        </FormControl>,
+        <FormControl>
+          <InputLabel id="complexity-select-label">Extentions</InputLabel>
+          <Select
+            native
+            labelId="complexity-select-label"
+            value={props.module.complexity}
+            onChange={handleComplexityChange}
+          >
+            <option value={3}>None</option>
+            <option value={4}>7ths</option>
+            <option value={5}>7ths + 9ths</option>
+          </Select>
+        </FormControl>,
       ];
 
       break;

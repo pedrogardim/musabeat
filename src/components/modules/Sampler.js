@@ -76,6 +76,7 @@ function Sampler(props) {
         {isBufferLoaded ? (
           <AudioClip
             index={0}
+            sessionSize={props.sessionSize}
             parentId={props.module.id}
             color={props.module.color}
             buffer={instrument.buffer}

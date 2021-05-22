@@ -1,5 +1,3 @@
--Fix Chord Prog. instrument and module editor bug
-
 -Load sample by dragging
 
 -Fix loader style
@@ -31,6 +29,8 @@
 (Different samples into sampler module)?
 
 -Effects controller
+
+-Full Screen Module
 
 -Piano Roll module
 
