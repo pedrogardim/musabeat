@@ -5,9 +5,8 @@ import * as Tone from "tone";
 import AudioClip from "./AudioClip";
 import BackgroundGrid from "./BackgroundGrid";
 
-
 import Draggable from "react-draggable";
-
+import { FileDrop } from "react-file-drop";
 import { CircularProgress, Typography } from "@material-ui/core";
 
 import { scheduleSamples } from "../../utils/TransportSchedule";
@@ -21,6 +20,7 @@ function Sampler(props) {
   const [score, setScore] = useState(props.module.score);
   const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [dropHover, setDropHover] = useState(false);
 
   let buffersChecker, cursorAnimator;
 
@@ -36,7 +36,6 @@ function Sampler(props) {
   };
 
   const checkForLoadedBuffers = () => {
-    console.log(instrument);
     if (instrument.buffer.loaded) {
       setIsBufferLoaded(true);
       clearInterval(buffersChecker);
@@ -54,16 +53,56 @@ function Sampler(props) {
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
   };
 
+  const handleFileDrop = (files, event) => {
+    setIsBufferLoaded(false);
+    Tone.Transport.pause()
+    setDropHover(false);
+    let file = files[0];
+    console.log(file);
+
+    file.arrayBuffer().then((arraybuffer) => {
+      instrument.context.rawContext.decodeAudioData(
+        arraybuffer,
+        (audiobuffer) => {
+          console.log(audiobuffer);
+
+          if(audiobuffer.duration > 50){
+            alert("Try importing a smaller audio file")
+            setIsBufferLoaded(true);
+            return;
+          }
+
+
+          setInstrument(new Tone.GrainPlayer(audiobuffer,setIsBufferLoaded(true)).toDestination());
+          
+
+        },
+        //decode audio error
+        (e) =>{
+          alert("Upps.. there was an error decoding your audio file, try to convert it to other format");
+          setIsBufferLoaded(true);
+        }
+      );
+    });
+
+    //instrument.buffer = new Tone.ToneAudioBuffer(fileUrl,()=>{console.log("yata",fileUrl);setIsBufferLoaded(true)})
+
+    //file.arrayBuffer().then((buffer) => {
+
+    //console.log(instrument.buffer.fromArray(convertBlock(buffer)));
+    //});
+    //file.arrayBuffer().then(buffer => console.log(instrument.buffer.fromArray(buffer)))
+  };
+
   useEffect(() => {
     scheduleEvents();
-  }, [score]);
+  }, [score,instrument]);
 
   useEffect(() => {
     buffersChecker = setInterval(checkForLoadedBuffers, 1000);
     startCursor();
     //watch to window resize to update clips position
     //window.addEventListener("resize", displayWindowSize);
-
   }, []);
 
   return (
@@ -71,8 +110,19 @@ function Sampler(props) {
       className="module-innerwrapper"
       style={(props.style, { backgroundColor: props.module.color["900"] })}
     >
-      <div className="sampler">
-        <BackgroundGrid sessionSize={props.sessionSize} color={props.module.color}/>
+      <div
+        className="sampler"
+        onDragEnter={() => setDropHover(true)}
+        onDragLeave={() => setDropHover(false)}
+      >
+        <BackgroundGrid
+          sessionSize={props.sessionSize}
+          color={props.module.color}
+        />
+        <FileDrop
+          onDrop={(files, event) => handleFileDrop(files, event)}
+          className={"file-drop"}
+        ></FileDrop>
         {isBufferLoaded ? (
           <AudioClip
             index={0}
@@ -85,7 +135,10 @@ function Sampler(props) {
             setScore={setScore}
           />
         ) : (
-          <CircularProgress />
+          <CircularProgress
+            className="loading-progress"
+            style={{ color: props.module.color[300] }}
+          />
         )}
         <Draggable
           axis="x"
@@ -101,5 +154,17 @@ function Sampler(props) {
     </div>
   );
 }
+
+const convertBlock = (buffer) => {
+  // incoming data is an ArrayBuffer
+  var incomingData = new Uint8Array(buffer); // create a uint8 view on the ArrayBuffer
+  var i,
+    l = incomingData.length; // length, we need this for the loop
+  var outputData = new Float32Array(incomingData.length); // create the Float32Array for output
+  for (i = 0; i < l; i++) {
+    outputData[i] = (incomingData[i] - 128) / 128.0; // convert audio to float
+  }
+  return outputData; // return the Float32Array
+};
 
 export default Sampler;

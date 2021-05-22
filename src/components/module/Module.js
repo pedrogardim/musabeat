@@ -93,7 +93,6 @@ function Module(props) {
 
   useEffect(() => {
     setMuted(props.module.instrument._volume.mute);
-    console.log(props.module.instrument._volume.mute);
   }, [props.module.instrument._volume.mute]);
 
   return (

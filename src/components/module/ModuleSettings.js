@@ -22,7 +22,7 @@ function ModuleSettings(props) {
 
   const handleStepsSelect = (event) => {
     let newValue = parseInt(event.target.value);
-    console.log(newValue);
+    //console.log(newValue);
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {

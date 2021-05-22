@@ -82,8 +82,8 @@ const initialModules = [
     type: 1,
     steps: 16,
     root: 0,
-    scale:1,
-    range:[3,4],
+    scale: 1,
+    range: [3, 4],
     instrument: instrumentContructor(2),
     color: colors[2],
     score: [
@@ -131,8 +131,8 @@ const initialModules = [
     type: 2,
     instrument: instrumentContructor(0),
     root: 0,
-    scale:0,
-    complexity:3,
+    scale: 0,
+    complexity: 3,
     color: colors[3],
     score: [
       {
@@ -168,11 +168,12 @@ const initialModules = [
     name: "Sampler",
     type: 3,
     length: 1,
-    instrument: new Tone.GrainPlayer("https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav").toDestination(),
+    instrument: new Tone.GrainPlayer(
+      "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav"
+    ).toDestination(),
     color: colors[6],
-    score:[{time:0,duration:1}],
+    score: [{ time: 0, duration: 1 }],
   },
-  
 ];
 
 const initialSessionData = {
@@ -185,12 +186,13 @@ Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
   const [modules, setModules] = useState(initialModules);
+  //to undo and redo
+  const [sessionHistory, setSessionHistory] = useState([]);
   const [sessionSize, setSessionSize] = useState(4);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   //temp: muted modules array as workspace state
   const [mutedModules, setMutedModules] = useState([]);
-
 
   const addModule = (moduletype) => {
     let module = {
@@ -220,6 +222,30 @@ function Workspace(props) {
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * longestModule;
   };
 
+  ////TODO: UNDO
+
+  const undoSession = () => {
+    setModules(sessionHistory[sessionHistory.length - 2]);
+    setSessionHistory((prev) => {
+      let newArray = [...prev];
+      newArray.pop();
+      newArray.pop();
+      return newArray;
+    });
+    console.log(sessionHistory.map((e) => e[0].score[0][0]));
+  };
+
+  const registerSession = () => {
+    setSessionHistory((prev) => {
+      let newInput = [...prev];
+      newInput.push([...modules])
+      return newInput;
+    });
+    console.log("change registered");
+  };
+
+  //KEY EVENTS
+
   const handleKeyPress = (event) => {
     Tone.start();
     switch (event.code) {
@@ -229,35 +255,44 @@ function Workspace(props) {
           ? Tone.Transport.start()
           : Tone.Transport.pause();
         break;
+      /* case "KeyZ":
+        event.preventDefault();
+        if (event.metaKey || event.ctrlKey) {
+          sessionHistory.length > 1
+            ? undoSession()
+            : alert("Nothing to be undone");
+        }
+        break; */
+      case "KeyX":
+        event.preventDefault();
+        console.log(sessionHistory);
+
+        break;
     }
   };
 
   useEffect(() => {
     adaptSessionSize();
+    //registerSession();
     console.log(modules);
   }, [modules]);
 
-
   return (
-    <div
-      className="workspace"
-      tabIndex="0"
-      onKeyDown={handleKeyPress}
-    >
-      {modules.map((module,moduleIndex) => (
+    <div className="workspace" tabIndex="0" onKeyDown={handleKeyPress}>
+      {modules.map((module, moduleIndex) => (
         <Fragment>
-        <Module
-          key={module.id}
-          index={module.id}
-          module={module}
-          sessionSize={sessionSize}
-          updateModules={setModules}
-          muted={mutedModules.includes(moduleIndex)}
-        />
-        {moduleIndex % 3 == 1 && <div className="break"/>}
+          <Module
+            key={module.id}
+            index={module.id}
+            module={module}
+            sessionSize={sessionSize}
+            updateModules={setModules}
+            muted={mutedModules.includes(moduleIndex)}
+          />
+          {moduleIndex % 3 == 1 && <div className="break" />}
         </Fragment>
       ))}
-      <div className="break"/>
+      <div className="break" />
       <Fab color="primary" onClick={() => chooseNewModule(true)}>
         <Icon>add</Icon>
       </Fab>
@@ -275,7 +310,9 @@ function Workspace(props) {
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
-      {mixerOpened && <Mixer setMutedModules={setMutedModules} modules={modules} />}
+      {mixerOpened && (
+        <Mixer setMutedModules={setMutedModules} modules={modules} />
+      )}
 
       <Fab
         className="fixed-fab"

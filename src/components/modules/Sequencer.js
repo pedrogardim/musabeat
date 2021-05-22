@@ -69,7 +69,8 @@ function Sequencer(props) {
   const loadDrumPatch = () => {
     //if(Drumdata.kits[loadedpatch].hasOwnProperty('sounds'))
     Drumdata.labels.forEach((element, index) => {
-      drumPlayers.add(index,
+      drumPlayers.add(
+        index,
         "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
           Drumdata.kits[loadedpatch].baseUrl +
           "/" +
@@ -91,9 +92,9 @@ function Sequencer(props) {
     setCurrentBeat(0);
   };
 
-  const updateSequence = () => {
+  const updateModuleSequence = () => {
     props.updateModules((previousModules) => {
-      let newmodules = previousModules;
+      let newmodules = [...previousModules];
       newmodules[props.module.id].score = sequencerArray;
       return newmodules;
     });
@@ -113,7 +114,7 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-    updateSequence();
+    updateModuleSequence();
     //updateInstrument();
   }, [drumPlayers, sequencerArray]);
 
@@ -156,7 +157,10 @@ function Sequencer(props) {
           ))}
         </div>
       ) : (
-        <CircularProgress />
+        <CircularProgress
+          className="loading-progress"
+          style={{ color: props.module.color[300] }}
+        />
       )}
       {sequencerArray.length > 1 && (
         <BottomNavigation
@@ -171,7 +175,7 @@ function Sequencer(props) {
           {sequencerArray.length > 1 &&
             sequencerArray.map((measure, index) => (
               <BottomNavigationAction
-                style={{ minWidth: 0, maxWidth:"100%"}}
+                style={{ minWidth: 0, maxWidth: "100%" }}
                 key={index}
                 label={index + 1}
               />
