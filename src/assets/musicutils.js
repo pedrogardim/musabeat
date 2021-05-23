@@ -5,6 +5,8 @@
 import * as Tone from "tone";
 
 import { instruments } from "./instrumentpatches";
+import { kits, labels } from "./drumkits";
+
 
 export const musicalNotes = [
   "C",
@@ -618,4 +620,22 @@ export const instrumentContructor = (input) => {
   }
 
   return instr;
+};
+
+export const loadDrumPatch = (patch,buffers) => {
+  let urlMap = {};
+  //drum patch with stardard configuration
+  labels.forEach((element, index) => {
+    urlMap[index] = "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
+    kits[patch].baseUrl +
+    "/" +
+    index +
+    ".wav";
+  });
+
+  let drumPlayers = new Tone.Players(urlMap).toDestination();
+
+  return drumPlayers;
+
+
 };

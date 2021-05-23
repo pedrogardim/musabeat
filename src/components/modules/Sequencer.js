@@ -6,6 +6,7 @@ import * as Tone from "tone";
 import * as Drumdata from "../../assets/drumkits";
 
 import { scheduleDrumSequence } from "../../utils/TransportSchedule";
+import { loadDrumPatch } from "../../assets/musicutils";
 
 import {
   CircularProgress,
@@ -66,23 +67,6 @@ function Sequencer(props) {
     setScheduledEvents(scheduledNotes);
   };
 
-  const loadDrumPatch = () => {
-    //if(Drumdata.kits[loadedpatch].hasOwnProperty('sounds'))
-    Drumdata.labels.forEach((element, index) => {
-      drumPlayers.add(
-        index,
-        "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
-          Drumdata.kits[loadedpatch].baseUrl +
-          "/" +
-          index +
-          ".wav",
-        () => {
-          index === Drumdata.labels.length - 1 && setIsBufferLoaded(true);
-        }
-      );
-    });
-  };
-
   const playDrumSound = (note, time) =>
     drumPlayers.player(note).start(time !== undefined ? time : 0);
 
@@ -109,14 +93,18 @@ function Sequencer(props) {
   };
 
   useEffect(() => {
-    loadDrumPatch();
-  }, []);
-
-  useEffect(() => {
     scheduleNotes();
     updateModuleSequence();
-    //updateInstrument();
-  }, [drumPlayers, sequencerArray]);
+  }, [sequencerArray]);
+
+  useEffect(() => {
+    console.log(drumPlayers);
+    let loadingChecker = setInterval(() => {
+      setIsBufferLoaded(drumPlayers.loaded);
+      drumPlayers.loaded && clearInterval(loadingChecker);
+    }, 200);
+    scheduleNotes();
+  }, [drumPlayers]);
 
   useEffect(() => {
     changeSequence(props.module.score);

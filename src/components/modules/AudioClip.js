@@ -21,21 +21,26 @@ function AudioClip(props) {
       document.getElementById("module-" + props.parentId).clientWidth
   );
 
+/*   
+  const [waveForm, setWaveForm] = useState(
+    drawClipWave(
+      props.buffer.toArray(),
+      props.buffer.duration,
+      props.score.duration,
+      clipHeight,
+      clipWidth,
+      props.color
+    )
+  );
+ */
 
-  let waveForm = drawClipWave(
-    props.buffer.toArray(),
-    clipHeight,
-    clipWidth,
-    props.color
-  )
-  
   const updateClipPosition = () => {
-    setClipWidth((props.score.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-    document.getElementById("module-" + props.parentId).clientWidth);
-    setClipPosition((props.score.time / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-    document.getElementById("module-" + props.parentId).clientWidth)
+    let timePerPixel =
+      document.getElementById("module-" + props.parentId).clientWidth /
+      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+    setClipPosition(props.score.time * timePerPixel);
   };
-  
+
   const handleDrag = (event, element) => {
     setClipPosition(element.x);
     props.setScore((prev) => {
@@ -61,16 +66,24 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    waveForm = drawClipWave(
-      props.buffer.toArray(),
-      clipHeight,
-      clipWidth,
-      props.color
-    );
+    /* setWaveForm(
+      drawClipWave(
+        props.buffer.toArray(),
+        props.buffer.duration,
+        props.score.duration,
+        clipHeight,
+        clipWidth,
+        props.color
+      )
+    ); */
   }, [props.buffer]);
 
   return (
-    <Draggable axis="x" onDrag={handleDrag} position={{ x: clipPosition, y:0 }}>
+    <Draggable
+      axis="x"
+      onDrag={handleDrag}
+      position={{ x: clipPosition, y: 0 }}
+    >
       {/*TODO:*/}
       {/*<Resizable
         resizeHandles={["e"]}
@@ -91,7 +104,7 @@ function AudioClip(props) {
           className="sampler-audio-clip-wave"
           preserveAspectRatio="xMinYMin slice"
         >
-          {waveForm}
+          {/*waveForm*/}
         </svg>
       </div>
       {/*</Resizable>*/}
@@ -99,29 +112,38 @@ function AudioClip(props) {
   );
 }
 
-/* 
+const drawClipWave = (
+  buffer,
+  clipDuration,
+  scheduledDuration,
+  clipHeight,
+  clipWidth,
+  color
+) => {
+  let waveArray = typeof buffer[0] === "number" ? buffer : buffer[0];
 
-const drawClipWave = (wavearray, clipHeight, clipWidth, color) => {
-  let scale = Math.floor(wavearray.length / clipWidth);
+  let scale = Math.floor(buffer.length / clipWidth * clipDuration );
 
-  let pathstring = "M 0 " + clipHeight / 2 + " ";
+  let pathString = "M 0 " + clipHeight / 2 + " ";
 
   for (let x = 0; x < clipWidth; x++) {
-    pathstring +=
+    pathString +=
       "L " +
       x +
       " " +
-      (wavearray[x * scale] * clipHeight * 2 + clipHeight / 2) +
+      (waveArray[x * clipWidth] * clipHeight * 2 + clipHeight / 2) +
       " ";
   }
-  return <path d={pathstring} stroke={color[100]} fill="none" />;
+  return <path d={pathString} stroke={color[100]} fill="none" />;
 };
 
- */
+/*
 
 const drawClipWave = (wavearray, clipHeight, clipWidth, color) => {
 
   return <path stroke={color[100]} fill="none" />;
 };
+
+*/
 
 export default AudioClip;

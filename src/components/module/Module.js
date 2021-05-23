@@ -128,6 +128,7 @@ function Module(props) {
 
       {instrumentEditorMode && (
         <InstrumentEditor
+          module={props.module}
           instrument={props.module.instrument}
           updateModules={props.updateModules}
           setInstrumentEditorMode={setInstrumentEditorMode}

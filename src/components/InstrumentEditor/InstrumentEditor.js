@@ -6,9 +6,9 @@ import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 
-
 import { instruments } from "../../assets/instrumentpatches";
-import { instrumentContructor } from "../../assets/musicutils";
+import { kits } from "../../assets/drumkits";
+import { instrumentContructor, loadDrumPatch } from "../../assets/musicutils";
 
 import "./InstrumentEditor.css";
 
@@ -27,7 +27,10 @@ function InstrumentEditor(props) {
             if (i === props.index) {
               let newModule = { ...module };
               newModule.instrument = {};
-              newModule.instrument = instrumentContructor(event.target.value);
+              newModule.instrument =
+                props.module.type === 0
+                  ? loadDrumPatch(event.target.value)
+                  : instrumentContructor(event.target.value);
               return newModule;
             } else {
               return module;
@@ -44,7 +47,6 @@ function InstrumentEditor(props) {
     //
   };
 
-
   let mainContent = "Nothing Here";
 
   let list = [];
@@ -52,17 +54,18 @@ function InstrumentEditor(props) {
   switch (instrument.name) {
     case "Players":
       //temp solution
-      instrument._buffers._buffers.forEach((e, i) =>
-        i > -1 && 
-        list.push(
-          <AudioFileItem
-            active={instrument.player(i).state === "started"}
-            key={i}
-            index={i}
-            instrument={instrument}
-            buffer={e}
-          />
-        )
+      instrument._buffers._buffers.forEach(
+        (e, i) =>
+          i > -1 &&
+          list.push(
+            <AudioFileItem
+              active={instrument.player(i).state === "started"}
+              key={i}
+              index={i}
+              instrument={instrument}
+              buffer={e}
+            />
+          )
       );
       mainContent = list;
       break;
@@ -76,15 +79,20 @@ function InstrumentEditor(props) {
           />
         </div>
       );
-      list.push(<div className="instrument-editor-column" key={1}>
-        <SynthParameters instrument={instrument}/>
-      </div>);
+      list.push(
+        <div className="instrument-editor-column" key={1}>
+          <SynthParameters instrument={instrument} />
+        </div>
+      );
       list.push(
         <div className="instrument-editor-column" key={2}>
           {Object.keys(instrument.get()).map(
             (envelope, envelopeIndex) =>
-              (envelope.toLowerCase().includes("envelope")) && (
-                <EnvelopeControl instrument={instrument} envelopeType={envelope}/>
+              envelope.toLowerCase().includes("envelope") && (
+                <EnvelopeControl
+                  instrument={instrument}
+                  envelopeType={envelope}
+                />
               )
           )}
         </div>
@@ -101,11 +109,17 @@ function InstrumentEditor(props) {
         value={selectedPatch}
         onChange={handlePatchSelect}
       >
-        {instruments.map((kit, kitIndex) => (
-          <option key={kitIndex} value={kitIndex}>
-            {kit.name}
-          </option>
-        ))}
+        {props.module.type === 0
+          ? kits.map((kit, kitIndex) => (
+              <option key={kitIndex} value={kitIndex}>
+                {kit.name}
+              </option>
+            ))
+          : instruments.map((kit, kitIndex) => (
+              <option key={kitIndex} value={kitIndex}>
+                {kit.name}
+              </option>
+            ))}
       </Select>
       <div className="break" />
 

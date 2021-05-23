@@ -55,7 +55,7 @@ function Sampler(props) {
 
   const handleFileDrop = (files, event) => {
     setIsBufferLoaded(false);
-    Tone.Transport.pause()
+    Tone.Transport.pause();
     setDropHover(false);
     let file = files[0];
     console.log(file);
@@ -66,20 +66,24 @@ function Sampler(props) {
         (audiobuffer) => {
           console.log(audiobuffer);
 
-          if(audiobuffer.duration > 50){
-            alert("Try importing a smaller audio file")
+          if (audiobuffer.duration > 50) {
+            alert("Try importing a smaller audio file");
             setIsBufferLoaded(true);
             return;
           }
 
-
-          setInstrument(new Tone.GrainPlayer(audiobuffer,setIsBufferLoaded(true)).toDestination());
-          
-
+          setInstrument(
+            new Tone.GrainPlayer(
+              audiobuffer,
+              setIsBufferLoaded(true)
+            ).toDestination()
+          );
         },
         //decode audio error
-        (e) =>{
-          alert("Upps.. there was an error decoding your audio file, try to convert it to other format");
+        (e) => {
+          alert(
+            "Upps.. there was an error decoding your audio file, try to convert it to other format"
+          );
           setIsBufferLoaded(true);
         }
       );
@@ -96,7 +100,7 @@ function Sampler(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [score,instrument]);
+  }, [score, instrument]);
 
   useEffect(() => {
     buffersChecker = setInterval(checkForLoadedBuffers, 1000);

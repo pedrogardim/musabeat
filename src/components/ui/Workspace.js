@@ -3,6 +3,8 @@ import * as Tone from "tone";
 
 import { Fab, Icon } from "@material-ui/core";
 
+import { loadDrumPatch } from "../../assets/musicutils";
+
 import "./Workspace.css";
 
 import Module from "./../module/Module";
@@ -53,7 +55,7 @@ const initialModules = [
     type: 0,
     steps: 16,
     patch: 0,
-    instrument: new Tone.Players({ "-1": "" }).toDestination(),
+    instrument: loadDrumPatch(0),
     color: colors[1],
     score: [
       [
