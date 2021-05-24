@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Fragment } from "react";
+import React, { useState,useEffect,Fragment } from "react";
 
 import {
   Select,
@@ -13,49 +12,50 @@ import { waveTypes, filterTypes } from "../../assets/musicutils";
 import "./InstrumentEditor.css";
 
 function SynthParameters(props) {
-  const [selectedPatch, setSelectedPatch] = useState(0);
   //const [selectedFile, setSelectedFile] = useState(null);
   const [instrumentParamenters, setInstrumentParamenters] = useState(
     props.instrument.get()
   );
 
-  console.log(instrumentParamenters)
+  console.log(instrumentParamenters);
 
   //console.log(instrument.get());
 
   let mainContent = "Nothing Here";
 
-  const handleChange = (paramenter, value) => {
+  const handleChange = (parameter, value) => {
     setInstrumentParamenters((prev) => {
-      return { ...prev, [paramenter]: value };
+      return { ...prev, [parameter]: value };
     });
-    props.instrument.set({ [paramenter]: value });
+    props.instrument.set({ [parameter]: value });
   };
 
-  const handleWaveTypeSelect = (paramenter, event) => {
+  const handleWaveTypeSelect = (parameter, event) => {
     let value = event.target.value;
     setInstrumentParamenters((prev) => {
-      return { ...prev, [paramenter]: { type: value } };
+      return { ...prev, [parameter]: { type: value } };
     });
-    props.instrument.set({ [paramenter]: { type: value } });
+    props.instrument.set({ [parameter]: { type: value } });
   };
 
-  const handleFilterChange = (paramenter, value) => {
+  const handleFilterChange = (parameter, value) => {
     setInstrumentParamenters((prev) => {
-      return { ...prev, filter: { ...prev.filter,[paramenter]: value } };
+      return { ...prev, filter: { ...prev.filter,[parameter]: value } };
     });
-    props.instrument.set({filter: { [paramenter]: value } });
+    props.instrument.set({filter: { [parameter]: value } });
   };
 //TODO
+
+  console.log(props.instrument);
+
   mainContent = (
     <Fragment>
-      {Object.keys(props.instrument.get()).map(
-        (element, index) =>
-          element === "filter" && (
+      {Object.keys(instrumentParamenters).map(
+        (parameter, index) =>
+          parameter === "filter" ? (
             <Fragment>
               <Typography variant="overline">Frequency</Typography>
               <Slider
-                key={0}
                 value={instrumentParamenters.filter.frequency}
                 min={20}
                 step={1}
@@ -65,7 +65,6 @@ function SynthParameters(props) {
               />
               <Typography variant="overline">Q</Typography>
               <Slider
-                key={0}
                 value={instrumentParamenters.filter.Q}
                 min={1}
                 step={1}
@@ -76,7 +75,6 @@ function SynthParameters(props) {
               <FormControl>
                 <InputLabel id="fm-wave-selector-label">Roll Off</InputLabel>
                 <Select
-                  key={1}
                   native
                   labelId="fm-wave-selector-label"
                   value={instrumentParamenters.filter.rolloff}
@@ -99,7 +97,6 @@ function SynthParameters(props) {
               <FormControl>
                 <InputLabel id="fm-wave-selector-label">Type</InputLabel>
                 <Select
-                  key={2}
                   native
                   labelId="fm-wave-selector-label"
                   value={instrumentParamenters.filter.type}
@@ -115,36 +112,28 @@ function SynthParameters(props) {
                 </Select>
               </FormControl>
             </Fragment>
-          )
-      )}
-      {Object.keys(props.instrument.get()).map(
-        (element, index) =>
-          (element === "harmonicity" || element === "modulationIndex") && (
+          ):
+          (parameter === "harmonicity" || parameter === "modulationIndex") ? (
             <Fragment>
-              <Typography variant="overline">{element}</Typography>
+              <Typography variant="overline">{parameter}</Typography>
               <Slider
-                key={0}
-                value={instrumentParamenters[element]}
+                value={instrumentParamenters[parameter]}
                 min={1}
                 step={1}
                 max={50}
-                onChange={(e, v) => handleChange(element, v)}
+                onChange={(e, v) => handleChange(parameter, v)}
                 valueLabelDisplay="auto"
               />
             </Fragment>
-          )
-      )}
-      {Object.keys(props.instrument.get()).map(
-        (element, index) =>
-          element === "modulation" && (
+          ):
+          parameter === "modulation" ? (
             <FormControl>
-              <InputLabel id="fm-wave-selector-label">{element}</InputLabel>
+              <InputLabel id="fm-wave-selector-label">{parameter}</InputLabel>
               <Select
-                key={2}
                 native
                 labelId="fm-wave-selector-label"
                 value={instrumentParamenters.modulation.type}
-                onChange={(event) => handleWaveTypeSelect(element, event)}
+                onChange={(event) => handleWaveTypeSelect(parameter, event)}
               >
                 {waveTypes.map((e, i) => (
                   <option key={i} value={e}>
@@ -153,10 +142,12 @@ function SynthParameters(props) {
                 ))}
               </Select>
             </FormControl>
-          )
-      )}
+          ):"")}
+      
     </Fragment>
   );
+
+  useEffect(()=>{setInstrumentParamenters(props.instrument.get())},[props.instrument])
 
   return mainContent;
 }

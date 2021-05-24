@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import * as Tone from "tone";
 
@@ -16,6 +16,8 @@ import "./Sampler.css";
 //TODO
 
 function Sampler(props) {
+
+  const sampleWrapper = useRef(null)
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [score, setScore] = useState(props.module.score);
   const [instrument, setInstrument] = useState(props.module.instrument);
@@ -30,7 +32,7 @@ function Sampler(props) {
       setCursorPosition(
         (Tone.Transport.seconds /
           Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-          document.getElementById("module-" + props.module.id).clientWidth
+          sampleWrapper.current.offsetWidth
       );
     }, 36);
   };
@@ -49,7 +51,7 @@ function Sampler(props) {
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
       (element.x /
-        document.getElementById("module-" + props.module.id).clientWidth) *
+        sampleWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
   };
 
@@ -120,6 +122,7 @@ function Sampler(props) {
     >
       <div
         className="sampler"
+        ref={sampleWrapper}
         onDragEnter={() => setDraggingOver(true)}
       >
         <BackgroundGrid
@@ -144,7 +147,7 @@ function Sampler(props) {
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
-            parentId={props.module.id}
+            parentRef={sampleWrapper}
             color={props.module.color}
             buffer={instrument.buffer}
             scheduleEvents={scheduleEvents}

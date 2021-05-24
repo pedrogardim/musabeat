@@ -15,7 +15,6 @@ import {
 import { PostAddSharp } from "@material-ui/icons";
 
 function AudioFileItem(props) {
-  const isSynth = props.instrument.name === "PolySynth";
 
   const [wavePath, setWavePath] = useState("");
   const [wave, setWave] = useState("");
@@ -29,7 +28,7 @@ function AudioFileItem(props) {
   useEffect(
     () =>
       drawWave(
-        isSynth ? props.buffer.asArray(128) : props.buffer.toArray(),
+        props.buffer.toArray(),
         setWavePath
       ),
     []
@@ -72,6 +71,9 @@ function AudioFileItem(props) {
 }
 
 const drawWave = (wavearray, setWavePath) => {
+
+  if(!wavearray.length){return};
+
   let pathstring = "M 0 16 ";
 
   let wave = wavearray;

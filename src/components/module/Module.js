@@ -62,7 +62,7 @@ function Module(props) {
       moduleContent = (
         <ChordProgression
           style={{
-            display: instrumentEditorMode || settingsMode ? "none" : "flex",
+            display: instrumentEditorMode || settingsMode ? "none" : "block",
           }}
           sessionSize={props.sessionSize}
           muted={muted}

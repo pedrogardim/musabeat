@@ -10,8 +10,11 @@ import SynthParameters from "./SynthParameters";
 
 import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
-import { instrumentContructor, loadDrumPatch, detectPitch } from "../../assets/musicutils";
-
+import {
+  instrumentContructor,
+  loadDrumPatch,
+  detectPitch,
+} from "../../assets/musicutils";
 
 import { FileDrop } from "react-file-drop";
 
@@ -26,32 +29,28 @@ function InstrumentEditor(props) {
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
-    switch (instrument.name) {
-      case "PolySynth":
-        props.updateModules((previous) =>
-          previous.map((module, i) => {
-            if (i === props.index) {
-              let newModule = { ...module };
-              newModule.instrument = {};
-              newModule.instrument =
-                props.module.type === 0
-                  ? loadDrumPatch(event.target.value)
-                  : instrumentContructor(event.target.value);
-              return newModule;
-            } else {
-              return module;
-            }
-          })
-        );
-        break;
-      case 2:
-        break;
-    }
-    //auto close
-    props.setInstrumentEditorMode(false);
 
-    //
+    props.updateModules((previous) =>
+      previous.map((module, i) => {
+        if (i === props.index) {
+          let newModule = { ...module };
+          newModule.instrument = {};
+          newModule.instrument =
+            props.module.type === 0
+              ? loadDrumPatch(event.target.value)
+              : instrumentContructor(event.target.value);
+          setInstrument(newModule.instrument);
+          return newModule;
+        } else {
+          return module;
+        }
+      })
+    );
   };
+  //auto close
+  //props.setInstrumentEditorMode(false);
+
+  //
 
   const handleFileDrop = (files, event) => {
     event.preventDefault();
@@ -69,14 +68,14 @@ function InstrumentEditor(props) {
             return;
           }
 
-          let fileName = (instrument.name === "Sampler")?Tone.Frequency(detectPitch(audiobuffer)[0]).toNote():file.name.split(".")[0];;
-
+          let fileName =
+            instrument.name === "Sampler"
+              ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
+              : file.name.split(".")[0];
 
           instrument.add(fileName, audiobuffer, (e) => {
             setSelectedPatch(null);
           });
-
-        
         },
         (e) => {
           alert(
@@ -119,12 +118,10 @@ function InstrumentEditor(props) {
   };
 
   const handleSamplerFileDelete = (fileName) => {
-
     let newInstrument = new Tone.Sampler().toDestination();
 
     props.instrument._buffers._buffers.forEach((value, key) => {
-      if (parseInt(key) !== fileName)
-        newInstrument.add(key, value);
+      if (parseInt(key) !== fileName) newInstrument.add(key, value);
     });
 
     props.instrument.dispose();
@@ -194,7 +191,7 @@ function InstrumentEditor(props) {
                 instrument={instrument}
                 handleFileDelete={handleSamplerFileDelete}
                 buffer={e[0]}
-                fileName={Tone.Frequency(e[1],"midi").toNote()}
+                fileName={Tone.Frequency(e[1], "midi").toNote()}
               />
               <Divider />
             </Fragment>

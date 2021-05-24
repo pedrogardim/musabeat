@@ -9,16 +9,16 @@ import "./AudioClip.css";
 
 function AudioClip(props) {
   const [clipHeight, setClipHeight] = useState(
-    document.getElementById("module-" + props.parentId).clientHeight
+    props.parentRef.current.offsetHeight
   );
   const [clipWidth, setClipWidth] = useState(
     (props.score.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-      document.getElementById("module-" + props.parentId).clientWidth
+    props.parentRef.current.offsetWidth
   );
 
   const [clipPosition, setClipPosition] = useState(
     (props.score.time / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-      document.getElementById("module-" + props.parentId).clientWidth
+    props.parentRef.current.offsetWidth
   );
 
    
@@ -36,7 +36,7 @@ function AudioClip(props) {
 
   const updateClipPosition = () => {
     let timePerPixel =
-      document.getElementById("module-" + props.parentId).clientWidth /
+    props.parentRef.current.offsetWidth /
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
     setClipPosition(props.score.time * timePerPixel);
   };
@@ -47,7 +47,7 @@ function AudioClip(props) {
       let newScore = [...prev];
       let newTime =
         (element.x /
-          document.getElementById("module-" + props.parentId).clientWidth) *
+          props.parentRef.current.offsetWidth) *
         Tone.Time(Tone.Transport.loopEnd).toSeconds();
       newScore[props.index].time = newTime;
       return newScore;

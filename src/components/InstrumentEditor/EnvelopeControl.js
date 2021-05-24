@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from "react";
+import React, { useState, Fragment,useEffect } from "react";
 
 import { Select, Typography, Slider } from "@material-ui/core";
 
@@ -12,10 +12,12 @@ function EnvelopeControl(props) {
     setEnvelope(prev => {return {...prev, [element]: value }})
   }
 
+  useEffect(() => {setEnvelope(props.instrument.get().envelope)},[props.instrument])
+
   return (
     <Fragment>
       <Typography variant="overline">
-        {props.envelopeType.toLowerCase().replace("envelope", " ADSR")}
+        {props.envelopeType.toLowerCase().replace("envelope", " ADSR").replace("modulation","mod")}
       </Typography>
       <div className="break"></div>
 
@@ -39,6 +41,8 @@ function EnvelopeControl(props) {
           )
       )}
       <div className="break"></div>
+
+
     </Fragment>
   );
 }
