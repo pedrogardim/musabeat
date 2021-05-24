@@ -16,25 +16,28 @@ import "./Sampler.css";
 //TODO
 
 function Sampler(props) {
-
-  const sampleWrapper = useRef(null)
+  const sampleWrapper = useRef(null);
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [score, setScore] = useState(props.module.score);
   const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [cursorAnimator, setCursorAnimator] = useState(null);
+  const [buffersChecker, setBuffersChecker] = useState(null);
+
   const [draggingOver, setDraggingOver] = useState(false);
 
-  let buffersChecker, cursorAnimator;
-
-  const startCursor = () => {
-    setInterval(() => {
-      //console.log((Tone.Transport.seconds/Tone.Time(Tone.Transport.loopEnd).toSeconds())*100+"%")
-      setCursorPosition(
-        (Tone.Transport.seconds /
-          Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-          sampleWrapper.current.offsetWidth
-      );
-    }, 36);
+  const startCursor = (started) => {
+    started
+      ? setCursorAnimator(
+          setInterval(() => {
+            setCursorPosition(
+              (Tone.Transport.seconds /
+                Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
+                sampleWrapper.current.offsetWidth
+            );
+          }, 16)
+        )
+      : clearInterval(cursorAnimator);
   };
 
   const checkForLoadedBuffers = () => {
@@ -50,14 +53,12 @@ function Sampler(props) {
 
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
-      (element.x /
-        sampleWrapper.current.offsetWidth) *
+      (element.x / sampleWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
   };
 
   const handleFileDrop = (files, event) => {
-
-    event.preventDefault()
+    event.preventDefault();
 
     Tone.Transport.pause();
 
@@ -105,12 +106,15 @@ function Sampler(props) {
   };
 
   useEffect(() => {
+    startCursor(Tone.Transport.state === "started");
+  }, [Tone.Transport.state]);
+
+  useEffect(() => {
     scheduleEvents();
   }, [score, instrument]);
 
   useEffect(() => {
-    buffersChecker = setInterval(checkForLoadedBuffers, 1000);
-    startCursor();
+    setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
     //watch to window resize to update clips position
     //window.addEventListener("resize", displayWindowSize);
   }, []);
@@ -130,19 +134,19 @@ function Sampler(props) {
           color={props.module.color}
         />
         {draggingOver && (
-        <FileDrop
-          onDragLeave={(e) => {
-            setDraggingOver(false);
-          }}
-          onDrop={(files, event) => handleFileDrop(files, event)}
-          className={"file-drop"}
-          style={{
-            backgroundColor: props.module.color[300],
-          }}
-        >
-          Drop your files here!
-        </FileDrop>
-      )}
+          <FileDrop
+            onDragLeave={(e) => {
+              setDraggingOver(false);
+            }}
+            onDrop={(files, event) => handleFileDrop(files, event)}
+            className={"file-drop"}
+            style={{
+              backgroundColor: props.module.color[300],
+            }}
+          >
+            Drop your files here!
+          </FileDrop>
+        )}
         {isBufferLoaded ? (
           <AudioClip
             index={0}
@@ -174,17 +178,5 @@ function Sampler(props) {
     </div>
   );
 }
-
-const convertBlock = (buffer) => {
-  // incoming data is an ArrayBuffer
-  var incomingData = new Uint8Array(buffer); // create a uint8 view on the ArrayBuffer
-  var i,
-    l = incomingData.length; // length, we need this for the loop
-  var outputData = new Float32Array(incomingData.length); // create the Float32Array for output
-  for (i = 0; i < l; i++) {
-    outputData[i] = (incomingData[i] - 128) / 128.0; // convert audio to float
-  }
-  return outputData; // return the Float32Array
-};
 
 export default Sampler;
