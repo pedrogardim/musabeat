@@ -105,7 +105,7 @@ function Module(props) {
       }}
       className={
         "module " +
-        (props.module.type === 3 && " module-compact ") +
+        //(props.module.type === 3 && " module-compact ") +
         (muted && " module-muted")
       }
     >

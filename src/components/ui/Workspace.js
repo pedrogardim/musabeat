@@ -187,6 +187,7 @@ Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
+  const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState(initialModules);
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
@@ -195,6 +196,17 @@ function Workspace(props) {
   const [mixerOpened, setMixerOpened] = useState(false);
   //temp: muted modules array as workspace state
   const [mutedModules, setMutedModules] = useState([]);
+
+  const togglePlaying = () => {
+    Tone.start();
+    if (Tone.Transport.state !== "started") {
+      Tone.Transport.start();
+      setIsPlaying(true);
+    } else {
+      Tone.Transport.pause();
+      setIsPlaying(false);
+    }
+  };
 
   const addModule = (moduletype) => {
     let module = {
@@ -240,7 +252,7 @@ function Workspace(props) {
   const registerSession = () => {
     setSessionHistory((prev) => {
       let newInput = [...prev];
-      newInput.push([...modules])
+      newInput.push([...modules]);
       return newInput;
     });
     console.log("change registered");
@@ -253,9 +265,7 @@ function Workspace(props) {
     switch (event.code) {
       case "Space":
         event.preventDefault();
-        Tone.Transport.state !== "started"
-          ? Tone.Transport.start()
-          : Tone.Transport.pause();
+        togglePlaying();
         break;
       /* case "KeyZ":
         event.preventDefault();
@@ -295,7 +305,11 @@ function Workspace(props) {
         </Fragment>
       ))}
       <div className="break" />
-      <Fab color="primary" onClick={() => chooseNewModule(true)}>
+      <Fab
+        color="primary"
+        style={{ marginTop: 48 }}
+        onClick={() => chooseNewModule(true)}
+      >
         <Icon>add</Icon>
       </Fab>
 
@@ -316,6 +330,14 @@ function Workspace(props) {
         <Mixer setMutedModules={setMutedModules} modules={modules} />
       )}
 
+      <Fab
+        color="primary"
+        className="fixed-fab"
+        style={{ right: "calc(50% - 12px)" }}
+        onClick={togglePlaying}
+      >
+        <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
+      </Fab>
       <Fab
         className="fixed-fab"
         color="primary"

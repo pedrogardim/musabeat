@@ -21,9 +21,10 @@ function AudioFileItem(props) {
   const [wave, setWave] = useState("");
 
   const handleClick = () => {
-    props.instrument.name === "Sampler" ? props.instrument.triggerAttackRelease(props.fileName,"8n") : props.instrument.player(props.fileName).start(0);
+    props.instrument.name === "Sampler"
+      ? props.instrument.triggerAttackRelease(props.fileName, "8n")
+      : props.instrument.player(props.fileName).start(0);
   };
-
 
   useEffect(
     () =>
@@ -52,7 +53,17 @@ function AudioFileItem(props) {
       </ListItemText>
 
       <ListItemSecondaryAction>
-        <IconButton onClick={()=>props.handleFileDelete(Tone.Frequency(props.fileName).toMidi())} edge="end" aria-label="delete">
+        <IconButton
+          onClick={() =>
+            props.handleFileDelete(
+              props.instrument.name === "Sampler"
+                ? Tone.Frequency(props.fileName).toMidi()
+                : props.fileName
+            )
+          }
+          edge="end"
+
+        >
           <Icon>delete</Icon>
         </IconButton>
       </ListItemSecondaryAction>

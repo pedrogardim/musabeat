@@ -1,12 +1,7 @@
--Load sample by dragging
-
--Fix loader style
-
 -Chord rhythm editor
 
 -Work on instrument editor
     -better filter control
-    -edit drum patch(related to load sample)
 
 -Ctrl + Z, Ctrl + C,  Ctrl + V
 

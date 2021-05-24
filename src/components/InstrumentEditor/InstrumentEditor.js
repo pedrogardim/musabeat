@@ -234,10 +234,6 @@ function InstrumentEditor(props) {
     mainContent = list;
   }
 
-  useEffect(() => {
-    console.log(draggingOver);
-  }, [draggingOver]);
-
   return (
     <div
       className="instrument-editor"
