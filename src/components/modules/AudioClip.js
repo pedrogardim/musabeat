@@ -21,7 +21,7 @@ function AudioClip(props) {
       document.getElementById("module-" + props.parentId).clientWidth
   );
 
-/*   
+   
   const [waveForm, setWaveForm] = useState(
     drawClipWave(
       props.buffer.toArray(),
@@ -32,7 +32,7 @@ function AudioClip(props) {
       props.color
     )
   );
- */
+ 
 
   const updateClipPosition = () => {
     let timePerPixel =
@@ -66,7 +66,7 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    /* setWaveForm(
+    setWaveForm(
       drawClipWave(
         props.buffer.toArray(),
         props.buffer.duration,
@@ -75,7 +75,7 @@ function AudioClip(props) {
         clipWidth,
         props.color
       )
-    ); */
+    ); 
   }, [props.buffer]);
 
   return (
@@ -104,7 +104,7 @@ function AudioClip(props) {
           className="sampler-audio-clip-wave"
           preserveAspectRatio="xMinYMin slice"
         >
-          {/*waveForm*/}
+          {waveForm}
         </svg>
       </div>
       {/*</Resizable>*/}
@@ -122,7 +122,7 @@ const drawClipWave = (
 ) => {
   let waveArray = typeof buffer[0] === "number" ? buffer : buffer[0];
 
-  let scale = Math.floor(buffer.length / clipWidth * clipDuration );
+  let scale = Math.floor( clipWidth /(scheduledDuration));
 
   let pathString = "M 0 " + clipHeight / 2 + " ";
 
@@ -131,7 +131,7 @@ const drawClipWave = (
       "L " +
       x +
       " " +
-      (waveArray[x * clipWidth] * clipHeight * 2 + clipHeight / 2) +
+      Math.floor((waveArray[Math.floor(x * scale)]) * clipHeight/4 + clipHeight / 2) +
       " ";
   }
   return <path d={pathString} stroke={color[100]} fill="none" />;

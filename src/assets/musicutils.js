@@ -640,7 +640,6 @@ export const loadDrumPatch = (patch, buffers) => {
 };
 
 export const detectPitch = (audioBuffer, callback) => {
-  console.log(audioBuffer);
   const detector = PitchDetector.forFloat32Array(audioBuffer.length);
   return detector.findPitch(audioBuffer.getChannelData(0),audioBuffer.sampleRate)
 };

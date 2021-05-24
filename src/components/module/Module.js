@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Card, IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon } from "@material-ui/core";
 
 import Sequencer from "../modules/Sequencer";
 import ChordProgression from "../modules/ChordProgression";
@@ -8,8 +8,6 @@ import MelodyGrid from "../modules/MelodyGrid";
 import Sampler from "../modules/Sampler";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
-
-import { clearEvents } from "../../utils/TransportSchedule";
 
 import "./Module.css";
 
