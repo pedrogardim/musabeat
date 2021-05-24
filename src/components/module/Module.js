@@ -14,14 +14,11 @@ import { clearEvents } from "../../utils/TransportSchedule";
 import "./Module.css";
 
 function Module(props) {
-  const [expanded, setExpanded] = useState(false);
   const [muted, setMuted] = useState(props.muted);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
 
-  //const getValue = (event) => console.log(event.target.value);
-
-  let innerModule = <span>Nothing Here</span>;
+  let moduleContent = <span>Nothing Here</span>;
 
   const handleInstrumentButtonMode = () => {
     setInstrumentEditorMode((prev) => (prev ? false : true));
@@ -35,11 +32,13 @@ function Module(props) {
 
   switch (props.module.type) {
     case 0:
-      innerModule = (
+      moduleContent = (
         <Sequencer
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
+            backgroundColor: props.module.color[500]
           }}
+
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
@@ -49,7 +48,7 @@ function Module(props) {
       );
       break;
     case 1:
-      innerModule = (
+      moduleContent = (
         <MelodyGrid
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
@@ -62,7 +61,7 @@ function Module(props) {
       );
       break;
     case 2:
-      innerModule = (
+      moduleContent = (
         <ChordProgression
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
@@ -76,7 +75,7 @@ function Module(props) {
       break;
 
     case 3:
-      innerModule = (
+      moduleContent = (
         <Sampler
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
@@ -144,7 +143,7 @@ function Module(props) {
         />
       )}
 
-      {innerModule}
+      {moduleContent}
     </div>
   );
 }

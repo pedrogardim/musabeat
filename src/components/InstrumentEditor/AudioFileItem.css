@@ -1,17 +1,7 @@
-.audio-file-item{
-    width: 20%;
-    height:96px;
-    margin:8px;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    align-content: center;
-    min-width: 64px;
-
+.audio-file-item {
+  width: 100%;
 }
 
-.active-audio-file-item{
-    background-color: brown !important;
-
+.audio-file-item-waveform {
+  margin: 0px 8px;
 }

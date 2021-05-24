@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 
-import { Select, Typography, Slider } from "@material-ui/core";
+import * as Tone from "tone";
+
+import { Select, Typography, Slider, List, Divider } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
@@ -10,13 +12,18 @@ import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
 import { instrumentContructor, loadDrumPatch } from "../../assets/musicutils";
 
+import { FileDrop } from "react-file-drop";
+
 import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
+  
   const [selectedPatch, setSelectedPatch] = useState(0);
   const [instrument, setInstrument] = useState(props.instrument);
+  const [draggingOver, setDraggingOver] = useState(false);
 
-  //console.log(instrument.get());
+  const ieWrapper = useRef(null);
+
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
@@ -47,30 +54,105 @@ function InstrumentEditor(props) {
     //
   };
 
+  const handleFileDrop = (files, event) => {
+
+    event.preventDefault()
+    Tone.Transport.pause();
+    let file = files[0];
+
+    setDraggingOver(false);
+
+    file.arrayBuffer().then((arraybuffer) => {
+      instrument.context.rawContext.decodeAudioData(
+        arraybuffer,
+        (audiobuffer) => {
+          if (audiobuffer.duration > 5) {
+            alert("Try importing a smaller audio file");
+            return;
+          }
+
+          instrument.add(file.name.split(".")[0], audiobuffer, (e) => {
+            setSelectedPatch(null);
+          });
+        },
+        (e) => {
+          alert(
+            "Upps.. there was an error decoding your audio file, try to convert it to other format"
+          );
+        }
+      );
+    });
+  };
+
+  const handleFileDelete = (fileName) => {
+    //temp solution, Tone.Players doesn't allow .remove()
+
+    //let filteredScore = props.module.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
+
+    let newInstrument = new Tone.Players().toDestination();
+    let deletedBufferName = JSON.stringify(fileName);
+
+    props.instrument._buffers._buffers.forEach((value, key) => {
+      if (JSON.stringify(key) !== deletedBufferName)
+        newInstrument.add(key, value);
+    });
+
+    props.instrument.dispose();
+
+    props.updateModules((previous) =>
+      previous.map((module, i) => {
+        if (i === props.index) {
+          let newModule = { ...module };
+          newModule.instrument = {};
+          newModule.instrument = newInstrument;
+          //newModule.score = [];
+          //newModule.score = filteredScore;
+          return newModule;
+        } else {
+          return module;
+        }
+      })
+    );
+  };
+
+  useEffect(() => {
+    setInstrument(props.instrument);
+  }, [props.instrument]);
+
   let mainContent = "Nothing Here";
 
   let list = [];
 
   switch (instrument.name) {
     case "Players":
-      //temp solution
-      instrument._buffers._buffers.forEach(
-        (e, i) =>
-          i > -1 &&
-          list.push(
-            <AudioFileItem
-              active={instrument.player(i).state === "started"}
-              key={i}
-              index={i}
-              instrument={instrument}
-              buffer={e}
-            />
-          )
+      let bufferObjects = [];
+
+      instrument._buffers._buffers.forEach((e, i, a) =>
+        bufferObjects.push([e, i])
       );
-      mainContent = list;
+
+      mainContent = (
+        <Fragment>
+          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+            {bufferObjects.map((e, i) => (
+              <Fragment>
+                <AudioFileItem
+                  key={i}
+                  index={i}
+                  instrument={instrument}
+                  handleFileDelete={handleFileDelete}
+                  buffer={e[0]}
+                  fileName={e[1]}
+                />
+                <Divider />
+              </Fragment>
+            ))}
+          </List>
+        </Fragment>
+      );
       break;
     case "PolySynth":
-      list.push(
+      /* list.push(
         <div className="instrument-editor-column" key={0}>
           <AudioFileItem
             instrument={instrument}
@@ -78,7 +160,8 @@ function InstrumentEditor(props) {
             name={instrument.get().oscillator.type}
           />
         </div>
-      );
+      ); */
+      list.push(<div className="instrument-editor-column" key={0}></div>);
       list.push(
         <div className="instrument-editor-column" key={1}>
           <SynthParameters instrument={instrument} />
@@ -101,8 +184,16 @@ function InstrumentEditor(props) {
       break;
   }
 
+  useEffect(() => {
+    console.log(draggingOver);
+  }, [draggingOver]);
+
   return (
-    <div className="instrument-editor">
+    <div
+      className="instrument-editor"
+      onDragEnter={() => {setDraggingOver(true); ieWrapper.current.scrollTop = 0;}}
+      ref={ieWrapper}
+    >
       <Select
         native
         className="instrument-editor-patch-select"
@@ -124,6 +215,20 @@ function InstrumentEditor(props) {
       <div className="break" />
 
       {mainContent}
+      {draggingOver && (
+        <FileDrop
+          onDragLeave={(e) => {
+            setDraggingOver(false);
+          }}
+          onDrop={(files, event) => handleFileDrop(files, event)}
+          className={"file-drop"}
+          style={{
+            backgroundColor: props.module.color[300],
+          }}
+        >
+          Drop your files here!
+        </FileDrop>
+      )}
     </div>
   );
 }

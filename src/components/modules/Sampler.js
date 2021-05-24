@@ -20,7 +20,7 @@ function Sampler(props) {
   const [score, setScore] = useState(props.module.score);
   const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const [dropHover, setDropHover] = useState(false);
+  const [draggingOver, setDraggingOver] = useState(false);
 
   let buffersChecker, cursorAnimator;
 
@@ -54,9 +54,13 @@ function Sampler(props) {
   };
 
   const handleFileDrop = (files, event) => {
-    setIsBufferLoaded(false);
+
+    event.preventDefault()
+
     Tone.Transport.pause();
-    setDropHover(false);
+
+    setIsBufferLoaded(false);
+    setDraggingOver(false);
     let file = files[0];
     console.log(file);
 
@@ -116,17 +120,26 @@ function Sampler(props) {
     >
       <div
         className="sampler"
-        onDragEnter={() => setDropHover(true)}
-        onDragLeave={() => setDropHover(false)}
+        onDragEnter={() => setDraggingOver(true)}
       >
         <BackgroundGrid
           sessionSize={props.sessionSize}
           color={props.module.color}
         />
+        {draggingOver && (
         <FileDrop
+          onDragLeave={(e) => {
+            setDraggingOver(false);
+          }}
           onDrop={(files, event) => handleFileDrop(files, event)}
           className={"file-drop"}
-        ></FileDrop>
+          style={{
+            backgroundColor: props.module.color[300],
+          }}
+        >
+          Drop your files here!
+        </FileDrop>
+      )}
         {isBufferLoaded ? (
           <AudioClip
             index={0}
