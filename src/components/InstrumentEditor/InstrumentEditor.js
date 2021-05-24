@@ -10,20 +10,19 @@ import SynthParameters from "./SynthParameters";
 
 import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
-import { instrumentContructor, loadDrumPatch } from "../../assets/musicutils";
+import { instrumentContructor, loadDrumPatch, detectPitch } from "../../assets/musicutils";
+
 
 import { FileDrop } from "react-file-drop";
 
 import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
-  
   const [selectedPatch, setSelectedPatch] = useState(0);
   const [instrument, setInstrument] = useState(props.instrument);
   const [draggingOver, setDraggingOver] = useState(false);
 
   const ieWrapper = useRef(null);
-
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
@@ -55,8 +54,7 @@ function InstrumentEditor(props) {
   };
 
   const handleFileDrop = (files, event) => {
-
-    event.preventDefault()
+    event.preventDefault();
     Tone.Transport.pause();
     let file = files[0];
 
@@ -71,9 +69,14 @@ function InstrumentEditor(props) {
             return;
           }
 
-          instrument.add(file.name.split(".")[0], audiobuffer, (e) => {
+          let fileName = (instrument.name === "Sampler")?Tone.Frequency(detectPitch(audiobuffer)[0]).toNote():file.name.split(".")[0];;
+
+
+          instrument.add(fileName, audiobuffer, (e) => {
             setSelectedPatch(null);
           });
+
+        
         },
         (e) => {
           alert(
@@ -84,7 +87,7 @@ function InstrumentEditor(props) {
     });
   };
 
-  const handleFileDelete = (fileName) => {
+  const handlePlayersFileDelete = (fileName) => {
     //temp solution, Tone.Players doesn't allow .remove()
 
     //let filteredScore = props.module.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
@@ -115,6 +118,33 @@ function InstrumentEditor(props) {
     );
   };
 
+  const handleSamplerFileDelete = (fileName) => {
+
+    let newInstrument = new Tone.Sampler().toDestination();
+
+    props.instrument._buffers._buffers.forEach((value, key) => {
+      if (parseInt(key) !== fileName)
+        newInstrument.add(key, value);
+    });
+
+    props.instrument.dispose();
+
+    props.updateModules((previous) =>
+      previous.map((module, i) => {
+        if (i === props.index) {
+          let newModule = { ...module };
+          newModule.instrument = {};
+          newModule.instrument = newInstrument;
+          //newModule.score = [];
+          //newModule.score = filteredScore;
+          return newModule;
+        } else {
+          return module;
+        }
+      })
+    );
+  };
+
   useEffect(() => {
     setInstrument(props.instrument);
   }, [props.instrument]);
@@ -123,36 +153,57 @@ function InstrumentEditor(props) {
 
   let list = [];
 
-  switch (instrument.name) {
-    case "Players":
-      let bufferObjects = [];
+  if (instrument.name === "Players") {
+    let bufferObjects = [];
 
-      instrument._buffers._buffers.forEach((e, i, a) =>
-        bufferObjects.push([e, i])
-      );
-
-      mainContent = (
-        <Fragment>
-          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-            {bufferObjects.map((e, i) => (
-              <Fragment>
-                <AudioFileItem
-                  key={i}
-                  index={i}
-                  instrument={instrument}
-                  handleFileDelete={handleFileDelete}
-                  buffer={e[0]}
-                  fileName={e[1]}
-                />
-                <Divider />
-              </Fragment>
-            ))}
-          </List>
-        </Fragment>
-      );
-      break;
-    case "PolySynth":
-      /* list.push(
+    instrument._buffers._buffers.forEach((e, i, a) =>
+      bufferObjects.push([e, i])
+    );
+    mainContent = (
+      <Fragment>
+        <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+          {bufferObjects.map((e, i) => (
+            <Fragment>
+              <AudioFileItem
+                key={i}
+                index={i}
+                instrument={instrument}
+                handleFileDelete={handlePlayersFileDelete}
+                buffer={e[0]}
+                fileName={e[1]}
+              />
+              <Divider />
+            </Fragment>
+          ))}
+        </List>
+      </Fragment>
+    );
+  } else if (instrument.name === "Sampler") {
+    let bufferObjects = [];
+    instrument._buffers._buffers.forEach((e, i, a) =>
+      bufferObjects.push([e, i])
+    );
+    mainContent = (
+      <Fragment>
+        <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+          {bufferObjects.map((e, i) => (
+            <Fragment>
+              <AudioFileItem
+                key={i}
+                index={i}
+                instrument={instrument}
+                handleFileDelete={handleSamplerFileDelete}
+                buffer={e[0]}
+                fileName={Tone.Frequency(e[1],"midi").toNote()}
+              />
+              <Divider />
+            </Fragment>
+          ))}
+        </List>
+      </Fragment>
+    );
+  } else {
+    /* list.push(
         <div className="instrument-editor-column" key={0}>
           <AudioFileItem
             instrument={instrument}
@@ -161,27 +212,26 @@ function InstrumentEditor(props) {
           />
         </div>
       ); */
-      list.push(<div className="instrument-editor-column" key={0}></div>);
-      list.push(
-        <div className="instrument-editor-column" key={1}>
-          <SynthParameters instrument={instrument} />
-        </div>
-      );
-      list.push(
-        <div className="instrument-editor-column" key={2}>
-          {Object.keys(instrument.get()).map(
-            (envelope, envelopeIndex) =>
-              envelope.toLowerCase().includes("envelope") && (
-                <EnvelopeControl
-                  instrument={instrument}
-                  envelopeType={envelope}
-                />
-              )
-          )}
-        </div>
-      );
-      mainContent = list;
-      break;
+    list.push(<div className="instrument-editor-column" key={0}></div>);
+    list.push(
+      <div className="instrument-editor-column" key={1}>
+        <SynthParameters instrument={instrument} />
+      </div>
+    );
+    list.push(
+      <div className="instrument-editor-column" key={2}>
+        {Object.keys(instrument.get()).map(
+          (envelope, envelopeIndex) =>
+            envelope.toLowerCase().includes("envelope") && (
+              <EnvelopeControl
+                instrument={instrument}
+                envelopeType={envelope}
+              />
+            )
+        )}
+      </div>
+    );
+    mainContent = list;
   }
 
   useEffect(() => {
@@ -191,7 +241,10 @@ function InstrumentEditor(props) {
   return (
     <div
       className="instrument-editor"
-      onDragEnter={() => {setDraggingOver(true); ieWrapper.current.scrollTop = 0;}}
+      onDragEnter={() => {
+        setDraggingOver(true);
+        ieWrapper.current.scrollTop = 0;
+      }}
       ref={ieWrapper}
     >
       <Select

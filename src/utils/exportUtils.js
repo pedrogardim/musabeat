@@ -8,7 +8,6 @@ import { audioBufferToWav } from "audiobuffer-to-wav";
 
 import * as MusicUtils from "../assets/musicutils";
 import * as Tone from "tone";
-import { useRadioGroup } from "@material-ui/core";
 
 export const bounceSessionExport = (
   modules,

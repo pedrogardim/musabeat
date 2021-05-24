@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { labels } from "../../assets/drumkits";
-import { waveTypes } from "../../assets/musicutils";
 
 import * as Tone from "tone";
 
@@ -22,7 +21,7 @@ function AudioFileItem(props) {
   const [wave, setWave] = useState("");
 
   const handleClick = () => {
-    !isSynth && props.instrument.player(props.fileName).start(0);
+    props.instrument.name === "Sampler" ? props.instrument.triggerAttackRelease(props.fileName,"8n") : props.instrument.player(props.fileName).start(0);
   };
 
 
@@ -53,7 +52,7 @@ function AudioFileItem(props) {
       </ListItemText>
 
       <ListItemSecondaryAction>
-        <IconButton onClick={()=>props.handleFileDelete(props.fileName)} edge="end" aria-label="delete">
+        <IconButton onClick={()=>props.handleFileDelete(Tone.Frequency(props.fileName).toMidi())} edge="end" aria-label="delete">
           <Icon>delete</Icon>
         </IconButton>
       </ListItemSecondaryAction>
