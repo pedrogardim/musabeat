@@ -95,7 +95,6 @@ function Sequencer(props) {
   }, [sequencerArray]);
 
   useEffect(() => {
-    console.log(drumPlayers);
     //temp
     let loadingChecker = setInterval(() => {
       setIsBufferLoaded(drumPlayers.loaded);

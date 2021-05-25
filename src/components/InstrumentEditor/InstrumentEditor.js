@@ -15,6 +15,7 @@ import {
 import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
+import OscillatorEditor from "./OscillatorEditor";
 
 import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
@@ -200,16 +201,8 @@ function InstrumentEditor(props) {
       </Fragment>
     );
   } else {
-    /* list.push(
-        <div className="instrument-editor-column" key={0}>
-          <AudioFileItem
-            instrument={instrument}
-            buffer={instrument._dummyVoice.oscillator}
-            name={instrument.get().oscillator.type}
-          />
-        </div>
-      ); */
-    list.push(<div className="instrument-editor-column" key={0}></div>);
+ 
+    list.push(<div className="instrument-editor-column" key={0}><OscillatorEditor instrument={instrument}/></div>);
     list.push(
       <div className="instrument-editor-column" key={1}>
         <SynthParameters instrument={instrument} />

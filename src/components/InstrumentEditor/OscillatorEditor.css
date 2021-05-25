@@ -1,0 +1,13 @@
+.oscillator-editor {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  flex-wrap: wrap;
+}
+
+.capitalize::first-letter{
+  text-transform:capitalize;
+
+}
+
