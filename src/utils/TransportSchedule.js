@@ -3,7 +3,7 @@ import * as Tone from "tone";
 let scheduledEvents = [];
 
 const clearEvents = (moduleId) => {
-  //console.log(moduleId)
+  console.log(moduleId)
   typeof scheduledEvents[moduleId] !== "undefined" &&
     scheduledEvents[moduleId].length > 0 &&
     scheduledEvents[moduleId].forEach((event) => Tone.Transport.clear(event));

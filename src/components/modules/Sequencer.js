@@ -116,8 +116,6 @@ function Sequencer(props) {
     scheduleNotes();
   }, [props.sessionSize]);
 
-  
-
   return (
     <div
       className="module-innerwrapper"

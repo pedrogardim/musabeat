@@ -2,7 +2,15 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 
 import * as Tone from "tone";
 
-import { Select, Typography, Slider, List, Divider } from "@material-ui/core";
+import {
+  Select,
+  Typography,
+  Slider,
+  List,
+  Divider,
+  InputLabel,
+  FormControl,
+} from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
@@ -47,10 +55,6 @@ function InstrumentEditor(props) {
       })
     );
   };
-  //auto close
-  //props.setInstrumentEditorMode(false);
-
-  //
 
   const handleFileDrop = (files, event) => {
     event.preventDefault();
@@ -142,10 +146,6 @@ function InstrumentEditor(props) {
     );
   };
 
-  useEffect(() => {
-    setInstrument(props.instrument);
-  }, [props.instrument]);
-
   let mainContent = "Nothing Here";
 
   let list = [];
@@ -231,6 +231,10 @@ function InstrumentEditor(props) {
     mainContent = list;
   }
 
+  useEffect(() => {
+    setInstrument(props.instrument);
+  }, [props.instrument]);
+
   return (
     <div
       className="instrument-editor"
@@ -258,10 +262,11 @@ function InstrumentEditor(props) {
               </option>
             ))}
       </Select>
+
       <div className="break" />
 
       {mainContent}
-      {draggingOver && (
+      {draggingOver && instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {
             setDraggingOver(false);

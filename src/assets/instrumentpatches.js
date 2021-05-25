@@ -72,6 +72,12 @@ export const instruments = [
         sustain: 1,
         release: 0.01,
       },
+      filter:{
+        gain:-12,
+        type:"lowpass",
+        Q:2,
+      },
+
       filterEnvelope: {
         attack: 0,
         decay: 0,

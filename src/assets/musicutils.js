@@ -643,3 +643,11 @@ export const detectPitch = (audioBuffer, callback) => {
   const detector = PitchDetector.forFloat32Array(audioBuffer.length);
   return detector.findPitch(audioBuffer.getChannelData(0),audioBuffer.sampleRate)
 };
+
+export const mapLogScale = (position,minp,maxp,minv,maxv) => {
+
+  var scale = (maxv-minv) / (maxp-minp);
+
+  return Math.exp(minv + scale*(position-minp));
+
+}

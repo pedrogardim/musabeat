@@ -1,4 +1,4 @@
-import React, { useState,useEffect,Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import {
   Select,
@@ -9,7 +9,11 @@ import {
 } from "@material-ui/core";
 import { waveTypes, filterTypes } from "../../assets/musicutils";
 
+import FilterEditor from "./FilterEditor"
+
 import "./InstrumentEditor.css";
+
+const filterRollOffs = [-12, -24, -48, -96];
 
 function SynthParameters(props) {
   //const [selectedFile, setSelectedFile] = useState(null);
@@ -39,115 +43,99 @@ function SynthParameters(props) {
   };
 
   const handleFilterChange = (parameter, value) => {
+
+    console.log(parameter,value);
     setInstrumentParamenters((prev) => {
-      return { ...prev, filter: { ...prev.filter,[parameter]: value } };
+      return { ...prev, filter: { ...prev.filter, [parameter]: value } };
     });
-    props.instrument.set({filter: { [parameter]: value } });
+    props.instrument.set({ filter: { [parameter]: value } });
   };
-//TODO
+  //TODO
 
   console.log(props.instrument);
 
   mainContent = (
     <Fragment>
-      {Object.keys(instrumentParamenters).map(
-        (parameter, index) =>
-          parameter === "filter" ? (
-            <Fragment>
-              <Typography variant="overline">Frequency</Typography>
-              <Slider
-                value={instrumentParamenters.filter.frequency}
-                min={20}
-                step={1}
-                max={20000}
-                onChange={(e, v) => handleFilterChange("frequency", v)}
-                valueLabelDisplay="auto"
-              />
-              <Typography variant="overline">Q</Typography>
-              <Slider
-                value={instrumentParamenters.filter.Q}
-                min={1}
-                step={1}
-                max={50}
-                onChange={(e, v) => handleFilterChange("Q", v)}
-                valueLabelDisplay="auto"
-              />
-              <FormControl>
-                <InputLabel id="fm-wave-selector-label">Roll Off</InputLabel>
-                <Select
-                  native
-                  labelId="fm-wave-selector-label"
-                  value={instrumentParamenters.filter.rolloff}
-                  onChange={(event) => handleWaveTypeSelect("rolloff", event)}
-                >
-                  <option key={-12} value={-12}>
-                    -12
-                  </option>
-                  <option key={-24} value={-24}>
-                    -24
-                  </option>
-                  <option key={-48} value={-48}>
-                    -48
-                  </option>
-                  <option key={-96} value={-96}>
-                    -96
-                  </option>
-                </Select>
-              </FormControl>
-              <FormControl>
-                <InputLabel id="fm-wave-selector-label">Type</InputLabel>
-                <Select
-                  native
-                  labelId="fm-wave-selector-label"
-                  value={instrumentParamenters.filter.type}
-                  onChange={(event) =>
-                    handleWaveTypeSelect("rollofftype", event)
-                  }
-                >
-                  {filterTypes.map((e, i) => (
-                    <option key={i} value={e}>
-                      {e}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Fragment>
-          ):
-          (parameter === "harmonicity" || parameter === "modulationIndex") ? (
-            <Fragment>
-              <Typography variant="overline">{parameter}</Typography>
-              <Slider
-                value={instrumentParamenters[parameter]}
-                min={1}
-                step={1}
-                max={50}
-                onChange={(e, v) => handleChange(parameter, v)}
-                valueLabelDisplay="auto"
-              />
-            </Fragment>
-          ):
-          parameter === "modulation" ? (
-            <FormControl>
-              <InputLabel id="fm-wave-selector-label">{parameter}</InputLabel>
+      {Object.keys(instrumentParamenters).map((parameter, index) =>
+        parameter === "filter" ? (
+          <Fragment>
+            <Typography variant="overline">Filter</Typography>
+            <div className="break"/>
+            <FilterEditor
+              instrumentParamenters={instrumentParamenters}
+              handleChange={handleChange}
+              instrument={props.instrument}
+            />
+
+            {/*<FormControl>
+              <InputLabel id="fm-wave-selector-label">Roll Off</InputLabel>
               <Select
                 native
                 labelId="fm-wave-selector-label"
-                value={instrumentParamenters.modulation.type}
-                onChange={(event) => handleWaveTypeSelect(parameter, event)}
+                value={instrumentParamenters.filter.rolloff}
+                onChange={(event) => handleWaveTypeSelect("rolloff", event)}
               >
-                {waveTypes.map((e, i) => (
-                  <option key={i} value={e}>
+                {filterRollOffs.map((e) => (
+                  <option key={e} value={e}>
                     {e}
                   </option>
                 ))}
               </Select>
             </FormControl>
-          ):"")}
-      
+            <FormControl>
+              <InputLabel id="fm-wave-selector-label">Type</InputLabel>
+              <Select
+                native
+                labelId="fm-wave-selector-label"
+                value={instrumentParamenters.filter.type}
+                onChange={(event) => handleWaveTypeSelect("rollofftype", event)}
+              >
+                {filterTypes.map((e, i) => (
+                  <option key={i} value={e}>
+                    {e}
+                  </option>
+                ))}
+              </Select>
+                </FormControl>*/}
+          </Fragment>
+        ) : parameter === "harmonicity" || parameter === "modulationIndex" ? (
+          <Fragment>
+            <Typography variant="overline">{parameter}</Typography>
+            <Slider
+              value={instrumentParamenters[parameter]}
+              min={1}
+              step={1}
+              max={50}
+              onChange={(e, v) => handleChange(parameter, v)}
+              valueLabelDisplay="auto"
+            />
+          </Fragment>
+        ) : parameter === "modulation" ? (
+          <FormControl>
+            <InputLabel id="fm-wave-selector-label">{parameter}</InputLabel>
+            <Select
+              native
+              labelId="fm-wave-selector-label"
+              value={instrumentParamenters.modulation.type}
+              onChange={(event) => handleWaveTypeSelect(parameter, event)}
+            >
+              {waveTypes.map((e, i) => (
+                <option key={i} value={e}>
+                  {e}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        ) : (
+          ""
+        )
+      )}
     </Fragment>
   );
 
-  useEffect(()=>{setInstrumentParamenters(props.instrument.get())},[props.instrument])
+  useEffect(() => {
+    setInstrumentParamenters(props.instrument.get());
+  }, [props.instrument]);
 
   return mainContent;
 }
