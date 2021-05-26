@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon, Menu, MenuItem } from "@material-ui/core";
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
@@ -15,17 +15,28 @@ function Module(props) {
   const [muted, setMuted] = useState(props.muted);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   let moduleContent = <span>Nothing Here</span>;
 
   const handleInstrumentButtonMode = () => {
     setInstrumentEditorMode((prev) => (prev ? false : true));
     setSettingsMode(false);
+    closeMenu();
   };
 
   const handleSettingsButtonMode = () => {
     setSettingsMode((prev) => (prev ? false : true));
     setInstrumentEditorMode(false);
+    closeMenu();
+  };
+
+  const openMenu = (e) => {
+    setMenuAnchorEl(e.currentTarget);
+  };
+
+  const closeMenu = () => {
+    setMenuAnchorEl(null);
   };
 
   switch (props.module.type) {
@@ -34,9 +45,8 @@ function Module(props) {
         <Sequencer
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
-            backgroundColor: props.module.color[500]
+            backgroundColor: props.module.color[500],
           }}
-
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
@@ -63,7 +73,7 @@ function Module(props) {
         <ChordProgression
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "block",
-            overflow:"hidden"
+            overflow: "hidden",
           }}
           sessionSize={props.sessionSize}
           muted={muted}
@@ -78,7 +88,6 @@ function Module(props) {
         <Sampler
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
-           
           }}
           sessionSize={props.sessionSize}
           muted={muted}
@@ -98,9 +107,8 @@ function Module(props) {
       id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
-        overflow: props.module.type === 2 ||props.module.type === 3   && "hidden"
-
-
+        overflow:
+          props.module.type === 2 || (props.module.type === 3 && "hidden"),
       }}
       className={
         "module " +
@@ -111,17 +119,32 @@ function Module(props) {
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>
         <IconButton
-          className="module-instrument-icon-button"
-          onClick={handleSettingsButtonMode}
+          className="module-options-button"
+          onClick={openMenu}
         >
-          <Icon style={{ color: "white" }}>settings</Icon>
+          <Icon style={{color:"white"}}>more_vert</Icon>
         </IconButton>
-        <IconButton
-          className="module-instrument-icon-button"
-          onClick={handleInstrumentButtonMode}
+        <Menu
+          anchorEl={menuAnchorEl}
+          keepMounted
+          open={Boolean(menuAnchorEl)}
+          onClose={closeMenu}
         >
-          <Icon style={{ color: "white" }}>piano</Icon>
-        </IconButton>
+          <MenuItem
+            onClick={handleSettingsButtonMode}
+            className="module-menu-option-icon"
+          >
+            <Icon className="module-menu-option-icon">settings</Icon>
+            Module Settings
+          </MenuItem>
+          <MenuItem
+            onClick={handleInstrumentButtonMode}
+            className="module-menu-option-icon"
+          >
+            <Icon >piano</Icon>
+             Instrument Editor
+          </MenuItem>
+        </Menu>
       </div>
 
       {instrumentEditorMode && (

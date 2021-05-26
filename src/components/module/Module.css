@@ -44,6 +44,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
+  position: relative;
 }
 
 .module-title {
@@ -54,9 +55,17 @@
   justify-self: center;
 }
 
-.module-instrument-icon-button {
+.module-options-button {
   height: 100%;
   width: 30px !important;
+  position: absolute !important;
+  right:0 !important;
+}
+
+.module-menu-option *{
+  color:rgba(0, 0, 0, 0.87) !important;
+
+
 }
 
 .hidden {
