@@ -47,8 +47,9 @@ function Sampler(props) {
     }
   };
 
-  const scheduleEvents = () => {
-    scheduleSamples(score, instrument, Tone.Transport, props.module.id);
+  const scheduleEvents = (offset) => {
+    console.log(score[0].time,offset)
+    scheduleSamples(score, instrument, offset,Tone.Transport, props.module.id);
   };
 
   const handleCursorDrag = (event, element) => {
@@ -56,12 +57,15 @@ function Sampler(props) {
       (element.x / sampleWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
-      setCursorPosition(
-        (Tone.Transport.seconds /
-          Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-          sampleWrapper.current.offsetWidth
-      );
-    
+    setCursorPosition(
+      (Tone.Transport.seconds / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
+        sampleWrapper.current.offsetWidth
+    );
+  };
+
+  const handleCursorDragStop = (event, element) => {
+    scheduleEvents((element.x / sampleWrapper.current.offsetWidth) *
+    Tone.Time(Tone.Transport.loopEnd).toSeconds())
   };
 
   const handleFileDrop = (files, event) => {
@@ -95,13 +99,11 @@ function Sampler(props) {
 
           //update score duration
 
-          setScore(prev=>{
+          setScore((prev) => {
             let newScore = [...prev];
             newScore[0].duration = audiobuffer.duration;
             return newScore;
-          })
-
-
+          });
         },
         //decode audio error
         (e) => {
@@ -112,14 +114,6 @@ function Sampler(props) {
         }
       );
     });
-
-    //instrument.buffer = new Tone.ToneAudioBuffer(fileUrl,()=>{console.log("yata",fileUrl);setIsBufferLoaded(true)})
-
-    //file.arrayBuffer().then((buffer) => {
-
-    //console.log(instrument.buffer.fromArray(convertBlock(buffer)));
-    //});
-    //file.arrayBuffer().then(buffer => console.log(instrument.buffer.fromArray(buffer)))
   };
 
   useEffect(() => {
@@ -148,8 +142,6 @@ function Sampler(props) {
 
   useEffect(() => {
     setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
-    //watch to window resize to update clips position
-    //window.addEventListener("resize", displayWindowSize);
   }, []);
 
   return (
@@ -200,6 +192,7 @@ function Sampler(props) {
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}
+          onStop={handleCursorDragStop}
           position={{ x: cursorPosition, y: 0 }}
         >
           <div

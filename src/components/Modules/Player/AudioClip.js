@@ -51,6 +51,8 @@ function AudioClip(props) {
       newScore[props.index].time = newTime;
       return newScore;
     });
+
+    //TODO: ReSchedule event
   }
 
   useEffect(() => {

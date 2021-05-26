@@ -35,7 +35,10 @@ export const scheduleDrumSequence = (
           Tone.Time("1m").toSeconds() * x * moduleLength;
 
         let thisevent = transport.schedule((time) => {
-          beat.forEach((note) => instrument.has(note) && instrument.player(note).start(time));
+          beat.forEach(
+            (note) =>
+              instrument.has(note) && instrument.player(note).start(time)
+          );
           updateBeat(beatIndex);
           updateMeasure(measureIndex);
         }, beatscheduletime);
@@ -146,18 +149,32 @@ export const scheduleChordProgression = (
   scheduledEvents[moduleId] = scheduledChords;
 };
 
-export const scheduleSamples = (score,instrument, transport, moduleId) => {
+export const scheduleSamples = (
+  score,
+  instrument,
+  offset,
+  transport,
+  moduleId
+) => {
   moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledSounds = [];
 
   score.map((event, eventIndex) => {
+    let eventTime = offset !== undefined ? offset : event.time
+    let eventOffset =
+        offset !== undefined && offset - event.time < event.duration
+          ? offset - event.time
+          : 0;
+
     let thisevent = transport.schedule((time) => {
-      instrument.start(time,0,event.duration)
+      
+
+      console.log(eventOffset);
+      instrument.start(time, eventOffset, event.duration);
       //console.log(chord.notes);
-    }, event.time);
+    }, eventTime);
     scheduledSounds.push(thisevent);
-    
   });
 
   scheduledEvents[moduleId] = scheduledSounds;
