@@ -9,7 +9,7 @@ import { starterSession } from "../../assets/starterSession";
 
 import "./Workspace.css";
 
-import Module from "./../module/Module";
+import Module from "../Module/Module";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Mixer from "./mixer/Mixer";

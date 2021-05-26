@@ -3,7 +3,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import Chord from "./Chord";
 import * as Tone from "tone";
 
-import { chordNotestoName } from "../../assets/musicutils";
+import { chordNotestoName } from "../../../assets/musicutils";
 
 import { Fab, Icon } from "@material-ui/core";
 

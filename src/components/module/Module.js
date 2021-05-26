@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import { IconButton, Icon } from "@material-ui/core";
 
-import Sequencer from "../modules/Sequencer";
-import ChordProgression from "../modules/ChordProgression";
-import MelodyGrid from "../modules/MelodyGrid";
-import Sampler from "../modules/Sampler";
+import Sequencer from "../Modules/DrumSequencer/Sequencer";
+import ChordProgression from "../Modules/ChordProgression/ChordProgression";
+import MelodyGrid from "../Modules/MelodyGrid/MelodyGrid";
+import Sampler from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 

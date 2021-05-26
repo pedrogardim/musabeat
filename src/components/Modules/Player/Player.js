@@ -9,9 +9,9 @@ import Draggable from "react-draggable";
 import { FileDrop } from "react-file-drop";
 import { CircularProgress, Typography } from "@material-ui/core";
 
-import { scheduleSamples } from "../../utils/TransportSchedule";
+import { scheduleSamples } from "../../../utils/TransportSchedule";
 
-import "./Sampler.css";
+import "./Player.css";
 
 //TODO
 

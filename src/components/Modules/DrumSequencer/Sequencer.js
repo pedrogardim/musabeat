@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import SequencerTile from "./SequencerTile";
 import * as Tone from "tone";
 
-import { labels } from "../../assets/drumkits";
+import { labels } from "../../../assets/drumkits";
 
-import { scheduleDrumSequence } from "../../utils/TransportSchedule";
-import { loadDrumPatch } from "../../assets/musicutils";
+import { scheduleDrumSequence } from "../../../utils/TransportSchedule";
+import { loadDrumPatch } from "../../../assets/musicutils";
 
 import {
   CircularProgress,

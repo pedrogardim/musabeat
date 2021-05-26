@@ -4,7 +4,7 @@ import * as Tone from "tone";
 
 import ChordRhythmTile from "./ChordRhythmTile";
 
-import { adaptSequencetoSubdiv } from "../../assets/musicutils";
+import { adaptSequencetoSubdiv } from "../../../assets/musicutils";
 
 import { Icon, IconButton } from "@material-ui/core";
 

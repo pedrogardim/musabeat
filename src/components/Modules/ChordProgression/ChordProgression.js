@@ -10,13 +10,13 @@ import {
   getChordsFromScale,
   chordNotestoName,
   adaptSequencetoSubdiv,
-} from "../../assets/musicutils";
+} from "../../../assets/musicutils";
 
 import { Divider } from "@material-ui/core";
 
 import "./ChordProgression.css";
 
-import { scheduleChordProgression } from "../../utils/TransportSchedule";
+import { scheduleChordProgression } from "../../../utils/TransportSchedule";
 
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);

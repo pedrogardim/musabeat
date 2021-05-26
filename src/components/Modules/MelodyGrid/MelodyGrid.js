@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-import SequencerTile from "./SequencerTile";
+import SequencerTile from "../DrumSequencer/SequencerTile";
 import * as Tone from "tone";
 
-import * as Drumdata from "../../assets/drumkits";
+import * as Drumdata from "../../../assets/drumkits";
 
-import { scheduleMelodyGrid } from "../../utils/TransportSchedule";
+import { scheduleMelodyGrid } from "../../../utils/TransportSchedule";
 
-import { scales, musicalNotes } from "../../assets/musicutils";
+import { scales, musicalNotes } from "../../../assets/musicutils";
 
 import {
   CircularProgress,
