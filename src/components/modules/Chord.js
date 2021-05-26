@@ -10,6 +10,7 @@ function Chord(props) {
     <div
       onClick={props.onClick}
       className={"chord " + (props.active && "selected-chord")}
+      style={{color:props.active && props.color[500]}}
     >
       {props.name}
     </div>

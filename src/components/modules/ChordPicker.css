@@ -7,8 +7,17 @@
   flex-wrap: wrap;
   align-content: center;
   justify-self: flex-end;
-  bottom:88px;
-  position: relative;
+  bottom:48px;
+  position: absolute;
+}
+
+.chord-picker-compact {
+  width:2vw!important;
+
+  min-width:40px!important;
+  right:calc(8px + 2vw / 2);
+  bottom:48px;
+  position: absolute;
 }
 
 .chord-picker-button {

@@ -1,30 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import Chord from "./Chord";
 import * as Tone from "tone";
 
-import {
-  getChordsFromScale,
-  chordNotestoName,
-  scales,
-  musicalNotes,
-} from "../../assets/musicutils";
+import { chordNotestoName } from "../../assets/musicutils";
 
-import {
-  Fab,
-  FormControl,
-  InputLabel,
-  Select,
-  Slider,
-  Icon,
-  Typography,
-} from "@material-ui/core";
+import { Fab, Icon } from "@material-ui/core";
 
 import "./ChordPicker.css";
 
 function ChordPicker(props) {
-
   //{props.selectedChord !== null}
+
+  const [open, setOpen] = useState(false);
 
   const setChords = props.setChords;
   let instrument = props.instrument;
@@ -45,29 +33,41 @@ function ChordPicker(props) {
     });
   };
 
-
   return (
-    <div className="chord-picker">
-      {scaleChords.map((chord, i) => (
+    <div onFocusOut={()=>setOpen(false)} className={open ? "chord-picker" : "chord-picker-compact"}>
+      {!open && (
         <Fab
-          color="primary"
-          onClick={() => clickHandler(i)}
+        style={{backgroundColor:props.color[600],color:"white"}}
+        onClick={() => setOpen(true)}
           className="chord-picker-button"
-          key={i}
           boxShadow={1}
-
         >
-          {chordNotestoName(chord)}
+          <Icon>edit</Icon>
         </Fab>
-      ))}
-      <Fab
-        color="secondary"
-        onClick={() => clickHandler(null)}
-        className="chord-picker-button"
-        boxShadow={1}
-      >
-        <Icon>highlight_off</Icon>
-      </Fab>     
+      )}
+      {open && (
+        <Fragment>
+          {scaleChords.map((chord, i) => (
+            <Fab
+              style={{backgroundColor:props.color[600],color:"white"}}
+              onClick={() => clickHandler(i)}
+              className="chord-picker-button"
+              key={i}
+              boxShadow={1}
+            >
+              {chordNotestoName(chord)}
+            </Fab>
+          ))}
+          <Fab
+            color="secondary"
+            onClick={() => clickHandler(null)}
+            className="chord-picker-button"
+            boxShadow={1}
+          >
+            <Icon>highlight_off</Icon>
+          </Fab>
+        </Fragment>
+      )}
     </div>
   );
 }

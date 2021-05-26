@@ -433,7 +433,9 @@ function gcd_two_numbers(x, y) {
   return x;
 }
 
-export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
+export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
+
+  //arrayType: array of numbers = true, arrays of arrays = false/undefined
   let difference = newsubdivision / oldarray.length;
   let gdc = gcd_two_numbers(newsubdivision, oldarray.length);
 
@@ -495,7 +497,7 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision) => {
 
       if ((x + 1) % (oldarray.length / gdc) === 0) {
         for (let y = 0; y < difference - 1; y++) {
-          newsubdivarray.push([]);
+          arrayType ? newsubdivarray.push(0) : newsubdivarray.push([]);
         }
       }
     }

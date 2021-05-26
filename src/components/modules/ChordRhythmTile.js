@@ -14,11 +14,10 @@ function ChordRhythmTile(props) {
   return (
     <div
       onClick={handleClick}
-      className="chord-rhythm-tile"
+      className={"chord-rhythm-tile "+(props.cursor && "cursor-chord-rhythm-tile")}
       style={{
         outline: "solid 1px " + props.color[900],
-        backgroundColor: props.rhythm === 1 ? props.color[700] : props.color[100],
-        filter: props.cursor && "brightness(1.1)"
+        backgroundColor: props.rhythm === 1 ? props.color[500] : props.color[100],
       }}
     ></div>
   );

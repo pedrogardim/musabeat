@@ -6,13 +6,10 @@ import ChordRhythmSequence from "./ChordRhythmSequence";
 
 import * as Tone from "tone";
 
-import * as MusicUtils from "../../assets/musicutils";
-
 import {
   getChordsFromScale,
   chordNotestoName,
-  scales,
-  musicalNotes,
+  adaptSequencetoSubdiv,
 } from "../../assets/musicutils";
 
 import { Divider } from "@material-ui/core";
@@ -20,8 +17,6 @@ import { Divider } from "@material-ui/core";
 import "./ChordProgression.css";
 
 import { scheduleChordProgression } from "../../utils/TransportSchedule";
-
-const defaultIntrument = MusicUtils.instrumentContructor(2);
 
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
@@ -43,9 +38,9 @@ function ChordProgression(props) {
   };
 
   const handleClick = (chordindex) => {
-    setSelectedChord((prevChord) => {
-      instrument.releaseAll();
+    instrument.releaseAll();
 
+    setSelectedChord((prevChord) => {
       if (chordindex === prevChord) {
         return null;
       } else {
@@ -63,14 +58,6 @@ function ChordProgression(props) {
       let newmodules = [...previousModules];
       newmodules[props.module.id].chords = chords;
       return newmodules;
-    });
-  };
-
-  const updateRhythm = (chordIndex,rhythmIndex, newRhythm) => {
-    setChords((previousChords) => {
-      let newChords = [...previousChords];
-      newChords[chordIndex].rhythm[rhythmIndex] = newRhythm;
-      return newChords;
     });
   };
 
@@ -126,8 +113,9 @@ function ChordProgression(props) {
             <Chord
               key={"chord" + i}
               active={activeChord === i}
-              name={MusicUtils.chordNotestoName(chord.notes)}
+              name={chordNotestoName(chord.notes)}
               onClick={() => handleClick(i)}
+              color={props.module.color}
             />
           </Fragment>
         ))}
@@ -138,7 +126,7 @@ function ChordProgression(props) {
             activeRhythm={activeRhythm}
             chords={chords}
             color={props.module.color}
-            updateRhythm={updateRhythm}
+            setChords={setChords}
           />
         }
       </div>
@@ -151,6 +139,7 @@ function ChordProgression(props) {
             props.module.complexity
           )}
           setChords={setChords}
+          color={props.module.color}
         />
       )}
     </div>

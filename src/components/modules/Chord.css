@@ -12,12 +12,15 @@
     color:gray;
     font-size: 1.8rem;
     font-weight:300;
+    padding:2px;
 
 
 }
 
+/* 
+
 .selected-chord{
-    /* animation: flashing 2s infinite alternate; */
+    /* animation: flashing 2s infinite alternate; 
     color:#3f51b5;
     text-decoration: bold;
     outline:1px solid #4b61dd;
@@ -25,6 +28,20 @@
 
   
   }
+
+  */
+
+  .selected-chord{
+
+    box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 20%), 0px 3px 5px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+    border-radius: 3px;
+    
+
+
+  
+  }
+
+
   
   @keyframes flashing {
     from {outline-color: #4b61dd}
