@@ -140,6 +140,7 @@ function ChordProgression(props) {
           )}
           setChords={setChords}
           color={props.module.color}
+          instrument={instrument}
         />
       )}
     </div>

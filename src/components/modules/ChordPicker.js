@@ -19,26 +19,30 @@ function ChordPicker(props) {
   let scaleChords = props.scaleChords;
 
   const clickHandler = (index) => {
+    props.instrument.releaseAll();
+    Tone.Transport.state !== "started" &&
+      props.instrument.triggerAttackRelease(scaleChords[index], "4n");
+
     setChords((previousChords) => {
       let newChords = [...previousChords];
       newChords[props.selectedChord].notes =
         index === null ? [] : scaleChords[index];
-      /* instrument.releaseAll();
-      Tone.Transport.state !== "started" &&
-        instrument.triggerAttackRelease(
-          scaleChords[index],
-          newChords[props.selectedChord].duration * Tone.Time("1m").toSeconds()
-        ); */
+
       return newChords;
     });
+
+    setOpen(false)
   };
 
   return (
-    <div onFocusOut={()=>setOpen(false)} className={open ? "chord-picker" : "chord-picker-compact"}>
+    <div
+      onFocusOut={() => setOpen(false)}
+      className={open ? "chord-picker" : "chord-picker-compact"}
+    >
       {!open && (
         <Fab
-        style={{backgroundColor:props.color[600],color:"white"}}
-        onClick={() => setOpen(true)}
+          style={{ backgroundColor: props.color[600], color: "white" }}
+          onClick={() => setOpen(true)}
           className="chord-picker-button"
           boxShadow={1}
         >
@@ -49,7 +53,7 @@ function ChordPicker(props) {
         <Fragment>
           {scaleChords.map((chord, i) => (
             <Fab
-              style={{backgroundColor:props.color[600],color:"white"}}
+              style={{ backgroundColor: props.color[600], color: "white" }}
               onClick={() => clickHandler(i)}
               className="chord-picker-button"
               key={i}

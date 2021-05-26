@@ -108,7 +108,7 @@ export const starterSession = {
       root: 0,
       scale: 0,
       complexity: 3,
-      color: colors[3],
+      color: colors[9],
       score: [
         {
           notes: ["E4", "G4", "B4"],

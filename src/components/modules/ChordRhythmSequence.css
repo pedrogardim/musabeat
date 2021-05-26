@@ -43,7 +43,7 @@
 .remove-step-chord-rhythm-button {
   position: absolute !important;
   bottom: 30px;
-  left: calc(50% + 12px);
+  left: calc(50%);
   visibility: hidden;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .cursor-chord-rhythm-tile{
-  filter: brightness(1.1) hue-rotate(10deg);
+  filter: brightness(1.1);
 }
 
 /* 

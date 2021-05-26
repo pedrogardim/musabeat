@@ -7,7 +7,6 @@ import { loadDrumPatch } from "../../assets/musicutils";
 
 import { starterSession } from "../../assets/starterSession";
 
-
 import "./Workspace.css";
 
 import Module from "./../module/Module";
@@ -29,8 +28,6 @@ const colors = [
   MUIcolors.amber,
   MUIcolors.orange,
 ];
-
-
 
 Tone.Transport.bpm.value = starterSession.bpm;
 Tone.Transport.loop = true;
@@ -54,6 +51,13 @@ function Workspace(props) {
       setIsPlaying(true);
     } else {
       Tone.Transport.pause();
+      modules.forEach((e) =>
+        e.instrument.name === "Players"
+          ? e.instrument.stopAll()
+          : e.instrument.name === "GrainPlayer"
+          ? e.instrument.stop()
+          : e.instrument.releaseAll()
+      );
       setIsPlaying(false);
     }
   };

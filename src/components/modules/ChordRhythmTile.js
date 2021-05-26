@@ -17,7 +17,7 @@ function ChordRhythmTile(props) {
       className={"chord-rhythm-tile "+(props.cursor && "cursor-chord-rhythm-tile")}
       style={{
         outline: "solid 1px " + props.color[900],
-        backgroundColor: props.rhythm === 1 ? props.color[500] : props.color[100],
+        backgroundColor: props.rhythm === 1 ? props.color[600] : props.color[300],
       }}
     ></div>
   );

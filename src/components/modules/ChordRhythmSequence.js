@@ -52,7 +52,7 @@ function ChordRhythmSequence(props) {
       let newSteps = addRemove
         ? rhythmArray.length * 2
         : rhythmArray.length / 2;
-      if (newSteps <= 16 && newSteps > 1)
+      if (newSteps <= 16 && newSteps >= 1)
         newChords[chordIndexOnScore].rhythm = adaptSequencetoSubdiv(
           rhythmArray,
           newSteps
@@ -87,7 +87,6 @@ function ChordRhythmSequence(props) {
   return (
     <div
       className="chord-rhythm-sequence"
-      style={{ outline: "solid 1px " + props.color[900] }}
     >
       {measureRhythm.map((chords, chordIndex) => (
         <div
