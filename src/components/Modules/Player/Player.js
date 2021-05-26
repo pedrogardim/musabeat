@@ -80,7 +80,7 @@ function Sampler(props) {
         (audiobuffer) => {
           console.log(audiobuffer);
 
-          if (audiobuffer.duration > 50) {
+          if (audiobuffer.duration > 180) {
             alert("Try importing a smaller audio file");
             setIsBufferLoaded(true);
             return;
@@ -92,6 +92,16 @@ function Sampler(props) {
               setIsBufferLoaded(true)
             ).toDestination()
           );
+
+          //update score duration
+
+          setScore(prev=>{
+            let newScore = [...prev];
+            newScore[0].duration = audiobuffer.duration;
+            return newScore;
+          })
+
+
         },
         //decode audio error
         (e) => {
@@ -119,6 +129,22 @@ function Sampler(props) {
   useEffect(() => {
     scheduleEvents();
   }, [score, instrument]);
+
+  useEffect(() => {
+    props.updateModules((previousModules) => {
+      let newmodules = [...previousModules];
+      newmodules[props.module.id].score = score;
+      return newmodules;
+    });
+  }, [score]);
+
+  useEffect(() => {
+    props.updateModules((previousModules) => {
+      let newmodules = [...previousModules];
+      newmodules[props.module.id].instrument = instrument;
+      return newmodules;
+    });
+  }, [instrument]);
 
   useEffect(() => {
     setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));

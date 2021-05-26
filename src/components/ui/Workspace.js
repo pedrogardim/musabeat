@@ -82,7 +82,7 @@ function Workspace(props) {
       module.type === 2
         ? Math.ceil(module.score[module.score.length - 1].time)
         : module.type === 3
-        ? module.length
+        ? Math.ceil(module.score[0].duration/Tone.Time("1m").toSeconds())
         : module.score.length
     );
     let longestModule = Math.max(...lengths);
