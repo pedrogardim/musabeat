@@ -63,6 +63,7 @@ function Module(props) {
         <ChordProgression
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "block",
+            overflow:"hidden"
           }}
           sessionSize={props.sessionSize}
           muted={muted}
@@ -97,7 +98,7 @@ function Module(props) {
       id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
-        overflow: props.module.type === 3 && "hidden"
+        overflow: props.module.type === 2 ||props.module.type === 3   && "hidden"
 
 
       }}

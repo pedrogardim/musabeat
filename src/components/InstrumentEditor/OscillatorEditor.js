@@ -10,6 +10,7 @@ import {
   InputLabel,
   FormControl,
   Slider,
+  Card
 } from "@material-ui/core";
 
 import "./OscillatorEditor.css";
@@ -73,6 +74,7 @@ function OscillatorEditor(props) {
     //if new is pulse or pwm remove form and partials
     newWave = newType === "pulse" || newType === "pwm" ? newType : newWave;
     props.instrument.set({ oscillator: { type: newWave } });
+
   };
 
   const handleOscPartialsSelect = (e, value) => {
@@ -97,7 +99,8 @@ function OscillatorEditor(props) {
   }, [props.instrument]);
 
   return (
-    <div className="oscillator-editor">
+    <Card className="oscillator-editor">
+    <Typography variant="overline">Oscillator</Typography>
       <svg
         width="128px"
         height="64px"
@@ -108,10 +111,9 @@ function OscillatorEditor(props) {
       </svg>
 
       <FormControl>
-        <InputLabel id="label">Oscillator</InputLabel>
+        <InputLabel>Type</InputLabel>
         <Select
           native
-          labelId="label"
           value={oscType}
           onChange={handleOscTypeSelect}
         >
@@ -123,11 +125,10 @@ function OscillatorEditor(props) {
         </Select>
       </FormControl>
       <FormControl>
-        <InputLabel id="label">Wave</InputLabel>
+        <InputLabel>Wave</InputLabel>
         <Select
           disabled={oscType === "pwm" || oscType === "pulse"}
           native
-          labelId="label"
           value={oscWave}
           onChange={handleOscWaveSelect}
         >
@@ -139,14 +140,23 @@ function OscillatorEditor(props) {
         </Select>
       </FormControl>
       <Slider
+      style={{width:"70%"}}
         disabled={oscType === "pwm" || oscType === "pulse"}
         valueLabelDisplay="auto"
         value={oscPartials}
         onChange={handleOscPartialsSelect}
         min={0}
         max={24}
+        valueLabelFormat={(x)=>x===0?"Off":x}
+
       />
-    </div>
+
+        {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
+            console.log(e)
+
+        })*/}
+      
+    </Card>
   );
 }
 

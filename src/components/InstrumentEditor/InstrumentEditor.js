@@ -30,12 +30,19 @@ import { FileDrop } from "react-file-drop";
 import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
-  const [selectedPatch, setSelectedPatch] = useState(0);
+  const [selectedPatch, setSelectedPatch] = useState("");
   const [instrument, setInstrument] = useState(props.instrument);
   const [draggingOver, setDraggingOver] = useState(false);
 
   const ieWrapper = useRef(null);
+/* 
+  const lookForPatch = () => {
+    //temp
+    let instrumentOptions = Object.toJSON(instrument.get());
+    instruments.map((e,i)=>Object.toJSON(e.options) === instrumentOptions && setSelectedPatch(i))
 
+  }
+ */
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
 
@@ -223,6 +230,10 @@ function InstrumentEditor(props) {
     );
     mainContent = list;
   }
+
+  useEffect(() => {
+    //lookForPatch()
+  }, []);
 
   useEffect(() => {
     setInstrument(props.instrument);

@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import Chord from "./Chord";
 import ChordPicker from "./ChordPicker";
+import ChordRhythmSequence from "./ChordRhythmSequence";
 
 import * as Tone from "tone";
 
@@ -25,6 +26,7 @@ const defaultIntrument = MusicUtils.instrumentContructor(2);
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
   const [activeChord, setActiveChord] = useState(null);
+  const [activeRhythm, setActiveRhythm] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.module.instrument);
 
@@ -34,6 +36,7 @@ function ChordProgression(props) {
       instrument,
       Tone.Transport,
       setActiveChord,
+      setActiveRhythm,
       props.module.id,
       props.sessionSize
     );
@@ -57,9 +60,17 @@ function ChordProgression(props) {
 
   const updateChords = () => {
     props.updateModules((previousModules) => {
-      let newmodules = previousModules;
+      let newmodules = [...previousModules];
       newmodules[props.module.id].chords = chords;
       return newmodules;
+    });
+  };
+
+  const updateRhythm = (chordIndex,rhythmIndex, newRhythm) => {
+    setChords((previousChords) => {
+      let newChords = [...previousChords];
+      newChords[chordIndex].rhythm[rhythmIndex] = newRhythm;
+      return newChords;
     });
   };
 
@@ -121,6 +132,15 @@ function ChordProgression(props) {
           </Fragment>
         ))}
         <Divider className="measure-divider" orientation="vertical" />
+        {
+          <ChordRhythmSequence
+            activeChord={activeChord}
+            activeRhythm={activeRhythm}
+            chords={chords}
+            color={props.module.color}
+            updateRhythm={updateRhythm}
+          />
+        }
       </div>
       {selectedChord !== null && (
         <ChordPicker

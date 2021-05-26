@@ -55,6 +55,13 @@ function Sampler(props) {
     Tone.Transport.seconds =
       (element.x / sampleWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
+
+      setCursorPosition(
+        (Tone.Transport.seconds /
+          Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
+          sampleWrapper.current.offsetWidth
+      );
+    
   };
 
   const handleFileDrop = (files, event) => {

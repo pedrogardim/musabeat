@@ -75,6 +75,7 @@ export const bounceSessionExport = (
             thisinstrument,
             transport,
             () => {},
+            () => {},
             "",
             sessionSize
           );

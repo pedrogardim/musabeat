@@ -95,6 +95,7 @@ export const scheduleChordProgression = (
   instrument,
   transport,
   updateChord,
+  updateRhythm,
   moduleId,
   sessionSize
 ) => {
@@ -135,6 +136,7 @@ export const scheduleChordProgression = (
 
           //console.log(chord.notes);
           updateChord(chordIndex);
+          updateRhythm(rhythmIndex);
         }, rhythmscheduletime);
         scheduledChords.push(thisevent);
       });
