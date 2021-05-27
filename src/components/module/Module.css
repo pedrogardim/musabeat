@@ -64,8 +64,10 @@
 
 .module-menu-option *{
   color:rgba(0, 0, 0, 0.5) !important;
+}
 
-
+.module-menu-remove-option *{
+  color:rgba(255, 9, 9, 0.733) !important;
 }
 
 .hidden {

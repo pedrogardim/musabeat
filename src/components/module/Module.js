@@ -31,6 +31,18 @@ function Module(props) {
     closeMenu();
   };
 
+  const removeModule = () => {
+    props.setModules((prevModules) => {
+      let newModules = [...prevModules];
+      newModules = newModules
+        .filter((e) => e.id !== props.index)
+        .map((e, i) => {
+          return { ...e, id: i };
+        });
+      return newModules;
+    });
+  };
+
   const openMenu = (e) => {
     setMenuAnchorEl(e.currentTarget);
   };
@@ -51,7 +63,7 @@ function Module(props) {
           muted={muted}
           module={props.module}
           kit={0}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
         />
       );
       break;
@@ -64,7 +76,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
         />
       );
       break;
@@ -78,7 +90,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
         />
       );
       break;
@@ -92,7 +104,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
         />
       );
       break;
@@ -104,7 +116,6 @@ function Module(props) {
 
   return (
     <div
-      id={"module-" + props.module.id}
       style={{
         backgroundColor: props.module.color[700],
         overflow:
@@ -118,11 +129,8 @@ function Module(props) {
     >
       <div className="module-header">
         <span className="module-title">{props.module.name}</span>
-        <IconButton
-          className="module-options-button"
-          onClick={openMenu}
-        >
-          <Icon style={{color:"white"}}>more_vert</Icon>
+        <IconButton className="module-options-button" onClick={openMenu}>
+          <Icon style={{ color: "white" }}>more_vert</Icon>
         </IconButton>
         <Menu
           anchorEl={menuAnchorEl}
@@ -141,8 +149,12 @@ function Module(props) {
             onClick={handleInstrumentButtonMode}
             className="module-menu-option"
           >
-            <Icon >piano</Icon>
-             Instrument Editor
+            <Icon>piano</Icon>
+            Instrument Editor
+          </MenuItem>
+          <MenuItem onClick={removeModule}>
+            <Icon className="module-menu-remove-option">delete</Icon>
+            Remove Module
           </MenuItem>
         </Menu>
       </div>
@@ -151,7 +163,7 @@ function Module(props) {
         <InstrumentEditor
           module={props.module}
           instrument={props.module.instrument}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
           setInstrumentEditorMode={setInstrumentEditorMode}
           index={props.index}
         />
@@ -159,7 +171,7 @@ function Module(props) {
       {settingsMode && (
         <ModuleSettings
           module={props.module}
-          updateModules={props.updateModules}
+          updateModules={props.setModules}
           setSettingsMode={setSettingsMode}
           index={props.index}
         />

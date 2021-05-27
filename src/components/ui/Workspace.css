@@ -1,6 +1,7 @@
 .workspace {
   background-color: #282c34;
-  background: radial-gradient(#ffffff, #fafaed);
+  /* background: radial-gradient(#ffffff, #fafaed); */
+  background:white;
   min-height:100vh;
   display: flex;
   flex-direction: row;

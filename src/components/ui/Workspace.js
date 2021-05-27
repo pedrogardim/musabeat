@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
-import { Fab, Icon } from "@material-ui/core";
+import { Fab, Icon, IconButton } from "@material-ui/core";
 
 import { loadDrumPatch } from "../../assets/musicutils";
 
@@ -77,6 +77,8 @@ function Workspace(props) {
     chooseNewModule(false);
   };
 
+
+
   const adaptSessionSize = () => {
     let lengths = modules.map((module) =>
       module.type === 2
@@ -88,6 +90,7 @@ function Workspace(props) {
     let longestModule = Math.max(...lengths);
     setSessionSize(longestModule);
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * longestModule;
+    console.log("Session size updated: "+longestModule);
   };
 
   ////TODO: UNDO
@@ -152,20 +155,20 @@ function Workspace(props) {
             index={module.id}
             module={module}
             sessionSize={sessionSize}
-            updateModules={setModules}
+            setModules={setModules}
             muted={mutedModules.includes(moduleIndex)}
           />
           {moduleIndex % 3 == 1 && <div className="break" />}
         </Fragment>
       ))}
       <div className="break" />
-      <Fab
+      <IconButton
         color="primary"
         style={{ marginTop: 48 }}
         onClick={() => chooseNewModule(true)}
       >
         <Icon>add</Icon>
-      </Fab>
+      </IconButton>
 
       {modulePickerVisibility && (
         <ModulePicker
