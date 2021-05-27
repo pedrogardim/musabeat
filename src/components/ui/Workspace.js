@@ -54,7 +54,7 @@ function Workspace(props) {
       modules.forEach((e) =>
         e.instrument.name === "Players"
           ? e.instrument.stopAll()
-          : e.instrument.name === "GrainPlayer"
+          : e.instrument.name === "GrainPlayer" || e.instrument.name === "Player"
           ? e.instrument.stop()
           : e.instrument.releaseAll()
       );

@@ -152,7 +152,7 @@ export const scheduleChordProgression = (
 export const scheduleSamples = (
   score,
   instrument,
-  offset,
+  cursorTime,
   transport,
   moduleId
 ) => {
@@ -161,18 +161,14 @@ export const scheduleSamples = (
   let scheduledSounds = [];
 
   score.map((event, eventIndex) => {
-    let eventTime = offset !== undefined ? offset : event.time
-    let eventOffset =
-        offset !== undefined && offset - event.time < event.duration
-          ? offset - event.time
-          : 0;
+    let isCursorinBetween =
+      cursorTime > event.time && cursorTime < event.time + event.duration;
+
+    let eventOffset = isCursorinBetween ? cursorTime - event.time : 0;
+    let eventTime = isCursorinBetween ? cursorTime : event.time;
 
     let thisevent = transport.schedule((time) => {
-      
-
-      console.log(eventOffset);
       instrument.start(time, eventOffset, event.duration);
-      //console.log(chord.notes);
     }, eventTime);
     scheduledSounds.push(thisevent);
   });

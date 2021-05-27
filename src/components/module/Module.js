@@ -132,14 +132,14 @@ function Module(props) {
         >
           <MenuItem
             onClick={handleSettingsButtonMode}
-            className="module-menu-option-icon"
+            className="module-menu-option"
           >
             <Icon className="module-menu-option-icon">settings</Icon>
             Module Settings
           </MenuItem>
           <MenuItem
             onClick={handleInstrumentButtonMode}
-            className="module-menu-option-icon"
+            className="module-menu-option"
           >
             <Icon >piano</Icon>
              Instrument Editor

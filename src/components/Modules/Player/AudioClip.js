@@ -41,18 +41,23 @@ function AudioClip(props) {
     
   };
 
+  const handleDragStart = () => {
+    props.instrument.stop();
+  }
+
   const handleDragStop = () => {
-    props.setScore((prev) => {
-      let newScore = [...prev];
-      let newTime =
+    let newTime =
         (clipPosition /
           props.parentRef.current.offsetWidth) *
         Tone.Time(Tone.Transport.loopEnd).toSeconds();
+
+    props.setScore((prev) => {
+      let newScore = [...prev];
+      
       newScore[props.index].time = newTime;
       return newScore;
     });
 
-    //TODO: ReSchedule event
   }
 
   useEffect(() => {
@@ -85,6 +90,7 @@ function AudioClip(props) {
     <Draggable
       axis="x"
       onDrag={handleDrag}
+      onStart={handleDragStart}
       onStop={handleDragStop}
       position={{ x: clipPosition, y: 0 }}
     >

@@ -47,9 +47,15 @@ function Sampler(props) {
     }
   };
 
-  const scheduleEvents = (offset) => {
-    console.log(score[0].time,offset)
-    scheduleSamples(score, instrument, offset,Tone.Transport, props.module.id);
+  const scheduleEvents = () => {
+    scheduleSamples(
+      score,
+      instrument,
+      Tone.Transport.seconds,
+      Tone.Transport,
+      props.module.id
+    );
+    console.log("scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -57,15 +63,15 @@ function Sampler(props) {
       (element.x / sampleWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
-    setCursorPosition(
-      (Tone.Transport.seconds / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-        sampleWrapper.current.offsetWidth
-    );
+    setCursorPosition(element.x);
+  };
+
+  const handleCursorDragStart = (event, element) => {
+    instrument.stop(0);
   };
 
   const handleCursorDragStop = (event, element) => {
-    scheduleEvents((element.x / sampleWrapper.current.offsetWidth) *
-    Tone.Time(Tone.Transport.loopEnd).toSeconds())
+    scheduleEvents();
   };
 
   const handleFileDrop = (files, event) => {
@@ -90,11 +96,12 @@ function Sampler(props) {
             return;
           }
 
-          setInstrument(
-            new Tone.GrainPlayer(
+          setInstrument((prev)=>{
+            prev.dispose()
+            return new Tone.GrainPlayer(
               audiobuffer,
               setIsBufferLoaded(true)
-            ).toDestination()
+            ).toDestination()}
           );
 
           //update score duration
@@ -118,6 +125,7 @@ function Sampler(props) {
 
   useEffect(() => {
     startCursor(Tone.Transport.state === "started");
+    Tone.Transport.state === "started" && scheduleEvents();
   }, [Tone.Transport.state]);
 
   useEffect(() => {
@@ -142,8 +150,16 @@ function Sampler(props) {
 
   useEffect(() => {
     setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
+    Tone.Transport.schedule((time) => {
+      scheduleEvents();
+    }, 0);
   }, []);
+  /* 
+  useEffect(() => {
+    Tone.Transport.seconds === 0 && console.log(Tone.Transport.position);
+  }, [Tone.Transport.seconds]);
 
+   */
   return (
     <div
       className="module-innerwrapper"
@@ -179,6 +195,7 @@ function Sampler(props) {
             parentRef={sampleWrapper}
             color={props.module.color}
             buffer={instrument.buffer}
+            instrument={instrument}
             scheduleEvents={scheduleEvents}
             score={score[0]}
             setScore={setScore}
@@ -192,6 +209,7 @@ function Sampler(props) {
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}
+          onStart={handleCursorDragStart}
           onStop={handleCursorDragStop}
           position={{ x: cursorPosition, y: 0 }}
         >

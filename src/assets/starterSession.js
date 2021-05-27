@@ -140,7 +140,7 @@ export const starterSession = {
     },
     {
       id: 3,
-      name: "Sampler",
+      name: "Player",
       type: 3,
       length: 1,
       instrument: new Tone.GrainPlayer(
