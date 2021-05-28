@@ -106,10 +106,12 @@ export const scheduleChordProgression = (
 
   let scheduledChords = [];
 
-  let moduleLength = Math.ceil(chords[chords.length - 1].time);
+  let moduleLength = Math.ceil(chords[chords.length - 1].time + 0.01);
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
   //console.log(sessionSize, moduleLength,loopTimes)
+
+  //console.log(loopTimes)
 
   for (let x = 0; x < loopTimes; x++) {
     chords.map((chord, chordIndex) => {
@@ -122,6 +124,7 @@ export const scheduleChordProgression = (
       chord.rhythm.map((rhythm, rhythmIndex) => {
         let rhythmscheduletime =
           rhythmduration * rhythmIndex + chordtimetostart;
+
         let thisevent = transport.schedule((time) => {
           switch (rhythm) {
             case 0:

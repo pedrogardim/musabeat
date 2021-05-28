@@ -78,6 +78,12 @@ function MelodyGrid(props) {
     setScheduledEvents(scheduledNotes);
   };
 
+  const getScaleFromSequenceNotes = () => {
+    let notes = [];
+    melodyArray.map(msre=>msre.map(beat=>beat.map(note=>!notes.includes(note) && notes.push(note))));
+    setGridScale(notes);
+  }
+
   const playNote = (note, time) =>
     instrument.triggerAttackRelease(
       note,
@@ -93,7 +99,7 @@ function MelodyGrid(props) {
 
   const updateSequence = () => {
     props.updateModules((previousModules) => {
-      let newmodules = previousModules;
+      let newmodules = [...previousModules];
       newmodules[props.module.id].score = melodyArray;
       return newmodules;
     });
@@ -132,6 +138,11 @@ function MelodyGrid(props) {
     updateGridRows();
     //console.log(gridScale);
   }, [props.module.root, props.module.scale, props.module.range]);
+
+  useEffect(() =>{
+    getScaleFromSequenceNotes();
+  },[])
+
 
   return (
     <div

@@ -88,7 +88,7 @@ function ChordRhythmSequence(props) {
     <div
       className="chord-rhythm-sequence"
     >
-      {measureRhythm.map((chords, chordIndex) => (
+      {measureRhythm.map((chord, chordIndex) => (
         <div
           className={
             "chord-rhythm-chord " +
@@ -107,7 +107,7 @@ function ChordRhythmSequence(props) {
           >
             <Icon>remove</Icon>
           </IconButton>
-          {chords.map((rhythm, rhythmIndex) => (
+          {chord.map((rhythm, rhythmIndex) => (
             <ChordRhythmTile
               chordIndex={chordIndex}
               rhythmIndex={rhythmIndex}

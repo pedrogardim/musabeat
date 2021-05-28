@@ -92,10 +92,10 @@ export const instruments = [
     ],
   },
   {
-    name: "Funky Bass",
+    name: "Deep Bass",
     base: "Mono",
     type: 2,
-    gain: -18,
+    gain: -12,
     options: {
       oscillator: {
         type: "sawtooth",
@@ -109,16 +109,14 @@ export const instruments = [
         attack : 0.005 ,
         decay : 0.1 ,
         sustain : 0.9 ,
-        release : 1
+        release : 0,
         } ,
         filterEnvelope : {
-        attack : 0.06 ,
-        decay : 0.2 ,
+        attack : 0.1 ,
+        decay : 0.05 ,
         sustain : 0.5 ,
         release : 0 ,
-        baseFrequency : 200 ,
-        octaves : 7 ,
-        exponent : 2
+        octaves:0
         }
     },
   },

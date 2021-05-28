@@ -156,6 +156,8 @@ function FilterEditor(props) {
       <Typography variant="overline" className="filter-editor-labels">
         {"Resonance:" + (selectorPos.y * 5).toFixed(2)}
       </Typography>
+
+      <Slider></Slider>
     </div>
   );
 }

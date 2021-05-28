@@ -75,12 +75,13 @@ function ChordProgression(props) {
   }, [chords]);
 
   useEffect(() => {
+    scheduleChords();
+  }, [instrument,props.sessionSize]);
+
+  useEffect(() => {
     setInstrument(props.module.instrument);
   }, [props.module.instrument]);
 
-  useEffect(() => {
-    scheduleChords();
-  }, [instrument]);
 
   useEffect(() => {
     selectedChord !== null &&
@@ -91,10 +92,6 @@ function ChordProgression(props) {
   useEffect(() => {
     setActiveChord(selectedChord);
   }, [selectedChord]);
-
-  useEffect(() => {
-    scheduleChords();
-  }, [props.sessionSize]);
 
   return (
     <div className="module-innerwrapper" style={props.style}>

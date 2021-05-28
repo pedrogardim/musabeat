@@ -38,7 +38,7 @@ function Workspace(props) {
   const [modules, setModules] = useState(starterSession.modules);
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
-  const [sessionSize, setSessionSize] = useState(4);
+  const [sessionSize, setSessionSize] = useState(null);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   //temp: muted modules array as workspace state
@@ -81,7 +81,7 @@ function Workspace(props) {
   const adaptSessionSize = () => {
     let lengths = modules.map((module) =>
       module.type === 2
-        ? Math.ceil(module.score[module.score.length - 1].time)
+        ? Math.ceil(module.score[module.score.length - 1].time+module.score[module.score.length - 1].duration)
         : module.type === 3
         ? Math.ceil((module.score[0].duration + module.score[0].time) / Tone.Time("1m").toSeconds())
         : module.score.length
