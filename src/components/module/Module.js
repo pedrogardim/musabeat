@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import * as Tone from "tone";
 
 import { IconButton, Icon, Menu, MenuItem } from "@material-ui/core";
 import { clearEvents } from "../../utils/TransportSchedule"
@@ -6,7 +7,7 @@ import { clearEvents } from "../../utils/TransportSchedule"
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
 import MelodyGrid from "../Modules/MelodyGrid/MelodyGrid";
-import Sampler from "../Modules/Player/Player";
+import Player from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 
@@ -38,8 +39,10 @@ function Module(props) {
   };
 
   const removeModule = () => {
+    //Tone.Transport.pause();
     props.setModules((prevModules) => {
-      prevModules.forEach(e=>clearEvents(e.id));
+      //prevModules.forEach(e=>clearEvents(e.id));
+      clearEvents(props.index);
       let newModules = [...prevModules];
       newModules = newModules
         .filter((e) => e.id !== props.index)
@@ -104,7 +107,7 @@ function Module(props) {
 
     case 3:
       moduleContent = (
-        <Sampler
+        <Player
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}

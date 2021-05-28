@@ -15,8 +15,8 @@ import "./Player.css";
 
 //TODO
 
-function Sampler(props) {
-  const sampleWrapper = useRef(null);
+function Player(props) {
+  const playerWrapper = useRef(null);
   const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [score, setScore] = useState(props.module.score);
   const [instrument, setInstrument] = useState(props.module.instrument);
@@ -30,11 +30,13 @@ function Sampler(props) {
     started
       ? setCursorAnimator(
           setInterval(() => {
-            setCursorPosition(
-              (Tone.Transport.seconds /
-                Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-                sampleWrapper.current.offsetWidth
-            );
+            //temp fix
+            playerWrapper.current !== null &&
+              setCursorPosition(
+                (Tone.Transport.seconds /
+                  Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
+                  playerWrapper.current.offsetWidth
+              );
           }, 16)
         )
       : clearInterval(cursorAnimator);
@@ -60,7 +62,7 @@ function Sampler(props) {
 
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
-      (element.x / sampleWrapper.current.offsetWidth) *
+      (element.x / playerWrapper.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
     setCursorPosition(element.x);
@@ -96,13 +98,13 @@ function Sampler(props) {
             return;
           }
 
-          setInstrument((prev)=>{
-            prev.dispose()
+          setInstrument((prev) => {
+            prev.dispose();
             return new Tone.GrainPlayer(
               audiobuffer,
               setIsBufferLoaded(true)
-            ).toDestination()}
-          );
+            ).toDestination();
+          });
 
           //update score duration
 
@@ -154,15 +156,16 @@ function Sampler(props) {
       scheduleEvents();
     }, 0);
     return () => {
+      clearInterval(cursorAnimator);
       Tone.Transport.clear(reScheculeEvent);
-    }
+    };
   }, []);
-  /* 
-  useEffect(() => {
-    Tone.Transport.seconds === 0 && console.log(Tone.Transport.position);
-  }, [Tone.Transport.seconds]);
 
-   */
+  useEffect(() => {
+    clearInterval(cursorAnimator);
+    console.log("triggered");
+  }, [props.module.id]);
+
   return (
     <div
       className="module-innerwrapper"
@@ -170,7 +173,7 @@ function Sampler(props) {
     >
       <div
         className="sampler"
-        ref={sampleWrapper}
+        ref={playerWrapper}
         onDragEnter={() => setDraggingOver(true)}
       >
         <BackgroundGrid
@@ -195,7 +198,7 @@ function Sampler(props) {
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
-            parentRef={sampleWrapper}
+            parentRef={playerWrapper}
             color={props.module.color}
             buffer={instrument.buffer}
             instrument={instrument}
@@ -226,4 +229,4 @@ function Sampler(props) {
   );
 }
 
-export default Sampler;
+export default Player;
