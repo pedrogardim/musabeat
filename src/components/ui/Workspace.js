@@ -64,7 +64,7 @@ function Workspace(props) {
 
   const addModule = (moduletype) => {
     let module = {
-      id: modules.length,
+      id: Math.max(...modules.map(e=>e.id))+1,
       name: "New Module",
       type: moduletype,
       subdiv: 16,

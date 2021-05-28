@@ -150,9 +150,12 @@ function Sampler(props) {
 
   useEffect(() => {
     setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
-    Tone.Transport.schedule((time) => {
+    let reScheculeEvent = Tone.Transport.schedule((time) => {
       scheduleEvents();
     }, 0);
+    return () => {
+      Tone.Transport.clear(reScheculeEvent);
+    }
   }, []);
   /* 
   useEffect(() => {

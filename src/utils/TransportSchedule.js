@@ -2,7 +2,7 @@ import * as Tone from "tone";
 
 let scheduledEvents = [];
 
-const clearEvents = (moduleId) => {
+export const clearEvents = (moduleId) => {
   //console.log(moduleId)
   typeof scheduledEvents[moduleId] !== "undefined" &&
     scheduledEvents[moduleId].length > 0 &&

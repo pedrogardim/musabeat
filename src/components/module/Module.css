@@ -60,6 +60,17 @@
   width: 30px !important;
   position: absolute !important;
   right:0 !important;
+  color:white !important;
+
+}
+
+.module-back-button{
+  height: 100%;
+  width: 30px !important;
+  position: absolute !important;
+  left:0 !important;
+  color:white !important;
+
 }
 
 .module-menu-option *{

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { IconButton, Icon, Menu, MenuItem } from "@material-ui/core";
+import { clearEvents } from "../../utils/TransportSchedule"
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
@@ -31,8 +32,14 @@ function Module(props) {
     closeMenu();
   };
 
+  const handleBackButtonClick = () => {
+    setSettingsMode(false);
+    setInstrumentEditorMode(false);
+  };
+
   const removeModule = () => {
     props.setModules((prevModules) => {
+      prevModules.forEach(e=>clearEvents(e.id));
       let newModules = [...prevModules];
       newModules = newModules
         .filter((e) => e.id !== props.index)
@@ -128,9 +135,12 @@ function Module(props) {
       }
     >
       <div className="module-header">
+      {(instrumentEditorMode || settingsMode) && <IconButton className="module-back-button" onClick={handleBackButtonClick}>
+          <Icon style={{fontSize:20}}>arrow_back_ios</Icon>
+        </IconButton>}
         <span className="module-title">{props.module.name}</span>
         <IconButton className="module-options-button" onClick={openMenu}>
-          <Icon style={{ color: "white" }}>more_vert</Icon>
+          <Icon>more_vert</Icon>
         </IconButton>
         <Menu
           anchorEl={menuAnchorEl}
