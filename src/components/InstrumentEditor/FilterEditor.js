@@ -13,7 +13,10 @@ function FilterEditor(props) {
 
   const [selecting, setIsSelecting] = useState(false);
   const [tempFilter, setTempFilter] = useState(() => {
-    return new Tone.Filter(props.instrument.get().filter);
+    return new Tone.Filter({
+      ...props.instrument.get().filter,
+      frequency: props.instrument.get().filterEnvelope.baseFrequency,
+    });
   });
   const [selectorPos, setSelectorPos] = useState({
     x: tempFilter.get().frequency / 20000,
@@ -41,25 +44,47 @@ function FilterEditor(props) {
         ),
       });
       tempFilter.set({ Q: selectorPos.y * 5 });
-  
+
       setFilterFR(tempFilter.getFrequencyResponse(64));
     }
   };
 
   const registerToSynth = () => {
-    
-
     setIsSelecting(false);
-    console.log(tempFilter.get());
-    props.handleChange("filter", tempFilter.get());
+    props.handleFilterChange(tempFilter.get());
+
     //tempFilter.dispose();
     //setTempFilter({});
     //setTempFilter(new Tone.Filter(props.instrument.get().filter));
   };
 
   useEffect(() => {
+    setSelectorPos({
+      x: mapLogScale(
+        tempFilter.get().frequency,
+        Math.log(20),
+        Math.log(20000),
+        1,
+        0
+      ),
+      y: tempFilter.get().Q / 5,
+      final: true,
+    });
+  }, [tempFilter]);
+
+  useEffect(() => {
     setFilterFRWave(drawWave(filterFR));
   }, [filterFR]);
+
+  useEffect(() => {
+    setTempFilter(
+      new Tone.Filter({
+        ...props.instrument.get().filter,
+        frequency: props.instrument.get().filterEnvelope.baseFrequency,
+      })
+    );
+    console.log("instr change triggered");
+  }, [props.instrument]);
 
   return (
     <div className="filter-editor">
@@ -74,7 +99,7 @@ function FilterEditor(props) {
       >
         <path d={filterFRWave} stroke="#05386b" fill="none" />
         <rect
-          x={Math.floor(selectorPos.x * 128)}
+          x={Math.floor((selectorPos.x) * 128)}
           height="100%"
           width="1"
           fill="#05386b"
@@ -90,9 +115,7 @@ function FilterEditor(props) {
       </svg>
       <Typography variant="overline" className="filter-editor-labels">
         {"Frequency:" +
-          Math.floor(
-            mapLogScale(selectorPos.x, 0, 1, Math.log(20), Math.log(20000))
-          ) +
+          Math.floor(tempFilter.get().frequency) +
           "Hz"}
       </Typography>
       <div className="break" />

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 
+import * as Tone from "tone";
+
 import {
   Select,
   Typography,
@@ -21,7 +23,6 @@ function SynthParameters(props) {
     props.instrument.get()
   );
 
-  console.log(instrumentParamenters);
 
   //console.log(instrument.get());
 
@@ -42,17 +43,21 @@ function SynthParameters(props) {
     props.instrument.set({ [parameter]: { type: value } });
   };
 
-  const handleFilterChange = (parameter, value) => {
+  const handleFilterChange = (newFilter) => {
 
-    console.log(parameter,value);
     setInstrumentParamenters((prev) => {
-      return { ...prev, filter: { ...prev.filter, [parameter]: value } };
+      return { ...prev, filter: newFilter};
     });
-    props.instrument.set({ filter: { [parameter]: value } });
+    props.instrument.set({ filter: newFilter,filterEnvelope:{baseFrequency:newFilter.frequency, octaves:0} });
+    console.log(newFilter,props.instrument.get())
+    console.log(Tone.FrequencyEnvelope.getDefaults())
   };
   //TODO
 
-  console.log(props.instrument);
+  useEffect(() => {
+    setInstrumentParamenters(props.instrument.get());
+  }, [props.instrument]);
+
 
   mainContent = (
     <Fragment>
@@ -63,7 +68,7 @@ function SynthParameters(props) {
             <div className="break"/>
             <FilterEditor
               instrumentParamenters={instrumentParamenters}
-              handleChange={handleChange}
+              handleFilterChange={handleFilterChange}
               instrument={props.instrument}
             />
 
@@ -133,9 +138,7 @@ function SynthParameters(props) {
     </Fragment>
   );
 
-  useEffect(() => {
-    setInstrumentParamenters(props.instrument.get());
-  }, [props.instrument]);
+
 
   return mainContent;
 }

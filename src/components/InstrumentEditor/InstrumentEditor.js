@@ -216,7 +216,7 @@ function InstrumentEditor(props) {
       </div>
     );
     list.push(
-      <div className="instrument-editor-column" key={2}>
+      <div className="instrument-editor-column" style={{flexDirection: 'column'}} key={2}>
         {Object.keys(instrument.get()).map(
           (envelope, envelopeIndex) =>
             envelope.toLowerCase().includes("envelope") && (

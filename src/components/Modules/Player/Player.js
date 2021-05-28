@@ -57,7 +57,7 @@ function Player(props) {
       Tone.Transport,
       props.module.id
     );
-    console.log("scheduled");
+    //console.log("scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -84,7 +84,7 @@ function Player(props) {
     setIsBufferLoaded(false);
     setDraggingOver(false);
     let file = files[0];
-    console.log(file);
+    //console.log(file);
 
     file.arrayBuffer().then((arraybuffer) => {
       instrument.context.rawContext.decodeAudioData(
@@ -163,7 +163,7 @@ function Player(props) {
 
   useEffect(() => {
     clearInterval(cursorAnimator);
-    console.log("triggered");
+    //console.log("triggered");
   }, [props.module.id]);
 
   return (
