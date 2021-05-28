@@ -54,7 +54,8 @@ function Workspace(props) {
       modules.forEach((e) =>
         e.instrument.name === "Players"
           ? e.instrument.stopAll()
-          : e.instrument.name === "GrainPlayer" || e.instrument.name === "Player"
+          : e.instrument.name === "GrainPlayer" ||
+            e.instrument.name === "Player"
           ? e.instrument.stop()
           : e.instrument.releaseAll()
       );
@@ -64,7 +65,7 @@ function Workspace(props) {
 
   const addModule = (moduletype) => {
     let module = {
-      id: Math.max(...modules.map(e=>e.id))+1,
+      id: Math.max(...modules.map((e) => e.id)) + 1,
       name: "New Module",
       type: moduletype,
       subdiv: 16,
@@ -77,20 +78,23 @@ function Workspace(props) {
     chooseNewModule(false);
   };
 
-
-
   const adaptSessionSize = () => {
     let lengths = modules.map((module) =>
       module.type === 2
         ? Math.ceil(module.score[module.score.length - 1].time)
         : module.type === 3
-        ? Math.ceil(module.score[0].duration/Tone.Time("1m").toSeconds())
+        ? Math.ceil((module.score[0].duration + module.score[0].time) / Tone.Time("1m").toSeconds())
         : module.score.length
     );
     let longestModule = Math.max(...lengths);
-    setSessionSize(longestModule);
-    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * longestModule;
-    console.log("Session size updated: "+longestModule);
+    let newSessionSize = longestModule > 8 ? 16 : longestModule > 4 ? 8 : longestModule > 2 ? 4 : longestModule > 1 ? 2 : 1
+
+
+    if (newSessionSize !== sessionSize) {
+      setSessionSize(newSessionSize);
+      Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * newSessionSize;
+      console.log("Session size updated: " + newSessionSize);
+    }
   };
 
   ////TODO: UNDO

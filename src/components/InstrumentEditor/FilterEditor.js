@@ -11,11 +11,12 @@ import "./FilterEditor.css";
 function FilterEditor(props) {
   const XYSelector = useRef(null);
   //temp
-  const [filterState, setFilterState] = useState(!(
-    props.instrument.get().filter.frequency === 20001 &&
+  const [filterState, setFilterState] = useState(
+    !(
+      props.instrument.get().filter.frequency === 20001 &&
       props.instrument.get().filter.Q === 1000 &&
-      props.instrument.get().filter.type === "peaking" &&
-      props.instrument.get().filter.gain === 0)
+      props.instrument.get().filter.type === "notch"
+    )
   );
 
   const [selecting, setIsSelecting] = useState(false);
@@ -71,7 +72,6 @@ function FilterEditor(props) {
           type: "notch",
           frequency: "20001",
           Q: 1000,
-          gain: 0,
         })
       : props.handleFilterChange(tempFilter.get());
 

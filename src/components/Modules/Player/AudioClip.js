@@ -13,52 +13,45 @@ function AudioClip(props) {
   );
   const [clipWidth, setClipWidth] = useState(
     (props.score.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-    props.parentRef.current.offsetWidth
+      props.parentRef.current.offsetWidth
   );
 
   const [clipPosition, setClipPosition] = useState(
     (props.score.time / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-    props.parentRef.current.offsetWidth
+      props.parentRef.current.offsetWidth
   );
 
-   
   const [waveForm, setWaveForm] = useState("");
- 
 
   const updateClipPosition = () => {
     let timePerPixel =
-    props.parentRef.current.offsetWidth /
+      props.parentRef.current.offsetWidth /
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
     setClipPosition(props.score.time * timePerPixel);
     setClipWidth(props.score.duration * timePerPixel);
     setClipHeight(props.parentRef.current.offsetHeight);
-
-    
   };
 
   const handleDrag = (event, element) => {
-    setClipPosition(element.x);
-    
+setClipPosition(element.x);
   };
 
   const handleDragStart = () => {
     props.instrument.stop();
-  }
+  };
 
   const handleDragStop = () => {
     let newTime =
-        (clipPosition /
-          props.parentRef.current.offsetWidth) *
-        Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      (clipPosition / props.parentRef.current.offsetWidth) *
+      Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
     props.setScore((prev) => {
       let newScore = [...prev];
-      
+
       newScore[props.index].time = newTime;
       return newScore;
     });
-
-  }
+  };
 
   useEffect(() => {
     //watch to window resize to update clips position
@@ -67,24 +60,15 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    updateClipPosition();    
-    
-  }, [props.sessionSize,props.score]);
-
-
-
+    updateClipPosition();
+  }, [props.sessionSize, props.score]);
 
   useEffect(() => {
     //watch to window resize to update clips position
     setWaveForm(
-      drawClipWave(
-        props.buffer.toArray(),
-        clipHeight,
-        clipWidth,
-        props.color
-      )
-    ); 
-  }, [props.buffer,clipWidth]);
+      drawClipWave(props.buffer.toArray(), clipHeight, clipWidth, props.color)
+    );
+  }, [props.buffer, clipWidth]);
 
   return (
     <Draggable
@@ -122,15 +106,7 @@ function AudioClip(props) {
   );
 }
 
-const drawClipWave = (
-  buffer,
-  clipHeight,
-  clipWidth,
-  color
-  
-) => {
-
-
+const drawClipWave = (buffer, clipHeight, clipWidth, color) => {
   let waveArray = typeof buffer[0] === "number" ? buffer : buffer[0];
 
   let scale = waveArray.length / clipWidth;
@@ -142,11 +118,12 @@ const drawClipWave = (
       "L " +
       x +
       " " +
-      Math.floor((waveArray[Math.floor(x * scale)]) * clipHeight + clipHeight / 2) +
+      Math.floor(
+        waveArray[Math.floor(x * scale)] * clipHeight + clipHeight / 2
+      ) +
       " ";
   }
   return <path d={pathString} stroke={color[100]} fill="none" />;
 };
-
 
 export default AudioClip;

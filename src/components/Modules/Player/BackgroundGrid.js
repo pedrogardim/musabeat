@@ -4,10 +4,9 @@ import * as Tone from "tone";
 
 import "./BackgroundGrid.css";
 
-//TODO
-
 function BackgroundGrid(props) {
   //TODO: Time signature subdivision, now fixed to 4
+
 
   let grid = [];
 

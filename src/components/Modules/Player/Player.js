@@ -23,6 +23,7 @@ function Player(props) {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [buffersChecker, setBuffersChecker] = useState(null);
+  const [rescheduleEvent,setRescheduleEvent] = useState(null);
 
   const [draggingOver, setDraggingOver] = useState(false);
 
@@ -57,7 +58,7 @@ function Player(props) {
       Tone.Transport,
       props.module.id
     );
-    //console.log("scheduled");
+    console.log("player scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -152,14 +153,20 @@ function Player(props) {
 
   useEffect(() => {
     setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
-    let reScheculeEvent = Tone.Transport.schedule((time) => {
+    setRescheduleEvent(Tone.Transport.schedule((time) => {
       scheduleEvents();
-    }, 0);
+    }, Tone.Transport.loopEnd-0.01))
     return () => {
       clearInterval(cursorAnimator);
-      Tone.Transport.clear(reScheculeEvent);
+      Tone.Transport.clear(rescheduleEvent);
     };
   }, []);
+
+  useEffect(() => {
+    setRescheduleEvent(Tone.Transport.schedule((time) => {
+      scheduleEvents();
+    }, Tone.Transport.loopEnd-0.01))
+  }, [props.sessionSize]);
 
   useEffect(() => {
     clearInterval(cursorAnimator);
