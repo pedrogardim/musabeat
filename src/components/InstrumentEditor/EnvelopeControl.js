@@ -11,7 +11,9 @@ import {
 import "./InstrumentEditor.css";
 
 function EnvelopeControl(props) {
-  const [envelope, setEnvelope] = useState(props.instrument.get()[props.envelopeType]);
+  const [envelope, setEnvelope] = useState(
+    props.instrument.get()[props.envelopeType]
+  );
 
   const handleChange = (element, value) => {
     props.instrument.set({ [props.envelopeType]: { [element]: value } });
@@ -26,14 +28,12 @@ function EnvelopeControl(props) {
     state
       ? props.instrument.set({ filterEnvelope: { octaves: 0 } })
       : props.instrument.set({ filterEnvelope: { octaves: 7 } });
-      
-      setEnvelope(props.instrument.get().filterEnvelope);
-      console.log(state);
+
+    setEnvelope(props.instrument.get().filterEnvelope);
   };
 
   useEffect(() => {
     setEnvelope(props.instrument.get()[props.envelopeType]);
-   console.log( "change imported to here!")
   }, [props.instrument]);
 
   return (
@@ -47,9 +47,7 @@ function EnvelopeControl(props) {
           .replace("envelope", " ADSR")
           .replace("modulation", "mod")}
       </Typography>
-      {Object.keys(envelope).includes(
-        "octaves"
-      ) && (
+      {Object.keys(envelope).includes("octaves") && (
         <IconButton
           color={envelope.octaves !== 0 ? "primary" : "default"}
           onClick={toggleFilterEnvelope}
@@ -66,7 +64,10 @@ function EnvelopeControl(props) {
             element === "sustain" ||
             element === "release") && (
             <div
-              className={"instrument-editor-envelope-slider-container "+ (envelope.octaves === 0 && "disabled")}
+              className={
+                "instrument-editor-envelope-slider-container " +
+                (envelope.octaves === 0 && "disabled")
+              }
               style={{ order: element === "release" ? 2 : 1 }}
             >
               <Slider

@@ -11,6 +11,6 @@ body {
 
 .disabled{
   pointer-events: none;
-  filter:saturate(0) brightness(1.1);
+  filter:saturate(0) brightness(1.5);
 
 }

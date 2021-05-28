@@ -4,12 +4,19 @@ import * as Tone from "tone";
 
 import { mapLogScale } from "../../assets/musicutils";
 
-import { Typography, Slider } from "@material-ui/core";
+import { Typography, Slider, IconButton, Icon } from "@material-ui/core";
 
 import "./FilterEditor.css";
 
 function FilterEditor(props) {
   const XYSelector = useRef(null);
+  //temp
+  const [filterState, setFilterState] = useState(!(
+    props.instrument.get().filter.frequency === 20001 &&
+      props.instrument.get().filter.Q === 1000 &&
+      props.instrument.get().filter.type === "peaking" &&
+      props.instrument.get().filter.gain === 0)
+  );
 
   const [selecting, setIsSelecting] = useState(false);
   const [tempFilter, setTempFilter] = useState(() => {
@@ -58,6 +65,19 @@ function FilterEditor(props) {
     //setTempFilter(new Tone.Filter(props.instrument.get().filter));
   };
 
+  const toggleFilter = () => {
+    filterState
+      ? props.handleFilterChange({
+          type: "notch",
+          frequency: "20001",
+          Q: 1000,
+          gain: 0,
+        })
+      : props.handleFilterChange(tempFilter.get());
+
+    setFilterState((prev) => !prev);
+  };
+
   useEffect(() => {
     setSelectorPos({
       x: mapLogScale(
@@ -88,6 +108,18 @@ function FilterEditor(props) {
 
   return (
     <div className="filter-editor">
+      <Typography variant="overline">Filter</Typography>
+      <div className="break" />
+
+      <IconButton
+        color={filterState ? "primary" : "default"}
+        onClick={toggleFilter}
+        size="small"
+        className="turnonoff-button"
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        <Icon>power_settings_new</Icon>
+      </IconButton>
       <svg
         onMouseDown={() => setIsSelecting(true)}
         onMouseMove={handleXYSelect}
@@ -97,26 +129,28 @@ function FilterEditor(props) {
         style={{ border: "1px solid #05386b", marginBottom: 8 }}
         ref={XYSelector}
       >
-        <path d={filterFRWave} stroke="#05386b" fill="none" />
-        <rect
-          x={Math.floor((selectorPos.x) * 128)}
-          height="100%"
-          width="1"
-          fill="#05386b"
-          fillOpacity="0.7"
-        />
-        <rect
-          y={Math.floor((1 - selectorPos.y) * 64)}
-          height="1"
-          width="100%"
-          fill="#05386b"
-          fillOpacity="0.7"
-        />
+        {filterState && (
+          <Fragment>
+            <path d={filterFRWave} stroke="#05386b" fill="none" />
+            <rect
+              x={Math.floor(selectorPos.x * 128)}
+              height="100%"
+              width="1"
+              fill="#05386b"
+              fillOpacity="0.7"
+            />
+            <rect
+              y={Math.floor((1 - selectorPos.y) * 64)}
+              height="1"
+              width="100%"
+              fill="#05386b"
+              fillOpacity="0.7"
+            />
+          </Fragment>
+        )}
       </svg>
       <Typography variant="overline" className="filter-editor-labels">
-        {"Frequency:" +
-          Math.floor(tempFilter.get().frequency) +
-          "Hz"}
+        {"Frequency:" + Math.floor(tempFilter.get().frequency) + "Hz"}
       </Typography>
       <div className="break" />
       <Typography variant="overline" className="filter-editor-labels">

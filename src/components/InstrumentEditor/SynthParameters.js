@@ -50,7 +50,6 @@ function SynthParameters(props) {
     });
     props.instrument.set({ filter: newFilter,filterEnvelope:{baseFrequency:newFilter.frequency, octaves:0} });
     console.log(newFilter,props.instrument.get())
-    console.log(Tone.FrequencyEnvelope.getDefaults())
   };
   //TODO
 
@@ -64,8 +63,6 @@ function SynthParameters(props) {
       {Object.keys(instrumentParamenters).map((parameter, index) =>
         parameter === "filter" ? (
           <Fragment>
-            <Typography variant="overline">Filter</Typography>
-            <div className="break"/>
             <FilterEditor
               instrumentParamenters={instrumentParamenters}
               handleFilterChange={handleFilterChange}
