@@ -104,6 +104,7 @@ function Sequencer(props) {
   }, [drumPlayers]);
 
   useEffect(() => {
+    currentMeasure > props.module.score.length && setCurrentMeasure(0)
     changeSequence(props.module.score);
   }, [props.module.score]);
 

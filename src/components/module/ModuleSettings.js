@@ -1,3 +1,5 @@
+import * as Tone from "tone";
+
 import {
   Select,
   InputLabel,
@@ -5,6 +7,7 @@ import {
   Typography,
   Slider,
 } from "@material-ui/core";
+
 
 import {
   adaptSequencetoSubdiv,
@@ -21,6 +24,7 @@ function ModuleSettings(props) {
   let mainContent = "No Settings";
 
   const handleStepsSelect = (event) => {
+    Tone.Transport.pause();
     let newValue = parseInt(event.target.value);
     //console.log(newValue);
     props.updateModules((previous) =>
@@ -42,6 +46,7 @@ function ModuleSettings(props) {
   };
 
   const handleLengthSelect = (event) => {
+    Tone.Transport.pause();
     let newLength = parseInt(event.target.value);
     props.updateModules((previous) =>
       previous.map((module, i) => {

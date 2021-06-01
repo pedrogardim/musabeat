@@ -81,6 +81,15 @@ function MelodyGrid(props) {
   const getScaleFromSequenceNotes = () => {
     let notes = [];
     melodyArray.map(msre=>msre.map(beat=>beat.map(note=>!notes.includes(note) && notes.push(note))));
+    notes.sort(function (a, b) {
+      if (Tone.Frequency(a).toFrequency() > Tone.Frequency(b).toFrequency()) {
+        return 1;
+      }
+      if (Tone.Frequency(a).toFrequency() < Tone.Frequency(b).toFrequency()) {
+        return -1;
+      }
+      return 0;
+    })
     setGridScale(notes);
   }
 
@@ -122,6 +131,7 @@ function MelodyGrid(props) {
   }, [props.module.instrument]);
 
   useEffect(() => {
+    currentMeasure > props.module.score.length && setCurrentMeasure(0)
     setMelodyArray(props.module.score);
   }, [props.module.score]);
 

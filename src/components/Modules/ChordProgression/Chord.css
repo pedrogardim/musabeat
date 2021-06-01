@@ -1,49 +1,72 @@
-.chord{
-    height:32px;
-    width:5vw;
-    min-width:48px;
-    max-width:128px;
-    text-align:center;
-    margin:8px;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color:gray;
-    font-size: 1.8rem;
-    font-weight:300;
-    padding:2px;
-
-
+.chord-wrapper{
+  position:relative;
 }
 
-/* 
+.chord {
+  height: 32px;
+  width: 5vw;
+  min-width: 48px;
+  max-width: 128px;
+  text-align: center;
+  margin: 8px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  font-size: 1.8rem;
+  font-weight: 300;
+  padding: 2px;
+  position: relative;
+}
 
-.selected-chord{
+/* .selected-chord{
     /* animation: flashing 2s infinite alternate; 
     color:#3f51b5;
     text-decoration: bold;
     outline:1px solid #4b61dd;
+  }*/
+
+.selected-chord {
+  box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 20%),
+    0px 3px 5px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  border-radius: 3px;
+}
+
+.chord-button-wrapper{
+  width: 100%;
+  top:-20px;
+  height:20px;
+  position:absolute;
+  visibility: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
 
-  
+}
+
+.chord-wrapper:hover > .chord-button-wrapper {
+  visibility: visible;
+}
+
+.chord-addchord-btn {
+  flex:1 1 1px;
+  padding:0 !important;
+}
+
+.chord-removechord-btn {
+  flex:1 1 1px;
+  padding:0 !important;
+
+
+}
+
+@keyframes flashing {
+  from {
+    outline-color: #4b61dd;
   }
-
-  */
-
-  .selected-chord{
-
-    box-shadow: 0px 3px 5px -1px rgb(0 0 0 / 20%), 0px 3px 5px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
-    border-radius: 3px;
-    
-
-
-  
+  to {
+    outline-color: white;
   }
-
-
-  
-  @keyframes flashing {
-    from {outline-color: #4b61dd}
-    to {outline-color: white}
-  }
+}

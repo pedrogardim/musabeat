@@ -128,14 +128,14 @@ function Workspace(props) {
         event.preventDefault();
         togglePlaying();
         break;
-      /* case "KeyZ":
+       case "KeyZ":
         event.preventDefault();
         if (event.metaKey || event.ctrlKey) {
           sessionHistory.length > 1
             ? undoSession()
             : alert("Nothing to be undone");
         }
-        break; */
+        break; 
       case "KeyX":
         event.preventDefault();
         console.log(sessionHistory);
@@ -146,7 +146,7 @@ function Workspace(props) {
 
   useEffect(() => {
     adaptSessionSize();
-    //registerSession();
+    registerSession();
     console.log(modules);
   }, [modules]);
 
