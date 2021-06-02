@@ -113,7 +113,7 @@ export const starterSession = {
       root: 0,
       scale: 1,
       range: [3, 4],
-      instrument: instrumentContructor(3),
+      instrument: "-MbByh-3xIipRPN7KOO7",
       color: colors[2],
       score: [
         [["E1"], ["E2"], ["E1"], ["E2"], ["E1"], ["E2"], ["E1"], ["E2"]],
@@ -126,7 +126,7 @@ export const starterSession = {
       id: 2,
       name: "Chords",
       type: 2,
-      instrument: instrumentContructor(2),
+      instrument: "-MbByh-2u1PvlOo4tkEo",
       root: 0,
       scale: 0,
       complexity: 3,

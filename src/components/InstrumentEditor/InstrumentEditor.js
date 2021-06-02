@@ -20,7 +20,7 @@ import OscillatorEditor from "./OscillatorEditor";
 import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
 import {
-  instrumentContructor,
+  patchLoader,
   loadDrumPatch,
   detectPitch,
 } from "../../assets/musicutils";
@@ -54,7 +54,7 @@ function InstrumentEditor(props) {
           newModule.instrument =
             props.module.type === 0
               ? loadDrumPatch(event.target.value)
-              : instrumentContructor(event.target.value);
+              : patchLoader(event.target.value);
           setInstrument(newModule.instrument);
           return newModule;
         } else {

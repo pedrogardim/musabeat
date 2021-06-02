@@ -16,7 +16,7 @@ export const bounceSessionExport = (
   sessionSize
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
-  let exportDuration = Tone.Time("1m").toSeconds() * 2;
+  /* let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
   let instrumentBuffers = modules.map((module, i) =>
     module.instrument.name === "Players" || module.instrument.name === "Sampler"
@@ -103,7 +103,7 @@ export const bounceSessionExport = (
     setIsReady(true);
 
     //});
-  });
+  }); */
 };
 
 const downloadURI = (uri, name) => {

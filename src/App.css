@@ -9,6 +9,10 @@ body {
 
 }
 
+.app-wrapper{
+
+}
+
 .disabled{
   pointer-events: none;
   filter:saturate(0) brightness(1.5);
@@ -26,6 +30,7 @@ body {
 }
 
 .side-menu-icon{
+  position: fixed !important;
   top: 16px;
   left:32px;
   height: 24px;

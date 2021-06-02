@@ -3,6 +3,11 @@ import * as Tone from "tone";
 
 import { IconButton, Icon, Menu, MenuItem } from "@material-ui/core";
 import { clearEvents } from "../../utils/TransportSchedule"
+import {
+  patchLoader,
+  loadDrumPatch,
+  detectPitch,
+} from "../../assets/musicutils";
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
@@ -15,11 +20,13 @@ import "./Module.css";
 
 function Module(props) {
   const [muted, setMuted] = useState(props.muted);
+  const [instrument, setInstrument] = useState(null);
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   let moduleContent = <span>Nothing Here</span>;
+
 
   const handleInstrumentButtonMode = () => {
     setInstrumentEditorMode((prev) => (prev ? false : true));
@@ -83,6 +90,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          instrument={instrument}
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
@@ -97,6 +105,7 @@ function Module(props) {
             display: instrumentEditorMode || settingsMode ? "none" : "block",
             overflow: "hidden",
           }}
+          instrument={instrument}
           sessionSize={props.sessionSize}
           muted={muted}
           module={props.module}
@@ -120,10 +129,12 @@ function Module(props) {
       break;
   }
 
-  useEffect(() => {
-    setMuted(props.module.instrument._volume.mute);
-  }, [props.module.instrument._volume.mute]);
+  
 
+  useEffect(() => {
+    typeof props.module.instrument === "string" && patchLoader(props.module.instrument,"",setInstrument)
+  }, []);
+ 
   return (
     <div
       style={{
@@ -175,7 +186,7 @@ function Module(props) {
       {instrumentEditorMode && (
         <InstrumentEditor
           module={props.module}
-          instrument={props.module.instrument}
+          instrument={instrument}
           updateModules={props.setModules}
           setInstrumentEditorMode={setInstrumentEditorMode}
           index={props.index}

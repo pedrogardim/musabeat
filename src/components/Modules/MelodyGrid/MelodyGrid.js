@@ -22,7 +22,7 @@ function MelodyGrid(props) {
   const loadedSequence = props.module.score;
 
   const [isBufferLoaded, setIsBufferLoaded] = useState(true);
-  const [instrument, setInstrument] = useState(props.module.instrument);
+  const [instrument, setInstrument] = useState(props.instrument);
   const [melodyArray, setMelodyArray] = useState(loadedSequence);
   const [gridScale, setGridScale] = useState([
     "C3",
@@ -127,8 +127,8 @@ function MelodyGrid(props) {
   };
 
   useEffect(() => {
-    setInstrument(props.module.instrument);
-  }, [props.module.instrument]);
+    setInstrument(props.instrument);
+  }, [props.instrument]);
 
   useEffect(() => {
     currentMeasure > props.module.score.length && setCurrentMeasure(0)
@@ -136,12 +136,12 @@ function MelodyGrid(props) {
   }, [props.module.score]);
 
   useEffect(() => {
-    instrument.hasOwnProperty("name") && scheduleNotes();
+    instrument && scheduleNotes();
     updateSequence();
   }, [instrument, melodyArray]);
 
   useEffect(() => {
-    scheduleNotes();
+    instrument && scheduleNotes();
   }, [props.sessionSize]);
 
   useEffect(() => {

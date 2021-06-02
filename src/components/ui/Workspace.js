@@ -2,9 +2,9 @@ import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { Fab, Icon, IconButton } from "@material-ui/core";
+import { Fab, Icon, IconButton, Button } from "@material-ui/core";
 
-import { loadDrumPatch } from "../../assets/musicutils";
+import { instruments } from "../../assets/instrumentpatches";
 
 import { starterSession } from "../../assets/starterSession";
 
@@ -45,13 +45,10 @@ function Workspace(props) {
   //temp: muted modules array as workspace state
   const [mutedModules, setMutedModules] = useState([]);
 
-  const togglePlaying = () => {
-    Tone.start();
-    if (Tone.Transport.state !== "started") {
-      Tone.Transport.start();
+  const handlePlaying = (state) => {
+    if (state !== "started") {
       setIsPlaying(true);
     } else {
-      Tone.Transport.pause();
       modules.forEach((e) =>
         e.instrument.name === "Players"
           ? e.instrument.stopAll()
@@ -82,14 +79,28 @@ function Workspace(props) {
   const adaptSessionSize = () => {
     let lengths = modules.map((module) =>
       module.type === 2
-        ? Math.ceil(module.score[module.score.length - 1].time+module.score[module.score.length - 1].duration)
+        ? Math.ceil(
+            module.score[module.score.length - 1].time +
+              module.score[module.score.length - 1].duration
+          )
         : module.type === 3
-        ? Math.ceil((module.score[0].duration + module.score[0].time) / Tone.Time("1m").toSeconds())
+        ? Math.ceil(
+            (module.score[0].duration + module.score[0].time) /
+              Tone.Time("1m").toSeconds()
+          )
         : module.score.length
     );
     let longestModule = Math.max(...lengths);
-    let newSessionSize = longestModule > 8 ? 16 : longestModule > 4 ? 8 : longestModule > 2 ? 4 : longestModule > 1 ? 2 : 1
-
+    let newSessionSize =
+      longestModule > 8
+        ? 16
+        : longestModule > 4
+        ? 8
+        : longestModule > 2
+        ? 4
+        : longestModule > 1
+        ? 2
+        : 1;
 
     if (newSessionSize !== sessionSize) {
       setSessionSize(newSessionSize);
@@ -99,11 +110,46 @@ function Workspace(props) {
   };
 
   const saveNewSession = () => {
-    //firebase.database().ref('session/' + Math.floor(Math.random()*1000)).set(modules);
-  }
+    let parsedSession = {
+      name: "New Session",
+      bpm: Tone.Transport.bpm.value,
+      creator:props.user.uid,
+      editors:[],
+      modules: modules.map((e) => {
+        let module = { ...e };
+        module.instrument = {};
+        if (
+          e.instrument.name !== "Players" &&
+          e.instrument.name !== "GrainPlayer"
+        )
+          module.instrument = e.instrument.get();
+        return module;
+      }),
+    };
+    console.log(parsedSession[0].instrument, parsedSession);
+    let pushedSessionRef = firebase
+      .database()
+      .ref("sessions")
+      .push(parsedSession);
+    console.log(pushedSessionRef.key);
+  };
+
+  const loadSession = () => {
+    let convertedSession = modules.map((e) => {
+      let module = { ...e };
+      module.instrument = {};
+      if (
+        e.instrument.name !== "Players" &&
+        e.instrument.name !== "GrainPlayer"
+      )
+        module.instrument = e.instrument.get();
+      return module;
+    });
+    setModules(convertedSession);
+  };
 
   ////TODO: UNDO
-
+/* 
   const undoSession = () => {
     setModules(sessionHistory[sessionHistory.length - 2]);
     setSessionHistory((prev) => {
@@ -129,34 +175,37 @@ function Workspace(props) {
   const handleKeyPress = (event) => {
     Tone.start();
     switch (event.code) {
-      case "Space":
-        event.preventDefault();
-        togglePlaying();
-        break;
-       case "KeyZ":
+      case "KeyZ":
         event.preventDefault();
         if (event.metaKey || event.ctrlKey) {
           sessionHistory.length > 1
             ? undoSession()
             : alert("Nothing to be undone");
         }
-        break; 
+        break;
       case "KeyX":
         event.preventDefault();
         console.log(sessionHistory);
 
         break;
     }
-  };
+  }; 
+  */
 
   useEffect(() => {
     adaptSessionSize();
-    registerSession();
+    //registerSession();
     console.log(modules);
   }, [modules]);
 
+  useEffect(() => {
+    handlePlaying(Tone.Transport.state);
+  }, [Tone.Transport.state]);
+
+  /*onKeyDown={handleKeyPress}*/
+
   return (
-    <div className="workspace" tabIndex="0" onKeyDown={handleKeyPress}>
+    <div className="workspace" tabIndex="0">
       {modules.map((module, moduleIndex) => (
         <Fragment>
           <Module
@@ -200,7 +249,7 @@ function Workspace(props) {
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 12px)" }}
-        onClick={togglePlaying}
+        onClick={()=>Tone.Transport.state !== "started"?Tone.Transport.pause():Tone.Transport.start()}
       >
         <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
       </Fab>
@@ -216,11 +265,18 @@ function Workspace(props) {
         className="fixed-fab"
         color="primary"
         onClick={() => setMixerOpened((prev) => (prev ? false : true))}
-        style={{left:24}}
+        style={{ left: 24 }}
         onClick={saveNewSession}
       >
         <Icon>save</Icon>
       </Fab>
+      {/*<Button onClick={()=>{instruments.map(e=>{
+        let pushedSessionRef = firebase
+        .database()
+        .ref("patches")
+        .push(e);
+      console.log(pushedSessionRef.key);
+      })}}>PUSHHH</Button>*/}
     </div>
   );
 }

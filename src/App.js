@@ -3,7 +3,15 @@ import "./App.css";
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
-import { Fab, Icon, IconButton, Avatar, Menu, MenuItem ,Drawer} from "@material-ui/core";
+import {
+  Fab,
+  Icon,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  Drawer,
+} from "@material-ui/core";
 
 import firebase from "firebase";
 
@@ -18,17 +26,32 @@ function App() {
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
 
-
   const handleAvatarClick = (e) => {
     !user ? setAuthDialog(true) : setUserOption(e.currentTarget);
   };
 
   const handleLogOut = () => {
-    firebase.auth().signOut().then(r=>console.log("singout"));
+    firebase
+      .auth()
+      .signOut()
+      .then((r) => console.log("singout"));
     setUserOption(false);
-  }
+  };
 
-  
+  const handleKeyPress = (event) => {
+    Tone.start();
+    switch (event.code) {
+      case "Space":
+        event.preventDefault();
+        Tone.start();
+        if (Tone.Transport.state !== "started") {
+          Tone.Transport.start();
+        } else {
+          Tone.Transport.pause();
+        }
+        break;
+    }
+  };
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
@@ -39,8 +62,8 @@ function App() {
   }, [user]);
 
   return (
-    <Fragment>
-      <IconButton className="side-menu-icon" onClick={()=>setSideMenu(true)}>
+    <div className="app-wrapper" onKeyDown={handleKeyPress}>
+      <IconButton className="side-menu-icon" onClick={() => setSideMenu(true)}>
         <Icon>menu</Icon>
       </IconButton>
       <Avatar
@@ -58,26 +81,26 @@ function App() {
         />
       )}
 
-    <Menu
-      style={{marginTop:48}}
-      anchorEl={userOption}
-      keepMounted
-      open={Boolean(userOption)}
-      onClose={()=>setUserOption(false)}
-    >
-      <MenuItem onClick={()=>setUserOption(false)}>Profile</MenuItem>
-      <MenuItem onClick={()=>setUserOption(false)}>My Sessions</MenuItem>
-      <MenuItem onClick={()=>setUserOption(false)}>My Samples</MenuItem>
-      <MenuItem onClick={()=>setUserOption(false)}>My Synth Patches</MenuItem>
-      <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-    </Menu>
+      <Menu
+        style={{ marginTop: 48 }}
+        anchorEl={userOption}
+        keepMounted
+        open={Boolean(userOption)}
+        onClose={() => setUserOption(false)}
+      >
+        <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
+        <MenuItem onClick={() => setUserOption(false)}>My Sessions</MenuItem>
+        <MenuItem onClick={() => setUserOption(false)}>My Samples</MenuItem>
+        <MenuItem onClick={() => setUserOption(false)}>
+          My Synth Patches
+        </MenuItem>
+        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+      </Menu>
 
-    <SideMenu open={sideMenu} setSideMenu={setSideMenu}/>
+      <SideMenu open={sideMenu} setSideMenu={setSideMenu} />
 
-
-
-      <Workspace className="workspace"/>
-    </Fragment>
+      <Workspace className="workspace" user={user} />
+    </div>
   );
 }
 

@@ -23,7 +23,7 @@ function ChordProgression(props) {
   const [activeChord, setActiveChord] = useState(null);
   const [activeRhythm, setActiveRhythm] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
-  const [instrument, setInstrument] = useState(props.module.instrument);
+  const [instrument, setInstrument] = useState(props.instrument);
 
   const scheduleChords = () => {
     scheduleChordProgression(
@@ -104,17 +104,17 @@ function ChordProgression(props) {
   };
 
   useEffect(() => {
-    scheduleChords();
+    instrument && scheduleChords();
     updateChords();
   }, [chords]);
 
   useEffect(() => {
-    scheduleChords();
+    instrument && scheduleChords();
   }, [instrument, props.sessionSize]);
 
   useEffect(() => {
-    setInstrument(props.module.instrument);
-  }, [props.module.instrument]);
+    setInstrument(props.instrument);
+  }, [props.instrument]);
 
   useEffect(() => {
     selectedChord !== null &&
