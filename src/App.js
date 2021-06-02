@@ -3,17 +3,21 @@ import "./App.css";
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
-import { Fab, Icon, IconButton, Avatar, Menu, MenuItem } from "@material-ui/core";
+import { Fab, Icon, IconButton, Avatar, Menu, MenuItem ,Drawer} from "@material-ui/core";
 
 import firebase from "firebase";
 
 import Workspace from "./components/ui/Workspace";
+import SideMenu from "./components/ui/SideMenu";
+
 import AuthDialog from "./components/ui/AuthDialog";
 
 function App() {
   const [user, setUser] = useState(null);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
+  const [sideMenu, setSideMenu] = useState(false);
+
 
   const handleAvatarClick = (e) => {
     !user ? setAuthDialog(true) : setUserOption(e.currentTarget);
@@ -23,6 +27,8 @@ function App() {
     firebase.auth().signOut().then(r=>console.log("singout"));
     setUserOption(false);
   }
+
+  
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
@@ -34,6 +40,9 @@ function App() {
 
   return (
     <Fragment>
+      <IconButton className="side-menu-icon" onClick={()=>setSideMenu(true)}>
+        <Icon>menu</Icon>
+      </IconButton>
       <Avatar
         onClick={handleAvatarClick}
         className="main-avatar"
@@ -63,7 +72,11 @@ function App() {
       <MenuItem onClick={handleLogOut}>Logout</MenuItem>
     </Menu>
 
-      <Workspace className="workspace" />
+    <SideMenu open={sideMenu} setSideMenu={setSideMenu}/>
+
+
+
+      <Workspace className="workspace"/>
     </Fragment>
   );
 }

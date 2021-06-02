@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
+import firebase from "firebase";
 
 import { Fab, Icon, IconButton } from "@material-ui/core";
 
@@ -96,6 +97,10 @@ function Workspace(props) {
       console.log("Session size updated: " + newSessionSize);
     }
   };
+
+  const saveNewSession = () => {
+    //firebase.database().ref('session/' + Math.floor(Math.random()*1000)).set(modules);
+  }
 
   ////TODO: UNDO
 
@@ -205,6 +210,16 @@ function Workspace(props) {
         onClick={() => setMixerOpened((prev) => (prev ? false : true))}
       >
         <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+      </Fab>
+
+      <Fab
+        className="fixed-fab"
+        color="primary"
+        onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+        style={{left:24}}
+        onClick={saveNewSession}
+      >
+        <Icon>save</Icon>
       </Fab>
     </div>
   );
