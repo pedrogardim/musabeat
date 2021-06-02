@@ -14,3 +14,13 @@ body {
   filter:saturate(0) brightness(1.5);
 
 }
+
+.main-avatar{
+  position: fixed !important;
+  top: 32px;
+  right:32px;
+  height: 48px !important;
+  width: 48px !important;
+
+
+}
