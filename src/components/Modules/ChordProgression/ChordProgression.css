@@ -11,6 +11,20 @@
     height:100%;
 }
 
+.measure{
+    width: calc(50% - 8px);
+    height:32px;
+    position:relative;
+    border-right: 1px solid gray;
+    border-left: 1px solid gray;
+
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 8px;
+
+
+  }
+
 
 .measure-divider{
     max-height:32px;

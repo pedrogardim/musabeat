@@ -7,66 +7,76 @@ import "./Chord.css";
 function Chord(props) {
   const addChord = (e, direction) => {
     e.preventDefault();
-    props.setChords((prev) => {
-      let newChords = [...prev];
-      let currentChordIndex = props.index;
-      let newChordIndex = direction ? currentChordIndex + 1 : currentChordIndex;
+    props.duration > 0.25 &&
+      props.setChords((prev) => {
+        let newChords = [...prev];
+        let currentChordIndex = props.index;
+        let newChordIndex = direction
+          ? currentChordIndex + 1
+          : currentChordIndex;
 
-      let currentChordDuration = newChords[currentChordIndex].duration / 2;
-      let currentChordRhythm = newChords[currentChordIndex].rhythm;
+        let currentChordDuration = newChords[currentChordIndex].duration / 2;
+        let currentChordRhythm = newChords[currentChordIndex].rhythm;
 
-      let newChord = {
-        notes: [],
-        duration: currentChordDuration,
-        time: direction
-          ? currentChordDuration + newChords[currentChordIndex].time
-          : newChords[currentChordIndex].time,
-        rhythm: direction
-          ? currentChordRhythm.slice(0, (currentChordRhythm.length / 2)-1)
-          : currentChordRhythm.slice(
-              (currentChordRhythm.length / 2),
-              currentChordRhythm.length
-            ),
-      };
+        let newChord = {
+          notes: [],
+          duration: currentChordDuration,
+          time: direction
+            ? currentChordDuration + newChords[currentChordIndex].time
+            : newChords[currentChordIndex].time,
+          rhythm: direction
+            ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
+            : currentChordRhythm.slice(
+                currentChordRhythm.length / 2,
+                currentChordRhythm.length
+              ),
+        };
 
-      let currentChord = {
-        notes: newChords[currentChordIndex].notes,
-        duration: currentChordDuration,
-        time: newChords[currentChordIndex].time +
-        (1 - direction) * currentChordDuration,
-        rhythm: !direction
-        ? currentChordRhythm.slice(0, (currentChordRhythm.length / 2)-1)
-        : currentChordRhythm.slice(
-            (currentChordRhythm.length / 2),
-            currentChordRhythm.length
-          ),
+        let currentChord = {
+          notes: newChords[currentChordIndex].notes,
+          duration: currentChordDuration,
+          time:
+            newChords[currentChordIndex].time +
+            (1 - direction) * currentChordDuration,
+          rhythm: !direction
+            ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
+            : currentChordRhythm.slice(
+                currentChordRhythm.length / 2,
+                currentChordRhythm.length
+              ),
+        };
 
-      }
+        newChords[currentChordIndex] = currentChord;
+        newChords.splice(newChordIndex, 0, newChord);
 
-      newChords[currentChordIndex] = currentChord;
-      newChords.splice(newChordIndex, 0, newChord);
-
-      return newChords;
-    });
+        return newChords;
+      });
   };
 
   const removeChord = (e) => {
     e.preventDefault();
     props.setChords((prev) => {
       let removedChordDuration = prev[props.index].duration;
-      let newChords = prev.map((chord, index)=>{
-        let newChord = {...chord};
-        newChord.time = index > props.index ? chord.time - removedChordDuration : chord.time;
-        return newChord;
-      }).filter((e, i) => i !== props.index)
-      console.log(newChords)
+      let newChords = prev
+        .map((chord, index) => {
+          let newChord = { ...chord };
+          newChord.time =
+            index > props.index
+              ? chord.time - removedChordDuration
+              : chord.time;
+          return newChord;
+        })
+        .filter((e, i) => i !== props.index);
+      console.log(newChords);
       return newChords;
-    })
-    };
-  
+    });
+  };
 
   return (
-    <div className="chord-wrapper">
+    <div
+      className="chord-wrapper"
+      style={{ width: props.duration * 100 + "%" }}
+    >
       <div className="chord-button-wrapper">
         <IconButton
           className="chord-addchord-btn"

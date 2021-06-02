@@ -12,7 +12,7 @@ import {
   adaptSequencetoSubdiv,
 } from "../../../assets/musicutils";
 
-import { Divider, IconButton,Icon } from "@material-ui/core";
+import { Divider, IconButton, Icon } from "@material-ui/core";
 
 import "./ChordProgression.css";
 
@@ -54,19 +54,38 @@ function ChordProgression(props) {
   };
 
   const addMeasure = () => {
-    setChords(prev=>{
-      let newChords = [...prev];
-      let newChord = {
-        notes:[],
-        time:newChords[newChords.length-1].time + 1,
-        duration:1,
-        rhythm:newChords[newChords.length-1].rhythm
-      }
-      newChords.push(newChord)
-      return newChords;
-    })
+    let chordsLength = Math.ceil(
+      chords[chords.length - 1].time + chords[chords.length - 1].duration
+    );
 
-  }
+    let newDuration =
+      chordsLength >= 8
+        ? 16
+        : chordsLength >= 4
+        ? 8
+        : chordsLength >= 2
+        ? 4
+        : chordsLength >= 1
+        ? 2
+        : 1;
+
+    let measuresToAdd = newDuration - chordsLength;
+
+    console.log(chordsLength, newDuration, measuresToAdd);
+
+    setChords((prev) => {
+      let newChords = [...prev];
+      for (let x = 0; x < measuresToAdd; x++) {
+        newChords.push({
+          notes: [],
+          duration: 1,
+          time: Math.ceil(newChords[newChords.length - 1].time)+1,
+          rhythm: newChords[newChords.length - 1].rhythm,
+        });
+      }
+      return newChords;
+    });
+  };
 
   const playChordPreview = (chordindex) => {
     instrument.releaseAll();
@@ -83,8 +102,6 @@ function ChordProgression(props) {
       return newModules;
     });
   };
-
-
 
   useEffect(() => {
     scheduleChords();
@@ -112,40 +129,44 @@ function ChordProgression(props) {
   return (
     <div className="module-innerwrapper" style={props.style}>
       <div className="chord-prog">
-        <Divider className="measure-divider" orientation="vertical" />
-        {chords.map((chord, i) => (
-          <Fragment key={i}>
-            {i > 0 &&
-              Math.floor(chord.time) > Math.floor(chords[i - 1].time) && (
-                <Divider
-                  key={"divider" + i}
-                  className="measure-divider"
-                  orientation="vertical"
-                />
-              )}
-            <Chord
-              key={"chord" + i}
-              index={i}
-              active={activeChord === i}
-              name={chordNotestoName(chord.notes)}
-              setChords={setChords}
-              onClick={() => handleClick(i)}
-              color={props.module.color}
-            />
-          </Fragment>
-        ))}
-        <Divider className="measure-divider" orientation="vertical" />
-        <div className="break"/>
-        <IconButton size="small" onClick={addMeasure}><Icon>add</Icon></IconButton>
+        {chords.map(
+          (chord, chordIndex) =>
+            (chordIndex === 0 ||
+              Math.floor(chord.time) !==
+                Math.floor(chords[chordIndex-1].time)) && (
+              <div className="measure">
+                {chords.map(
+                  (inChord, inChordIndex) =>
+                    Math.floor(inChord.time) === chordIndex && (
+                      <Chord
+                        key={inChordIndex}
+                        index={inChordIndex}
+                        active={activeChord === inChordIndex}
+                        name={chordNotestoName(inChord.notes)}
+                        setChords={setChords}
+                        onClick={() => handleClick(inChordIndex)}
+                        color={props.module.color}
+                        duration={inChord.duration}
+                      />
+                    )
+                )}
+              </div>
+            )
+        )}
+        <div className="break" />
+        <IconButton size="small" onClick={addMeasure}>
+          <Icon>add</Icon>
+        </IconButton>
 
-        <ChordRhythmSequence
+        
+      </div>
+      <ChordRhythmSequence
           activeChord={activeChord}
           activeRhythm={activeRhythm}
           chords={chords}
           color={props.module.color}
           setChords={setChords}
         />
-      </div>
       {selectedChord !== null && (
         <ChordPicker
           selectedChord={selectedChord}
