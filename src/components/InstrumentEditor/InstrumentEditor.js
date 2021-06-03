@@ -98,8 +98,6 @@ function InstrumentEditor(props) {
             return;
           }
 
-          
-
           let fileName =
             props.instrument.name === "Sampler"
               ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
@@ -110,7 +108,7 @@ function InstrumentEditor(props) {
           });
 
           const user = firebase.auth().currentUser;
-          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name.split(".")[0]}`);
           const task = storageRef.put(file);
       
           task.on(

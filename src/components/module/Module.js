@@ -1,7 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import * as Tone from "tone";
 
-import { IconButton, Icon, Menu, MenuItem } from "@material-ui/core";
+import {
+  IconButton,
+  Icon,
+  Menu,
+  MenuItem,
+  CircularProgress,
+} from "@material-ui/core";
 import { clearEvents } from "../../utils/TransportSchedule";
 import {
   patchLoader,
@@ -69,17 +75,29 @@ function Module(props) {
   };
 
   const loadInstrument = () => {
-    if (props.module.type === 0) {
-      setInstrument(()=>{return new Tone.Players(props.module.instrument.urls,()=>setBufferLoaded(true)).toDestination()})
-
-    }
     //players
+    if (props.module.type === 0) {
+      setBufferLoaded(false);
+      setInstrument(() => {
+        return new Tone.Players(props.module.instrument.urls, () =>
+          setBufferLoaded(true)
+        ).toDestination();
+      });
+    }
+    //player
     else if (props.module.type === 3) {
-      console.log("loading player")
-      setInstrument(()=>{return new Tone.GrainPlayer(props.module.instrument.url,()=>setBufferLoaded(true)).toDestination()})
-    } else if (typeof props.module.instrument === "string") {
-      patchLoader(props.module.instrument, "", setInstrument);
-    } else if (
+      setBufferLoaded(false);
+      setInstrument(() => {
+        return new Tone.GrainPlayer(props.module.instrument.url, () =>
+          setBufferLoaded(true)
+        ).toDestination();
+      });
+    }
+    //load from patch id
+    else if (typeof props.module.instrument === "string") {
+      patchLoader(props.module.instrument, "", setInstrument, setBufferLoaded);
+    } //load from obj
+    else if (
       typeof props.module.instrument === "object" &&
       props.module.instrument.name !== "Players" &&
       props.module.instrument.name !== "GrainPlayer" &&
@@ -89,16 +107,25 @@ function Module(props) {
     }
   };
 
-  const onInstrumentMod = (url,name,isRemoving) => {
+  const onInstrumentMod = (url, name, isRemoving) => {
     //update instrument info in module object
     props.setModules((prev) => {
       let newModules = [...prev];
-      newModules[props.module.id].instrument =
-      props.module.type === 0
-          ? { urls: {...prev[props.module.id].instrument.urls,[name]:url} }
-          : props.module.type === 3
-          ? { url }
-          : instrument.get();
+      if (props.module.type === 0) {
+        newModules[props.module.id].instrument = {
+          urls: { ...prev[props.module.id].instrument.urls, [name]: url },
+        };
+      } else if (props.module.type === 3) {
+        newModules[props.module.id].instrument = { url };
+      } else if (instrument.name === "Sampler") {
+        let samplerPrms = instrument.get();
+        delete samplerPrms.onerror;
+        delete samplerPrms.onload;
+        samplerPrms.urls = { ...instrument.get().urls, [name]: url };
+        newModules[props.module.id].instrument = samplerPrms;
+      } else {
+        newModules[props.module.id].instrument = instrument.get();
+      }
       return newModules;
     });
   };
@@ -167,7 +194,7 @@ function Module(props) {
       );
       break;
   }
-
+  
   useEffect(() => {
     loadInstrument();
   }, []);
@@ -184,7 +211,7 @@ function Module(props) {
   }, [props.module.muted]);
 
   useEffect(() => {
-    console.log(bufferLoaded)
+    console.log(bufferLoaded);
   }, [bufferLoaded]);
 
   useEffect(() => {
@@ -249,30 +276,38 @@ function Module(props) {
           </MenuItem>
         </Menu>
       </div>
+      {bufferLoaded ? (
+        <Fragment>
+          {instrumentEditorMode && (
+            <InstrumentEditor
+              module={props.module}
+              setModules={props.setModules}
+              instrument={instrument}
+              onInstrumentMod={onInstrumentMod}
+              setInstrument={setInstrument}
+              updateModules={props.setModules}
+              setInstrumentEditorMode={setInstrumentEditorMode}
+              index={props.index}
+            />
+          )}
+          {settingsMode && (
+            <ModuleSettings
+              instrument={instrument}
+              module={props.module}
+              updateModules={props.setModules}
+              setSettingsMode={setSettingsMode}
+              index={props.index}
+            />
+          )}
 
-      {instrumentEditorMode && (
-        <InstrumentEditor
-          module={props.module}
-          setModules={props.setModules}
-          instrument={instrument}
-          onInstrumentMod={onInstrumentMod}
-          setInstrument={setInstrument}
-          updateModules={props.setModules}
-          setInstrumentEditorMode={setInstrumentEditorMode}
-          index={props.index}
+          {moduleContent}
+        </Fragment>
+      ) : (
+        <CircularProgress
+          className="loading-progress"
+          style={{ color: props.module.color[300] }}
         />
       )}
-      {settingsMode && (
-        <ModuleSettings
-          instrument={instrument}
-          module={props.module}
-          updateModules={props.setModules}
-          setSettingsMode={setSettingsMode}
-          index={props.index}
-        />
-      )}
-
-      {moduleContent}
     </div>
   );
 }

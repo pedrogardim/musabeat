@@ -3,6 +3,7 @@
   height: calc(100%);
   width: calc(100%);
   overflow: hidden !important;
+  position: relative
 }
 
 .sampler-cursor {

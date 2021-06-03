@@ -22,7 +22,6 @@ function Player(props) {
   //const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
-  const [buffersChecker, setBuffersChecker] = useState(null);
   const [rescheduleEvent,setRescheduleEvent] = useState(null);
 
   const [draggingOver, setDraggingOver] = useState(false);
@@ -215,24 +214,17 @@ function Player(props) {
             Drop your files here!
           </FileDrop>
         )}
-        {props.bufferLoaded ? (
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
             parentRef={playerWrapper}
             color={props.module.color}
-            buffer={props.instrument.buffer}
             instrument={props.instrument}
             scheduleEvents={scheduleEvents}
             score={score[0]}
             setScore={setScore}
           />
-        ) : (
-          <CircularProgress
-            className="loading-progress"
-            style={{ color: props.module.color[300] }}
-          />
-        )}
+        
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}

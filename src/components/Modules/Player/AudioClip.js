@@ -8,18 +8,9 @@ import Draggable from "react-draggable";
 import "./AudioClip.css";
 
 function AudioClip(props) {
-  const [clipHeight, setClipHeight] = useState(
-    props.parentRef.current.offsetHeight
-  );
-  const [clipWidth, setClipWidth] = useState(
-    (props.score.duration / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-      props.parentRef.current.offsetWidth
-  );
-
-  const [clipPosition, setClipPosition] = useState(
-    (props.score.time / Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-      props.parentRef.current.offsetWidth
-  );
+  const [clipHeight, setClipHeight] = useState(0);
+  const [clipWidth, setClipWidth] = useState(0);
+  const [clipPosition, setClipPosition] = useState(0);
 
   const [waveForm, setWaveForm] = useState("");
 
@@ -33,7 +24,7 @@ function AudioClip(props) {
   };
 
   const handleDrag = (event, element) => {
-setClipPosition(element.x);
+    setClipPosition(element.x);
   };
 
   const handleDragStart = () => {
@@ -55,8 +46,15 @@ setClipPosition(element.x);
 
   useEffect(() => {
     //watch to window resize to update clips position
+    let timePerPixel =
+      props.parentRef.current.offsetWidth /
+      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+
     window.addEventListener("resize", updateClipPosition);
-  }, [props.parentRef.current.offsetWidth]);
+    setClipPosition(props.score.time * timePerPixel);
+    setClipWidth(props.score.duration * timePerPixel);
+    setClipHeight(props.parentRef.current.offsetHeight);
+  }, []);
 
   useEffect(() => {
     //watch to window resize to update clips position
@@ -65,10 +63,16 @@ setClipPosition(element.x);
 
   useEffect(() => {
     //watch to window resize to update clips position
-    setWaveForm(
-      drawClipWave(props.buffer.toArray(), clipHeight, clipWidth, props.color)
-    );
-  }, [props.buffer, clipWidth]);
+    props.instrument !== null &&
+      setWaveForm(
+        drawClipWave(
+          props.instrument.buffer.toArray(),
+          clipHeight,
+          clipWidth,
+          props.color
+        )
+      );
+  }, [props.instrument, clipWidth]);
 
   return (
     <Draggable

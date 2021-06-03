@@ -551,7 +551,7 @@ export const getChordsFromScale = (scale, root, extentions) => {
   return scalechords;
 };
 
-export const patchLoader = (input, type, setInstrument) => {
+export const patchLoader = (input, type, setInstrument,setBufferLoaded) => {
   console.log(input);
   let instr;
   firebase
@@ -560,20 +560,26 @@ export const patchLoader = (input, type, setInstrument) => {
     .once("value")
     .then((snapshot) => {
       let patch = snapshot.val();
+      console.log(patch)
 
       let options = patch.options;
       let instrfx = [];
 
       if (patch.base === "Sampler") {
-        instr = new Tone.Sampler({
-          urls: patch.urls,
+        setBufferLoaded(false);
+        instr = new Tone.Sampler(patch.urls,{
           baseUrl:
             "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" +
             patch.baseUrl,
-        }).toDestination();
+        },()=>setBufferLoaded(true)).toDestination();
+        
+        console.log(instr);
 
         instr.attack = patch.asdr[0];
         instr.release = patch.asdr[1];
+      }
+      else{
+        setBufferLoaded(true)
       }
       if (patch.base === "FM" || type === "FMSynth") {
         instr = new Tone.PolySynth(Tone.FMSynth, options);

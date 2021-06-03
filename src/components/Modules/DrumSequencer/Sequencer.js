@@ -108,7 +108,7 @@ function Sequencer(props) {
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
     >
-      {props.bufferLoaded ? (
+      
         <div className="sequencer">
           {Object.keys(props.module.instrument.urls).map((drumsound, row) => (
             <div className="sequencer-row" key={drumsound}>
@@ -137,12 +137,7 @@ function Sequencer(props) {
             </div>
           ))}
         </div>
-      ) : (
-        <CircularProgress
-          className="loading-progress"
-          style={{ color: props.module.color[300] }}
-        />
-      )}
+      
       {props.module.instrument === {} && (
         <Typography style={{ color: "white" }}>
           Oops..! No sounds loaded
