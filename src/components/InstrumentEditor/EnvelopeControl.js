@@ -78,6 +78,7 @@ function EnvelopeControl(props) {
                 min={0}
                 step={0.01}
                 max={element === "sustain" ? 1 : 2}
+                onChangeCommitted={() => props.onInstrumentMod()}
                 onChange={(e, v) => handleChange(element, v)}
                 valueLabelDisplay="auto"
               />

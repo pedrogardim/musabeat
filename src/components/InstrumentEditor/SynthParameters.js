@@ -28,6 +28,7 @@ function SynthParameters(props) {
   let mainContent = "Nothing Here";
 
   const handleChange = (parameter, value) => {
+    console.log(parameter, value);
     setInstrumentParamenters((prev) => {
       return { ...prev, [parameter]: value };
     });
@@ -36,10 +37,12 @@ function SynthParameters(props) {
 
   const handleWaveTypeSelect = (parameter, event) => {
     let value = event.target.value;
+    console.log(parameter, value);
     setInstrumentParamenters((prev) => {
       return { ...prev, [parameter]: { type: value } };
     });
     props.instrument.set({ [parameter]: { type: value } });
+    props.onInstrumentMod();
   };
 
   const handleFilterChange = (newFilter) => {
@@ -51,6 +54,7 @@ function SynthParameters(props) {
       filterEnvelope: { baseFrequency: newFilter.frequency, octaves: 0 },
     });
     console.log(newFilter, props.instrument.get());
+    props.onInstrumentMod();
   };
   //TODO
 
@@ -70,6 +74,7 @@ function SynthParameters(props) {
               min={1}
               step={1}
               max={50}
+              onChangeCommitted={() => props.onInstrumentMod()}
               onChange={(e, v) => handleChange(parameter, v)}
               valueLabelDisplay="auto"
             />

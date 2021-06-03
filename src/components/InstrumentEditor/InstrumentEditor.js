@@ -33,8 +33,7 @@ import "./InstrumentEditor.css";
 import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
 
 function InstrumentEditor(props) {
-  const [selectedPatch, setSelectedPatch] = useState("");
-  const [instrument, setInstrument] = useState(props.instrument);
+  const [selectedPatch, setSelectedPatch] = useState(null);
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchesList, setPatchesList] = useState([]);
 
@@ -65,7 +64,7 @@ function InstrumentEditor(props) {
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
-    patchLoader(event.target.value,"",setInstrument);
+    patchLoader(event.target.value, "", props.setInstrument);
 
     props.updateModules((previous) =>
       previous.map((module, i) => {
@@ -88,7 +87,7 @@ function InstrumentEditor(props) {
     setDraggingOver(false);
 
     file.arrayBuffer().then((arraybuffer) => {
-      instrument.context.rawContext.decodeAudioData(
+      props.instrument.context.rawContext.decodeAudioData(
         arraybuffer,
         (audiobuffer) => {
           if (audiobuffer.duration > 5) {
@@ -97,11 +96,11 @@ function InstrumentEditor(props) {
           }
 
           let fileName =
-            instrument.name === "Sampler"
+            props.instrument.name === "Sampler"
               ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
               : file.name.split(".")[0];
 
-          instrument.add(fileName, audiobuffer, (e) => {
+          props.instrument.add(fileName, audiobuffer, (e) => {
             setSelectedPatch(null);
           });
         },
@@ -129,12 +128,14 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
+    props.setInstrument(newInstrument);
+
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
           newModule.instrument = {};
-          newModule.instrument = newInstrument;
+          //newModule.instrument = newInstrument.get();
           //newModule.score = [];
           //newModule.score = filteredScore;
           return newModule;
@@ -154,12 +155,14 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
+    props.setInstrument(newInstrument);
+
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
           newModule.instrument = {};
-          newModule.instrument = newInstrument;
+          //newModule.instrument = newInstrument;
           //newModule.score = [];
           //newModule.score = filteredScore;
           return newModule;
@@ -174,10 +177,10 @@ function InstrumentEditor(props) {
 
   let list = [];
 
-  if (instrument.name === "Players") {
+  if (props.instrument.name === "Players") {
     let bufferObjects = [];
 
-    instrument._buffers._buffers.forEach((e, i, a) =>
+    props.instrument._buffers._buffers.forEach((e, i, a) =>
       bufferObjects.push([e, i])
     );
     mainContent = (
@@ -188,7 +191,7 @@ function InstrumentEditor(props) {
               <AudioFileItem
                 key={i}
                 index={i}
-                instrument={instrument}
+                instrument={props.instrument}
                 handleFileDelete={handlePlayersFileDelete}
                 buffer={e[0]}
                 fileName={e[1]}
@@ -199,9 +202,9 @@ function InstrumentEditor(props) {
         </List>
       </Fragment>
     );
-  } else if (instrument.name === "Sampler") {
+  } else if (props.instrument.name === "Sampler") {
     let bufferObjects = [];
-    instrument._buffers._buffers.forEach((e, i, a) =>
+    props.instrument._buffers._buffers.forEach((e, i, a) =>
       bufferObjects.push([e, i])
     );
     mainContent = (
@@ -212,7 +215,7 @@ function InstrumentEditor(props) {
               <AudioFileItem
                 key={i}
                 index={i}
-                instrument={instrument}
+                instrument={props.instrument}
                 handleFileDelete={handleSamplerFileDelete}
                 buffer={e[0]}
                 fileName={Tone.Frequency(e[1], "midi").toNote()}
@@ -226,12 +229,18 @@ function InstrumentEditor(props) {
   } else {
     list.push(
       <div className="instrument-editor-column" key={0}>
-        <OscillatorEditor instrument={instrument} />
+        <OscillatorEditor
+          onInstrumentMod={props.onInstrumentMod}
+          instrument={props.instrument}
+        />
       </div>
     );
     list.push(
       <div className="instrument-editor-column" key={1}>
-        <SynthParameters instrument={instrument} />
+        <SynthParameters
+          onInstrumentMod={props.onInstrumentMod}
+          instrument={props.instrument}
+        />
       </div>
     );
     list.push(
@@ -240,11 +249,12 @@ function InstrumentEditor(props) {
         style={{ flexDirection: "column" }}
         key={2}
       >
-        {Object.keys(instrument.get()).map(
+        {Object.keys(props.instrument.get()).map(
           (envelope, envelopeIndex) =>
             envelope.toLowerCase().includes("envelope") && (
               <EnvelopeControl
-                instrument={instrument}
+                onInstrumentMod={props.onInstrumentMod}
+                instrument={props.instrument}
                 envelopeType={envelope}
               />
             )
@@ -258,10 +268,11 @@ function InstrumentEditor(props) {
     props.module.type !== 0 && loadDBPatches();
   }, []);
 
+  /* 
   useEffect(() => {
     setInstrument(props.instrument);
-  }, [props.instrument]);
-/* 
+  }, [props.instrument]); */
+  /* 
   useEffect(() => {
     console.log(patchesList);
   }, [selectedPatch]); */
@@ -275,30 +286,29 @@ function InstrumentEditor(props) {
       }}
       ref={ieWrapper}
     >
-        <Select
-          native
-          className="instrument-editor-patch-select"
-          value={selectedPatch}
-          onChange={handlePatchSelect}
-        >
-          {props.module.type === 0
-            ? kits.map((kit, kitIndex) => (
-                <option key={kitIndex} value={kitIndex}>
-                  {kit.name}
-                </option>
-              ))
-            : patchesList.map((kit, kitIndex) => (
-                <option key={kitIndex} value={kit[0]}>
-                  {kit[1]}
-                </option>
-              ))}
-        </Select>
-      
+      <Select
+        native
+        className="instrument-editor-patch-select"
+        value={selectedPatch}
+        onChange={handlePatchSelect}
+      >
+        {props.module.type === 0
+          ? kits.map((kit, kitIndex) => (
+              <option key={kitIndex} value={kitIndex}>
+                {kit.name}
+              </option>
+            ))
+          : patchesList.map((kit, kitIndex) => (
+              <option key={kitIndex} value={kit[0]}>
+                {kit[1]}
+              </option>
+            ))}
+      </Select>
 
       <div className="break" />
 
       {mainContent}
-      {draggingOver && instrument.name !== "PolySynth" && (
+      {draggingOver && props.instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {
             setDraggingOver(false);

@@ -66,6 +66,20 @@ function Module(props) {
     setMenuAnchorEl(null);
   };
 
+  const onInstrumentMod = () => {
+    //update instrument info in module object
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      prev[props.module.id].instrument =
+        instrument.name === "Players"
+          ? { filesid: [] }
+          : instrument.name === "GrainPlayer"
+          ? "fileId"
+          : instrument.get();
+      return newModules;
+    });
+  };
+
   switch (props.module.type) {
     case 0:
       moduleContent = (
@@ -128,28 +142,24 @@ function Module(props) {
       patchLoader(props.module.instrument, "", setInstrument);
   }, [props.module.instrument]);
 
-
   useEffect(() => {
     if (instrument !== null) instrument.volume.value = props.module.volume;
   }, [props.module.volume]);
 
   useEffect(() => {
-    console.log(props.module.muted)
     if (instrument !== null)
       instrument.volume.value = props.module.muted
         ? -Infinity
         : props.module.volume;
-      
   }, [props.module.muted]);
 
   useEffect(() => {
-    if (instrument !== null){
-    Tone.Transport.state !== "started" &&
-    instrument.name === "Players"
-      ? instrument.stopAll()
-      : instrument.name === "GrainPlayer" || instrument.name === "Player"
-      ? instrument.stop()
-      : instrument.releaseAll();
+    if (instrument !== null) {
+      Tone.Transport.state !== "started" && instrument.name === "Players"
+        ? instrument.stopAll()
+        : instrument.name === "GrainPlayer" || instrument.name === "Player"
+        ? instrument.stop()
+        : instrument.releaseAll();
     }
   }, [Tone.Transport.state]);
 
@@ -209,7 +219,10 @@ function Module(props) {
       {instrumentEditorMode && (
         <InstrumentEditor
           module={props.module}
+          setModules={props.setModules}
           instrument={instrument}
+          onInstrumentMod={onInstrumentMod}
+          setInstrument={setInstrument}
           updateModules={props.setModules}
           setInstrumentEditorMode={setInstrumentEditorMode}
           index={props.index}
@@ -217,7 +230,7 @@ function Module(props) {
       )}
       {settingsMode && (
         <ModuleSettings
-         instrument={instrument}
+          instrument={instrument}
           module={props.module}
           updateModules={props.setModules}
           setSettingsMode={setSettingsMode}

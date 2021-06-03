@@ -10,7 +10,7 @@ import {
   InputLabel,
   FormControl,
   Slider,
-  Card
+  Card,
 } from "@material-ui/core";
 
 import "./OscillatorEditor.css";
@@ -30,12 +30,6 @@ function OscillatorEditor(props) {
   const [oscWave, setOscWave] = useState("");
   const [oscType, setOscType] = useState("");
   const [oscPartials, setOscPartials] = useState("");
-
-  const registerToSynth = () => {
-    //tempFilter.dispose();
-    //setTempFilter({});
-    //setTempFilter(new Tone.Filter(props.instrument.get().filter));
-  };
 
   const getOscillatorData = () => {
     let oscillator = props.instrument.get().oscillator.type;
@@ -62,6 +56,7 @@ function OscillatorEditor(props) {
     setOscWave(event.target.value);
     let newWave = oscType + event.target.value + oscPartials;
     props.instrument.set({ oscillator: { type: newWave } });
+    props.onInstrumentMod();
   };
 
   const handleOscTypeSelect = (event) => {
@@ -75,6 +70,7 @@ function OscillatorEditor(props) {
     newWave = newType === "pulse" || newType === "pwm" ? newType : newWave;
     props.instrument.set({ oscillator: { type: newWave } });
 
+    props.onInstrumentMod();
   };
 
   const handleOscPartialsSelect = (e, value) => {
@@ -100,7 +96,7 @@ function OscillatorEditor(props) {
 
   return (
     <Card className="oscillator-editor">
-    <Typography variant="overline">Oscillator</Typography>
+      <Typography variant="overline">Oscillator</Typography>
       <svg
         width="128px"
         height="64px"
@@ -112,11 +108,7 @@ function OscillatorEditor(props) {
 
       <FormControl>
         <InputLabel>Type</InputLabel>
-        <Select
-          native
-          value={oscType}
-          onChange={handleOscTypeSelect}
-        >
+        <Select native value={oscType} onChange={handleOscTypeSelect}>
           {oscTypes.map((e) => (
             <option key={e} value={e}>
               {e}
@@ -140,22 +132,23 @@ function OscillatorEditor(props) {
         </Select>
       </FormControl>
       <Slider
-      style={{width:"70%"}}
+        style={{ width: "70%" }}
         disabled={oscType === "pwm" || oscType === "pulse"}
         valueLabelDisplay="auto"
         value={oscPartials}
         onChange={handleOscPartialsSelect}
+        onChangeCommitted={() => {
+          props.onInstrumentMod();
+        }}
         min={0}
         max={24}
-        valueLabelFormat={(x)=>x===0?"Off":x}
-
+        valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
       />
 
-        {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
+      {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
             console.log(e)
 
         })*/}
-      
     </Card>
   );
 }
