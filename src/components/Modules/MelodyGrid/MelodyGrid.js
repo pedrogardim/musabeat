@@ -17,6 +17,8 @@ import {
 } from "@material-ui/core";
 
 import "./MelodyGrid.css";
+import { colors } from "../../../utils/materialPalette"
+
 
 function MelodyGrid(props) {
   const loadedSequence = props.module.score;
@@ -179,7 +181,7 @@ function MelodyGrid(props) {
                   inputNote={inputNote}
                   active={beat.includes(gridScale[row])}
                   cursor={currentBeat == column}
-                  color={props.module.color}
+                  color={colors[props.module.color]}
                   x={column}
                   y={row}
                 />

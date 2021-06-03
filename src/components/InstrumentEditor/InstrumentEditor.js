@@ -30,7 +30,7 @@ import {
 import { FileDrop } from "react-file-drop";
 
 import "./InstrumentEditor.css";
-import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
+import { colors } from "../../utils/materialPalette"
 
 function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState(null);
@@ -336,7 +336,7 @@ function InstrumentEditor(props) {
           onDrop={(files, event) => handleFileDrop(files, event)}
           className={"file-drop"}
           style={{
-            backgroundColor: props.module.color[300],
+            backgroundColor: colors[props.module.color][300],
           }}
         >
           Drop your files here!

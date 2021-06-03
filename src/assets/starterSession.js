@@ -1,22 +1,3 @@
-import * as MUIcolors from "@material-ui/core/colors";
-
-import { instrumentContructor } from "./musicutils";
-import { loadDrumPatch } from "./musicutils";
-
-import * as Tone from "tone";
-
-const colors = [
-  MUIcolors.red,
-  MUIcolors.deepPurple,
-  MUIcolors.indigo,
-  MUIcolors.blue,
-  MUIcolors.cyan,
-  MUIcolors.teal,
-  MUIcolors.lightGreen,
-  MUIcolors.lime,
-  MUIcolors.amber,
-  MUIcolors.orange,
-];
 
 export const starterSession = {
   name: "",
@@ -42,7 +23,7 @@ export const starterSession = {
           9: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
         },
       },
-      color: colors[1],
+      color: 2,
       volume: 0,
       muted: false,
       score: [
@@ -129,7 +110,7 @@ export const starterSession = {
       scale: 1,
       range: [3, 4],
       instrument: "-MbByh-3xIipRPN7KOO7",
-      color: colors[2],
+      color: 7,
       volume: -18,
       muted: false,
       score: [
@@ -147,7 +128,7 @@ export const starterSession = {
       root: 0,
       scale: 0,
       complexity: 3,
-      color: colors[9],
+      color: 12,
       volume: -12,
       muted: false,
       score: [
@@ -187,7 +168,7 @@ export const starterSession = {
       instrument: {
         url: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
       },
-      color: colors[6],
+      color: 9,
       score: [{ time: 0, duration: 1 }],
     },
   ],

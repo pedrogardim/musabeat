@@ -17,6 +17,8 @@ import { Divider, IconButton, Icon } from "@material-ui/core";
 import "./ChordProgression.css";
 
 import { scheduleChordProgression } from "../../../utils/TransportSchedule";
+import { colors } from "../../../utils/materialPalette"
+
 
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
@@ -145,7 +147,7 @@ function ChordProgression(props) {
                         name={chordNotestoName(inChord.notes)}
                         setChords={setChords}
                         onClick={() => handleClick(inChordIndex)}
-                        color={props.module.color}
+                        color={colors[props.module.color]}
                         duration={inChord.duration}
                       />
                     )
@@ -164,7 +166,7 @@ function ChordProgression(props) {
           activeChord={activeChord}
           activeRhythm={activeRhythm}
           chords={chords}
-          color={props.module.color}
+          color={colors[props.module.color]}
           setChords={setChords}
         />
       {selectedChord !== null && (
@@ -176,7 +178,7 @@ function ChordProgression(props) {
             props.module.complexity
           )}
           setChords={setChords}
-          color={props.module.color}
+          color={colors[props.module.color]}
           instrument={instrument}
         />
       )}

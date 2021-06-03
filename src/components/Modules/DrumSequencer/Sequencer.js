@@ -16,6 +16,8 @@ import {
 } from "@material-ui/core";
 
 import "./Sequencer.css";
+import { colors } from "../../../utils/materialPalette"
+
 
 function Sequencer(props) {
   const loadedSequence = props.module.score;
@@ -127,7 +129,7 @@ function Sequencer(props) {
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   )}
                   cursor={currentBeat == column}
-                  color={props.module.color}
+                  color={colors[props.module.color]}
                   x={column}
                   y={
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
@@ -145,7 +147,7 @@ function Sequencer(props) {
       )}
       {sequencerArray.length > 1 && (
         <BottomNavigation
-          style={{ color: props.module.color[900] }}
+          style={{ color: colors[props.module.color][900] }}
           value={currentMeasure}
           showLabels
           onChange={(event, newValue) => {

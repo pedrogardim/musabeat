@@ -14,6 +14,9 @@ import { scheduleSamples } from "../../../utils/TransportSchedule";
 
 import "./Player.css";
 
+import { colors } from "../../../utils/materialPalette"
+
+
 //TODO
 
 function Player(props) {
@@ -189,7 +192,7 @@ function Player(props) {
   return (
     <div
       className="module-innerwrapper"
-      style={(props.style, { backgroundColor: props.module.color["900"] })}
+      style={(props.style, { backgroundColor: colors[props.module.color]["900"] })}
     >
       <div
         className="sampler"
@@ -198,7 +201,7 @@ function Player(props) {
       >
         <BackgroundGrid
           sessionSize={props.sessionSize}
-          color={props.module.color}
+          color={colors[props.module.color]}
         />
         {draggingOver && (
           <FileDrop
@@ -208,7 +211,7 @@ function Player(props) {
             onDrop={(files, event) => handleFileDrop(files, event)}
             className={"file-drop"}
             style={{
-              backgroundColor: props.module.color[300],
+              backgroundColor: colors[props.module.color][300],
             }}
           >
             Drop your files here!
@@ -218,7 +221,7 @@ function Player(props) {
             index={0}
             sessionSize={props.sessionSize}
             parentRef={playerWrapper}
-            color={props.module.color}
+            color={colors[props.module.color]}
             instrument={props.instrument}
             scheduleEvents={scheduleEvents}
             score={score[0]}

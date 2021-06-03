@@ -22,6 +22,8 @@ import Player from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 
+import { colors } from "../../utils/materialPalette"
+
 import "./Module.css";
 
 function Module(props) {
@@ -136,7 +138,7 @@ function Module(props) {
         <Sequencer
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
-            backgroundColor: props.module.color[500],
+            backgroundColor: colors[props.module.color][500],
           }}
           instrument={instrument}
           bufferLoaded={bufferLoaded}
@@ -227,7 +229,7 @@ function Module(props) {
   return (
     <div
       style={{
-        backgroundColor: props.module.color[700],
+        backgroundColor: colors[props.module.color][700],
         overflow:
           props.module.type === 2 || (props.module.type === 3 && "hidden"),
       }}
@@ -305,7 +307,7 @@ function Module(props) {
       ) : (
         <CircularProgress
           className="loading-progress"
-          style={{ color: props.module.color[300] }}
+          style={{ color: colors[props.module.color][300] }}
         />
       )}
     </div>
