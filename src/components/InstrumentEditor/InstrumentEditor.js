@@ -82,21 +82,10 @@ function InstrumentEditor(props) {
   const handleFileDrop = (files, event) => {
     event.preventDefault();
     Tone.Transport.pause();
-    const user = firebase.auth().currentUser;
-
     let file = files[0];
 
-    const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
-    const task = storageRef.put(file);
-
-    task.on(
-      "state_changed",
-      (snapshot) => {
-       console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-      },
-      (error) => {console.log(error)},
-      () => {console.log(task.snapshot)}
-    );
+    
+   
 
     setDraggingOver(false);
 
@@ -109,6 +98,8 @@ function InstrumentEditor(props) {
             return;
           }
 
+          
+
           let fileName =
             props.instrument.name === "Sampler"
               ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
@@ -117,6 +108,23 @@ function InstrumentEditor(props) {
           props.instrument.add(fileName, audiobuffer, (e) => {
             setSelectedPatch(null);
           });
+
+          const user = firebase.auth().currentUser;
+          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+          const task = storageRef.put(file);
+      
+          task.on(
+            "state_changed",
+            (snapshot) => {
+             console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            },
+            (error) => {console.log(error)},
+            () => {storageRef.getDownloadURL().then(r=>{
+              props.onInstrumentMod(r,fileName)
+            })}
+          );
+
+          
         },
         (e) => {
           alert(

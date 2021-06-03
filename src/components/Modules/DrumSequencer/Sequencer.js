@@ -19,9 +19,6 @@ import "./Sequencer.css";
 
 function Sequencer(props) {
   const loadedSequence = props.module.score;
-
-  const [isBufferLoaded, setIsBufferLoaded] = useState(false);
-  const [drumPlayers, setDrumPlayers] = useState(props.module.instrument);
   const [sequencerArray, changeSequence] = useState(loadedSequence);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
@@ -54,7 +51,7 @@ function Sequencer(props) {
 
     scheduledNotes = scheduleDrumSequence(
       sequencerArray,
-      drumPlayers,
+      props.instrument,
       Tone.Transport,
       setCurrentBeat,
       setCurrentMeasure,
@@ -66,7 +63,7 @@ function Sequencer(props) {
   };
 
   const playDrumSound = (note, time) =>
-    drumPlayers.player(note).start(time !== undefined ? time : 0);
+    props.instrument.player(note).start(time !== undefined ? time : 0);
 
   const handleBottomNavClick = (value) => {
     setCurrentMeasure(value);
@@ -82,11 +79,6 @@ function Sequencer(props) {
     });
   };
 
-  //================
-
-  let bufferObjects = [];
-  drumPlayers._buffers._buffers.forEach((e, i) => bufferObjects.push([e, i]));
-
   //===================
 
   useEffect(() => {
@@ -95,22 +87,15 @@ function Sequencer(props) {
   }, [sequencerArray]);
 
   useEffect(() => {
-    //temp
-    let loadingChecker = setInterval(() => {
-      setIsBufferLoaded(drumPlayers.loaded);
-      drumPlayers.loaded && clearInterval(loadingChecker);
-    }, 200);
+
     scheduleNotes();
-  }, [drumPlayers]);
+  }, [props.instrument]);
 
   useEffect(() => {
     currentMeasure > props.module.score.length && setCurrentMeasure(0)
     changeSequence(props.module.score);
   }, [props.module.score]);
 
-  useEffect(() => {
-    setDrumPlayers(props.module.instrument);
-  }, [props.module.instrument]);
 
   useEffect(() => {
     scheduleNotes();
@@ -123,29 +108,29 @@ function Sequencer(props) {
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
     >
-      {isBufferLoaded ? (
+      {props.bufferLoaded ? (
         <div className="sequencer">
-          {bufferObjects.map((drumsound, row) => (
-            <div className="sequencer-row" key={drumsound[1]}>
+          {Object.keys(props.module.instrument.urls).map((drumsound, row) => (
+            <div className="sequencer-row" key={drumsound}>
               {hovered && (
                 <Typography className="sequencer-row-label" variant="overline">
-                  {isNaN(drumsound[1])
-                    ? drumsound[1]
-                    : labels[parseInt(drumsound[1])]}
+                  {isNaN(drumsound)
+                    ? drumsound
+                    : labels[parseInt(drumsound)]}
                 </Typography>
               )}
               {sequencerArray[currentMeasure].map((beat, column) => (
                 <SequencerTile
-                  key={[column, drumsound[1]]}
+                  key={[column, drumsound]}
                   inputNote={inputNote}
                   active={beat.includes(
-                    isNaN(drumsound[1]) ? drumsound[1] : parseInt(drumsound[1])
+                    isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   )}
                   cursor={currentBeat == column}
                   color={props.module.color}
                   x={column}
                   y={
-                    isNaN(drumsound[1]) ? drumsound[1] : parseInt(drumsound[1])
+                    isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   }
                 />
               ))}
@@ -158,7 +143,7 @@ function Sequencer(props) {
           style={{ color: props.module.color[300] }}
         />
       )}
-      {!bufferObjects.length && (
+      {props.module.instrument === {} && (
         <Typography style={{ color: "white" }}>
           Oops..! No sounds loaded
         </Typography>

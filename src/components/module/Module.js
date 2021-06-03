@@ -70,6 +70,8 @@ function Module(props) {
 
   const loadInstrument = () => {
     if (props.module.type === 0) {
+      setInstrument(()=>{return new Tone.Players(props.module.instrument.urls,()=>setBufferLoaded(true)).toDestination()})
+
     }
     //players
     else if (props.module.type === 3) {
@@ -87,13 +89,13 @@ function Module(props) {
     }
   };
 
-  const onInstrumentMod = (url) => {
+  const onInstrumentMod = (url,name,isRemoving) => {
     //update instrument info in module object
     props.setModules((prev) => {
       let newModules = [...prev];
-      prev[props.module.id].instrument =
-        instrument.name === "Players"
-          ? { filesid: [] }
+      newModules[props.module.id].instrument =
+      props.module.type === 0
+          ? { urls: {...prev[props.module.id].instrument.urls,[name]:url} }
           : props.module.type === 3
           ? { url }
           : instrument.get();
@@ -109,6 +111,9 @@ function Module(props) {
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
             backgroundColor: props.module.color[500],
           }}
+          instrument={instrument}
+          bufferLoaded={bufferLoaded}
+          setBufferLoaded={setBufferLoaded}
           sessionSize={props.sessionSize}
           module={props.module}
           kit={0}
