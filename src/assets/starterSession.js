@@ -30,6 +30,8 @@ export const starterSession = {
       patch: 0,
       instrument: loadDrumPatch(0),
       color: colors[1],
+      volume:0,
+      muted:false,
       score: [
         [
           [0],
@@ -115,6 +117,8 @@ export const starterSession = {
       range: [3, 4],
       instrument: "-MbByh-3xIipRPN7KOO7",
       color: colors[2],
+      volume:-18,
+      muted:false,
       score: [
         [["E1"], ["E2"], ["E1"], ["E2"], ["E1"], ["E2"], ["E1"], ["E2"]],
         [["C1"], ["C2"], ["C1"], ["C2"], ["C1"], ["C2"], ["C1"], ["C2"]],
@@ -131,6 +135,8 @@ export const starterSession = {
       scale: 0,
       complexity: 3,
       color: colors[9],
+      volume:-12,
+      muted:false,
       score: [
         {
           notes: ["E1", "E3", "E4", "G4", "B4"],
@@ -163,6 +169,8 @@ export const starterSession = {
       name: "Player",
       type: 3,
       length: 1,
+      volume:0,
+      muted:false,
       instrument: new Tone.GrainPlayer(
         "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav"
       ).toDestination(),

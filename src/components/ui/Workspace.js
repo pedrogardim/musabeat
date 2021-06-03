@@ -42,21 +42,20 @@ function Workspace(props) {
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
-  //temp: muted modules array as workspace state
-  const [mutedModules, setMutedModules] = useState([]);
+  
+  
+  //TODO:volume array as ws state: avoid triggering changes in module state onChange
+/* 
+  const [moduleVolumes, setModulesVolume] = useState(
+    modules.map((e) => e.volume)
+  );
+ */
 
   const handlePlaying = (state) => {
     if (state !== "started") {
       setIsPlaying(true);
     } else {
-      modules.forEach((e) =>
-        e.instrument.name === "Players"
-          ? e.instrument.stopAll()
-          : e.instrument.name === "GrainPlayer" ||
-            e.instrument.name === "Player"
-          ? e.instrument.stop()
-          : e.instrument.releaseAll()
-      );
+      
       setIsPlaying(false);
     }
   };
@@ -113,8 +112,8 @@ function Workspace(props) {
     let parsedSession = {
       name: "New Session",
       bpm: Tone.Transport.bpm.value,
-      creator:props.user.uid,
-      editors:[],
+      creator: props.user.uid,
+      editors: [],
       modules: modules.map((e) => {
         let module = { ...e };
         module.instrument = {};
@@ -149,7 +148,7 @@ function Workspace(props) {
   };
 
   ////TODO: UNDO
-/* 
+  /* 
   const undoSession = () => {
     setModules(sessionHistory[sessionHistory.length - 2]);
     setSessionHistory((prev) => {
@@ -202,6 +201,7 @@ function Workspace(props) {
     handlePlaying(Tone.Transport.state);
   }, [Tone.Transport.state]);
 
+
   /*onKeyDown={handleKeyPress}*/
 
   return (
@@ -214,7 +214,6 @@ function Workspace(props) {
             module={module}
             sessionSize={sessionSize}
             setModules={setModules}
-            muted={mutedModules.includes(moduleIndex)}
           />
           {moduleIndex % 3 == 1 && <div className="break" />}
         </Fragment>
@@ -242,14 +241,23 @@ function Workspace(props) {
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
       {mixerOpened && (
-        <Mixer setMutedModules={setMutedModules} modules={modules} />
+        <Mixer
+          modules={modules}
+          setModules={setModules}
+        />
+
       )}
+                  {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 12px)" }}
-        onClick={()=>Tone.Transport.state !== "started"?Tone.Transport.pause():Tone.Transport.start()}
+        onClick={() =>
+          Tone.Transport.state !== "started"
+            ? Tone.Transport.pause()
+            : Tone.Transport.start()
+        }
       >
         <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
       </Fab>
