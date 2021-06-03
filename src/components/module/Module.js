@@ -134,6 +134,10 @@ function Module(props) {
   useEffect(() => {
     typeof props.module.instrument === "string" && patchLoader(props.module.instrument,"",setInstrument)
   }, []);
+
+  useEffect(() => {
+    patchLoader(props.module.instrument,"",setInstrument)
+  }, [props.module.instrument]);
  
   return (
     <div

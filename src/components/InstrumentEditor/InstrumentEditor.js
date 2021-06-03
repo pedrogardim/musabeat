@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment, useRef } from "react";
 
 import * as Tone from "tone";
+import firebase from "firebase";
 
 import {
   Select,
@@ -10,6 +11,7 @@ import {
   Divider,
   InputLabel,
   FormControl,
+  CircularProgress,
 } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
@@ -28,14 +30,16 @@ import {
 import { FileDrop } from "react-file-drop";
 
 import "./InstrumentEditor.css";
+import { LocalConvenienceStoreOutlined } from "@material-ui/icons";
 
 function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState("");
   const [instrument, setInstrument] = useState(props.instrument);
   const [draggingOver, setDraggingOver] = useState(false);
+  const [patchesList, setPatchesList] = useState([]);
 
   const ieWrapper = useRef(null);
-/* 
+  /* 
   const lookForPatch = () => {
     //temp
     let instrumentOptions = Object.toJSON(instrument.get());
@@ -43,19 +47,31 @@ function InstrumentEditor(props) {
 
   }
  */
+  const loadDBPatches = () => {
+    //temp
+    firebase
+      .database()
+      .ref("/patches/")
+      .once("value")
+      .then((snapshot) => {
+        let array = Object.keys(snapshot.val()).map((e, i, a) => [
+          e,
+          snapshot.val()[e].name,
+        ]);
+        //console.log(array);
+        setPatchesList(array);
+      });
+  };
+
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
+    patchLoader(event.target.value,"",setInstrument);
 
     props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
-          newModule.instrument = {};
-          newModule.instrument =
-            props.module.type === 0
-              ? loadDrumPatch(event.target.value)
-              : patchLoader(event.target.value);
-          setInstrument(newModule.instrument);
+          newModule.instrument = event.target.value;
           return newModule;
         } else {
           return module;
@@ -208,15 +224,22 @@ function InstrumentEditor(props) {
       </Fragment>
     );
   } else {
- 
-    list.push(<div className="instrument-editor-column" key={0}><OscillatorEditor instrument={instrument}/></div>);
+    list.push(
+      <div className="instrument-editor-column" key={0}>
+        <OscillatorEditor instrument={instrument} />
+      </div>
+    );
     list.push(
       <div className="instrument-editor-column" key={1}>
         <SynthParameters instrument={instrument} />
       </div>
     );
     list.push(
-      <div className="instrument-editor-column" style={{flexDirection: 'column'}} key={2}>
+      <div
+        className="instrument-editor-column"
+        style={{ flexDirection: "column" }}
+        key={2}
+      >
         {Object.keys(instrument.get()).map(
           (envelope, envelopeIndex) =>
             envelope.toLowerCase().includes("envelope") && (
@@ -232,12 +255,16 @@ function InstrumentEditor(props) {
   }
 
   useEffect(() => {
-    //lookForPatch()
+    props.module.type !== 0 && loadDBPatches();
   }, []);
 
   useEffect(() => {
     setInstrument(props.instrument);
   }, [props.instrument]);
+/* 
+  useEffect(() => {
+    console.log(patchesList);
+  }, [selectedPatch]); */
 
   return (
     <div
@@ -248,24 +275,25 @@ function InstrumentEditor(props) {
       }}
       ref={ieWrapper}
     >
-      <Select
-        native
-        className="instrument-editor-patch-select"
-        value={selectedPatch}
-        onChange={handlePatchSelect}
-      >
-        {props.module.type === 0
-          ? kits.map((kit, kitIndex) => (
-              <option key={kitIndex} value={kitIndex}>
-                {kit.name}
-              </option>
-            ))
-          : instruments.map((kit, kitIndex) => (
-              <option key={kitIndex} value={kitIndex}>
-                {kit.name}
-              </option>
-            ))}
-      </Select>
+        <Select
+          native
+          className="instrument-editor-patch-select"
+          value={selectedPatch}
+          onChange={handlePatchSelect}
+        >
+          {props.module.type === 0
+            ? kits.map((kit, kitIndex) => (
+                <option key={kitIndex} value={kitIndex}>
+                  {kit.name}
+                </option>
+              ))
+            : patchesList.map((kit, kitIndex) => (
+                <option key={kitIndex} value={kit[0]}>
+                  {kit[1]}
+                </option>
+              ))}
+        </Select>
+      
 
       <div className="break" />
 

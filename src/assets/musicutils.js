@@ -552,6 +552,7 @@ export const getChordsFromScale = (scale, root, extentions) => {
 };
 
 export const patchLoader = (input, type, setInstrument) => {
+  console.log(input);
   let instr;
   firebase
     .database()
@@ -559,7 +560,6 @@ export const patchLoader = (input, type, setInstrument) => {
     .once("value")
     .then((snapshot) => {
       let patch = snapshot.val();
-      console.log(patch);
 
       let options = patch.options;
       let instrfx = [];
@@ -632,10 +632,9 @@ export const patchLoader = (input, type, setInstrument) => {
       } else {
         instr.toDestination();
       }
-      console.log(instr);
       setInstrument(instr);
     })
-    .catch((e) => alert("This patch doest exist"));
+    .catch((e) => console.log(e.message));
 
   
 };
