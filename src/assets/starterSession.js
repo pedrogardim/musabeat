@@ -171,9 +171,7 @@ export const starterSession = {
       length: 1,
       volume:0,
       muted:false,
-      instrument: new Tone.GrainPlayer(
-        "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav"
-      ).toDestination(),
+      instrument: {url:"https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav"},
       color: colors[6],
       score: [{ time: 0, duration: 1 }],
     },

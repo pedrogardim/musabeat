@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import * as Tone from "tone";
+import firebase from "firebase";
 
 import AudioClip from "./AudioClip";
 import BackgroundGrid from "./BackgroundGrid";
@@ -17,9 +18,8 @@ import "./Player.css";
 
 function Player(props) {
   const playerWrapper = useRef(null);
-  const [isBufferLoaded, setIsBufferLoaded] = useState(false);
   const [score, setScore] = useState(props.module.score);
-  const [instrument, setInstrument] = useState(props.module.instrument);
+  //const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [buffersChecker, setBuffersChecker] = useState(null);
@@ -43,17 +43,11 @@ function Player(props) {
       : clearInterval(cursorAnimator);
   };
 
-  const checkForLoadedBuffers = () => {
-    if (instrument.buffer.loaded) {
-      setIsBufferLoaded(true);
-      clearInterval(buffersChecker);
-    }
-  };
 
   const scheduleEvents = () => {
     scheduleSamples(
       score,
-      instrument,
+      props.instrument,
       Tone.Transport.seconds,
       Tone.Transport,
       props.module.id
@@ -70,7 +64,7 @@ function Player(props) {
   };
 
   const handleCursorDragStart = (event, element) => {
-    instrument.stop(0);
+    props.instrument.stop(0);
   };
 
   const handleCursorDragStop = (event, element) => {
@@ -82,28 +76,48 @@ function Player(props) {
 
     Tone.Transport.pause();
 
-    setIsBufferLoaded(false);
+    props.setBufferLoaded(false);
     setDraggingOver(false);
+
     let file = files[0];
-    //console.log(file);
+
+    //UPLOAD
+   
+
+    //
 
     file.arrayBuffer().then((arraybuffer) => {
-      instrument.context.rawContext.decodeAudioData(
+      props.instrument.context.rawContext.decodeAudioData(
         arraybuffer,
         (audiobuffer) => {
           console.log(audiobuffer);
 
           if (audiobuffer.duration > 180) {
             alert("Try importing a smaller audio file");
-            setIsBufferLoaded(true);
+            props.setBufferLoaded(true);
             return;
           }
 
-          setInstrument((prev) => {
+          const user = firebase.auth().currentUser;
+          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+          const task = storageRef.put(file);
+      
+          task.on(
+            "state_changed",
+            (snapshot) => {
+             console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            },
+            (error) => {console.log(error)},
+            () => {storageRef.getDownloadURL().then(r=>{
+              props.onInstrumentMod(r)
+            })}
+          );
+
+          props.setInstrument((prev) => {
             prev.dispose();
             return new Tone.GrainPlayer(
               audiobuffer,
-              setIsBufferLoaded(true)
+              props.setBufferLoaded(true)
             ).toDestination();
           });
 
@@ -120,7 +134,7 @@ function Player(props) {
           alert(
             "Upps.. there was an error decoding your audio file, try to convert it to other format"
           );
-          setIsBufferLoaded(true);
+          props.setBufferLoaded(true);
         }
       );
     });
@@ -133,7 +147,7 @@ function Player(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [score, instrument]);
+  }, [score, props.instrument]);
 
   useEffect(() => {
     props.updateModules((previousModules) => {
@@ -143,16 +157,15 @@ function Player(props) {
     });
   }, [score]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     props.updateModules((previousModules) => {
       let newmodules = [...previousModules];
       newmodules[props.module.id].instrument = instrument;
       return newmodules;
     });
-  }, [instrument]);
+  }, [instrument]); */
 
   useEffect(() => {
-    setBuffersChecker(setInterval(checkForLoadedBuffers, 1000));
     setRescheduleEvent(Tone.Transport.schedule((time) => {
       scheduleEvents();
     }, Tone.Transport.loopEnd-0.01))
@@ -161,6 +174,7 @@ function Player(props) {
       Tone.Transport.clear(rescheduleEvent);
     };
   }, []);
+
 
   useEffect(() => {
     setRescheduleEvent(Tone.Transport.schedule((time) => {
@@ -201,14 +215,14 @@ function Player(props) {
             Drop your files here!
           </FileDrop>
         )}
-        {isBufferLoaded ? (
+        {props.bufferLoaded ? (
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
             parentRef={playerWrapper}
             color={props.module.color}
-            buffer={instrument.buffer}
-            instrument={instrument}
+            buffer={props.instrument.buffer}
+            instrument={props.instrument}
             scheduleEvents={scheduleEvents}
             score={score[0]}
             setScore={setScore}

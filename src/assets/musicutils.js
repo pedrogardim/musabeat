@@ -639,6 +639,16 @@ export const patchLoader = (input, type, setInstrument) => {
   
 };
 
+export const loadSynthFromGetObject = (obj) => {
+
+  console.log(obj)
+
+  let instr = new Tone.PolySynth(obj).toDestination();
+  return instr;
+
+}
+
+
 export const loadDrumPatch = (patch, buffers) => {
   let urlMap = {};
   //drum patch with stardard configuration

@@ -82,7 +82,21 @@ function InstrumentEditor(props) {
   const handleFileDrop = (files, event) => {
     event.preventDefault();
     Tone.Transport.pause();
+    const user = firebase.auth().currentUser;
+
     let file = files[0];
+
+    const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+    const task = storageRef.put(file);
+
+    task.on(
+      "state_changed",
+      (snapshot) => {
+       console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+      },
+      (error) => {console.log(error)},
+      () => {console.log(task.snapshot)}
+    );
 
     setDraggingOver(false);
 

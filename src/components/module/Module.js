@@ -6,7 +6,7 @@ import { clearEvents } from "../../utils/TransportSchedule";
 import {
   patchLoader,
   loadDrumPatch,
-  detectPitch,
+  loadSynthFromGetObject,
 } from "../../assets/musicutils";
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
@@ -20,6 +20,8 @@ import "./Module.css";
 
 function Module(props) {
   const [instrument, setInstrument] = useState(null);
+  const [bufferLoaded, setBufferLoaded] = useState(false);
+
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -66,15 +68,34 @@ function Module(props) {
     setMenuAnchorEl(null);
   };
 
-  const onInstrumentMod = () => {
+  const loadInstrument = () => {
+    if (props.module.type === 0) {
+    }
+    //players
+    else if (props.module.type === 3) {
+      console.log("loading player")
+      setInstrument(()=>{return new Tone.GrainPlayer(props.module.instrument.url,()=>setBufferLoaded(true)).toDestination()})
+    } else if (typeof props.module.instrument === "string") {
+      patchLoader(props.module.instrument, "", setInstrument);
+    } else if (
+      typeof props.module.instrument === "object" &&
+      props.module.instrument.name !== "Players" &&
+      props.module.instrument.name !== "GrainPlayer" &&
+      instrument === null
+    ) {
+      setInstrument(loadSynthFromGetObject(props.module.instrument));
+    }
+  };
+
+  const onInstrumentMod = (url) => {
     //update instrument info in module object
     props.setModules((prev) => {
       let newModules = [...prev];
       prev[props.module.id].instrument =
         instrument.name === "Players"
           ? { filesid: [] }
-          : instrument.name === "GrainPlayer"
-          ? "fileId"
+          : props.module.type === 3
+          ? { url }
           : instrument.get();
       return newModules;
     });
@@ -129,6 +150,11 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
+          onInstrumentMod={onInstrumentMod}
+          setInstrument={setInstrument}
+          bufferLoaded={bufferLoaded}
+          setBufferLoaded={setBufferLoaded}
+          instrument={instrument}
           sessionSize={props.sessionSize}
           module={props.module}
           updateModules={props.setModules}
@@ -138,9 +164,8 @@ function Module(props) {
   }
 
   useEffect(() => {
-    typeof props.module.instrument === "string" &&
-      patchLoader(props.module.instrument, "", setInstrument);
-  }, [props.module.instrument]);
+    loadInstrument();
+  }, []);
 
   useEffect(() => {
     if (instrument !== null) instrument.volume.value = props.module.volume;
@@ -152,6 +177,10 @@ function Module(props) {
         ? -Infinity
         : props.module.volume;
   }, [props.module.muted]);
+
+  useEffect(() => {
+    console.log(bufferLoaded)
+  }, [bufferLoaded]);
 
   useEffect(() => {
     if (instrument !== null) {
