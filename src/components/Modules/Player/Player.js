@@ -29,18 +29,18 @@ function Player(props) {
 
   const [draggingOver, setDraggingOver] = useState(false);
 
-  const startCursor = (started) => {
-    started
+  const toggleCursor = (state) => {
+    state
       ? setCursorAnimator(
           setInterval(() => {
             //temp fix
-            playerWrapper.current !== null &&
+            playerWrapper.current !== null && Tone.Transport.state === "started" &&
               setCursorPosition(
                 (Tone.Transport.seconds /
                   Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
                   playerWrapper.current.offsetWidth
               );
-          }, 16)
+          }, 32)
         )
       : clearInterval(cursorAnimator);
   };
@@ -142,9 +142,11 @@ function Player(props) {
     });
   };
 
+  //TODO: Optimize performance: clear on play/plause
+
   useEffect(() => {
-    startCursor(Tone.Transport.state === "started");
-    Tone.Transport.state === "started" && scheduleEvents();
+    toggleCursor(true);
+    scheduleEvents();
   }, [Tone.Transport.state]);
 
   useEffect(() => {
@@ -176,7 +178,6 @@ function Player(props) {
       Tone.Transport.clear(rescheduleEvent);
     };
   }, []);
-
 
   useEffect(() => {
     setRescheduleEvent(Tone.Transport.schedule((time) => {
