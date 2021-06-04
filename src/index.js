@@ -7,14 +7,13 @@ import reportWebVitals from './reportWebVitals';
 import firebase from "firebase";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDMnEQYcIN4dcwFW_ls3d23C1tOQCxsYGo",
-  authDomain: "musa-fc149.firebaseapp.com",
-  databaseURL: "https://musa-fc149-default-rtdb.firebaseio.com",
-  projectId: "musa-fc149",
-  storageBucket: "musa-fc149.appspot.com",
-  messagingSenderId: "782550093685",
-  appId: "1:782550093685:web:ece5438a5eb4db2d448d3c",
-  measurementId: "G-SH0QZXLRXW"
+  apiKey: "AIzaSyD5Tg5t1YD72Q3weL5rYTlxroSH4QwEV-k",
+  authDomain: "musamusicapp-c5d73.firebaseapp.com",
+  projectId: "musamusicapp-c5d73",
+  storageBucket: "musamusicapp-c5d73.appspot.com",
+  messagingSenderId: "851928058346",
+  appId: "1:851928058346:web:95d91a745251985bab8a93",
+  measurementId: "G-4ZRP9FY1VG"
 };
 
 // Initialize Firebase

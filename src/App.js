@@ -16,6 +16,7 @@ import {
 import firebase from "firebase";
 
 import Workspace from "./components/ui/Workspace";
+import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import SideMenu from "./components/ui/SideMenu";
 
 import AuthDialog from "./components/ui/AuthDialog";
@@ -25,6 +26,7 @@ function App() {
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
+  const [userSamplesPage, setSamplePage] = useState(false);
 
   const handleAvatarClick = (e) => {
     !user ? setAuthDialog(true) : setUserOption(e.currentTarget);
@@ -90,12 +92,14 @@ function App() {
       >
         <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
         <MenuItem onClick={() => setUserOption(false)}>My Sessions</MenuItem>
-        <MenuItem onClick={() => setUserOption(false)}>My Samples</MenuItem>
+        <MenuItem onClick={() => setSamplePage(prev=>!prev)}>My Samples</MenuItem>
         <MenuItem onClick={() => setUserOption(false)}>
           My Synth Patches
         </MenuItem>
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
+
+      {userSamplesPage && <FileExplorer user={user} />}
 
       <SideMenu open={sideMenu} setSideMenu={setSideMenu} />
 

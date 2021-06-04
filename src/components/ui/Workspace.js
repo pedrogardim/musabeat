@@ -23,7 +23,6 @@ Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
-  const instrumentRef = useRef(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState(starterSession.modules);
@@ -37,15 +36,7 @@ function Workspace(props) {
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
 
-  
-  
-  
-  //TODO:volume array as ws state: avoid triggering changes in module state onChange
-/* 
-  const [moduleVolumes, setModulesVolume] = useState(
-    modules.map((e) => e.volume)
-  );
- */
+
 
   const handlePlaying = (state) => {
     if (state !== "started") {
@@ -239,7 +230,6 @@ function Workspace(props) {
         sessionData={starterSession}
         modules={modules}
         modulesInstruments={modulesInstruments}
-        ref={instrumentRef}
 
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}

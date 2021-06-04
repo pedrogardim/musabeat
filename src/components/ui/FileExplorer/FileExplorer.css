@@ -1,0 +1,20 @@
+.file-explorer{
+    position:fixed;
+    height:100%;
+    width:80%;
+    left:10%;
+    top:0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color:white;
+}
+
+.file-explorer::before{
+    position:fixed;
+    
+    height:100vw;
+    width:100vw;
+    background-color: #fff;
+}
