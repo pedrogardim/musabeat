@@ -12,7 +12,7 @@ function Exporter(props) {
 
   const handleButtonClick = () => {
     setIsReady(false);
-    bounceSessionExport(modules, sessionData, setIsReady, props.sessionSize);
+    bounceSessionExport(modules, props.modulesInstruments, sessionData, setIsReady, props.sessionSize);
   };
 
   return (

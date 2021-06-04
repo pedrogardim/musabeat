@@ -22,9 +22,10 @@ import Player from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 
-import { colors } from "../../utils/materialPalette"
+import { colors } from "../../utils/materialPalette";
 
 import "./Module.css";
+import { PinDropRounded } from "@material-ui/icons";
 
 function Module(props) {
   const [instrument, setInstrument] = useState(null);
@@ -111,6 +112,12 @@ function Module(props) {
 
   const onInstrumentMod = (url, name, isRemoving) => {
     //update instrument info in module object
+    props.setModulesInstruments((prev) => {
+      let newInstruments = [...prev];
+      newInstruments[props.index] = instrument;
+      return newInstruments;
+    });
+
     props.setModules((prev) => {
       let newModules = [...prev];
       if (props.module.type === 0) {
@@ -196,10 +203,19 @@ function Module(props) {
       );
       break;
   }
-  
+
   useEffect(() => {
     loadInstrument();
   }, []);
+
+  useEffect(() => {
+    props.setModulesInstruments((prev) => {
+      let newInstruments = [...prev];
+      newInstruments[props.index] = instrument;
+      return newInstruments;
+    });
+    //console.log("-- instr change triggered! --"+instrument)
+  }, [instrument]);
 
   useEffect(() => {
     if (instrument !== null) instrument.volume.value = props.module.volume;
@@ -213,12 +229,8 @@ function Module(props) {
   }, [props.module.muted]);
 
   useEffect(() => {
-    console.log(bufferLoaded);
-  }, [bufferLoaded]);
-
-  useEffect(() => {
-    if (instrument !== null) {
-      Tone.Transport.state !== "started" && instrument.name === "Players"
+    if (instrument !== null && Tone.Transport.state !== "started") {
+      instrument.name === "Players"
         ? instrument.stopAll()
         : instrument.name === "GrainPlayer" || instrument.name === "Player"
         ? instrument.stop()
@@ -285,6 +297,7 @@ function Module(props) {
               module={props.module}
               setModules={props.setModules}
               instrument={instrument}
+              setBufferLoaded={setBufferLoaded}
               onInstrumentMod={onInstrumentMod}
               setInstrument={setInstrument}
               updateModules={props.setModules}

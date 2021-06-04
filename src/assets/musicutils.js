@@ -560,7 +560,7 @@ export const patchLoader = (input, type, setInstrument,setBufferLoaded) => {
     .once("value")
     .then((snapshot) => {
       let patch = snapshot.val();
-      console.log(patch)
+      //console.log(patch)
 
       let options = patch.options;
       let instrfx = [];
@@ -573,7 +573,7 @@ export const patchLoader = (input, type, setInstrument,setBufferLoaded) => {
             patch.baseUrl,
         },()=>setBufferLoaded(true)).toDestination();
         
-        console.log(instr);
+        //console.log(instr);
 
         instr.attack = patch.asdr[0];
         instr.release = patch.asdr[1];
@@ -647,9 +647,13 @@ export const patchLoader = (input, type, setInstrument,setBufferLoaded) => {
 
 export const loadSynthFromGetObject = (obj) => {
 
-  console.log(obj)
+  //TODO: differ AM from FM Synth
 
-  let instr = new Tone.PolySynth(obj).toDestination();
+  let instrBase = obj.hasOwnProperty('filter') ? Tone.MonoSynth : obj.hasOwnProperty('modulation') ? Tone.FMSynth : Tone.Synth
+  
+  let instr = new Tone.PolySynth(instrBase,obj).toDestination();
+
+
   return instr;
 
 }

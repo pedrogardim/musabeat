@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
@@ -15,33 +15,29 @@ import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Mixer from "./mixer/Mixer";
 
-import * as MUIcolors from "@material-ui/core/colors";
+import { colors } from "../../utils/materialPalette";
 
-const colors = [
-  MUIcolors.red,
-  MUIcolors.deepPurple,
-  MUIcolors.indigo,
-  MUIcolors.blue,
-  MUIcolors.cyan,
-  MUIcolors.teal,
-  MUIcolors.lightGreen,
-  MUIcolors.lime,
-  MUIcolors.amber,
-  MUIcolors.orange,
-];
 
 Tone.Transport.bpm.value = starterSession.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
+  const instrumentRef = useRef(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState(starterSession.modules);
-  //to undo and redo
-  const [sessionHistory, setSessionHistory] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
+
+  //a copy of the instruments, to be able to use them on export function
+  const [modulesInstruments, setModulesInstruments] = useState([]);
+
+  //to undo and redo
+  const [sessionHistory, setSessionHistory] = useState([]);
+
+  
   
   
   //TODO:volume array as ws state: avoid triggering changes in module state onChange
@@ -191,10 +187,13 @@ function Workspace(props) {
   }; 
   */
 
+
+
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
+
   }, [modules]);
 
   useEffect(() => {
@@ -214,6 +213,8 @@ function Workspace(props) {
             module={module}
             sessionSize={sessionSize}
             setModules={setModules}
+            setModulesInstruments={setModulesInstruments}
+
           />
           {moduleIndex % 3 == 1 && <div className="break" />}
         </Fragment>
@@ -237,6 +238,9 @@ function Workspace(props) {
         sessionSize={sessionSize}
         sessionData={starterSession}
         modules={modules}
+        modulesInstruments={modulesInstruments}
+        ref={instrumentRef}
+
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
@@ -250,6 +254,7 @@ function Workspace(props) {
                   {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab
+
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 12px)" }}

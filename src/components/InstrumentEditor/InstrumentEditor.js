@@ -64,7 +64,7 @@ function InstrumentEditor(props) {
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
-    patchLoader(event.target.value, "", props.setInstrument);
+    patchLoader(event.target.value, "", props.setInstrument,props.setBufferLoaded);
 
     props.updateModules((previous) =>
       previous.map((module, i) => {

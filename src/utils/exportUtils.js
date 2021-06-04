@@ -6,27 +6,28 @@ import {
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
-import * as MusicUtils from "../assets/musicutils";
+import { loadSynthFromGetObject} from "../assets/musicutils";
 import * as Tone from "tone";
 
-export const bounceSessionExport = (
+export const bounceSessionExport = async (
   modules,
+  instruments,
   sessionData,
   setIsReady,
   sessionSize
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
-  /* let exportDuration = Tone.Time("1m").toSeconds() * 2;
+   let exportDuration = Tone.Time("1m").toSeconds() * 2;
 
   let instrumentBuffers = modules.map((module, i) =>
-    module.instrument.name === "Players" || module.instrument.name === "Sampler"
-      ? module.instrument._buffers
-      : module.instrument.name === "Player"
-      ? module.instrument._buffer
+  instruments[i].name === "Players" || instruments[i].name === "Sampler"
+      ? instruments[i]._buffers
+      : instruments[i].name === "Player"
+      ? instruments[i]._buffer
+      : instruments[i].name === "GrainPlayer"
+      ? instruments[i].buffer
       : ""
   );
-
-  //console.log(instrumentBuffers);
 
   Tone.Offline(({ transport }) => {
     //console.log(transport);
@@ -35,14 +36,9 @@ export const bounceSessionExport = (
     transport.bpm.value = sessionData.bpm;
 
     modules.map((module, moduleIndex) => {
-      let thisinstrument = MusicUtils.instrumentContructor(
-        module.instrument.get()
-      );
-      if (module.instrument.name == "Sampler") {
-        thisinstrument = new Tone.Sampler().toDestination();
-        thisinstrument._buffers = instrumentBuffers[moduleIndex];
-      }
-
+      let originalInstrument = instruments[moduleIndex];
+      let thisinstrument; 
+      
       switch (module.type) {
         case 0:
           thisinstrument = new Tone.Players().toDestination();
@@ -59,6 +55,8 @@ export const bounceSessionExport = (
           );
           break;
         case 1:
+          thisinstrument = loadSynthFromGetObject(originalInstrument.get()); 
+
           scheduleMelodyGrid(
             module.score,
             thisinstrument,
@@ -70,8 +68,10 @@ export const bounceSessionExport = (
           );
           break;
         case 2:
+          thisinstrument = loadSynthFromGetObject(originalInstrument.get()); 
+
           scheduleChordProgression(
-            module.chords,
+            module.score,
             thisinstrument,
             transport,
             () => {},
@@ -81,10 +81,11 @@ export const bounceSessionExport = (
           );
           break;
           case 3:
-            thisinstrument = new Tone.GrainPlayer(module.instrument.buffer).toDestination()
+            thisinstrument = new Tone.GrainPlayer(instrumentBuffers[moduleIndex]).toDestination()
             scheduleSamples(
             module.score,
             thisinstrument,
+            0,
             transport,
             ""
           );
@@ -103,7 +104,7 @@ export const bounceSessionExport = (
     setIsReady(true);
 
     //});
-  }); */
+  }); 
 };
 
 const downloadURI = (uri, name) => {
