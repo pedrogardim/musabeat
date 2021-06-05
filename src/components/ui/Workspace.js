@@ -207,6 +207,14 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
+    DBModulesRef !== null && DBModulesRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      setModules(data);
+    });
+  }, [DBModulesRef]);
+
+
+  useEffect(() => {
     handlePlaying(Tone.Transport.state);
   }, [Tone.Transport.state]);
 
