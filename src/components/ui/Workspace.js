@@ -30,6 +30,9 @@ function Workspace(props) {
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
 
+  const [DBModulesRef, setDBModulesRef] = useState(null);
+
+
   //a copy of the instruments, to be able to use them on export function
   const [modulesInstruments, setModulesInstruments] = useState([]);
 
@@ -121,18 +124,25 @@ function Workspace(props) {
   };
 
   const loadSession = () => {
-    let convertedSession = modules.map((e) => {
-      let module = { ...e };
-      module.instrument = {};
-      if (
-        e.instrument.name !== "Players" &&
-        e.instrument.name !== "GrainPlayer"
-      )
-        module.instrument = e.instrument.get();
-      return module;
-    });
-    setModules(convertedSession);
+    if(props.session === null){
+      setModules([]);
+      return;
+    }
+    else if(typeof props.session === "object"){
+      setModules(props.session.modules);
+      return;
+    }
+    else if(typeof props.session === "string"){
+      let sessionRef = firebase.database().ref('sessions').child(props.session);
+      sessionRef.get().then(snapshot=>setModules(snapshot.val().modules))
+      
+    }
   };
+
+  const saveToDatabase = () => {
+    DBModulesRef !== null && DBModulesRef.set(modules)
+
+  }
 
   ////TODO: UNDO
   /* 
@@ -184,8 +194,17 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
+    saveToDatabase(modules);
 
   }, [modules]);
+
+  useEffect(() => {
+    loadSession();
+    console.log(props.session);
+    let sessionRef = props.session !== null && firebase.database().ref('sessions').child(props.session).child('modules');
+    console.log(sessionRef);
+    setDBModulesRef(!sessionRef ? null : sessionRef);
+  }, [props.session]);
 
   useEffect(() => {
     handlePlaying(Tone.Transport.state);

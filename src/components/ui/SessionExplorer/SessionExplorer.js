@@ -11,17 +11,18 @@ import firebase from "firebase";
 
 function SessionExplorer(props) {
   const [sessions, setSessions] = useState([]);
-  const [refList, setRefList] = useState([]);
+  const [sessionsKeys, setSessionsKeys] = useState([]);
+
 
   const getUserSessionList = async () => {
     const dbRef = firebase.database().ref('users').child(props.user.uid).child('sessions');
     const userSessionKeys = (await dbRef.get()).val()
+    setSessionsKeys(userSessionKeys);
 
     let userSessions = await Promise.all(
         userSessionKeys.map(async (e, i) => {
             let sessionRef = firebase.database().ref('sessions').child(e);
             let session = (await sessionRef.get()).val();
-            console.log(e,sessionRef,session);
             return session;
         })
       );
@@ -29,6 +30,12 @@ function SessionExplorer(props) {
     setSessions(userSessions);
       
   };
+
+  const handleSessionSelect = (index) => {
+      props.setOpenedSession(sessionsKeys[index])
+      props.setCurrentPage(null);
+
+  }
 
   useEffect(() => {
     getUserSessionList();
@@ -44,7 +51,7 @@ function SessionExplorer(props) {
       {!!sessions.length ? (
         <Fragment>
           {sessions.map((session, sessionIndex) => (
-            <SessionGalleryItem session={session} />
+            <SessionGalleryItem handleSessionSelect={handleSessionSelect} index={sessionIndex} session={session} />
           ))}
         </Fragment>
       ) : (

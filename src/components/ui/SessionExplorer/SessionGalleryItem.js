@@ -16,14 +16,16 @@ import firebase from "firebase";
 import { colors } from "../../../utils/materialPalette";
 
 function SessionGalleryItem(props) {
-  const handleClick = () => {};
+  const handleClick = () => {
+    props.handleSessionSelect(props.index);
+  };
 
   useEffect(() => {
     return () => {};
   }, []);
 
   return (
-    <Paper className="session-gallery-item">
+    <Paper className="session-gallery-item" onClick={handleClick}>
         <Typography variant="h5" className="session-gallery-item-title">
           {props.session.name}
         </Typography>
@@ -41,9 +43,6 @@ function SessionGalleryItem(props) {
         ))}
       </div>
       <div className="session-gallery-item-module-footer">
-        <IconButton>
-          <Icon>edit</Icon>
-        </IconButton>
         <IconButton>
           <Icon>share</Icon>
         </IconButton>

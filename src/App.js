@@ -34,25 +34,51 @@ function App() {
     let newSession = {
       name: "New Session",
       bpm: 120,
-      creator:user.uid,
-      editors:[user.uid],
-      modules: [{name:"Sequencer",color:2}],
-      copied:0,
-      opened:0,
-      likedBy:["a"]
-
+      creator: user.uid,
+      editors: [user.uid],
+      modules: [
+        {
+          id:0,
+          name: "Sequencer",
+          color: 2,
+          score: [[[0], [3], [2, 0], [3], [0], [3], [2, 0], [3]]],
+          instrument: {
+            urls: {
+              0: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/0.wav",
+              1: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/1.wav",
+              2: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/2.wav",
+              3: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/3.wav",
+              4: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/4.wav",
+              5: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/5.wav",
+              6: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/6.wav",
+              7: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/7.wav",
+              8: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/8.wav",
+              9: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
+            },
+          },
+          type: 0,
+          volume: 0,
+      muted: false,
+        },
+      ],
+      
+      copied: 0,
+      opened: 0,
+      likedBy: ["a"],
     };
     const sessionsRef = firebase.database().ref(`sessions`);
-    const newSessionRef = sessionsRef.push()
-    newSessionRef.set(newSession,setOpenedSession(newSessionRef.key));
+    const newSessionRef = sessionsRef.push();
+    newSessionRef.set(newSession, setOpenedSession(newSessionRef.key));
 
-    const userSessionsRef = firebase.database().ref('users').child(user.uid).child('sessions');
-    userSessionsRef.get().then(snapshot=>{
+    const userSessionsRef = firebase
+      .database()
+      .ref("users")
+      .child(user.uid)
+      .child("sessions");
+    userSessionsRef.get().then((snapshot) => {
       let prev = snapshot.val() === null ? [] : snapshot.val();
-      userSessionsRef.set([...prev,newSessionRef.key]);
-    })
-
-
+      userSessionsRef.set([...prev, newSessionRef.key]);
+    });
   };
 
   const handleAvatarClick = (e) => {
@@ -126,9 +152,11 @@ function App() {
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
 
-      {currentPage === 1 && <SessionExplorer user={user} />}
+      {currentPage === 1 && (
+        <SessionExplorer setCurrentPage={setCurrentPage} setOpenedSession={setOpenedSession} user={user} />
+      )}
 
-      {currentPage === 2 && <FileExplorer user={user} />}
+      {currentPage === 2 && <FileExplorer setCurrentPage={setCurrentPage} user={user} />}
 
       <SideMenu
         open={sideMenu}
