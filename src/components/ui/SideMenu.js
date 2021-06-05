@@ -12,21 +12,36 @@ import {
   Divider,
 } from "@material-ui/core";
 
+import "./SideMenu.css";
+
 function SideMenu(props) {
   const handleClose = () => props.setSideMenu(false);
 
+  const handleClick = (opt) => {
+    console.log(opt);
+    opt === "New Session" && props.createNewSession();
+  };
+
   return (
-    <Drawer className="sidemenu" anchor={"left"} open={props.open} onClose={handleClose}>
-      <Typography style={{textAlign:"center"}} variant="h4">MUSA</Typography>
+    <Drawer anchor={"left"} open={props.open} onClose={handleClose}>
+      <Typography style={{ textAlign: "center" }} variant="h6">
+        --Musa Logo--
+      </Typography>
       <Divider />
-      <List>
-        {["Explore", "Sample Bank"].map((text, index) => (
-          <ListItem button onClick={()=>{}}>
+      <List className="side-menu-list">
+        {["New Session", "Explore", "Sample Bank"].map((text, index) => (
+          <ListItem
+            button
+            onClick={() => {
+              handleClick(text);
+            }}
+          >
             <ListItemIcon>
-              <Icon>{index !== 1 ? text.toLowerCase() : index}</Icon>
+              <Icon>
+                {index === 0 ? "add" : index === 1 ? "explore" : "equalizer"}
+              </Icon>
             </ListItemIcon>
             <ListItemText primary={text} />
-
           </ListItem>
         ))}
       </List>

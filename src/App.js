@@ -16,6 +16,7 @@ import {
 import firebase from "firebase";
 
 import Workspace from "./components/ui/Workspace";
+import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import SideMenu from "./components/ui/SideMenu";
 
@@ -26,7 +27,33 @@ function App() {
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
-  const [userSamplesPage, setSamplePage] = useState(false);
+  const [currentPage, setCurrentPage] = useState(null);
+  const [openedSession, setOpenedSession] = useState(null);
+
+  const createNewSession = () => {
+    let newSession = {
+      name: "New Session",
+      bpm: 120,
+      creator:user.uid,
+      editors:[user.uid],
+      modules: [{name:"Sequencer",color:2}],
+      copied:0,
+      opened:0,
+      likedBy:["a"]
+
+    };
+    const sessionsRef = firebase.database().ref(`sessions`);
+    const newSessionRef = sessionsRef.push()
+    newSessionRef.set(newSession,setOpenedSession(newSessionRef.key));
+
+    const userSessionsRef = firebase.database().ref('users').child(user.uid).child('sessions');
+    userSessionsRef.get().then(snapshot=>{
+      let prev = snapshot.val() === null ? [] : snapshot.val();
+      userSessionsRef.set([...prev,newSessionRef.key]);
+    })
+
+
+  };
 
   const handleAvatarClick = (e) => {
     !user ? setAuthDialog(true) : setUserOption(e.currentTarget);
@@ -91,19 +118,25 @@ function App() {
         onClose={() => setUserOption(false)}
       >
         <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
-        <MenuItem onClick={() => setUserOption(false)}>My Sessions</MenuItem>
-        <MenuItem onClick={() => setSamplePage(prev=>!prev)}>My Samples</MenuItem>
+        <MenuItem onClick={() => setCurrentPage(1)}>My Sessions</MenuItem>
+        <MenuItem onClick={() => setCurrentPage(2)}>My Samples</MenuItem>
         <MenuItem onClick={() => setUserOption(false)}>
           My Synth Patches
         </MenuItem>
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
 
-      {userSamplesPage && <FileExplorer user={user} />}
+      {currentPage === 1 && <SessionExplorer user={user} />}
 
-      <SideMenu open={sideMenu} setSideMenu={setSideMenu} />
+      {currentPage === 2 && <FileExplorer user={user} />}
 
-      <Workspace className="workspace" user={user} />
+      <SideMenu
+        open={sideMenu}
+        setSideMenu={setSideMenu}
+        createNewSession={createNewSession}
+      />
+
+      <Workspace className="workspace" session={openedSession} user={user} />
     </div>
   );
 }
