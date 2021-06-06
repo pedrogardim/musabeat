@@ -16,15 +16,12 @@ import {
 } from "@material-ui/core";
 
 import "./Sequencer.css";
-import { colors } from "../../../utils/materialPalette"
-
+import { colors } from "../../../utils/materialPalette";
 
 function Sequencer(props) {
-  const loadedSequence = props.module.score;
-  const [sequencerArray, changeSequence] = useState(loadedSequence);
+  const [sequencerArray, changeSequence] = useState(props.module.score);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
-  const [scheduledEvents, setScheduledEvents] = useState([]);
   const [hovered, setHovered] = useState(false);
 
   const inputNote = (x, y) => {
@@ -32,13 +29,17 @@ function Sequencer(props) {
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
           measureIndex == currentMeasure && beatIndex == x
-            ? beat.includes(y)
-              ? beat.filter((note) => note != (isNaN(y) ? y : parseInt(y)))
-              : (() => {
+            ? beat === 0
+              ? [y]
+              : beat.includes(y) && beat.length > 1
+              ? beat.filter((z) => z != y)
+              : beat.includes(y) && beat.length === 1
+              ? 0
+              : () => {
                   let newbeat = [...beat];
                   newbeat.push(isNaN(y) ? y : parseInt(y));
                   return newbeat;
-                })()
+                }
             : beat
         )
       )
@@ -47,8 +48,6 @@ function Sequencer(props) {
   };
 
   const scheduleNotes = () => {
-    //setScheduledEvents([]);
-
     let scheduledNotes = [];
 
     scheduledNotes = scheduleDrumSequence(
@@ -60,8 +59,6 @@ function Sequencer(props) {
       props.module.id,
       props.sessionSize
     );
-
-    setScheduledEvents(scheduledNotes);
   };
 
   const playDrumSound = (note, time) =>
@@ -75,9 +72,9 @@ function Sequencer(props) {
 
   const updateModuleSequence = () => {
     props.updateModules((previousModules) => {
-      let newmodules = [...previousModules];
-      newmodules[props.module.id].score = sequencerArray;
-      return newmodules;
+      let newModules = [...previousModules];
+      newModules[props.module.id].score = sequencerArray;
+      return newModules;
     });
   };
 
@@ -85,19 +82,22 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-    updateModuleSequence();
+    props.module.score !== sequencerArray && updateModuleSequence();
+    console.log(
+      sequencerArray[currentMeasure],
+      sequencerArray[currentMeasure][4],
+      sequencerArray[currentMeasure][4] === undefined
+    );
   }, [sequencerArray]);
 
   useEffect(() => {
-
     scheduleNotes();
   }, [props.instrument]);
 
   useEffect(() => {
-    currentMeasure > props.module.score.length && setCurrentMeasure(0)
+    currentMeasure > props.module.score.length && setCurrentMeasure(0);
     changeSequence(props.module.score);
   }, [props.module.score]);
-
 
   useEffect(() => {
     scheduleNotes();
@@ -110,36 +110,34 @@ function Sequencer(props) {
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
     >
-      
-        <div className="sequencer">
-          {Object.keys(props.module.instrument.urls).map((drumsound, row) => (
-            <div className="sequencer-row" key={drumsound}>
-              {hovered && (
-                <Typography className="sequencer-row-label" variant="overline">
-                  {isNaN(drumsound)
-                    ? drumsound
-                    : labels[parseInt(drumsound)]}
-                </Typography>
-              )}
-              {sequencerArray[currentMeasure].map((beat, column) => (
-                <SequencerTile
-                  key={[column, drumsound]}
-                  inputNote={inputNote}
-                  active={beat.includes(
+      <div className="sequencer">
+        {Object.keys(props.module.instrument.urls).map((drumsound, row) => (
+          <div className="sequencer-row" key={drumsound}>
+            {hovered && (
+              <Typography className="sequencer-row-label" variant="overline">
+                {isNaN(drumsound) ? drumsound : labels[parseInt(drumsound)]}
+              </Typography>
+            )}
+            {sequencerArray[currentMeasure].map((beat, column) => (
+              <SequencerTile
+                key={[column, drumsound]}
+                inputNote={inputNote}
+                active={
+                  sequencerArray[currentMeasure][column] !== 0 &&
+                  sequencerArray[currentMeasure][column].includes(
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
-                  )}
-                  cursor={currentBeat == column}
-                  color={colors[props.module.color]}
-                  x={column}
-                  y={
-                    isNaN(drumsound) ? drumsound : parseInt(drumsound)
-                  }
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-      
+                  )
+                }
+                cursor={currentBeat == column}
+                color={colors[props.module.color]}
+                x={column}
+                y={isNaN(drumsound) ? drumsound : parseInt(drumsound)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
       {props.module.instrument === {} && (
         <Typography style={{ color: "white" }}>
           Oops..! No sounds loaded

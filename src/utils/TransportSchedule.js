@@ -35,7 +35,7 @@ export const scheduleDrumSequence = (
           Tone.Time("1m").toSeconds() * x * moduleLength;
 
         let thisevent = transport.schedule((time) => {
-          beat.forEach(
+          beat !==0 && beat.forEach(
             (note) =>
               instrument.has(note) && instrument.player(note).start(time)
           );

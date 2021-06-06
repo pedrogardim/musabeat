@@ -38,7 +38,7 @@ function App() {
       editors: [user.uid],
       modules: [
         {
-          id:0,
+          id: 0,
           name: "Sequencer",
           color: 2,
           score: [[[0], [3], [2, 0], [3], [0], [3], [2, 0], [3]]],
@@ -58,10 +58,10 @@ function App() {
           },
           type: 0,
           volume: 0,
-      muted: false,
+          muted: false,
         },
       ],
-      
+
       copied: 0,
       opened: 0,
       likedBy: ["a"],
@@ -127,7 +127,6 @@ function App() {
         alt={user && user.displayName}
         src={user && user.photoURL}
       />
-
       {authDialog && (
         <AuthDialog
           authDialog={authDialog}
@@ -135,7 +134,6 @@ function App() {
           setUser={setUser}
         />
       )}
-
       <Menu
         style={{ marginTop: 48 }}
         anchorEl={userOption}
@@ -151,20 +149,24 @@ function App() {
         </MenuItem>
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
-
       {currentPage === 1 && (
-        <SessionExplorer setCurrentPage={setCurrentPage} setOpenedSession={setOpenedSession} user={user} />
+        <SessionExplorer
+          setCurrentPage={setCurrentPage}
+          setOpenedSession={setOpenedSession}
+          user={user}
+        />
       )}
-
-      {currentPage === 2 && <FileExplorer setCurrentPage={setCurrentPage} user={user} />}
-
+      {currentPage === 2 && (
+        <FileExplorer setCurrentPage={setCurrentPage} user={user} />
+      )}
       <SideMenu
         open={sideMenu}
         setSideMenu={setSideMenu}
         createNewSession={createNewSession}
       />
-
-      <Workspace className="workspace" session={openedSession} user={user} />
+      {openedSession !== null && (
+        <Workspace className="workspace" session={openedSession} user={user} />
+      )}
     </div>
   );
 }

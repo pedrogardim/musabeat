@@ -133,14 +133,16 @@ function Workspace(props) {
       return;
     }
     else if(typeof props.session === "string"){
-      let sessionRef = firebase.database().ref('sessions').child(props.session);
-      sessionRef.get().then(snapshot=>setModules(snapshot.val().modules))
-      
+      let sessionRef = firebase.database().ref('sessions').child(props.session).child('modules');
+      sessionRef.get().then(snapshot=>{
+        setModules(snapshot.val())
+      })
     }
   };
 
   const saveToDatabase = () => {
     DBModulesRef !== null && DBModulesRef.set(modules)
+    console.log("Saved");
 
   }
 
@@ -210,6 +212,7 @@ function Workspace(props) {
     DBModulesRef !== null && DBModulesRef.on('value', (snapshot) => {
       const data = snapshot.val();
       setModules(data);
+      console.log("Retrieved");
     });
   }, [DBModulesRef]);
 

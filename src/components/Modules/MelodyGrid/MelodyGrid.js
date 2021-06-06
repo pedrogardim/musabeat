@@ -37,7 +37,6 @@ function MelodyGrid(props) {
 
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
-  const [scheduledEvents, setScheduledEvents] = useState([]);
   const [hovered, setHovered] = useState(false);
 
   let loadedpatch = props.module.patch;
@@ -48,8 +47,11 @@ function MelodyGrid(props) {
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
           measureIndex == currentMeasure && beatIndex == x
-            ? beat.includes(note)
-              ? beat.filter((z) => z != note)
+            ? beat.includes(note) && beat.length>1
+              ? beat.filter((z) => z != note) :
+              beat.includes(note) && beat.length === 1 ?
+              0
+
               : (() => {
                   let newbeat = [...beat];
                   newbeat.push(note);
@@ -64,10 +66,7 @@ function MelodyGrid(props) {
 
   const scheduleNotes = () => {
     //setScheduledEvents([]);
-
-    let scheduledNotes = [];
-
-    scheduledNotes = scheduleMelodyGrid(
+    scheduleMelodyGrid(
       melodyArray,
       instrument,
       Tone.Transport,
@@ -76,8 +75,6 @@ function MelodyGrid(props) {
       props.module.id,
       props.sessionSize
     );
-
-    setScheduledEvents(scheduledNotes);
   };
 
   const getScaleFromSequenceNotes = () => {
@@ -108,11 +105,11 @@ function MelodyGrid(props) {
     setCurrentBeat(0);
   };
 
-  const updateSequence = () => {
+  const updateModuleSequence = () => {
     props.updateModules((previousModules) => {
-      let newmodules = [...previousModules];
-      newmodules[props.module.id].score = melodyArray;
-      return newmodules;
+      let newModules = [...previousModules];
+      newModules[props.module.id].score = melodyArray;
+      return newModules;
     });
   };
 
@@ -139,7 +136,7 @@ function MelodyGrid(props) {
 
   useEffect(() => {
     instrument && scheduleNotes();
-    updateSequence();
+    props.module.score !== melodyArray && updateModuleSequence();
   }, [instrument, melodyArray]);
 
   useEffect(() => {
@@ -175,11 +172,11 @@ function MelodyGrid(props) {
                   {drumsound}
                 </Typography>
               )}
-              {melodyArray[currentMeasure].map((beat, column) => (
+              {new Array(melodyArray[currentMeasure].length).fill(" ").map((beat, column) => (
                 <SequencerTile
                   key={[column, row]}
                   inputNote={inputNote}
-                  active={beat.includes(gridScale[row])}
+                  active={melodyArray[currentMeasure][column].includes(gridScale[row])}
                   cursor={currentBeat == column}
                   color={colors[props.module.color]}
                   x={column}
