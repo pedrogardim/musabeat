@@ -1,12 +1,20 @@
 import "./ModulePicker.css";
 
+import React, { useState, useEffect, Fragment, useRef } from "react";
+
 import {
   IconButton,
   Card,
+  Typography,
   Icon,
+  Dialog,
+  BottomNavigation,
+  BottomNavigationAction,
+  Button,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core";
-
-import ModulePickerItem from "./ModulePickerItem";
 
 const moduletypes = [
   {
@@ -16,9 +24,9 @@ const moduletypes = [
     icon: "grid_on",
   },
   {
-    name: "Melody Composer",
+    name: "Melody Grid",
     description:
-      "Make a melody with a typical piano roll, or with a pitch sequencer",
+      "Makes melody with a grid similar to a sequencer, but with pitches",
     icon: "music_note",
   },
   {
@@ -28,31 +36,146 @@ const moduletypes = [
     icon: "piano",
   },
   {
-    name: "Sampler",
-    description: "Drag audio files and manipulate them on time and pitch",
+    name: "Player",
+    description:
+      "Drag audio files to play, and manipulate them on time and pitch",
     icon: "graphic_eq",
   },
 ];
 
+const stepValues = [4, 8, 12, 16, 24, 32];
+const lengthValues = [1, 2, 4, 8, 16];
+
 function ModulePicker(props) {
+  const [selectedType, setSelectedType] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(1);
+  const [selectedSteps, setSelectedSteps] = useState(8);
+  const [selectedInstrument, setSelectedInstrument] = useState(0);
+  const [selectedRoot, setSelectedRoot] = useState(0);
+  const [selectedScale, setSelectedScale] = useState(1);
+  const [selectedRange, setSelectedRange] = useState([3, 6]);
+
+  const addModule = (moduletype) => {
+    let module = {
+      id: Math.max(...props.modules.map((e) => e.id)) + 1,
+      name: moduletypes[selectedType].name,
+      type: selectedType,
+      root: selectedType === 1 || selectedType === 2 ? selectedRoot : undefined,
+      scale:
+        selectedType === 1 || selectedType === 2 ? selectedScale : undefined,
+      range:
+        selectedType === 1 || selectedType === 2 ? selectedRange : undefined,
+
+      score:
+        selectedType === 0 || selectedType === 1
+          ? [new Array(selectedSteps).fill(0)]
+          : selectedType === 2
+          ? new Array(selectedSize).map((e, i) => {
+              return {
+                notes: ["E1", "E3", "E4", "G4", "B4"],
+                duration: 1,
+                time: i,
+                rhythm: [1],
+              };
+            })
+          : [{ time: 0, duration: 0 }],
+      instrument:
+        selectedType === 0
+          ? {
+              urls: {
+                0: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/0.wav",
+                1: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/1.wav",
+                2: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/2.wav",
+                3: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/3.wav",
+                4: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/4.wav",
+                5: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/5.wav",
+                6: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/6.wav",
+                7: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/7.wav",
+                8: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/8.wav",
+                9: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
+              },
+            }
+          : "-MbBygzylMiMRWrAv1kh",
+      color: Math.floor(Math.random() * 15.99),
+    };
+    props.setModules((prevModules) => [...prevModules, module]);
+    props.setModulePicker(false);
+  };
+
+  const handleSizeSelect = (event) => {
+    setSelectedSize(event.target.value);
+  };
+
+  const handleStepSelect = (event) => {
+    setSelectedSteps(event.target.value);
+  };
+
+  const handleInstrumentSelect = (event) => {
+    setSelectedInstrument(event.target.value);
+  };
+
   return (
-    <Card className="module-picker">
-      {moduletypes.map((data, index) => (
-        <ModulePickerItem
-          addNewModule={props.addNewModule}
-          key={index}
-          id={index}
-          data={data}
-        />
-      ))}
+    <Dialog
+      open={props.open}
+      onClose={props.onClose}
+      PaperProps={{ className: "module-picker" }}
+    >
+      <Typography variant="overline"> Create a new module</Typography>
+      <BottomNavigation
+        value={selectedType}
+        onChange={(event, newValue) => {
+          setSelectedType(newValue);
+        }}
+        showLabels
+      >
+        {moduletypes.map((e) => (
+          <BottomNavigationAction
+            label={e.name}
+            key={e.name}
+            icon={<Icon>{e.icon}</Icon>}
+          />
+        ))}
+      </BottomNavigation>
+
+      <p variant="overline"> {moduletypes[selectedType].description}</p>
+
+      <div className="module-picker-select-cont">
+        {
+          <FormControl>
+            <InputLabel>Length, in measures</InputLabel>
+            <Select native value={selectedSize} onChange={handleSizeSelect}>
+              {lengthValues.map((e) => (
+                <option key={`mpl${e}`} value={e}>
+                  {e}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        }
+        {(selectedType === 0 || selectedType === 1) && (
+          <FormControl>
+            <InputLabel>Steps</InputLabel>
+            <Select native value={selectedSteps} onChange={handleStepSelect}>
+              {stepValues.map((e) => (
+                <option key={`mps${e}`} value={e}>
+                  {e}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+      </div>
+
+      <Button onClick={addModule}>ADD MODULE</Button>
+
       <IconButton
-        onClick={() => props.toggleVisibility(false)}
+        onClick={() => props.setModulePicker(false)}
         className="mp-closebtn"
         color="primary"
       >
         <Icon>close</Icon>
       </IconButton>
-    </Card>
+    </Dialog>
   );
 }
 

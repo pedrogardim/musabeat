@@ -25,7 +25,7 @@ function Workspace(props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
-  const [modulePickerVisibility, chooseNewModule] = useState(false);
+  const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
 
   const [DBModulesRef, setDBModulesRef] = useState(null);
@@ -44,20 +44,6 @@ function Workspace(props) {
     }
   };
 
-  const addModule = (moduletype) => {
-    let module = {
-      id: Math.max(...modules.map((e) => e.id)) + 1,
-      name: "New Module",
-      type: moduletype,
-      subdiv: 16,
-      patch: 0,
-      score: [],
-      instrument: {},
-      color: colors[Math.floor(Math.random() * colors.length)],
-    };
-    setModules((prevModules) => [...prevModules, module]);
-    chooseNewModule(false);
-  };
 
   const adaptSessionSize = () => {
     let lengths = modules.map((module) =>
@@ -229,15 +215,18 @@ function Workspace(props) {
       <IconButton
         color="primary"
         style={{ marginTop: 48 }}
-        onClick={() => chooseNewModule(true)}
+        onClick={() => setModulePicker(true)}
       >
         <Icon>add</Icon>
       </IconButton>
 
-      {modulePickerVisibility && (
+      {modulePicker && (
         <ModulePicker
-          toggleVisibility={chooseNewModule}
-          addNewModule={addModule}
+          open={modulePicker}
+          onClose={()=>setModulePicker(false)}
+          setModulePicker={setModulePicker}
+          setModules={setModules}
+          modules={modules}
         />
       )}
       <Exporter

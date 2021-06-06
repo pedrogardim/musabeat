@@ -150,7 +150,7 @@ function MelodyGrid(props) {
   }, [props.module.root, props.module.scale, props.module.range]);
 
   useEffect(() =>{
-    getScaleFromSequenceNotes();
+    //getScaleFromSequenceNotes();
   },[])
 
 
@@ -161,7 +161,6 @@ function MelodyGrid(props) {
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
     >
-      {isBufferLoaded ? (
         <div className="melody-grid">
           {gridScale.map((drumsound, row) => (
             <div className="melody-grid-row" key={row}>
@@ -173,12 +172,16 @@ function MelodyGrid(props) {
                   {drumsound}
                 </Typography>
               )}
-              {new Array(melodyArray[currentMeasure].length).fill(" ").map((beat, column) => (
+              {melodyArray[currentMeasure].map((beat, column) => (
                 <SequencerTile
                   key={[column, row]}
                   inputNote={inputNote}
-                  active={melodyArray[currentMeasure][column].includes(gridScale[row])}
-                  cursor={currentBeat == column}
+                  active={
+                    typeof beat === "object" &&
+                    beat.includes(
+                      isNaN(drumsound) ? drumsound : parseInt(drumsound)
+                    )
+                  }                  cursor={currentBeat == column}
                   color={colors[props.module.color]}
                   x={column}
                   y={row}
@@ -187,9 +190,7 @@ function MelodyGrid(props) {
             </div>
           ))}
         </div>
-      ) : (
-        <CircularProgress />
-      )}
+      
       {melodyArray.length > 1 && (
         <BottomNavigation
           value={currentMeasure}
