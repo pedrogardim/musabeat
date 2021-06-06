@@ -39,26 +39,21 @@ function MelodyGrid(props) {
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [hovered, setHovered] = useState(false);
 
-  let loadedpatch = props.module.patch;
-
   const inputNote = (x, y) => {
     let note = gridScale[y];
     setMelodyArray((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
-        measure.map((beat, beatIndex) =>
-          measureIndex == currentMeasure && beatIndex == x
-            ? beat.includes(note) && beat.length>1
-              ? beat.filter((z) => z != note) :
-              beat.includes(note) && beat.length === 1 ?
-              0
-
-              : (() => {
-                  let newbeat = [...beat];
-                  newbeat.push(note);
-                  return newbeat;
-                })()
-            : beat
-        )
+      measure.map((beat, beatIndex) =>
+      measureIndex == currentMeasure && beatIndex == x
+        ? beat === 0
+          ? [note]
+          : beat.includes(note) && beat.length > 1
+          ? beat.filter((z) => z != note)
+          : beat.includes(note) && beat.length === 1
+          ? 0
+          : [...beat, note]
+        : beat
+    )
       )
     );
     playNote(note);
@@ -129,10 +124,12 @@ function MelodyGrid(props) {
     setInstrument(props.instrument);
   }, [props.instrument]);
 
+/* 
   useEffect(() => {
     currentMeasure > props.module.score.length && setCurrentMeasure(0)
     setMelodyArray(props.module.score);
   }, [props.module.score]);
+ */
 
   useEffect(() => {
     instrument && scheduleNotes();

@@ -35,10 +35,11 @@ export const scheduleDrumSequence = (
           Tone.Time("1m").toSeconds() * x * moduleLength;
 
         let thisevent = transport.schedule((time) => {
-          beat !==0 && beat.forEach(
-            (note) =>
-              instrument.has(note) && instrument.player(note).start(time)
-          );
+          beat !== 0 &&
+            beat.forEach(
+              (note) =>
+                instrument.has(note) && instrument.player(note).start(time)
+            );
           updateBeat(beatIndex);
           updateMeasure(measureIndex);
         }, beatscheduletime);
@@ -76,13 +77,14 @@ export const scheduleMelodyGrid = (
           Tone.Time("1m").toSeconds() * x * moduleLength;
 
         let thisevent = transport.schedule((time) => {
-          beat.forEach((note) =>
-            instrument.triggerAttackRelease(
-              note,
-              Tone.Time("1m").toSeconds() / sequence[measureIndex].length,
-              time
-            )
-          );
+          beat !== 0 &&
+            beat.forEach((note) =>
+              instrument.triggerAttackRelease(
+                note,
+                Tone.Time("1m").toSeconds() / sequence[measureIndex].length,
+                time
+              )
+            );
           updateBeat(beatIndex);
           updateMeasure(measureIndex);
         }, beatscheduletime);
