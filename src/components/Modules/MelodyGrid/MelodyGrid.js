@@ -137,6 +137,10 @@ function MelodyGrid(props) {
   }, [instrument, melodyArray]);
 
   useEffect(() => {
+    props.module.score !== melodyArray && setMelodyArray(props.module.score);
+  }, [props.module]);
+
+  useEffect(() => {
     instrument && scheduleNotes();
   }, [props.sessionSize]);
 

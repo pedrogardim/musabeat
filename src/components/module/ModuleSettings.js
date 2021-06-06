@@ -27,7 +27,7 @@ function ModuleSettings(props) {
     Tone.Transport.pause();
     let newValue = parseInt(event.target.value);
     //console.log(newValue);
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
@@ -48,7 +48,7 @@ function ModuleSettings(props) {
   const handleLengthSelect = (event) => {
     Tone.Transport.pause();
     let newLength = parseInt(event.target.value);
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
@@ -71,7 +71,7 @@ function ModuleSettings(props) {
 
   const handleRootChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module, root: newValue };
@@ -87,7 +87,7 @@ function ModuleSettings(props) {
 
   const handleScaleChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module, scale: newValue };
@@ -103,7 +103,7 @@ function ModuleSettings(props) {
 
   const handleComplexityChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module, complexity: newValue };
@@ -119,7 +119,7 @@ function ModuleSettings(props) {
 
   const handleOctaveRangeSelect = (e, v) => {
     let newValue = v;
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module, range: newValue };

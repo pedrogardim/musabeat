@@ -17,13 +17,11 @@ import Mixer from "./mixer/Mixer";
 
 import { colors } from "../../utils/materialPalette";
 
-
 Tone.Transport.bpm.value = starterSession.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
-
   const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
@@ -32,20 +30,16 @@ function Workspace(props) {
 
   const [DBModulesRef, setDBModulesRef] = useState(null);
 
-
   //a copy of the instruments, to be able to use them on export function
   const [modulesInstruments, setModulesInstruments] = useState([]);
 
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
 
-
-
   const handlePlaying = (state) => {
     if (state !== "started") {
       setIsPlaying(true);
     } else {
-      
       setIsPlaying(false);
     }
   };
@@ -115,36 +109,36 @@ function Workspace(props) {
         return module;
       }),
     };
-    console.log(parsedSession[0].instrument, parsedSession);
+    //console.log(parsedSession[0].instrument, parsedSession);
     let pushedSessionRef = firebase
       .database()
       .ref("sessions")
       .push(parsedSession);
-    console.log(pushedSessionRef.key);
+    //console.log(pushedSessionRef.key);
   };
 
   const loadSession = () => {
-    if(props.session === null){
+    if (props.session === null) {
+      console.log("session is null!")
       setModules([]);
       return;
     }
-    else if(typeof props.session === "object"){
-      setModules(props.session.modules);
-      return;
-    }
-    else if(typeof props.session === "string"){
-      let sessionRef = firebase.database().ref('sessions').child(props.session).child('modules');
-      sessionRef.get().then(snapshot=>{
-        setModules(snapshot.val())
-      })
-    }
+    console.log(props.session);
+    let sessionRef =
+      props.session !== null &&
+      firebase.database().ref("sessions").child(props.session).child("modules");
+    console.log(sessionRef);
+    setDBModulesRef(!sessionRef ? null : sessionRef);
   };
 
   const saveToDatabase = () => {
-    DBModulesRef !== null && DBModulesRef.set(modules)
-    console.log("Saved");
-
-  }
+    DBModulesRef !== null &&
+      DBModulesRef.get().then((snapshot) => {
+        snapshot !== modules
+          ? DBModulesRef.set(modules)
+          : console.log("Checked but not atualized");
+      });
+  };
 
   ////TODO: UNDO
   /* 
@@ -190,37 +184,29 @@ function Workspace(props) {
   }; 
   */
 
-
-
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
     saveToDatabase(modules);
-
   }, [modules]);
 
   useEffect(() => {
     loadSession();
-    console.log(props.session);
-    let sessionRef = props.session !== null && firebase.database().ref('sessions').child(props.session).child('modules');
-    console.log(sessionRef);
-    setDBModulesRef(!sessionRef ? null : sessionRef);
+    
   }, [props.session]);
 
   useEffect(() => {
-    DBModulesRef !== null && DBModulesRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      setModules(data);
-      console.log("Retrieved");
-    });
+    DBModulesRef !== null &&
+      DBModulesRef.on("value", (snapshot) => {
+        const data = snapshot.val();
+        setModules(data);
+      });
   }, [DBModulesRef]);
-
 
   useEffect(() => {
     handlePlaying(Tone.Transport.state);
   }, [Tone.Transport.state]);
-
 
   /*onKeyDown={handleKeyPress}*/
 
@@ -235,7 +221,6 @@ function Workspace(props) {
             sessionSize={sessionSize}
             setModules={setModules}
             setModulesInstruments={setModulesInstruments}
-
           />
           {moduleIndex % 3 == 1 && <div className="break" />}
         </Fragment>
@@ -260,21 +245,13 @@ function Workspace(props) {
         sessionData={starterSession}
         modules={modules}
         modulesInstruments={modulesInstruments}
-
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
-      {mixerOpened && (
-        <Mixer
-          modules={modules}
-          setModules={setModules}
-        />
-
-      )}
-                  {/*setModulesVolume={setModulesVolume}*/}
+      {mixerOpened && <Mixer modules={modules} setModules={setModules} />}
+      {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab
-
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 12px)" }}

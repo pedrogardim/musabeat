@@ -309,7 +309,7 @@ function Module(props) {
             <ModuleSettings
               instrument={instrument}
               module={props.module}
-              updateModules={props.setModules}
+              setModules={props.setModules}
               setSettingsMode={setSettingsMode}
               index={props.index}
             />

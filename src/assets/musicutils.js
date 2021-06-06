@@ -497,7 +497,7 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
 
       if ((x + 1) % (oldarray.length / gdc) === 0) {
         for (let y = 0; y < difference - 1; y++) {
-          arrayType ? newsubdivarray.push(0) : newsubdivarray.push([]);
+          arrayType ? newsubdivarray.push(0) : newsubdivarray.push(0);
         }
       }
     }

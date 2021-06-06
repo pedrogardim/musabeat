@@ -19,13 +19,13 @@ import "./Sequencer.css";
 import { colors } from "../../../utils/materialPalette";
 
 function Sequencer(props) {
-  const [sequencerArray, changeSequence] = useState(props.module.score);
+  const [sequencerArray, setSequence] = useState(props.module.score);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [hovered, setHovered] = useState(false);
 
   const inputNote = (x, y) => {
-    changeSequence((previousSequence) =>
+    setSequence((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
           measureIndex == currentMeasure && beatIndex == x
@@ -82,13 +82,17 @@ function Sequencer(props) {
   }, [sequencerArray]);
 
   useEffect(() => {
+    props.module.score !== sequencerArray && setSequence(props.module.score);
+  }, [props.module]);
+
+  useEffect(() => {
     scheduleNotes();
   }, [props.instrument]);
 
   /* 
   useEffect(() => {
     currentMeasure > props.module.score.length && setCurrentMeasure(0);
-    changeSequence(props.module.score);
+    setSequence(props.module.score);
   }, [props.module.score]);
  */
 
