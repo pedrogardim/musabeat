@@ -25,7 +25,7 @@ Tone.Transport.loopStart = 0;
 function Workspace(props) {
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [modules, setModules] = useState(starterSession.modules);
+  const [modules, setModules] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePickerVisibility, chooseNewModule] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);

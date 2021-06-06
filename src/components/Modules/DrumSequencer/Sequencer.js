@@ -35,11 +35,7 @@ function Sequencer(props) {
               ? beat.filter((z) => z != y)
               : beat.includes(y) && beat.length === 1
               ? 0
-              : () => {
-                  let newbeat = [...beat];
-                  newbeat.push(isNaN(y) ? y : parseInt(y));
-                  return newbeat;
-                }
+              : [...beat, isNaN(y) ? y : parseInt(y)]
             : beat
         )
       )
@@ -83,21 +79,18 @@ function Sequencer(props) {
   useEffect(() => {
     scheduleNotes();
     props.module.score !== sequencerArray && updateModuleSequence();
-    console.log(
-      sequencerArray[currentMeasure],
-      sequencerArray[currentMeasure][4],
-      sequencerArray[currentMeasure][4] === undefined
-    );
   }, [sequencerArray]);
 
   useEffect(() => {
     scheduleNotes();
   }, [props.instrument]);
 
+  /* 
   useEffect(() => {
     currentMeasure > props.module.score.length && setCurrentMeasure(0);
     changeSequence(props.module.score);
   }, [props.module.score]);
+ */
 
   useEffect(() => {
     scheduleNotes();
@@ -123,8 +116,8 @@ function Sequencer(props) {
                 key={[column, drumsound]}
                 inputNote={inputNote}
                 active={
-                  sequencerArray[currentMeasure][column] !== 0 &&
-                  sequencerArray[currentMeasure][column].includes(
+                  typeof beat === "object" &&
+                  beat.includes(
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   )
                 }
@@ -138,11 +131,6 @@ function Sequencer(props) {
         ))}
       </div>
 
-      {props.module.instrument === {} && (
-        <Typography style={{ color: "white" }}>
-          Oops..! No sounds loaded
-        </Typography>
-      )}
       {sequencerArray.length > 1 && (
         <BottomNavigation
           style={{ color: colors[props.module.color][900] }}
