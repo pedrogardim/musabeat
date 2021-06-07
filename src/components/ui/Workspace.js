@@ -29,7 +29,7 @@ function Workspace(props) {
   const [mixerOpened, setMixerOpened] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
-  const [DBModulesRef, setDBModulesRef] = useState(null);
+  const [DBSessionRef, setDBSessionRef] = useState(null);
 
   //a copy of the instruments, to be able to use them on export function
   const [modulesInstruments, setModulesInstruments] = useState([]);
@@ -110,23 +110,16 @@ function Workspace(props) {
       setModules([]);
     } else {
       console.log(props.session);
-      let modulesRef =
+      let sessionRef =
         props.session !== null &&
         firebase
           .database()
           .ref("sessions")
-          .child(props.session)
-          .child("modules");
-      console.log(`loaded session: ${modulesRef}`);
-      setDBModulesRef(!modulesRef ? null : modulesRef);
+          .child(props.session);
+      console.log(`loaded session: ${sessionRef}`);
+      setDBSessionRef(!sessionRef ? null : sessionRef);
 
       //Check for editmode and get title
-
-      let sessionRef = firebase
-        .database()
-        .ref("sessions")
-        .child(props.session);
-
       sessionRef.get().then((snapshot) => {
         let editors = snapshot.val().editors;
         editors.includes(props.user.uid) ? setEditMode(true) : setEditMode(false);
@@ -138,10 +131,10 @@ function Workspace(props) {
   };
 
   const saveToDatabase = () => {
-    DBModulesRef !== null &&
-      DBModulesRef.get().then((snapshot) => {
+    DBSessionRef !== null &&
+      DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
-          ? DBModulesRef.set(modules)
+          ? DBSessionRef.child('modules').set(modules)
           : console.log("Checked but not atualized");
       });
   };
@@ -202,12 +195,12 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
-    DBModulesRef !== null &&
-      DBModulesRef.on("value", (snapshot) => {
+    DBSessionRef !== null &&
+      DBSessionRef.child('modules').on("value", (snapshot) => {
         const data = snapshot.val();
         setModules(data);
       });
-  }, [DBModulesRef]);
+  }, [DBSessionRef]);
 
   useEffect(() => {
     handlePlaying(Tone.Transport.state);

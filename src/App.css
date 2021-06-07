@@ -27,7 +27,8 @@ body {
   top: 24px;
   right:32px;
   height: 24px;
-  width: 24px 
+  width: 24px;
+  z-index:99 !important;
 
 
 }
