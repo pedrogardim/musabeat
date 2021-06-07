@@ -110,26 +110,29 @@ function Workspace(props) {
       setModules([]);
     } else {
       console.log(props.session);
-      let sessionRef =
+      let modulesRef =
         props.session !== null &&
         firebase
           .database()
           .ref("sessions")
           .child(props.session)
           .child("modules");
-      console.log(`loaded session: ${sessionRef}`);
-      setDBModulesRef(!sessionRef ? null : sessionRef);
+      console.log(`loaded session: ${modulesRef}`);
+      setDBModulesRef(!modulesRef ? null : modulesRef);
 
-      //Check for editmode
+      //Check for editmode and get title
 
-      let editorsRef = firebase
+      let sessionRef = firebase
         .database()
         .ref("sessions")
-        .child(props.session)
-        .child("editors");
-      editorsRef.get().then((snapshot) => {
-        let editors = snapshot.val();
+        .child(props.session);
+
+      sessionRef.get().then((snapshot) => {
+        let editors = snapshot.val().editors;
         editors.includes(props.user.uid) ? setEditMode(true) : setEditMode(false);
+        let name = snapshot.val().name;
+        props.setAppTitle(name)
+
       });
     }
   };

@@ -104,10 +104,8 @@ function FileExplorer(props) {
 
   return (
     <div className="file-explorer">
-        <Typography variant="h5">User Samples</Typography>
-
       {!!filedata.length ? (
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper} className="file-explorer-table">
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>

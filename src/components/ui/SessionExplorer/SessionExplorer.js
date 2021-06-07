@@ -57,11 +57,6 @@ function SessionExplorer(props) {
  */
   return (
     <div className="session-explorer">
-      <Typography variant="h5">
-        {isUser ? "User Sessions" : "Explore"}
-      </Typography>
-      <div className="break" />
-
       {!!sessions.length ? (
         <Fragment>
           {sessions.map((session, sessionIndex) => (

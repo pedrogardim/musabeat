@@ -11,6 +11,7 @@ import {
   Menu,
   MenuItem,
   Drawer,
+  Typography,
 } from "@material-ui/core";
 
 import firebase from "firebase";
@@ -29,6 +30,7 @@ function App() {
   const [sideMenu, setSideMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
+  const [appTitle, setAppTitle] = useState("Welcome!");
 
   const createNewSession = () => {
     let newSession = {
@@ -113,6 +115,20 @@ function App() {
     }
   };
 
+  const updateAppTitle = () => {
+    setAppTitle(
+      currentPage === "userSessions"
+        ? "My Sessions"
+        : currentPage === "exploreSessions"
+        ? "Explore"
+        : currentPage === "userFiles"
+        ? "My Samples"
+        : (currentPage === null && user !== null)
+        ? `Welcome ${user.displayName.split(" ")[0]} ${user.displayName.split(" ")[1]}!`
+        : "Welcome!"
+    );
+  }
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
   }, []);
@@ -121,14 +137,20 @@ function App() {
     console.log(user);
     setCurrentPage(null);
     setOpenedSession(null);
+    updateAppTitle()
   }, [user]);
 
   useEffect(() => {
     console.log(currentPage);
+    updateAppTitle();
   }, [currentPage]);
 
   return (
     <div className="app-wrapper" onKeyDown={handleKeyPress}>
+      <Typography variant="h4" className="app-title">
+        {appTitle}
+      </Typography>
+      
       <IconButton className="side-menu-icon" onClick={() => setSideMenu(true)}>
         <Icon>menu</Icon>
       </IconButton>
@@ -184,7 +206,12 @@ function App() {
         createNewSession={createNewSession}
       />
       {openedSession !== null && currentPage === null && (
-        <Workspace className="workspace" session={openedSession} user={user} />
+        <Workspace
+          className="workspace"
+          setAppTitle={setAppTitle}
+          session={openedSession}
+          user={user}
+        />
       )}
     </div>
   );

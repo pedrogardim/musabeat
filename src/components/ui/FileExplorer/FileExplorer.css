@@ -1,12 +1,28 @@
 .file-explorer{
-    position:fixed;
-    height:100%;
-    width:80%;
-    left:10%;
-    top:0;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background-color:white;
+    position: fixed;
+  height: 100%;
+  width: 100%;
+  padding-top:80px;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: center;
 }
+
+.file-explorer-table{
+    width:60% !important;
+ 
+}
+
+@media only screen and (max-width: 800px) {
+    .file-explorer-table{
+        width:95% !important;
+     
+    }
+  }
+
+

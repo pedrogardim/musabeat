@@ -9,7 +9,10 @@ body {
 
 }
 
-.app-wrapper{
+.app-title{
+  position:fixed;
+  left:88px;
+  top:16px;
 
 }
 
@@ -21,7 +24,7 @@ body {
 
 .main-avatar{
   position: fixed !important;
-  top: 16px;
+  top: 24px;
   right:32px;
   height: 24px;
   width: 24px 
@@ -31,7 +34,7 @@ body {
 
 .side-menu-icon{
   position: fixed !important;
-  top: 16px;
+  top: 24px;
   left:32px;
   height: 24px;
   width: 24px 
