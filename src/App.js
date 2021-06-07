@@ -61,10 +61,11 @@ function App() {
           muted: false,
         },
       ],
-
       copied: 0,
       opened: 0,
+      likes: 0,
       likedBy: ["a"],
+      createdOn: firebase.database.ServerValue.TIMESTAMP,
     };
     const sessionsRef = firebase.database().ref(`sessions`);
     const newSessionRef = sessionsRef.push();
@@ -79,6 +80,12 @@ function App() {
       let prev = snapshot.val() === null ? [] : snapshot.val();
       userSessionsRef.set([...prev, newSessionRef.key]);
     });
+
+    //temp:only show workspace
+
+    setCurrentPage(null);
+
+
   };
 
   const handleAvatarClick = (e) => {
@@ -116,6 +123,10 @@ function App() {
     console.log(user);
   }, [user]);
 
+  useEffect(() => {
+    console.log(currentPage);
+  }, [currentPage]);
+
   return (
     <div className="app-wrapper" onKeyDown={handleKeyPress}>
       <IconButton className="side-menu-icon" onClick={() => setSideMenu(true)}>
@@ -142,25 +153,33 @@ function App() {
         onClose={() => setUserOption(false)}
       >
         <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
-        <MenuItem onClick={() => setCurrentPage(1)}>My Sessions</MenuItem>
-        <MenuItem onClick={() => setCurrentPage(2)}>My Samples</MenuItem>
+        <MenuItem onClick={() => setCurrentPage("userSessions")}>
+          My Sessions
+        </MenuItem>
+        <MenuItem onClick={() => setCurrentPage("userFiles")}>
+          My Samples
+        </MenuItem>
         <MenuItem onClick={() => setUserOption(false)}>
           My Synth Patches
         </MenuItem>
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
-      {currentPage === 1 && (
+      {(currentPage === "userSessions" ||
+        currentPage === "exploreSessions") && (
         <SessionExplorer
           setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
           setOpenedSession={setOpenedSession}
           user={user}
         />
       )}
-      {currentPage === 2 && (
+      {currentPage === "userFiles" && (
         <FileExplorer setCurrentPage={setCurrentPage} user={user} />
       )}
       <SideMenu
         open={sideMenu}
+        setCurrentPage={setCurrentPage}
+        setOpenedSession={setOpenedSession}
         setSideMenu={setSideMenu}
         createNewSession={createNewSession}
       />
