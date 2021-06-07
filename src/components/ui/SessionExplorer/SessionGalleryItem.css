@@ -12,6 +12,37 @@
 .session-gallery-item-title {
   text-align: center;
 }
+.session-gallery-item-subtitle  {
+  width:80%;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+
+}
+
+.session-gallery-item-subtitle > span,p  {
+  max-width:60;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  overflow: hidden;
+
+
+}
+
+.session-gallery-item-subtitle-avatar {
+  height:24px !important;
+  width:24px !important;
+  margin-right:8px;
+  
+
+}
+
 
 .session-gallery-item-title-cont {
     width:100%;

@@ -70,6 +70,7 @@ function SessionExplorer(props) {
               key={`sgi${sessionIndex}`}
               index={sessionIndex}
               session={session}
+              isUser={isUser}
             />
           ))}
         </Fragment>
