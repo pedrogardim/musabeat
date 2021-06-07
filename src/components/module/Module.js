@@ -218,11 +218,11 @@ function Module(props) {
   }, [instrument]);
 
   useEffect(() => {
-    if (instrument !== null) instrument.volume.value = props.module.volume;
+    if (instrument !== null && props.module.volume !== undefined) instrument.volume.value = props.module.volume;
   }, [props.module.volume]);
 
   useEffect(() => {
-    if (instrument !== null)
+    if (instrument !== null && props.module.muted !== undefined)
       instrument.volume.value = props.module.muted
         ? -Infinity
         : props.module.volume;

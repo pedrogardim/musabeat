@@ -44,8 +44,8 @@ function Workspace(props) {
     }
   };
 
-
   const adaptSessionSize = () => {
+    if (modules === null) return;
     let lengths = modules.map((module) =>
       module.type === 2
         ? Math.ceil(
@@ -105,7 +105,7 @@ function Workspace(props) {
 
   const loadSession = () => {
     if (props.session === null) {
-      console.log("session is null!")
+      console.log("session is null!");
       setModules([]);
       return;
     }
@@ -179,7 +179,6 @@ function Workspace(props) {
 
   useEffect(() => {
     loadSession();
-    
   }, [props.session]);
 
   useEffect(() => {
@@ -198,19 +197,23 @@ function Workspace(props) {
 
   return (
     <div className="workspace" tabIndex="0">
-      {modules.map((module, moduleIndex) => (
-        <Fragment>
-          <Module
-            key={module.id}
-            index={module.id}
-            module={module}
-            sessionSize={sessionSize}
-            setModules={setModules}
-            setModulesInstruments={setModulesInstruments}
-          />
-          {moduleIndex % 3 == 1 && <div className="break" />}
-        </Fragment>
-      ))}
+      {modules !== null && !!modules.length ? (
+        modules.map((module, moduleIndex) => (
+          <Fragment>
+            <Module
+              key={module.id}
+              index={module.id}
+              module={module}
+              sessionSize={sessionSize}
+              setModules={setModules}
+              setModulesInstruments={setModulesInstruments}
+            />
+            {moduleIndex % 3 == 1 && <div className="break" />}
+          </Fragment>
+        ))
+      ) : (
+        <p>No Modules!</p>
+      )}
       <div className="break" />
       <IconButton
         color="primary"
@@ -223,7 +226,7 @@ function Workspace(props) {
       {modulePicker && (
         <ModulePicker
           open={modulePicker}
-          onClose={()=>setModulePicker(false)}
+          onClose={() => setModulePicker(false)}
           setModulePicker={setModulePicker}
           setModules={setModules}
           modules={modules}

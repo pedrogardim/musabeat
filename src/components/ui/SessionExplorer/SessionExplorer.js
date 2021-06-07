@@ -50,11 +50,11 @@ function SessionExplorer(props) {
     setSessions([]);
     getSessionList();
   }, [props.currentPage]);
-
+/* 
   useEffect(() => {
     console.log(sessionKeys, sessions);
   }, [sessions, sessionKeys]);
-
+ */
   return (
     <div className="session-explorer">
       <Typography variant="h5">

@@ -56,16 +56,10 @@ function ModulePicker(props) {
   const [selectedRange, setSelectedRange] = useState([3, 6]);
 
   const addModule = (moduletype) => {
-    let module = {
-      id: Math.max(...props.modules.map((e) => e.id)) + 1,
+    let newModule = {
+      id: props.modules === null ? 0 : Math.max(...props.modules.map((e) => e.id)) + 1,
       name: moduletypes[selectedType].name,
       type: selectedType,
-      root: selectedType === 1 || selectedType === 2 ? selectedRoot : undefined,
-      scale:
-        selectedType === 1 || selectedType === 2 ? selectedScale : undefined,
-      range:
-        selectedType === 1 || selectedType === 2 ? selectedRange : undefined,
-
       score:
         selectedType === 0 || selectedType === 1
           ? [new Array(selectedSteps).fill(0)]
@@ -98,7 +92,14 @@ function ModulePicker(props) {
           : "-MbBygzylMiMRWrAv1kh",
       color: Math.floor(Math.random() * 15.99),
     };
-    props.setModules((prevModules) => [...prevModules, module]);
+
+    if(selectedType === 1 || selectedType === 2){
+      newModule.root = selectedRoot;
+      newModule.scale = selectedScale;
+      newModule.range = selectedRange;
+    }
+
+    props.setModules((prevModules) => prevModules === null ? [newModule]: [...prevModules, newModule]);
     props.setModulePicker(false);
   };
 

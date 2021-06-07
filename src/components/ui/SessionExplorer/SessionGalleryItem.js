@@ -26,21 +26,31 @@ function SessionGalleryItem(props) {
 
   return (
     <Paper className="session-gallery-item" onClick={handleClick}>
-        <Typography variant="h5" className="session-gallery-item-title">
-          {props.session.name}
-        </Typography>
-        <IconButton style={{ position: "absolute", top:0,right:0}}>
-          <Icon>edit</Icon>
-        </IconButton>
+      <Typography variant="h5" className="session-gallery-item-title">
+        {props.session.name}
+      </Typography>
+      <IconButton style={{ position: "absolute", top: 0, right: 0 }}>
+        <Icon>edit</Icon>
+      </IconButton>
       <div className="session-gallery-item-modules-cont">
-        {props.session.modules.map((e) => (
+        {props.session.modules !== undefined &&
+        !!props.session.modules.length ? (
+          props.session.modules.map((e) => (
+            <Paper
+              className="session-gallery-item-module"
+              style={{ backgroundColor: colors[e.color][500] }}
+            >
+              {e.name}
+            </Paper>
+          ))
+        ) : (
           <Paper
             className="session-gallery-item-module"
-            style={{ backgroundColor: colors[e.color][500] }}
+            style={{ backgroundColor: "gray", opacity: 0.7 }}
           >
-            {e.name}
+            No Modules
           </Paper>
-        ))}
+        )}
       </div>
       <div className="session-gallery-item-module-footer">
         <IconButton>
