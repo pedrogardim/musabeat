@@ -27,6 +27,7 @@ function Workspace(props) {
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   const [DBModulesRef, setDBModulesRef] = useState(null);
 
@@ -107,14 +108,30 @@ function Workspace(props) {
     if (props.session === null) {
       console.log("session is null!");
       setModules([]);
-      return;
+    } else {
+      console.log(props.session);
+      let sessionRef =
+        props.session !== null &&
+        firebase
+          .database()
+          .ref("sessions")
+          .child(props.session)
+          .child("modules");
+      console.log(`loaded session: ${sessionRef}`);
+      setDBModulesRef(!sessionRef ? null : sessionRef);
+
+      //Check for editmode
+
+      let editorsRef = firebase
+        .database()
+        .ref("sessions")
+        .child(props.session)
+        .child("editors");
+      editorsRef.get().then((snapshot) => {
+        let editors = snapshot.val();
+        editors.includes(props.user.uid) ? setEditMode(true) : setEditMode(false);
+      });
     }
-    console.log(props.session);
-    let sessionRef =
-      props.session !== null &&
-      firebase.database().ref("sessions").child(props.session).child("modules");
-    console.log(sessionRef);
-    setDBModulesRef(!sessionRef ? null : sessionRef);
   };
 
   const saveToDatabase = () => {
@@ -196,7 +213,7 @@ function Workspace(props) {
   /*onKeyDown={handleKeyPress}*/
 
   return (
-    <div className="workspace" tabIndex="0">
+    <div className="workspace" tabIndex="0" style={{ pointerEvents: editMode ? 'auto' : 'none' }}>
       {modules !== null && !!modules.length ? (
         modules.map((module, moduleIndex) => (
           <Fragment>
@@ -215,13 +232,14 @@ function Workspace(props) {
         <p>No Modules!</p>
       )}
       <div className="break" />
-      <IconButton
+      {editMode && <IconButton
+      
         color="primary"
         style={{ marginTop: 48 }}
         onClick={() => setModulePicker(true)}
       >
         <Icon>add</Icon>
-      </IconButton>
+      </IconButton>}
 
       {modulePicker && (
         <ModulePicker
@@ -255,13 +273,13 @@ function Workspace(props) {
       >
         <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
       </Fab>
-      <Fab
+      {editMode && <Fab
         className="fixed-fab"
         color="primary"
         onClick={() => setMixerOpened((prev) => (prev ? false : true))}
       >
         <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-      </Fab>
+      </Fab>}
 
       <Fab
         className="fixed-fab"

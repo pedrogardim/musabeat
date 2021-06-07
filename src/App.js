@@ -84,8 +84,6 @@ function App() {
     //temp:only show workspace
 
     setCurrentPage(null);
-
-
   };
 
   const handleAvatarClick = (e) => {
@@ -121,6 +119,8 @@ function App() {
 
   useEffect(() => {
     console.log(user);
+    setCurrentPage(null);
+    setOpenedSession(null);
   }, [user]);
 
   useEffect(() => {
@@ -183,7 +183,7 @@ function App() {
         setSideMenu={setSideMenu}
         createNewSession={createNewSession}
       />
-      {openedSession !== null && (
+      {openedSession !== null && currentPage === null && (
         <Workspace className="workspace" session={openedSession} user={user} />
       )}
     </div>
