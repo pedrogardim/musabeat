@@ -5,39 +5,39 @@ html {
 
 body {
   height: 100%;
-  overflow-y:overlay
-
+  overflow: hidden;
 }
+
+/* .app-title {
+  position: fixed;
+  left: 88px;
+  top: 80px;
+} */
 
 .app-title{
-  position:fixed;
-  left:88px;
-  top:16px;
-
+  margin-left: 16px !important;
 }
 
-.disabled{
+
+.app-wrapper{
+  max-height:calc(100vh - 64px);
+  overflow-y: scroll;
+}
+
+.disabled {
   pointer-events: none;
-  filter:saturate(0) brightness(1.5);
-
+  filter: saturate(0) brightness(1.5);
 }
 
-.main-avatar{
-  position: fixed !important;
-  top: 24px;
-  right:32px;
+.main-avatar {
   height: 24px;
   width: 24px;
-  z-index:99 !important;
-
-
+  position:absolute !important;
+  right:32px !important;
 }
 
-.side-menu-icon{
-  position: fixed !important;
-  top: 24px;
-  left:32px;
+.side-menu-icon {
   height: 24px;
-  width: 24px 
-
+  width: 24px;
+  color:white !important;
 }
