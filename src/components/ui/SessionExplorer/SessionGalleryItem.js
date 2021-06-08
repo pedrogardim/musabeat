@@ -19,20 +19,21 @@ import { colors } from "../../../utils/materialPalette";
 
 function SessionGalleryItem(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
-  const [hovered,setHovered] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [sessionLikes, setSessionLikes] = useState(false);
+
 
   const handleClick = (event) => {
-    (event.target.classList.contains("session-gallery-item") ||
-      event.target.classList.contains("session-gallery-item-modules-cont") ||
-      event.target.classList.contains("session-gallery-item-module")) &&
+    !event.target.classList.contains("MuiButtonBase-root") &&
+      !event.target.classList.contains("MuiIcon-root") &&
       props.handleSessionSelect(props.index);
   };
 
   const handleHover = (event) => {
-    (event.target.classList.contains("session-gallery-item") ||
-      event.target.classList.contains("session-gallery-item-modules-cont") ||
-      event.target.classList.contains("session-gallery-item-module")) ?
-      setHovered(true) : setHovered(false)
+    !event.target.classList.contains("MuiButtonBase-root") &&
+    !event.target.classList.contains("MuiIcon-root")
+      ? setHovered(true)
+      : setHovered(false);
   };
 
   const fetchCreatorDisplayName = () => {
@@ -46,11 +47,15 @@ function SessionGalleryItem(props) {
     fetchCreatorDisplayName();
   }, [props.session]);
 
-  useEffect(() => {
-    creatorInfo !== {} && console.log(creatorInfo);
-  }, [creatorInfo]);
   return (
-    <Paper className={`session-gallery-item ${hovered && 'session-gallery-item-hovered'}`} onClick={handleClick} onMouseOver={handleHover} onMouseOut={()=>setHovered(false)}>
+    <Paper
+      className={`session-gallery-item ${
+        hovered && "session-gallery-item-hovered"
+      }`}
+      onClick={handleClick}
+      onMouseOver={handleHover}
+      onMouseOut={() => setHovered(false)}
+    >
       {
         <Typography variant="h5" className="session-gallery-item-title">
           {props.session.name}
@@ -96,7 +101,13 @@ function SessionGalleryItem(props) {
           <Icon>play_arrow</Icon>
         </IconButton>
         <IconButton>
-          <Icon>favorite</Icon>
+          <Icon
+            onClick={props.handleUserLike}
+            color={props.likedByUser ? "secondary" : "none"}
+          >
+            favorite
+          </Icon>
+          <Typography variant="overline">{props.session.likes}</Typography>
         </IconButton>
         <IconButton>
           <Icon>share</Icon>

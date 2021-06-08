@@ -61,6 +61,7 @@
 
 .session-gallery-item-hovered {
   background-color:#00000011 !important;
+  cursor: pointer
 }
 
 .session-gallery-item-module {
