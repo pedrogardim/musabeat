@@ -64,13 +64,14 @@ function ModulePicker(props) {
         selectedType === 0 || selectedType === 1
           ? [new Array(selectedSteps).fill(0)]
           : selectedType === 2
-          ? new Array(selectedSize).map((e, i) => {
-              return {
+          ? new Array(selectedSize).fill().map((e, i) => {
+              let chord = {
                 notes: ["E1", "E3", "E4", "G4", "B4"],
                 duration: 1,
                 time: i,
                 rhythm: [1],
               };
+              return chord;
             })
           : [{ time: 0, duration: 0 }],
       instrument:
