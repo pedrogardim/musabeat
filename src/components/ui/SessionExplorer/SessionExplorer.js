@@ -1,7 +1,17 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
-import { Paper, Typography, CircularProgress } from "@material-ui/core";
+import {
+  Paper,
+  Typography,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@material-ui/core";
 
 import SessionGalleryItem from "./SessionGalleryItem";
 
@@ -13,6 +23,8 @@ function SessionExplorer(props) {
   const [sessions, setSessions] = useState([]);
   const [sessionKeys, setSessionKeys] = useState([]);
   const [userLikes, setUserLikes] = useState("");
+  const [deleteConfirmationDialog, setDeleteConfirmationDialog] =
+    useState(null);
 
   const isUser = props.currentPage === "userSessions";
 
@@ -85,6 +97,30 @@ function SessionExplorer(props) {
     });
   };
 
+  const handleSessionDelete = () => {
+    let index = deleteConfirmationDialog;
+    const sessionRef = firebase
+      .database()
+      .ref(`sessions/${sessionKeys[index]}`);
+    sessionRef.remove();
+    const userSessionsRef = firebase
+      .database()
+      .ref(`users/${props.user.uid}/sessions`);
+
+    userSessionsRef
+      .get()
+      .then((snapshot) =>
+        userSessionsRef.set(
+          snapshot.val().filter((e) => e !== sessionKeys[index])
+        )
+      );
+
+    setSessions((prev) => prev.filter((e, i) => i !== index));
+    setSessionKeys((prev) => prev.filter((e, i) => i !== index));
+
+    setDeleteConfirmationDialog(null);
+  };
+
   const getUserLikes = () => {
     let dbLikesRef = firebase
       .database()
@@ -105,7 +141,7 @@ function SessionExplorer(props) {
     return () => {};
   }, []);
 
- /*  useEffect(() => {
+  /*  useEffect(() => {
     console.log(userLikes);
   }, [userLikes]); */
 
@@ -127,6 +163,9 @@ function SessionExplorer(props) {
             <SessionGalleryItem
               handleSessionSelect={handleSessionSelect}
               handleUserLike={() => handleUserLike(sessionIndex)}
+              handleSessionDelete={() =>
+                setDeleteConfirmationDialog(sessionIndex)
+              }
               key={`sgi${sessionIndex}`}
               index={sessionIndex}
               session={session}
@@ -137,6 +176,22 @@ function SessionExplorer(props) {
         </Fragment>
       ) : (
         <CircularProgress />
+      )}
+      {!!deleteConfirmationDialog && (
+        <Dialog open={!!deleteConfirmationDialog}>
+          <DialogTitle>Are you sure?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Deleting a session is an action that can't be undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button color="none">Cancel</Button>
+            <Button color="secondary" onClick={handleSessionDelete}>
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </div>
   );

@@ -117,9 +117,11 @@ function SessionGalleryItem(props) {
           <Icon>content_copy</Icon>
         </IconButton>
         {props.isUser && (
-          <IconButton>
-            <Icon>delete</Icon>
-          </IconButton>
+          <Tooltip title="Delete Session">
+            <IconButton onClick={props.handleSessionDelete}>
+              <Icon>delete</Icon>
+            </IconButton>
+          </Tooltip>
         )}
       </div>
     </Paper>
