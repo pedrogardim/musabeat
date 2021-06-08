@@ -551,113 +551,126 @@ export const getChordsFromScale = (scale, root, extentions) => {
   return scalechords;
 };
 
-export const patchLoader = (input, type, setInstrument,setBufferLoaded) => {
+export const patchLoader = async (
+  input,
+  type,
+  setInstrumentsLoaded,
+  moduleIndex
+) => {
   console.log(input);
   let instr;
-  firebase
-    .database()
-    .ref("/patches/" + input)
-    .once("value")
-    .then((snapshot) => {
-      let patch = snapshot.val();
-      //console.log(patch)
+  let patchRef = firebase.database().ref("/patches/" + input);
 
-      let options = patch.options;
-      let instrfx = [];
+  let patch = (await patchRef.get()).val();
+  //console.log(patch)
 
-      if (patch.base === "Sampler") {
-        setBufferLoaded(false);
-        instr = new Tone.Sampler(patch.urls,{
-          baseUrl:
-            "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" +
-            patch.baseUrl,
-        },()=>setBufferLoaded(true)).toDestination();
-        
-        //console.log(instr);
+  let options = patch.options;
+  let instrfx = [];
 
-        instr.attack = patch.asdr[0];
-        instr.release = patch.asdr[1];
-      }
-      else{
-        setBufferLoaded(true)
-      }
-      if (patch.base === "FM" || type === "FMSynth") {
-        instr = new Tone.PolySynth(Tone.FMSynth, options);
-      }
-      if (patch.base === "AM" || type === "AMSynth") {
-        instr = new Tone.PolySynth(Tone.AMSynth, options);
-      }
-      if (patch.base === "Mono" || type === "Synth") {
-        instr = new Tone.PolySynth(Tone.MonoSynth, options);
-      }
-      if (patch.base === "Synth" || type === "Synth") {
-        instr = new Tone.PolySynth(Tone.Synth, options);
-      }
-      if (patch.base === undefined) {
-        instr = new Tone.PolySynth(patch);
-        instr.set(patch);
-        //console.log(instr);
-      }
+  if (patch.base === "Sampler") {
+    setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[moduleIndex] = false;
+      return a;
+    });
+    instr = new Tone.Sampler(
+      patch.urls,
+      {
+        baseUrl:
+          "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" +
+          patch.baseUrl,
+      },
+      () => setInstrumentsLoaded((prev) => {
+        let a = [...prev];
+        a[moduleIndex] = true;
+        return a;
+      })
+    ).toDestination();
 
-      "gain" in patch
-        ? (instr.volume.value = patch.gain)
-        : (instr.volume.value = -18);
+    //console.log(instr);
 
-      if ("fx" in patch) {
-        patch.fx.forEach((e, i) => {
-          if (e[0] === "vib") {
-            instrfx[i] = new Tone.Vibrato(e[1], e[2]);
-          }
-          if (e[0] === "stwid") {
-            instrfx[i] = new Tone.StereoWidener(e[1]);
-          }
-          if (e[0] === "trem") {
-            instrfx[i] = new Tone.Tremolo(e[1], e[2]).start();
-          }
-          if (e[0] === "phsr") {
-            instrfx[i] = new Tone.Phaser(e[1], e[2], e[3]);
-          }
-          if (e[0] === "rvb") {
-            instrfx[i] = new Tone.Reverb({
-              decay: e[1],
-              wet: e[2],
-              predelay: [3],
-            });
-          }
-          if (e[0] === "dly") {
-            instrfx[i] = new Tone.FeedbackDelay({
-              delayTime: e[1],
-              feedback: e[2],
-              wet: e[3],
-            });
-          }
-          instr.connect(instrfx[i]);
+    instr.attack = patch.asdr[0];
+    instr.release = patch.asdr[1];
+  } else {
+    setInstrumentsLoaded((prev) => {
+        let a = [...prev];
+        a[moduleIndex] = true;
+        return a;
+      })
+  }
+  if (patch.base === "FM" || type === "FMSynth") {
+    instr = new Tone.PolySynth(Tone.FMSynth, options);
+  }
+  if (patch.base === "AM" || type === "AMSynth") {
+    instr = new Tone.PolySynth(Tone.AMSynth, options);
+  }
+  if (patch.base === "Mono" || type === "Synth") {
+    instr = new Tone.PolySynth(Tone.MonoSynth, options);
+  }
+  if (patch.base === "Synth" || type === "Synth") {
+    instr = new Tone.PolySynth(Tone.Synth, options);
+  }
+  if (patch.base === undefined) {
+    instr = new Tone.PolySynth(patch);
+    instr.set(patch);
+    //console.log(instr);
+  }
 
-          i === patch.fx.length - 1 && instrfx[i].toDestination();
+  "gain" in patch
+    ? (instr.volume.value = patch.gain)
+    : (instr.volume.value = -18);
+
+  if ("fx" in patch) {
+    patch.fx.forEach((e, i) => {
+      if (e[0] === "vib") {
+        instrfx[i] = new Tone.Vibrato(e[1], e[2]);
+      }
+      if (e[0] === "stwid") {
+        instrfx[i] = new Tone.StereoWidener(e[1]);
+      }
+      if (e[0] === "trem") {
+        instrfx[i] = new Tone.Tremolo(e[1], e[2]).start();
+      }
+      if (e[0] === "phsr") {
+        instrfx[i] = new Tone.Phaser(e[1], e[2], e[3]);
+      }
+      if (e[0] === "rvb") {
+        instrfx[i] = new Tone.Reverb({
+          decay: e[1],
+          wet: e[2],
+          predelay: [3],
         });
-      } else {
-        instr.toDestination();
       }
-      setInstrument(instr);
-    })
-    .catch((e) => console.log(e.message));
+      if (e[0] === "dly") {
+        instrfx[i] = new Tone.FeedbackDelay({
+          delayTime: e[1],
+          feedback: e[2],
+          wet: e[3],
+        });
+      }
+      instr.connect(instrfx[i]);
 
-  
+      i === patch.fx.length - 1 && instrfx[i].toDestination();
+    });
+  } else {
+    instr.toDestination();
+  }
+  return instr;
 };
 
 export const loadSynthFromGetObject = (obj) => {
-
   //TODO: differ AM from FM Synth
 
-  let instrBase = obj.hasOwnProperty('filter') ? Tone.MonoSynth : obj.hasOwnProperty('modulation') ? Tone.FMSynth : Tone.Synth
-  
-  let instr = new Tone.PolySynth(instrBase,obj).toDestination();
+  let instrBase = obj.hasOwnProperty("filter")
+    ? Tone.MonoSynth
+    : obj.hasOwnProperty("modulation")
+    ? Tone.FMSynth
+    : Tone.Synth;
 
+  let instr = new Tone.PolySynth(instrBase, obj).toDestination();
 
   return instr;
-
-}
-
+};
 
 export const loadDrumPatch = (patch, buffers) => {
   let urlMap = {};

@@ -27,8 +27,6 @@ import { colors } from "../../utils/materialPalette";
 import "./Module.css";
 
 function Module(props) {
-  const [instrument, setInstrument] = useState(null);
-  const [bufferLoaded, setBufferLoaded] = useState(false);
 
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
@@ -76,48 +74,8 @@ function Module(props) {
     setMenuAnchorEl(null);
   };
 
-  const loadInstrument = () => {
-    instrument !== null && instrument.dispose()
-    //console.log(instrument)
-    //sequencer
-    if (props.module.type === 0) {
-      setBufferLoaded(false);
-      setInstrument(() => {
-        return new Tone.Players(props.module.instrument.urls, () =>
-          setBufferLoaded(true)
-        ).toDestination();
-      });
-    }
-    //player
-    else if (props.module.type === 3) {
-      setBufferLoaded(false);
-      setInstrument(() => {
-        return new Tone.GrainPlayer(props.module.instrument.url, () =>
-          setBufferLoaded(true)
-        ).toDestination();
-      });
-    }
-    //load from patch id
-    else if (typeof props.module.instrument === "string") {
-      patchLoader(props.module.instrument, "", setInstrument, setBufferLoaded);
-    } //load from obj
-    else if (
-      typeof props.module.instrument === "object" &&
-      props.module.instrument.name !== "Players" &&
-      props.module.instrument.name !== "GrainPlayer" &&
-      instrument === null
-    ) {
-      setInstrument(loadSynthFromGetObject(props.module.instrument));
-    }
-  };
-
   const onInstrumentMod = (url, name, isRemoving) => {
     //update instrument info in module object
-    props.setModulesInstruments((prev) => {
-      let newInstruments = [...prev];
-      newInstruments[props.index] = instrument;
-      return newInstruments;
-    });
 
     props.setModules((prev) => {
       let newModules = [...prev];
@@ -127,14 +85,14 @@ function Module(props) {
         };
       } else if (props.module.type === 3) {
         newModules[props.module.id].instrument = { url };
-      } else if (instrument.name === "Sampler") {
-        let samplerPrms = instrument.get();
+      } else if (props.instrument.name === "Sampler") {
+        let samplerPrms = module.instrument.get();
         delete samplerPrms.onerror;
         delete samplerPrms.onload;
-        samplerPrms.urls = { ...instrument.get().urls, [name]: url };
+        samplerPrms.urls = { ...module.instrument.get().urls, [name]: url };
         newModules[props.module.id].instrument = samplerPrms;
       } else {
-        newModules[props.module.id].instrument = instrument.get();
+        newModules[props.module.id].instrument = module.instrument.get();
       }
       return newModules;
     });
@@ -148,9 +106,8 @@ function Module(props) {
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
             backgroundColor: colors[props.module.color][500],
           }}
-          instrument={instrument}
-          bufferLoaded={bufferLoaded}
-          setBufferLoaded={setBufferLoaded}
+          instrument={props.instrument}
+          loaded={props.loaded}
           sessionSize={props.sessionSize}
           module={props.module}
           kit={0}
@@ -164,7 +121,7 @@ function Module(props) {
           style={{
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
-          instrument={instrument}
+          instrument={props.instrument}
           sessionSize={props.sessionSize}
           module={props.module}
           updateModules={props.setModules}
@@ -178,7 +135,7 @@ function Module(props) {
             display: instrumentEditorMode || settingsMode ? "none" : "block",
             overflow: "hidden",
           }}
-          instrument={instrument}
+          instrument={props.instrument}
           sessionSize={props.sessionSize}
           module={props.module}
           updateModules={props.setModules}
@@ -193,10 +150,9 @@ function Module(props) {
             display: instrumentEditorMode || settingsMode ? "none" : "flex",
           }}
           onInstrumentMod={onInstrumentMod}
-          setInstrument={setInstrument}
-          bufferLoaded={bufferLoaded}
-          setBufferLoaded={setBufferLoaded}
-          instrument={instrument}
+          setInstruments={props.setInstruments}
+          loaded={props.loaded}
+          instrument={props.instrument}
           sessionSize={props.sessionSize}
           module={props.module}
           updateModules={props.setModules}
@@ -206,7 +162,6 @@ function Module(props) {
   }
 
   useEffect(() => {
-    loadInstrument();
     return () => {
       //TODO: IMPORTANT: Dispose module instrument on unmount
       //console.log(instrument) -> null
@@ -214,45 +169,25 @@ function Module(props) {
     }
   }, []);
 
-  useEffect(() => {
-    props.setModulesInstruments((prev) => {
-      let newInstruments = [...prev];
-      newInstruments[props.index] = instrument;
-      return newInstruments;
-    });
-    console.log("instr changed:"+instrument)
-  }, [instrument]);
 
   useEffect(() => {
-    if (instrument !== null && props.module.volume !== undefined)
-      instrument.volume.value = props.module.volume;
-  }, [props.module.volume]);
-
-  useEffect(() => {
-    if (instrument !== null && props.module.muted !== undefined)
-      instrument.volume.value = props.module.muted
-        ? -Infinity
-        : props.module.volume;
-  }, [props.module.muted]);
-
-  useEffect(() => {
-    if (instrument !== null && Tone.Transport.state !== "started") {
-      instrument.name === "Players"
-        ? instrument.stopAll()
-        : instrument.name === "GrainPlayer" || instrument.name === "Player"
-        ? instrument.stop()
-        : instrument.releaseAll();
+    if (props.instrument !== null && props.instrument !== undefined && Tone.Transport.state !== "started") {
+      props.instrument.name === "Players"
+        ? props.instrument.stopAll()
+        : props.instrument.name === "GrainPlayer" || props.instrument.name === "Player"
+        ? props.instrument.stop()
+        : props.instrument.releaseAll();
     }
   }, [Tone.Transport.state]);
 
   useEffect(() => {
-    bufferLoaded &&
+    props.loaded &&
       props.setInstrumentsLoaded((prev) => {
         let newIL = [...prev];
         newIL[props.index] = true;
         return newIL;
       });
-  }, [bufferLoaded]);
+  }, [props.loaded]);
 
   return (
     <div
@@ -306,16 +241,15 @@ function Module(props) {
           </MenuItem>
         </Menu>
       </div>
-      {bufferLoaded ? (
+      {props.loaded ? (
         <Fragment>
           {instrumentEditorMode && (
             <InstrumentEditor
               module={props.module}
               setModules={props.setModules}
-              instrument={instrument}
-              setBufferLoaded={setBufferLoaded}
+              instrument={props.instrument}
               onInstrumentMod={onInstrumentMod}
-              setInstrument={setInstrument}
+              setInstruments={props.setInstruments}
               updateModules={props.setModules}
               setInstrumentEditorMode={setInstrumentEditorMode}
               index={props.index}
@@ -323,7 +257,7 @@ function Module(props) {
           )}
           {settingsMode && (
             <ModuleSettings
-              instrument={instrument}
+              instrument={props.instrument}
               module={props.module}
               setModules={props.setModules}
               setSettingsMode={setSettingsMode}

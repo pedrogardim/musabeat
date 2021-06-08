@@ -15,6 +15,12 @@ import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Mixer from "./mixer/Mixer";
 
+import {
+  patchLoader,
+  loadDrumPatch,
+  loadSynthFromGetObject,
+} from "../../assets/musicutils";
+
 import { colors } from "../../utils/materialPalette";
 
 Tone.Transport.bpm.value = starterSession.bpm;
@@ -23,6 +29,8 @@ Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
   const [modules, setModules] = useState(null);
+  const [instruments, setInstruments] = useState([]);
+  const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
@@ -33,7 +41,6 @@ function Workspace(props) {
   //a copy of the instruments, to be able to use them on export function
   const [modulesInstruments, setModulesInstruments] = useState([]);
 
-  const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
 
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
@@ -110,6 +117,7 @@ function Workspace(props) {
       //Check for editmode and get title
       !props.hidden &&
         sessionRef.get().then((snapshot) => {
+          loadInstruments(snapshot.val().modules);
           let editors = snapshot.val().editors;
           editors.includes(props.user.uid)
             ? setEditMode(true)
@@ -118,6 +126,62 @@ function Workspace(props) {
           props.setAppTitle(name);
         });
     }
+  };
+
+  const loadInstruments = (sessionModules) => {
+    let moduleInstruments = [];
+    sessionModules.map((module, moduleIndex) => {
+      //console.log(instrument)
+      //sequencer
+      if (module.type === 0) {
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[moduleIndex] = false;
+          return a;
+        });
+        moduleInstruments.push(
+          new Tone.Players(module.instrument.urls, () =>
+            setInstrumentsLoaded((prev) => {
+              let a = [...prev];
+              a[moduleIndex] = true;
+              return a;
+            })
+          ).toDestination()
+        );
+      }
+      //player
+      else if (module.type === 3) {
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[moduleIndex] = false;
+          return a;
+        });
+        moduleInstruments.push(
+          new Tone.GrainPlayer(module.instrument.url, () =>
+            setInstrumentsLoaded((prev) => {
+              let a = [...prev];
+              a[moduleIndex] = true;
+              return a;
+            })
+          ).toDestination()
+        );
+      }
+      //load from patch id
+      else if (typeof module.instrument === "string") {
+        moduleInstruments.push(
+          patchLoader(module.instrument, "", setInstrumentsLoaded, moduleIndex)
+        );
+      } //load from obj
+      else if (
+        typeof module.instrument === "object" &&
+        module.instrument.name !== "Players" &&
+        module.instrument.name !== "GrainPlayer" &&
+        instruments[moduleIndex] === null
+      ) {
+        moduleInstruments.push(loadSynthFromGetObject(props.module.instrument));
+      }
+    });
+    setInstruments(moduleInstruments);
   };
 
   const saveToDatabase = () => {
@@ -133,7 +197,7 @@ function Workspace(props) {
     //console.log(JSON.stringify(modules),JSON.stringify(modulesData))
     if (JSON.stringify(modules) !== JSON.stringify(modulesData)) {
       //console.log("ITS DIFFERENT!!!")
-      console.log("moduled loaded from server:"+modulesData)
+      //console.log("moduled loaded from server:" + modulesData);
       setModules(modulesData);
     } else {
       //console.log("ITS THE SAME!!!");
@@ -188,6 +252,10 @@ function Workspace(props) {
     };
   }, []);
 
+  useEffect(() => {
+    console.log(instruments);
+  }, [instruments]);
+
   /**/
 
   return (
@@ -207,6 +275,9 @@ function Workspace(props) {
               key={module.id}
               index={module.id}
               module={module}
+              instrument={instruments[moduleIndex]}
+              setInstruments={setInstruments}
+              loaded={instrumentsLoaded[moduleIndex]}
               sessionSize={sessionSize}
               setModules={setModules}
               setModulesInstruments={setModulesInstruments}
@@ -218,7 +289,7 @@ function Workspace(props) {
       ) : (
         <Fragment>
           <Typography variant="h1">😛</Typography>
-          <div className="break"/>
+          <div className="break" />
           <p>No Modules!</p>
         </Fragment>
       )}
