@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 
 import SessionGalleryItem from "./SessionGalleryItem";
+import NameInput from "../Dialogs/NameInput";
 
 import "./SessionExplorer.css";
 
@@ -23,8 +24,9 @@ function SessionExplorer(props) {
   const [sessions, setSessions] = useState([]);
   const [sessionKeys, setSessionKeys] = useState([]);
   const [userLikes, setUserLikes] = useState("");
-  const [deleteConfirmationDialog, setDeleteConfirmationDialog] =
-    useState(null);
+  const [deleteDialog, setDeleteDialog] = useState(null);
+
+  const [renameDialog, setRenameDialog] = useState(null);
 
   const isUser = props.currentPage === "userSessions";
 
@@ -98,7 +100,7 @@ function SessionExplorer(props) {
   };
 
   const handleSessionDelete = () => {
-    let index = deleteConfirmationDialog;
+    let index = deleteDialog;
     const sessionRef = firebase
       .database()
       .ref(`sessions/${sessionKeys[index]}`);
@@ -118,7 +120,18 @@ function SessionExplorer(props) {
     setSessions((prev) => prev.filter((e, i) => i !== index));
     setSessionKeys((prev) => prev.filter((e, i) => i !== index));
 
-    setDeleteConfirmationDialog(null);
+    setDeleteDialog(null);
+  };
+
+  const handleSessionRename = (newName) => {
+    let index = renameDialog;
+    const sessionRefName = firebase
+      .database()
+      .ref(`sessions/${sessionKeys[index]}/name`);
+    sessionRefName.set(newName);
+    sessions[index].name = newName;
+    setRenameDialog(null);
+
   };
 
   const getUserLikes = () => {
@@ -141,9 +154,9 @@ function SessionExplorer(props) {
     return () => {};
   }, []);
 
-  /*  useEffect(() => {
-    console.log(userLikes);
-  }, [userLikes]); */
+  useEffect(() => {
+    console.log(renameDialog, deleteDialog);
+  }, [renameDialog, deleteDialog]);
 
   useEffect(() => {
     setSessions([]);
@@ -163,9 +176,8 @@ function SessionExplorer(props) {
             <SessionGalleryItem
               handleSessionSelect={handleSessionSelect}
               handleUserLike={() => handleUserLike(sessionIndex)}
-              handleSessionDelete={() =>
-                setDeleteConfirmationDialog(sessionIndex)
-              }
+              handleSessionDelete={setDeleteDialog}
+              setRenameDialog={setRenameDialog}
               key={`sgi${sessionIndex}`}
               index={sessionIndex}
               session={session}
@@ -177,8 +189,8 @@ function SessionExplorer(props) {
       ) : (
         <CircularProgress />
       )}
-      {!!deleteConfirmationDialog && (
-        <Dialog open={!!deleteConfirmationDialog}>
+      {deleteDialog !== null && (
+        <Dialog open="true" onClose={()=>setDeleteDialog(null)}>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -186,12 +198,18 @@ function SessionExplorer(props) {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button color="none">Cancel</Button>
+            <Button>Cancel</Button>
             <Button color="secondary" onClick={handleSessionDelete}>
               Delete
             </Button>
           </DialogActions>
         </Dialog>
+      )}
+      {renameDialog !== null && (
+        <NameInput
+          onSubmit={handleSessionRename}
+          onClose={()=>setRenameDialog(null)}
+        />
       )}
     </div>
   );

@@ -4,49 +4,54 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding:8px;
+  padding: 8px;
   position: relative;
-  margin:16px;
+  margin: 16px;
 }
 
 .session-gallery-item-title {
   text-align: center;
+  position: relative;
+  max-width: 90%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+
+
 }
-.session-gallery-item-subtitle  {
-  width:80%;
+.session-gallery-item-subtitle {
+  width: 80%;
   text-align: center;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: flex;
   align-items: center;
   justify-content: center;
-
-
 }
 
-.session-gallery-item-subtitle > span,p  {
-  max-width:60;
+.session-gallery-item-subtitle > span,
+p {
+  max-width: 60;
   text-align: center;
   white-space: nowrap;
   text-overflow: ellipsis;
   display: inline-block;
   overflow: hidden;
-
-
 }
 
 .session-gallery-item-subtitle-avatar {
-  height:24px !important;
-  width:24px !important;
-  margin-right:8px;
-  
-
+  height: 24px !important;
+  width: 24px !important;
+  margin-right: 8px;
 }
 
-
 .session-gallery-item-title-cont {
-    width:100%;
-  }
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .session-gallery-item-modules-cont {
   flex: 1 1 100px;
@@ -54,21 +59,20 @@
   flex-direction: column;
   width: 80%;
   margin: 24px;
-  justify-content:center;
+  justify-content: center;
   transition: background-color 0.1s;
-
 }
 
 .session-gallery-item-hovered {
-  background-color:#00000011 !important;
-  cursor: pointer
+  background-color: #00000011 !important;
+  cursor: pointer;
 }
 
 .session-gallery-item-module {
   width: 100%;
   max-height: 30px;
   flex-grow: 1;
-  color:white !important;
+  color: white !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,4 +84,16 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+}
+
+.session-gallery-item-editname-button {
+  position: absolute !important;
+  height:16px !important;
+  width:16px !important;
+  top: 12px !important;
+  right:  8px!important;
+}
+
+.session-gallery-item-editname-button span {
+  font-size:16px !important;
 }

@@ -106,7 +106,6 @@ function App() {
     Tone.start();
     switch (event.code) {
       case "Space":
-        event.preventDefault();
         Tone.start();
         if (Tone.Transport.state !== "started") {
           Tone.Transport.start();

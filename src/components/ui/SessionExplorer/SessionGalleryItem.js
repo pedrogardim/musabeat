@@ -56,15 +56,22 @@ function SessionGalleryItem(props) {
       onMouseOver={handleHover}
       onMouseOut={() => setHovered(false)}
     >
-      <Typography variant="h5" className="session-gallery-item-title">
-        {props.session.name}
-      </Typography>
+      <div className="session-gallery-item-title-cont">
+        <Tooltip placement={"top"} title={props.session.name}>
+        <Typography variant="h5" className="session-gallery-item-title">
+          {props.session.name}
+        </Typography>
+        </Tooltip>
+        {props.isUser && (
+          <IconButton
+            onClick={() => props.setRenameDialog(props.index)}
+            className="session-gallery-item-editname-button"
+          >
+            <Icon>edit</Icon>
+          </IconButton>
+        )}
+      </div>
 
-      {props.isUser && (
-        <IconButton style={{ position: "absolute", top: 0, right: 0 }}>
-          <Icon>edit</Icon>
-        </IconButton>
-      )}
       {!props.isUser && (
         <div className="session-gallery-item-subtitle">
           <Avatar
@@ -118,7 +125,7 @@ function SessionGalleryItem(props) {
         </IconButton>
         {props.isUser && (
           <Tooltip title="Delete Session">
-            <IconButton onClick={props.handleSessionDelete}>
+            <IconButton onClick={() => props.handleSessionDelete(props.index)}>
               <Icon>delete</Icon>
             </IconButton>
           </Tooltip>
