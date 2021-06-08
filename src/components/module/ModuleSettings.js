@@ -8,7 +8,6 @@ import {
   Slider,
 } from "@material-ui/core";
 
-
 import {
   adaptSequencetoSubdiv,
   scales,
@@ -17,11 +16,30 @@ import {
 
 import "./ModuleSettings.css";
 
+import { colors } from "../../utils/materialPalette";
+
 const subdivisionValues = [4, 8, 12, 16, 24, 32];
 const lengthValues = [1, 2, 4, 8, 16];
 
 function ModuleSettings(props) {
   let mainContent = "No Settings";
+
+  const handleColorSelect = (event) => {
+    let color = event.target.value;
+    //console.log(newValue);
+    props.setModules((previous) =>
+      previous.map((module, i) => {
+        if (i === props.index) {
+          let newModule = { ...module };
+          newModule.color = color;
+          return newModule;
+        } else {
+          return module;
+        }
+      })
+    );
+    //props.setSettingsMode(false);
+  };
 
   const handleStepsSelect = (event) => {
     Tone.Transport.pause();
@@ -293,7 +311,27 @@ function ModuleSettings(props) {
       break;
   }
 
-  return <div className="module-settings">{mainContent}</div>;
+  return (
+    <div className="module-settings">
+      {mainContent}
+      <FormControl>
+        <InputLabel id="color-select-label"></InputLabel>
+        <Select
+          labelId="color-select-label"
+          value={props.module.color}
+          onChange={handleColorSelect}
+          style={{backgroundColor:colors[props.module.color][500]}}
+        >
+          {colors.map((value, index) => (
+            <option key={`color${index}`} value={index} style={{backgroundColor:colors[index][500]}}>
+              
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+      
+    </div>
+  );
 }
 
 export default ModuleSettings;

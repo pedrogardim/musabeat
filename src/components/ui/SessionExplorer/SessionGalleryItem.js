@@ -117,9 +117,9 @@ function SessionGalleryItem(props) {
           </IconButton>
         </Tooltip>
 
-        <IconButton>
+        {/*<IconButton>
           <Icon>share</Icon>
-        </IconButton>
+        </IconButton>*/}
         <IconButton>
           <Icon>content_copy</Icon>
         </IconButton>

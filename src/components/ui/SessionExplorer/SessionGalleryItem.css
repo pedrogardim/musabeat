@@ -12,7 +12,7 @@
 .session-gallery-item-title {
   text-align: center;
   position: relative;
-  max-width: 90%;
+  max-width: 163px;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: inline-block;
