@@ -9,6 +9,7 @@ import {
   Icon,
   IconButton,
   Avatar,
+  Tooltip,
 } from "@material-ui/core";
 
 import "./SessionGalleryItem.css";
@@ -21,7 +22,6 @@ function SessionGalleryItem(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
   const [sessionLikes, setSessionLikes] = useState(false);
-
 
   const handleClick = (event) => {
     !event.target.classList.contains("MuiButtonBase-root") &&
@@ -56,11 +56,10 @@ function SessionGalleryItem(props) {
       onMouseOver={handleHover}
       onMouseOut={() => setHovered(false)}
     >
-      {
-        <Typography variant="h5" className="session-gallery-item-title">
-          {props.session.name}
-        </Typography>
-      }
+      <Typography variant="h5" className="session-gallery-item-title">
+        {props.session.name}
+      </Typography>
+
       {props.isUser && (
         <IconButton style={{ position: "absolute", top: 0, right: 0 }}>
           <Icon>edit</Icon>
@@ -100,15 +99,17 @@ function SessionGalleryItem(props) {
         <IconButton>
           <Icon>play_arrow</Icon>
         </IconButton>
-        <IconButton>
-          <Icon
-            onClick={props.handleUserLike}
-            color={props.likedByUser ? "secondary" : "none"}
-          >
-            favorite
-          </Icon>
-          <Typography variant="overline">{props.session.likes}</Typography>
-        </IconButton>
+        <Tooltip title={props.session.likes}>
+          <IconButton>
+            <Icon
+              onClick={props.handleUserLike}
+              color={props.likedByUser ? "secondary" : "none"}
+            >
+              favorite
+            </Icon>
+          </IconButton>
+        </Tooltip>
+
         <IconButton>
           <Icon>share</Icon>
         </IconButton>

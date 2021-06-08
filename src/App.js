@@ -12,6 +12,8 @@ import {
   MenuItem,
   Drawer,
   Typography,
+  Toolbar,
+  AppBar,
 } from "@material-ui/core";
 
 import firebase from "firebase";
@@ -123,11 +125,13 @@ function App() {
         ? "Explore"
         : currentPage === "userFiles"
         ? "My Samples"
-        : (currentPage === null && user !== null)
-        ? `Welcome ${user.displayName.split(" ")[0]} ${user.displayName.split(" ")[1]}!`
+        : currentPage === null && user !== null
+        ? `Welcome ${user.displayName.split(" ")[0]} ${
+            user.displayName.split(" ")[1]
+          }!`
         : "Welcome!"
     );
-  }
+  };
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
@@ -137,7 +141,7 @@ function App() {
     console.log(user);
     setCurrentPage(null);
     setOpenedSession(null);
-    updateAppTitle()
+    updateAppTitle();
   }, [user]);
 
   useEffect(() => {
@@ -146,74 +150,82 @@ function App() {
   }, [currentPage]);
 
   return (
-    <div className="app-wrapper" onKeyDown={handleKeyPress}>
-      <Typography variant="h4" className="app-title">
-        {appTitle}
-      </Typography>
-      
-      <IconButton className="side-menu-icon" onClick={() => setSideMenu(true)}>
-        <Icon>menu</Icon>
-      </IconButton>
-      <Avatar
-        onClick={handleAvatarClick}
-        className="main-avatar"
-        alt={user && user.displayName}
-        src={user && user.photoURL}
-      />
-      {authDialog && (
-        <AuthDialog
-          authDialog={authDialog}
-          setAuthDialog={setAuthDialog}
-          setUser={setUser}
-        />
-      )}
-      <Menu
-        style={{ marginTop: 48 }}
-        anchorEl={userOption}
-        keepMounted
-        open={Boolean(userOption)}
-        onClose={() => setUserOption(false)}
-      >
-        <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
-        <MenuItem onClick={() => setCurrentPage("userSessions")}>
-          My Sessions
-        </MenuItem>
-        <MenuItem onClick={() => setCurrentPage("userFiles")}>
-          My Samples
-        </MenuItem>
-        <MenuItem onClick={() => setUserOption(false)}>
-          My Synth Patches
-        </MenuItem>
-        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-      </Menu>
-      {(currentPage === "userSessions" ||
-        currentPage === "exploreSessions") && (
-        <SessionExplorer
+    <Fragment>
+      <AppBar position="sticky">
+        <Toolbar className="app-bar">
+          <IconButton
+            className="side-menu-icon"
+            onClick={() => setSideMenu(true)}
+          >
+            <Icon>menu</Icon>
+          </IconButton>
+          <Typography variant="h4" className="app-title">
+            {appTitle}
+          </Typography>
+          <Avatar
+            onClick={handleAvatarClick}
+            className="main-avatar"
+            alt={user && user.displayName}
+            src={user && user.photoURL}
+          />
+        </Toolbar>
+      </AppBar>
+      <div className="app-wrapper" onKeyDown={handleKeyPress}>
+        {authDialog && (
+          <AuthDialog
+            authDialog={authDialog}
+            setAuthDialog={setAuthDialog}
+            setUser={setUser}
+          />
+        )}
+        <Menu
+          style={{ marginTop: 48 }}
+          anchorEl={userOption}
+          keepMounted
+          open={Boolean(userOption)}
+          onClose={() => setUserOption(false)}
+        >
+          <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
+          <MenuItem onClick={() => setCurrentPage("userSessions")}>
+            My Sessions
+          </MenuItem>
+          <MenuItem onClick={() => setCurrentPage("userFiles")}>
+            My Samples
+          </MenuItem>
+          <MenuItem onClick={() => setUserOption(false)}>
+            My Synth Patches
+          </MenuItem>
+          <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+        </Menu>
+        {(currentPage === "userSessions" ||
+          currentPage === "exploreSessions") && (
+          <SessionExplorer
+            setCurrentPage={setCurrentPage}
+            currentPage={currentPage}
+            setOpenedSession={setOpenedSession}
+            user={user}
+          />
+        )}
+        {currentPage === "userFiles" && (
+          <FileExplorer setCurrentPage={setCurrentPage} user={user} />
+        )}
+        <SideMenu
+          open={sideMenu}
           setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
           setOpenedSession={setOpenedSession}
-          user={user}
+          setSideMenu={setSideMenu}
+          createNewSession={createNewSession}
         />
-      )}
-      {currentPage === "userFiles" && (
-        <FileExplorer setCurrentPage={setCurrentPage} user={user} />
-      )}
-      <SideMenu
-        open={sideMenu}
-        setCurrentPage={setCurrentPage}
-        setOpenedSession={setOpenedSession}
-        setSideMenu={setSideMenu}
-        createNewSession={createNewSession}
-      />
-      {openedSession !== null && currentPage === null && (
-        <Workspace
-          className="workspace"
-          setAppTitle={setAppTitle}
-          session={openedSession}
-          user={user}
-        />
-      )}
-    </div>
+        {openedSession !== null && currentPage === null && (
+          <Workspace
+            className="workspace"
+            setAppTitle={setAppTitle}
+            session={openedSession}
+            user={user}
+          />
+        )}
+      </div>
+    </Fragment>
   );
 }
 
