@@ -25,7 +25,6 @@ import ModuleSettings from "./ModuleSettings";
 import { colors } from "../../utils/materialPalette";
 
 import "./Module.css";
-import { PinDropRounded } from "@material-ui/icons";
 
 function Module(props) {
   const [instrument, setInstrument] = useState(null);
@@ -78,7 +77,7 @@ function Module(props) {
   };
 
   const loadInstrument = () => {
-    //players
+    //sequencer
     if (props.module.type === 0) {
       setBufferLoaded(false);
       setInstrument(() => {
@@ -218,7 +217,8 @@ function Module(props) {
   }, [instrument]);
 
   useEffect(() => {
-    if (instrument !== null && props.module.volume !== undefined) instrument.volume.value = props.module.volume;
+    if (instrument !== null && props.module.volume !== undefined)
+      instrument.volume.value = props.module.volume;
   }, [props.module.volume]);
 
   useEffect(() => {
@@ -237,6 +237,15 @@ function Module(props) {
         : instrument.releaseAll();
     }
   }, [Tone.Transport.state]);
+
+  useEffect(() => {
+    bufferLoaded &&
+      props.setInstrumentsLoaded((prev) => {
+        let newIL = [...prev];
+        newIL[props.index] = true;
+        return newIL;
+      });
+  }, [bufferLoaded]);
 
   return (
     <div

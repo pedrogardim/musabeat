@@ -103,8 +103,8 @@ function SessionGalleryItem(props) {
         )}
       </div>
       <div className="session-gallery-item-module-footer">
-        <IconButton>
-          <Icon>play_arrow</Icon>
+        <IconButton onClick={props.setPlayingSession}>
+          <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
         </IconButton>
         <Tooltip title={props.session.likes}>
           <IconButton>

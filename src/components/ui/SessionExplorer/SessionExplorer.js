@@ -15,6 +15,7 @@ import {
 
 import SessionGalleryItem from "./SessionGalleryItem";
 import NameInput from "../Dialogs/NameInput";
+import Workspace from "../Workspace";
 
 import "./SessionExplorer.css";
 
@@ -25,13 +26,13 @@ function SessionExplorer(props) {
   const [sessionKeys, setSessionKeys] = useState([]);
   const [userLikes, setUserLikes] = useState("");
   const [deleteDialog, setDeleteDialog] = useState(null);
-
   const [renameDialog, setRenameDialog] = useState(null);
+  const [playingSession, setPlayingSession] = useState(null);
 
   const isUser = props.currentPage === "userSessions";
 
   const getSessionList = async () => {
-    console.log(isUser ? "fetching user sessions" : "fetching explore");
+    //console.log(isUser ? "fetching user sessions" : "fetching explore");
     let dbRef = isUser
       ? firebase.database().ref("users").child(props.user.uid).child("sessions")
       : firebase.database().ref("sessions");
@@ -131,7 +132,6 @@ function SessionExplorer(props) {
     sessionRefName.set(newName);
     sessions[index].name = newName;
     setRenameDialog(null);
-
   };
 
   const getUserLikes = () => {
@@ -155,8 +155,13 @@ function SessionExplorer(props) {
   }, []);
 
   useEffect(() => {
-    console.log(renameDialog, deleteDialog);
-  }, [renameDialog, deleteDialog]);
+    //console.log(playingSession);
+    Tone.Transport.seconds = 0;
+    Tone.Transport.clear();
+    if (playingSession === null) {
+      Tone.Transport.pause();
+    }
+  }, [playingSession]);
 
   useEffect(() => {
     setSessions([]);
@@ -177,7 +182,15 @@ function SessionExplorer(props) {
               handleSessionSelect={handleSessionSelect}
               handleUserLike={() => handleUserLike(sessionIndex)}
               handleSessionDelete={setDeleteDialog}
+              setPlayingSession={() =>
+                setPlayingSession((prev) =>
+                  prev === sessionIndex
+                    ? null
+                    : sessionIndex
+                )
+              }
               setRenameDialog={setRenameDialog}
+              playingSession={playingSession === sessionIndex}
               key={`sgi${sessionIndex}`}
               index={sessionIndex}
               session={session}
@@ -190,7 +203,7 @@ function SessionExplorer(props) {
         <CircularProgress />
       )}
       {deleteDialog !== null && (
-        <Dialog open="true" onClose={()=>setDeleteDialog(null)}>
+        <Dialog open="true" onClose={() => setDeleteDialog(null)}>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -208,8 +221,11 @@ function SessionExplorer(props) {
       {renameDialog !== null && (
         <NameInput
           onSubmit={handleSessionRename}
-          onClose={()=>setRenameDialog(null)}
+          onClose={() => setRenameDialog(null)}
         />
+      )}
+      {playingSession !== null && (
+        <Workspace hidden session={sessionKeys[playingSession]} isPlaying={true} />
       )}
     </div>
   );

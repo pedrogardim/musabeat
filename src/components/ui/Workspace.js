@@ -33,6 +33,8 @@ function Workspace(props) {
   //a copy of the instruments, to be able to use them on export function
   const [modulesInstruments, setModulesInstruments] = useState([]);
 
+  const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
+
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
 
@@ -104,19 +106,19 @@ function Workspace(props) {
       let sessionRef =
         props.session !== null &&
         firebase.database().ref("sessions").child(props.session);
-      console.log(`loaded session: ${sessionRef}`);
       setDBSessionRef(!sessionRef ? null : sessionRef);
-
       //Check for editmode and get title
-      sessionRef.get().then((snapshot) => {
-        let editors = snapshot.val().editors;
-        editors.includes(props.user.uid)
-          ? setEditMode(true)
-          : setEditMode(false);
-        let name = snapshot.val().name;
-        props.setAppTitle(name);
-      });
+      !props.hidden &&
+        sessionRef.get().then((snapshot) => {
+          let editors = snapshot.val().editors;
+          editors.includes(props.user.uid)
+            ? setEditMode(true)
+            : setEditMode(false);
+          let name = snapshot.val().name;
+          props.setAppTitle(name);
+        });
     }
+    
   };
 
   const saveToDatabase = () => {
@@ -191,6 +193,7 @@ function Workspace(props) {
 
   useEffect(() => {
     loadSession();
+    //!props.session.length && Tone.Transport.start()
   }, [props.session]);
 
   useEffect(() => {
@@ -201,13 +204,22 @@ function Workspace(props) {
       });
   }, [DBSessionRef]);
 
+  useEffect(()=>{
+    console.log(instrumentsLoaded);
+    (props.hidden && !instrumentsLoaded.includes(false)) && Tone.Transport.start();
+
+  },[instrumentsLoaded])
+
   /**/
 
   return (
     <div
       className="workspace"
       tabIndex="0"
-      style={{ pointerEvents: editMode ? "auto" : "none" }}
+      style={{
+        pointerEvents: editMode ? "auto" : "none",
+        display: props.hidden ? "none" : "flex",
+      }}
       onKeyDown={handleKeyPress}
     >
       {modules !== null && !!modules.length ? (
@@ -220,6 +232,7 @@ function Workspace(props) {
               sessionSize={sessionSize}
               setModules={setModules}
               setModulesInstruments={setModulesInstruments}
+              setInstrumentsLoaded={setInstrumentsLoaded}
             />
             {moduleIndex % 3 == 1 && <div className="break" />}
           </Fragment>
