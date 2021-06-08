@@ -27,6 +27,8 @@ import AuthDialog from "./components/ui/AuthDialog";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(null);
+
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
@@ -106,15 +108,22 @@ function App() {
     Tone.start();
     switch (event.code) {
       case "Space":
-        Tone.start();
-        if (Tone.Transport.state !== "started") {
-          Tone.Transport.start();
-        } else {
-          Tone.Transport.pause();
-        }
+        togglePlaying();
         break;
     }
   };
+
+  const togglePlaying = () => {
+    if (openedSession !== null && currentPage === null) {
+      if (Tone.Transport.state !== "started") {
+        Tone.Transport.start();
+        setIsPlaying(true);
+      } else {
+        Tone.Transport.pause();
+        setIsPlaying(false);
+      }
+    }
+  }
 
   const updateAppTitle = () => {
     setAppTitle(
@@ -220,6 +229,8 @@ function App() {
             className="workspace"
             setAppTitle={setAppTitle}
             session={openedSession}
+            isPlaying={isPlaying}
+            togglePlaying={togglePlaying}
             user={user}
           />
         )}

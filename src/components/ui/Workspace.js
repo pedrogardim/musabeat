@@ -22,7 +22,6 @@ Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [modules, setModules] = useState([]);
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePicker, setModulePicker] = useState(false);
@@ -36,14 +35,6 @@ function Workspace(props) {
 
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
-
-  const handlePlaying = (state) => {
-    if (state !== "started") {
-      setIsPlaying(true);
-    } else {
-      setIsPlaying(false);
-    }
-  };
 
   const adaptSessionSize = () => {
     if (modules === null) return;
@@ -112,20 +103,18 @@ function Workspace(props) {
       console.log(props.session);
       let sessionRef =
         props.session !== null &&
-        firebase
-          .database()
-          .ref("sessions")
-          .child(props.session);
+        firebase.database().ref("sessions").child(props.session);
       console.log(`loaded session: ${sessionRef}`);
       setDBSessionRef(!sessionRef ? null : sessionRef);
 
       //Check for editmode and get title
       sessionRef.get().then((snapshot) => {
         let editors = snapshot.val().editors;
-        editors.includes(props.user.uid) ? setEditMode(true) : setEditMode(false);
+        editors.includes(props.user.uid)
+          ? setEditMode(true)
+          : setEditMode(false);
         let name = snapshot.val().name;
-        props.setAppTitle(name)
-
+        props.setAppTitle(name);
       });
     }
   };
@@ -134,7 +123,7 @@ function Workspace(props) {
     DBSessionRef !== null &&
       DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
-          ? DBSessionRef.child('modules').set(modules)
+          ? DBSessionRef.child("modules").set(modules)
           : console.log("Checked but not atualized");
       });
   };
@@ -166,6 +155,7 @@ function Workspace(props) {
   const handleKeyPress = (event) => {
     Tone.start();
     switch (event.code) {
+      
       case "KeyZ":
         event.preventDefault();
         if (event.metaKey || event.ctrlKey) {
@@ -183,6 +173,15 @@ function Workspace(props) {
   }; 
   */
 
+  const handleKeyPress = (event) => {
+    Tone.start();
+
+    switch (event.code) {
+      case "Space":
+        event.preventDefault();
+    }
+  };
+
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
@@ -196,20 +195,21 @@ function Workspace(props) {
 
   useEffect(() => {
     DBSessionRef !== null &&
-      DBSessionRef.child('modules').on("value", (snapshot) => {
+      DBSessionRef.child("modules").on("value", (snapshot) => {
         const data = snapshot.val();
         setModules(data);
       });
   }, [DBSessionRef]);
 
-  useEffect(() => {
-    handlePlaying(Tone.Transport.state);
-  }, [Tone.Transport.state]);
-
-  /*onKeyDown={handleKeyPress}*/
+  /**/
 
   return (
-    <div className="workspace" tabIndex="0" style={{ pointerEvents: editMode ? 'auto' : 'none' }}>
+    <div
+      className="workspace"
+      tabIndex="0"
+      style={{ pointerEvents: editMode ? "auto" : "none" }}
+      onKeyDown={handleKeyPress}
+    >
       {modules !== null && !!modules.length ? (
         modules.map((module, moduleIndex) => (
           <Fragment>
@@ -228,14 +228,15 @@ function Workspace(props) {
         <p>No Modules!</p>
       )}
       <div className="break" />
-      {editMode && <IconButton
-      
-        color="primary"
-        style={{ marginTop: 48 }}
-        onClick={() => setModulePicker(true)}
-      >
-        <Icon>add</Icon>
-      </IconButton>}
+      {editMode && (
+        <IconButton
+          color="primary"
+          style={{ marginTop: 48 }}
+          onClick={() => setModulePicker(true)}
+        >
+          <Icon>add</Icon>
+        </IconButton>
+      )}
 
       {modulePicker && (
         <ModulePicker
@@ -261,21 +262,19 @@ function Workspace(props) {
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 12px)" }}
-        onClick={() =>
-          Tone.Transport.state !== "started"
-            ? Tone.Transport.pause()
-            : Tone.Transport.start()
-        }
+        onClick={props.togglePlaying}
       >
-        <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
+        <Icon>{props.isPlaying ? "pause" : "play_arrow"}</Icon>
       </Fab>
-      {editMode && <Fab
-        className="fixed-fab"
-        color="primary"
-        onClick={() => setMixerOpened((prev) => (prev ? false : true))}
-      >
-        <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-      </Fab>}
+      {editMode && (
+        <Fab
+          className="fixed-fab"
+          color="primary"
+          onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+        >
+          <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+        </Fab>
+      )}
 
       <Fab
         className="fixed-fab"
