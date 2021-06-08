@@ -77,6 +77,8 @@ function Module(props) {
   };
 
   const loadInstrument = () => {
+    instrument !== null && instrument.dispose()
+    //console.log(instrument)
     //sequencer
     if (props.module.type === 0) {
       setBufferLoaded(false);
@@ -205,6 +207,11 @@ function Module(props) {
 
   useEffect(() => {
     loadInstrument();
+    return () => {
+      //TODO: IMPORTANT: Dispose module instrument on unmount
+      //console.log(instrument) -> null
+      //instrument.dispose();
+    }
   }, []);
 
   useEffect(() => {
@@ -213,7 +220,7 @@ function Module(props) {
       newInstruments[props.index] = instrument;
       return newInstruments;
     });
-    //console.log("-- instr change triggered! --"+instrument)
+    console.log("instr changed:"+instrument)
   }, [instrument]);
 
   useEffect(() => {

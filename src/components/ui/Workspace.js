@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { Fab, Icon, IconButton, Button } from "@material-ui/core";
+import { Fab, Icon, IconButton, Button, Typography } from "@material-ui/core";
 
 import { instruments } from "../../assets/instrumentpatches";
 
@@ -22,7 +22,7 @@ Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
-  const [modules, setModules] = useState([]);
+  const [modules, setModules] = useState(null);
   const [sessionSize, setSessionSize] = useState(null);
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
@@ -122,7 +122,7 @@ function Workspace(props) {
 
   const saveToDatabase = () => {
     DBSessionRef !== null && DBSessionRef.child("modules").set(modules);
-      /* DBSessionRef.get().then((snapshot) => {
+    /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
           ? DBSessionRef.child("modules").set(modules)
           : console.log("Checked but not atualized");
@@ -131,58 +131,14 @@ function Workspace(props) {
 
   const updateFromDatabase = (modulesData) => {
     //console.log(JSON.stringify(modules),JSON.stringify(modulesData))
-    if(JSON.stringify(modules) !== JSON.stringify(modulesData)){
+    if (JSON.stringify(modules) !== JSON.stringify(modulesData)) {
       //console.log("ITS DIFFERENT!!!")
+      console.log("moduled loaded from server:"+modulesData)
       setModules(modulesData);
-    }else{
+    } else {
       //console.log("ITS THE SAME!!!");
     }
-  }
-
-  ////TODO: UNDO
-  /* 
-  const undoSession = () => {
-    setModules(sessionHistory[sessionHistory.length - 2]);
-    setSessionHistory((prev) => {
-      let newArray = [...prev];
-      newArray.pop();
-      newArray.pop();
-      return newArray;
-    });
-    console.log(sessionHistory.map((e) => e[0].score[0][0]));
   };
-
-  const registerSession = () => {
-    setSessionHistory((prev) => {
-      let newInput = [...prev];
-      newInput.push([...modules]);
-      return newInput;
-    });
-    console.log("change registered");
-  };
-
-  //KEY EVENTS
-
-  const handleKeyPress = (event) => {
-    Tone.start();
-    switch (event.code) {
-      
-      case "KeyZ":
-        event.preventDefault();
-        if (event.metaKey || event.ctrlKey) {
-          sessionHistory.length > 1
-            ? undoSession()
-            : alert("Nothing to be undone");
-        }
-        break;
-      case "KeyX":
-        event.preventDefault();
-        console.log(sessionHistory);
-
-        break;
-    }
-  }; 
-  */
 
   const handleKeyPress = (event) => {
     Tone.start();
@@ -218,11 +174,19 @@ function Workspace(props) {
   }, [DBSessionRef]);
 
   useEffect(() => {
-    //console.log(instrumentsLoaded);
-    props.hidden &&
-      !instrumentsLoaded.includes(false) &&
-      Tone.Transport.start();
+    console.log(instrumentsLoaded);
+    if (props.hidden && !instrumentsLoaded.includes(false)) {
+      Tone.Transport.seconds = 0;
+      Tone.Transport.start(0);
+    }
   }, [instrumentsLoaded]);
+
+  useEffect(() => {
+    Tone.Transport.clear();
+    return () => {
+      modulesInstruments.forEach((e) => e.dispose());
+    };
+  }, []);
 
   /**/
 
@@ -252,7 +216,11 @@ function Workspace(props) {
           </Fragment>
         ))
       ) : (
-        <p>No Modules!</p>
+        <Fragment>
+          <Typography variant="h1">😛</Typography>
+          <div className="break"/>
+          <p>No Modules!</p>
+        </Fragment>
       )}
       <div className="break" />
       {editMode && (

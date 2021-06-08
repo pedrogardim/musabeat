@@ -156,10 +156,11 @@ function SessionExplorer(props) {
 
   useEffect(() => {
     //console.log(playingSession);
-    Tone.Transport.seconds = 0;
-    Tone.Transport.clear();
+    //Tone.Transport.seconds = 0;
+    //Tone.Transport.clear();
     if (playingSession === null) {
       Tone.Transport.pause();
+      console.log("stop")
     }
   }, [playingSession]);
 
