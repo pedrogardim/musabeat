@@ -99,7 +99,7 @@ function Workspace(props) {
 
   const loadSession = () => {
     if (props.session === null) {
-      console.log("session is null!");
+      //console.log("session is null!");
       setModules([]);
     } else {
       console.log(props.session);
@@ -118,17 +118,26 @@ function Workspace(props) {
           props.setAppTitle(name);
         });
     }
-    
   };
 
   const saveToDatabase = () => {
-    DBSessionRef !== null &&
-      DBSessionRef.get().then((snapshot) => {
+    DBSessionRef !== null && DBSessionRef.child("modules").set(modules);
+      /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
           ? DBSessionRef.child("modules").set(modules)
           : console.log("Checked but not atualized");
-      });
+      }); */
   };
+
+  const updateFromDatabase = (modulesData) => {
+    //console.log(JSON.stringify(modules),JSON.stringify(modulesData))
+    if(JSON.stringify(modules) !== JSON.stringify(modulesData)){
+      //console.log("ITS DIFFERENT!!!")
+      setModules(modulesData);
+    }else{
+      //console.log("ITS THE SAME!!!");
+    }
+  }
 
   ////TODO: UNDO
   /* 
@@ -199,16 +208,21 @@ function Workspace(props) {
   useEffect(() => {
     DBSessionRef !== null &&
       DBSessionRef.child("modules").on("value", (snapshot) => {
-        const data = snapshot.val();
-        setModules(data);
+        updateFromDatabase(snapshot.val());
+      });
+    DBSessionRef !== null &&
+      DBSessionRef.get().then((snapshot) => {
+        const modulesData = snapshot.val();
+        setInstrumentsLoaded(new Array(modulesData.length).fill(false));
       });
   }, [DBSessionRef]);
 
-  useEffect(()=>{
-    console.log(instrumentsLoaded);
-    (props.hidden && !instrumentsLoaded.includes(false)) && Tone.Transport.start();
-
-  },[instrumentsLoaded])
+  useEffect(() => {
+    //console.log(instrumentsLoaded);
+    props.hidden &&
+      !instrumentsLoaded.includes(false) &&
+      Tone.Transport.start();
+  }, [instrumentsLoaded]);
 
   /**/
 
