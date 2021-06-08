@@ -25,7 +25,7 @@ function SideMenu(props) {
 
   return (
     <Drawer anchor={"left"} open={props.open} onClose={handleClose}>
-      <Typography style={{ textAlign: "center" }} variant="h6">
+      <Typography style={{ textAlign: "center" ,height:64,lineHeight:"64px"}} variant="h6">
         --Musa Logo--
       </Typography>
       <Divider />
