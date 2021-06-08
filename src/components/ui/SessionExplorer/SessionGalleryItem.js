@@ -88,7 +88,7 @@ function SessionGalleryItem(props) {
           props.session.modules.map((e) => (
             <Paper
               className="session-gallery-item-module"
-              style={{ backgroundColor: colors[e.color][500] }}
+              style={{ backgroundColor: colors[e.color][500], borderRadius:0 }}
             >
               {e.name}
             </Paper>

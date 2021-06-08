@@ -180,15 +180,6 @@ function Module(props) {
     }
   }, [Tone.Transport.state]);
 
-  useEffect(() => {
-    props.loaded &&
-      props.setInstrumentsLoaded((prev) => {
-        let newIL = [...prev];
-        newIL[props.index] = true;
-        return newIL;
-      });
-  }, [props.loaded]);
-
   return (
     <div
       style={{

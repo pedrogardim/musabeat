@@ -39,9 +39,6 @@ function Workspace(props) {
   const [DBSessionRef, setDBSessionRef] = useState(null);
 
   //a copy of the instruments, to be able to use them on export function
-  const [modulesInstruments, setModulesInstruments] = useState([]);
-
-
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
 
@@ -105,26 +102,28 @@ function Workspace(props) {
   };
 
   const loadSession = () => {
+    console.log("loading session: " + props.session);
     if (props.session === null) {
-      //console.log("session is null!");
+      console.log("session is null!");
       setModules([]);
     } else {
-      console.log(props.session);
       let sessionRef =
         props.session !== null &&
         firebase.database().ref("sessions").child(props.session);
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editmode and get title
-      !props.hidden &&
-        sessionRef.get().then((snapshot) => {
-          loadInstruments(snapshot.val().modules);
-          let editors = snapshot.val().editors;
-          editors.includes(props.user.uid)
-            ? setEditMode(true)
-            : setEditMode(false);
-          let name = snapshot.val().name;
-          props.setAppTitle(name);
-        });
+
+      sessionRef.get().then((snapshot) => {
+        //console.log(snapshot.val().modules + "-----");
+        loadInstruments(snapshot.val().modules);
+        setModules(snapshot.val().modules);
+        let editors = snapshot.val().editors;
+        !props.hidden && editors.includes(props.user.uid)
+          ? setEditMode(true)
+          : setEditMode(false);
+        let name = snapshot.val().name;
+        !props.hidden && props.setAppTitle(name);
+      });
     }
   };
 
@@ -168,8 +167,17 @@ function Workspace(props) {
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
-        moduleInstruments.push(
-          patchLoader(module.instrument, "", setInstrumentsLoaded, moduleIndex)
+        patchLoader(
+          module.instrument,
+          "",
+          setInstrumentsLoaded,
+          moduleIndex
+        ).then((r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = r;
+            return a;
+          })
         );
       } //load from obj
       else if (
@@ -217,7 +225,7 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
-    saveToDatabase(modules);
+    !props.hidden && saveToDatabase(modules);
   }, [modules]);
 
   useEffect(() => {
@@ -226,34 +234,36 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
-    DBSessionRef !== null &&
+    if (!props.hidden && DBSessionRef !== null) {
       DBSessionRef.child("modules").on("value", (snapshot) => {
         updateFromDatabase(snapshot.val());
       });
-    DBSessionRef !== null &&
       DBSessionRef.get().then((snapshot) => {
         const modulesData = snapshot.val();
-        setInstrumentsLoaded(new Array(modulesData.length).fill(false));
+        //setInstrumentsLoaded(new Array(modulesData.length).fill(false));
       });
+    }
   }, [DBSessionRef]);
 
   useEffect(() => {
-    console.log(instrumentsLoaded);
-    if (props.hidden && !instrumentsLoaded.includes(false)) {
+   //console.log(instrumentsLoaded);
+    if (!instrumentsLoaded.includes(false)) {
+      console.log("started!");
       Tone.Transport.seconds = 0;
-      Tone.Transport.start(0);
+      props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     }
   }, [instrumentsLoaded]);
 
   useEffect(() => {
-    Tone.Transport.clear();
+    Tone.Transport.cancel(0);
+    console.log("transport cleared");
     return () => {
-      modulesInstruments.forEach((e) => e.dispose());
+      instruments.forEach((e) => e.dispose());
     };
   }, []);
 
   useEffect(() => {
-    console.log(instruments);
+    //console.log(instruments);
   }, [instruments]);
 
   /**/
@@ -280,8 +290,6 @@ function Workspace(props) {
               loaded={instrumentsLoaded[moduleIndex]}
               sessionSize={sessionSize}
               setModules={setModules}
-              setModulesInstruments={setModulesInstruments}
-              setInstrumentsLoaded={setInstrumentsLoaded}
             />
             {moduleIndex % 3 == 1 && <div className="break" />}
           </Fragment>
@@ -317,7 +325,7 @@ function Workspace(props) {
         sessionSize={sessionSize}
         sessionData={starterSession}
         modules={modules}
-        modulesInstruments={modulesInstruments}
+        modulesInstruments={instruments}
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
