@@ -300,7 +300,11 @@ export const chordNametoNotes = (arg) => {
     //TODO: append bass
   }
 
-  if(chordtypes[chordtype] === undefined || musicalNotes.indexOf(chordroot) === -1) return null;
+  if (
+    chordtypes[chordtype] === undefined ||
+    musicalNotes.indexOf(chordroot) === -1
+  )
+    return null;
 
   let harmonizedchord = Tone.Frequency(chordroot + "3").harmonize(
     chordtypes[chordtype]
@@ -491,7 +495,7 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
   //apply GCD
 
   if (difference > 1) {
-    console.log("gdccase+", gdc, oldarray.length);
+    //console.log("gdccase+", gdc, oldarray.length);
 
     for (let x = 0; x < oldarray.length; x++) {
       newsubdivarray.push(oldarray[x]);
@@ -504,7 +508,7 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
       }
     }
   } else if (difference < 1) {
-    console.log("gdc case -", gdc);
+    //console.log("gdc case -", gdc);
 
     //works if gdc = new newsubdivision
 
@@ -559,7 +563,6 @@ export const patchLoader = async (
   setInstrumentsLoaded,
   moduleIndex
 ) => {
-  console.log(input);
   let instr;
   let patchRef = firebase.database().ref("/patches/" + input);
 
@@ -577,28 +580,23 @@ export const patchLoader = async (
     });
     instr = new Tone.Sampler(
       patch.urls,
-      {
-        baseUrl:
-          "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/" +
-          patch.baseUrl,
-      },
-      () => setInstrumentsLoaded((prev) => {
-        let a = [...prev];
-        a[moduleIndex] = true;
-        return a;
-      })
+      () =>
+        setInstrumentsLoaded((prev) => {
+          //console.log("======LOADED=======")
+          let a = [...prev];
+          a[moduleIndex] = true;
+          return a;
+        }),options.baseUrl
     ).toDestination();
 
-    //console.log(instr);
+    instr.set(options);
 
-    instr.attack = patch.asdr[0];
-    instr.release = patch.asdr[1];
   } else {
     setInstrumentsLoaded((prev) => {
-        let a = [...prev];
-        a[moduleIndex] = true;
-        return a;
-      })
+      let a = [...prev];
+      a[moduleIndex] = true;
+      return a;
+    });
   }
   if (patch.base === "FM" || type === "FMSynth") {
     instr = new Tone.PolySynth(Tone.FMSynth, options);

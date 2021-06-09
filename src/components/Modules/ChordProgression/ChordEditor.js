@@ -45,7 +45,7 @@ function ChordEditor(props) {
 
   const changeChordOnInput = (e) => {
     let chord = chordNametoNotes(e.target.value);
-    console.log(chord);
+    //console.log(chord);
     chord !== null &&
       props.setChords((prev) => {
         let newChords = [...prev];
