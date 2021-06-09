@@ -97,7 +97,7 @@ function ModulePicker(props) {
       color: Math.floor(Math.random() * 15.99),
     };
 
-    if (selectedType === 1 || selectedType === 2) {
+    if (selectedType === 1) {
       newModule.root = selectedRoot;
       newModule.scale = selectedScale;
       newModule.range = selectedRange;

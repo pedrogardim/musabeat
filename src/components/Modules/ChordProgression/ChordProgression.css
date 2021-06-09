@@ -1,33 +1,38 @@
-.chord-prog{
-    position:relative;
-    display:flex;
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
-    align-items: center;
-    align-content: center;
-    flex:1 0;
-    background:"white";
-    height:100%;
+.chord-prog {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  flex: 1 0;
+  background: "white";
+  height: 100%;
 }
 
-.measure{
-    width: calc(50% - 8px);
-    height:32px;
-    position:relative;
-    border-right: 1px solid gray;
-    border-left: 1px solid gray;
+.measure {
+  width: calc(50% - 8px);
+  height: 32px;
+  position: relative;
+  border-right: 1px solid gray;
+  border-left: 1px solid gray;
 
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 8px;
-
-
-  }
-
-
-.measure-divider{
-    max-height:32px;
-    background-color:black !important;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
 }
 
+.measure-divider {
+  max-height: 32px;
+  background-color: black !important;
+}
+
+.edit-chord-button {
+  height: 36px !important;
+  width: 36px !important;
+  bottom: 46px !important;
+  right: 16px !important;
+  position: absolute !important;
+  color: white !important;
+}

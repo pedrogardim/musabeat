@@ -297,8 +297,10 @@ export const chordNametoNotes = (arg) => {
   });
 
   if (chordbass !== null) {
-    //append bass
+    //TODO: append bass
   }
+
+  if(chordtypes[chordtype] === undefined || musicalNotes.indexOf(chordroot) === -1) return null;
 
   let harmonizedchord = Tone.Frequency(chordroot + "3").harmonize(
     chordtypes[chordtype]

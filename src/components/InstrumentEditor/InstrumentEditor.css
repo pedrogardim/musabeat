@@ -2,8 +2,6 @@
   background-color: white;
   flex: 1 0;
   display: flex;
-  overflow-y: overlay;
-
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;

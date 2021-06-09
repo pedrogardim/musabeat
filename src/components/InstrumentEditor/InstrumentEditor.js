@@ -72,9 +72,9 @@ function InstrumentEditor(props) {
       })
     );
 
-    //props.module.instrument = event.target.value 
+    //props.module.instrument = event.target.value
 
-   props.updateModules((previous) =>
+    props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
@@ -85,7 +85,6 @@ function InstrumentEditor(props) {
         }
       })
     );
-     
   };
 
   const handleFileDrop = (files, event) => {
@@ -312,6 +311,14 @@ function InstrumentEditor(props) {
   return (
     <div
       className="instrument-editor"
+      style={{
+        overflowY:
+          props.instrument.name === "Sampler" ||
+          props.instrument.name === "Players" ||
+          props.instrument.name === "GrainPlayer"
+            ? "overlay"
+            : "hidden",
+      }}
       onDragEnter={() => {
         setDraggingOver(true);
         ieWrapper.current.scrollTop = 0;
