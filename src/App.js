@@ -14,6 +14,7 @@ import {
   Typography,
   Toolbar,
   AppBar,
+  Tooltip,
 } from "@material-ui/core";
 
 import firebase from "firebase";
@@ -27,21 +28,26 @@ import AuthDialog from "./components/ui/AuthDialog";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [appTitle, setAppTitle] = useState("Welcome!");
   const [isPlaying, setIsPlaying] = useState(null);
-
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
-  const [appTitle, setAppTitle] = useState("Welcome!");
+  const [sessionEditMode, setSessionEditMode] = useState(null);
 
   const createNewSession = () => {
     let newSession = {
       name: "New Session",
-      bpm: 120,
+      description: "No description",
+      tags: ["musa"],
+      copied: 0,
+      opened: 0,
+      played: 0,
       creator: user.uid,
       editors: [user.uid],
+      bpm: 120,
       modules: [
         {
           id: 0,
@@ -67,8 +73,6 @@ function App() {
           muted: false,
         },
       ],
-      copied: 0,
-      opened: 0,
       likes: 0,
       likedBy: ["a"],
       createdOn: firebase.database.ServerValue.TIMESTAMP,
@@ -123,7 +127,7 @@ function App() {
         setIsPlaying(false);
       }
     }
-  }
+  };
 
   const updateAppTitle = () => {
     setAppTitle(
@@ -167,9 +171,18 @@ function App() {
           >
             <Icon>menu</Icon>
           </IconButton>
-          <Typography variant="h4" className="app-title">
+          <Typography
+            variant="h4"
+            className="app-title"
+            style={{ marginRight: 8 }}
+          >
             {appTitle}
           </Typography>
+          {!sessionEditMode && !!openedSession && (
+            <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
+              <Icon>visibility</Icon>
+            </Tooltip>
+          )}
           <Avatar
             onClick={handleAvatarClick}
             className="main-avatar"
@@ -232,6 +245,7 @@ function App() {
             isPlaying={isPlaying}
             togglePlaying={togglePlaying}
             user={user}
+            setSessionEditMode={setSessionEditMode}
           />
         )}
       </div>

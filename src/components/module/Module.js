@@ -27,7 +27,6 @@ import { colors } from "../../utils/materialPalette";
 import "./Module.css";
 
 function Module(props) {
-
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -166,15 +165,19 @@ function Module(props) {
       //TODO: IMPORTANT: Dispose module instrument on unmount
       //console.log(instrument) -> null
       //instrument.dispose();
-    }
+    };
   }, []);
 
-
   useEffect(() => {
-    if (props.instrument !== null && props.instrument !== undefined && Tone.Transport.state !== "started") {
+    if (
+      props.instrument !== null &&
+      props.instrument !== undefined &&
+      Tone.Transport.state !== "started"
+    ) {
       props.instrument.name === "Players"
         ? props.instrument.stopAll()
-        : props.instrument.name === "GrainPlayer" || props.instrument.name === "Player"
+        : props.instrument.name === "GrainPlayer" ||
+          props.instrument.name === "Player"
         ? props.instrument.stop()
         : props.instrument.releaseAll();
     }
@@ -186,6 +189,7 @@ function Module(props) {
         backgroundColor: colors[props.module.color][700],
         overflow:
           props.module.type === 2 || (props.module.type === 3 && "hidden"),
+        pointerEvents: props.editMode ? "auto" : "none",
       }}
       className={
         "module " +

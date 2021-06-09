@@ -2,7 +2,14 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { Fab, Icon, IconButton, Button, Typography } from "@material-ui/core";
+import {
+  Fab,
+  Icon,
+  IconButton,
+  Button,
+  Typography,
+  Tooltip,
+} from "@material-ui/core";
 
 import { instruments } from "../../assets/instrumentpatches";
 
@@ -21,9 +28,6 @@ import {
   loadSynthFromGetObject,
 } from "../../assets/musicutils";
 
-import { colors } from "../../utils/materialPalette";
-
-Tone.Transport.bpm.value = starterSession.bpm;
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
@@ -113,25 +117,31 @@ function Workspace(props) {
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editmode and get title
       sessionRef.get().then((snapshot) => {
+        let sessionData = snapshot.val();
         //console.log(snapshot.val().modules + "-----");
-        loadInstruments(snapshot.val().modules);
-        setModules(snapshot.val().modules);
-        let editors = snapshot.val().editors;
-        !props.hidden && editors.includes(props.user.uid)
+        if (sessionData.hasOwnProperty("modules")) {
+          loadSessionInstruments(sessionData.modules);
+          setModules(sessionData.modules);
+        }
+        Tone.Transport.bpm.value = sessionData.bpm;
+
+        let editors = sessionData.editors;
+        editors.includes(props.user.uid)
           ? setEditMode(true)
           : setEditMode(false);
-        let name = snapshot.val().name;
-        !props.hidden && props.setAppTitle(name);
+        let name = sessionData.name;
+        props.setAppTitle(name);
       });
     } else if (typeof props.session === "object") {
       setModules(props.session.modules);
       setInstrumentsLoaded(new Array(props.session.modules.length).fill(false));
+      Tone.Transport.bpm.value = props.session.bpm;
 
-      loadInstruments(props.session.modules);
+      loadSessionInstruments(props.session.modules);
     }
   };
 
-  const loadInstruments = (sessionModules) => {
+  const loadSessionInstruments = (sessionModules) => {
     let moduleInstruments = [];
     sessionModules.map((module, moduleIndex) => {
       //console.log(instrument)
@@ -196,6 +206,69 @@ function Workspace(props) {
     setInstruments(moduleInstruments);
   };
 
+  const loadNewModuleInstrument = (index) => {
+    let instrument;
+    console.log("inserting new instrument on" + index);
+    if (modules[index].type === 0) {
+      setInstrumentsLoaded((prev) => {
+        let a = [...prev];
+        a[index] = false;
+        return a;
+      });
+      instrument = new Tone.Players(modules[index].instrument.urls, () =>
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[index] = true;
+          return a;
+        })
+      ).toDestination();
+    }
+    //player
+    else if (modules[index] === 3) {
+      setInstrumentsLoaded((prev) => {
+        let a = [...prev];
+        a[index] = false;
+        return a;
+      });
+      instrument = new Tone.GrainPlayer(modules[index].instrument.url, () =>
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[index] = true;
+          return a;
+        })
+      ).toDestination();
+    }
+    //load from patch id
+    else if (typeof modules[index].instrument === "string") {
+      patchLoader(
+        modules[index].instrument,
+        "",
+        setInstrumentsLoaded,
+        index
+      ).then((r) =>
+        setInstruments((prev) => {
+          let a = [...prev];
+          a[index] = r;
+          return a;
+        })
+      );
+    } //load from obj
+    else if (
+      typeof modules[index].instrument === "object" &&
+      modules[index].instrument.name !== "Players" &&
+      modules[index].instrument.name !== "GrainPlayer" &&
+      instruments[index] === null
+    ) {
+      instrument = loadSynthFromGetObject(modules[index].instrument);
+    }
+
+    setInstruments((prev) => {
+      let a = [...prev];
+      a[index] = instrument;
+      return a;
+    });
+  };
+
   const saveToDatabase = () => {
     DBSessionRef !== null && DBSessionRef.child("modules").set(modules);
     /* DBSessionRef.get().then((snapshot) => {
@@ -229,6 +302,11 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
+    //create instrument if there's a new module
+    modules !== null &&
+      instruments[modules.length - 1] === undefined &&
+      loadNewModuleInstrument(modules.length - 1);
+
     !props.hidden && saveToDatabase(modules);
   }, [modules]);
 
@@ -276,8 +354,8 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
-    //console.log(instruments);
-  }, [instruments]);
+    props.setSessionEditMode(editMode);
+  }, [editMode]);
 
   /**/
 
@@ -286,7 +364,6 @@ function Workspace(props) {
       className="workspace"
       tabIndex="0"
       style={{
-        pointerEvents: editMode ? "auto" : "none",
         display: props.hidden ? "none" : "flex",
       }}
       onKeyDown={handleKeyPress}
@@ -303,6 +380,7 @@ function Workspace(props) {
               loaded={instrumentsLoaded[moduleIndex]}
               sessionSize={sessionSize}
               setModules={setModules}
+              editMode={editMode}
             />
             {moduleIndex % 3 == 1 && <div className="break" />}
           </Fragment>
@@ -316,13 +394,15 @@ function Workspace(props) {
       )}
       <div className="break" />
       {editMode && (
-        <IconButton
-          color="primary"
-          style={{ marginTop: 48 }}
-          onClick={() => setModulePicker(true)}
-        >
-          <Icon>add</Icon>
-        </IconButton>
+        <Tooltip title="Add new module">
+          <IconButton
+            color="primary"
+            style={{ marginTop: 48 }}
+            onClick={() => setModulePicker(true)}
+          >
+            <Icon style={{ fontSize: 40 }}>add</Icon>
+          </IconButton>
+        </Tooltip>
       )}
 
       {modulePicker && (
@@ -331,6 +411,7 @@ function Workspace(props) {
           onClose={() => setModulePicker(false)}
           setModulePicker={setModulePicker}
           setModules={setModules}
+          loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}
         />
       )}
