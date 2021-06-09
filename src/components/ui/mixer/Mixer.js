@@ -20,7 +20,7 @@ function Mixer(props) {
   };
 
   const handleSliderStop = (index,value) => {
-    console.log(value)
+    //console.log(value)
     props.setModules(prev=>{
       let newModules = [...prev];
       prev[index].volume = value;

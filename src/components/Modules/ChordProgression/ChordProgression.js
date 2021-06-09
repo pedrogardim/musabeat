@@ -1,24 +1,19 @@
 import React, { useState, useEffect, Fragment } from "react";
 
 import Chord from "./Chord";
-import ChordPicker from "./ChordPicker";
+import ChordEditor from "./ChordEditor";
 import ChordRhythmSequence from "./ChordRhythmSequence";
 
 import * as Tone from "tone";
 
-import {
-  getChordsFromScale,
-  chordNotestoName,
-  adaptSequencetoSubdiv,
-} from "../../../assets/musicutils";
+import { chordNotestoName } from "../../../assets/musicutils";
 
-import { Divider, IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon, Fab } from "@material-ui/core";
 
 import "./ChordProgression.css";
 
 import { scheduleChordProgression } from "../../../utils/TransportSchedule";
-import { colors } from "../../../utils/materialPalette"
-
+import { colors } from "../../../utils/materialPalette";
 
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
@@ -26,6 +21,7 @@ function ChordProgression(props) {
   const [activeRhythm, setActiveRhythm] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   const scheduleChords = () => {
     scheduleChordProgression(
@@ -81,7 +77,7 @@ function ChordProgression(props) {
         newChords.push({
           notes: [],
           duration: 1,
-          time: Math.ceil(newChords[newChords.length - 1].time)+1,
+          time: Math.ceil(newChords[newChords.length - 1].time) + 1,
           rhythm: newChords[newChords.length - 1].rhythm,
         });
       }
@@ -135,7 +131,7 @@ function ChordProgression(props) {
           (chord, chordIndex) =>
             (chordIndex === 0 ||
               Math.floor(chord.time) !==
-                Math.floor(chords[chordIndex-1].time)) && (
+                Math.floor(chords[chordIndex - 1].time)) && (
               <div className="measure">
                 {chords.map(
                   (inChord, inChordIndex) =>
@@ -159,29 +155,35 @@ function ChordProgression(props) {
         <IconButton size="small" onClick={addMeasure}>
           <Icon>add</Icon>
         </IconButton>
-
-        
+        {selectedChord !== null && (
+          <Fab
+            style={{
+              backgroundColor: colors[props.module.color][600],
+            }}
+            onClick={() => setEditorOpen(true)}
+            className="edit-chord-button"
+            boxShadow={1}
+          >
+            <Icon>edit</Icon>
+          </Fab>
+        )}
       </div>
-      <ChordRhythmSequence
-          activeChord={activeChord}
-          activeRhythm={activeRhythm}
+      {editorOpen && (
+        <ChordEditor
           chords={chords}
-          color={colors[props.module.color]}
-          setChords={setChords}
-        />
-      {selectedChord !== null && (
-        <ChordPicker
           selectedChord={selectedChord}
-          scaleChords={getChordsFromScale(
-            props.module.scale,
-            props.module.root,
-            props.module.complexity
-          )}
+          module={props.module}
           setChords={setChords}
-          color={colors[props.module.color]}
-          instrument={instrument}
+          onClose={() => setEditorOpen(false)}
         />
       )}
+      <ChordRhythmSequence
+        activeChord={activeChord}
+        activeRhythm={activeRhythm}
+        chords={chords}
+        color={colors[props.module.color]}
+        setChords={setChords}
+      />
     </div>
   );
 }

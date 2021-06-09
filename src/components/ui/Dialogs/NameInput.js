@@ -28,7 +28,7 @@ function NameInput(props) {
         <TextField ref={inputRef}></TextField>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => props.onClose}>Cancel</Button>
+        <Button onClick={props.onClose}>Cancel</Button>
         <Button color="primary" onClick={handleSubmit}>
           Change Name
         </Button>
