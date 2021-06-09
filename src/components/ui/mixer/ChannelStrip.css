@@ -8,3 +8,10 @@
     align-items: center;
     margin:16px;
 }
+
+.mixer-channel-strip-title{
+    text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  overflow: hidden;
+}

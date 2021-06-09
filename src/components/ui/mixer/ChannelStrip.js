@@ -8,43 +8,49 @@ import "./ChannelStrip.css";
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
 function ChannelStrip(props) {
-  const moduleName = props.module.name
-  const mutedModule = props.muted
+  const [volume, setVolume] = useState(
+    props.module.volume !== undefined
+      ? props.module.volume
+      : props.instrument.volume.value.toFixed(2)
+  );
 
-  const [volume,setVolume] = useState(props.module.volume);
+  const handleSliderMove = (e, v) => {
+    setVolume(v);
+    props.handleSliderMove(props.index, v);
+  };
 
-useEffect(() =>{
-
-  //props.handleSliderMove(props.index,volume)
-  
-
-},[volume])
-
+  const handleSliderStop = (e, v) => {
+    props.handleSliderStop(props.index, v);
+  };
 
   return (
     <div
       className="mixer-channel-strip"
-      style={(props.style, { filter: mutedModule ? "saturate(0)" : "none" })}
+      style={
+        (props.style, { filter: props.module.muted ? "saturate(0)" : "none" })
+      }
     >
       <Slider
         value={volume}
         min={-80}
         step={0.1}
         max={0}
-        scale={(x) => (x)}
-        onChange={(e, v) => setVolume(v)}
-        onChangeCommitted={(e,v)=>props.handleSliderStop(props.index,v)}
+        scale={(x) => x}
+        onChange={handleSliderMove}
+        onChangeCommitted={handleSliderStop}
         orientation="vertical"
         className="channel-strip-fader"
       />{" "}
       <IconButton onClick={props.handleMute}>
-        <Icon>{mutedModule ? "volume_off" : "volume_up"}</Icon>
+        <Icon>{props.module.muted ? "volume_off" : "volume_up"}</Icon>
       </IconButton>
       <Typography variant="overline" style={{ textTransform: "none" }}>
         {" "}
-        {mutedModule ? "MUTED" : volume + " dB"}{" "}
+        {props.module.muted ? "MUTED" : volume + " dB"}{" "}
       </Typography>
-      <Typography variant="overline"> {moduleName} </Typography>
+      <Typography variant="overline" className="mixer-channel-strip-title">
+        {props.module.name}{" "}
+      </Typography>
     </div>
   );
 }

@@ -414,7 +414,7 @@ function Workspace(props) {
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
-      {mixerOpened && <Mixer modules={modules} setModules={setModules} />}
+      {mixerOpened && <Mixer modules={modules} instruments={instruments} setModules={setModules} />}
       {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab
