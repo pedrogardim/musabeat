@@ -28,6 +28,7 @@ function SessionExplorer(props) {
   const [deleteDialog, setDeleteDialog] = useState(null);
   const [renameDialog, setRenameDialog] = useState(null);
   const [playingSession, setPlayingSession] = useState(null);
+  const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
   const isUser = props.currentPage === "userSessions";
 
@@ -160,7 +161,7 @@ function SessionExplorer(props) {
     //Tone.Transport.clear();
     if (playingSession === null) {
       Tone.Transport.pause();
-      console.log("stop")
+      console.log("stop");
     }
   }, [playingSession]);
 
@@ -169,11 +170,7 @@ function SessionExplorer(props) {
     getSessionList();
     getUserLikes();
   }, [props.currentPage]);
-  /* 
-  useEffect(() => {
-    console.log(sessionKeys, sessions);
-  }, [sessions, sessionKeys]);
- */
+
   return (
     <div className="session-explorer">
       {!!sessions.length ? (
@@ -185,11 +182,10 @@ function SessionExplorer(props) {
               handleSessionDelete={setDeleteDialog}
               setPlayingSession={() =>
                 setPlayingSession((prev) =>
-                  prev === sessionIndex
-                    ? null
-                    : sessionIndex
+                  prev === sessionIndex ? null : sessionIndex
                 )
               }
+              playingLoadingProgress={playingLoadingProgress}
               setRenameDialog={setRenameDialog}
               playingSession={playingSession === sessionIndex}
               key={`sgi${sessionIndex}`}
@@ -226,7 +222,12 @@ function SessionExplorer(props) {
         />
       )}
       {playingSession !== null && (
-        <Workspace hidden session={sessionKeys[playingSession]} isPlaying={true} />
+        <Workspace
+          hidden
+          session={sessions[playingSession]}
+          isPlaying={true}
+          setPlayingLoadingProgress={setPlayingLoadingProgress}
+        />
       )}
     </div>
   );

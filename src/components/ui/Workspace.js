@@ -31,7 +31,7 @@ function Workspace(props) {
   const [modules, setModules] = useState(null);
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
-  const [sessionSize, setSessionSize] = useState(null);
+  const [sessionSize, setSessionSize] = useState(0);
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -106,13 +106,12 @@ function Workspace(props) {
     if (props.session === null) {
       console.log("session is null!");
       setModules([]);
-    } else {
+    } else if (typeof props.session === "string") {
       let sessionRef =
         props.session !== null &&
         firebase.database().ref("sessions").child(props.session);
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editmode and get title
-
       sessionRef.get().then((snapshot) => {
         //console.log(snapshot.val().modules + "-----");
         loadInstruments(snapshot.val().modules);
@@ -124,6 +123,11 @@ function Workspace(props) {
         let name = snapshot.val().name;
         !props.hidden && props.setAppTitle(name);
       });
+    } else if (typeof props.session === "object") {
+      setModules(props.session.modules);
+      setInstrumentsLoaded(new Array(props.session.modules.length).fill(false));
+
+      loadInstruments(props.session.modules);
     }
   };
 
@@ -246,17 +250,26 @@ function Workspace(props) {
   }, [DBSessionRef]);
 
   useEffect(() => {
-   //console.log(instrumentsLoaded);
-    if (!instrumentsLoaded.includes(false)) {
+    //console.log(instrumentsLoaded);
+    if (!instrumentsLoaded.includes(false) && sessionSize > 0) {
       console.log("started!");
       Tone.Transport.seconds = 0;
       props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     }
+    props.hidden &&
+      props.setPlayingLoadingProgress(
+        Math.floor(
+          (instrumentsLoaded.filter((e) => e !== false).length /
+            instrumentsLoaded.length) *
+            100
+        )
+      );
   }, [instrumentsLoaded]);
 
   useEffect(() => {
+    //TODO: Completely clear Tone instance, disposing context
     Tone.Transport.cancel(0);
-    console.log("transport cleared");
+    //console.log("transport cleared");
     return () => {
       instruments.forEach((e) => e.dispose());
     };

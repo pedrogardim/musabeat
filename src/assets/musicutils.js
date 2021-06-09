@@ -620,7 +620,8 @@ export const patchLoader = async (
     ? (instr.volume.value = patch.gain)
     : (instr.volume.value = -18);
 
-  if ("fx" in patch) {
+  //if ("fx" in patch) {
+  if ("asdajsiod" in patch) {
     patch.fx.forEach((e, i) => {
       if (e[0] === "vib") {
         instrfx[i] = new Tone.Vibrato(e[1], e[2]);

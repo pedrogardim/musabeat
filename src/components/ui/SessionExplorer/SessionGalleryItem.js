@@ -4,7 +4,7 @@ import * as Tone from "tone";
 import {
   Paper,
   Typography,
-  CircularProgres,
+  CircularProgress,
   TextField,
   Icon,
   IconButton,
@@ -58,9 +58,9 @@ function SessionGalleryItem(props) {
     >
       <div className="session-gallery-item-title-cont">
         <Tooltip placement={"top"} title={props.session.name}>
-        <Typography variant="h5" className="session-gallery-item-title">
-          {props.session.name}
-        </Typography>
+          <Typography variant="h5" className="session-gallery-item-title">
+            {props.session.name}
+          </Typography>
         </Tooltip>
         {props.isUser && (
           <IconButton
@@ -88,7 +88,7 @@ function SessionGalleryItem(props) {
           props.session.modules.map((e) => (
             <Paper
               className="session-gallery-item-module"
-              style={{ backgroundColor: colors[e.color][500], borderRadius:0 }}
+              style={{ backgroundColor: colors[e.color][500], borderRadius: 0 }}
             >
               {e.name}
             </Paper>
@@ -103,9 +103,13 @@ function SessionGalleryItem(props) {
         )}
       </div>
       <div className="session-gallery-item-module-footer">
-        <IconButton onClick={props.setPlayingSession}>
-          <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
-        </IconButton>
+        {props.playingLoadingProgress !== 100 && props.playingSession ? (
+          <CircularProgress value={props.playingLoadingProgress} />
+        ) : (
+          <IconButton onClick={props.setPlayingSession}>
+            <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
+          </IconButton>
+        )}
         <Tooltip title={props.session.likes}>
           <IconButton>
             <Icon
