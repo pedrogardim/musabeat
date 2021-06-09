@@ -206,16 +206,16 @@ function Workspace(props) {
     setInstruments(moduleInstruments);
   };
 
-  const loadNewModuleInstrument = (index) => {
+  const loadNewModuleInstrument = (module, index) => {
     let instrument;
-    console.log("inserting new instrument on" + index);
-    if (modules[index].type === 0) {
+    //console.log("inserting new instrument on" + index);
+    if (module.type === 0) {
       setInstrumentsLoaded((prev) => {
         let a = [...prev];
         a[index] = false;
         return a;
       });
-      instrument = new Tone.Players(modules[index].instrument.urls, () =>
+      instrument = new Tone.Players(module.instrument.urls, () =>
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
           a[index] = true;
@@ -224,13 +224,13 @@ function Workspace(props) {
       ).toDestination();
     }
     //player
-    else if (modules[index] === 3) {
+    else if (module === 3) {
       setInstrumentsLoaded((prev) => {
         let a = [...prev];
         a[index] = false;
         return a;
       });
-      instrument = new Tone.GrainPlayer(modules[index].instrument.url, () =>
+      instrument = new Tone.GrainPlayer(module.instrument.url, () =>
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
           a[index] = true;
@@ -239,27 +239,23 @@ function Workspace(props) {
       ).toDestination();
     }
     //load from patch id
-    else if (typeof modules[index].instrument === "string") {
-      patchLoader(
-        modules[index].instrument,
-        "",
-        setInstrumentsLoaded,
-        index
-      ).then((r) =>
-        setInstruments((prev) => {
-          let a = [...prev];
-          a[index] = r;
-          return a;
-        })
+    else if (typeof module.instrument === "string") {
+      patchLoader(module.instrument, "", setInstrumentsLoaded, index).then(
+        (r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[index] = r;
+            return a;
+          })
       );
     } //load from obj
     else if (
-      typeof modules[index].instrument === "object" &&
-      modules[index].instrument.name !== "Players" &&
-      modules[index].instrument.name !== "GrainPlayer" &&
+      typeof module.instrument === "object" &&
+      module.instrument.name !== "Players" &&
+      module.instrument.name !== "GrainPlayer" &&
       instruments[index] === null
     ) {
-      instrument = loadSynthFromGetObject(modules[index].instrument);
+      instrument = loadSynthFromGetObject(module.instrument);
     }
 
     setInstruments((prev) => {
@@ -302,11 +298,6 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log(modules);
-    //create instrument if there's a new module
-    modules !== null &&
-      instruments[modules.length - 1] === undefined &&
-      loadNewModuleInstrument(modules.length - 1);
-
     !props.hidden && saveToDatabase(modules);
   }, [modules]);
 
@@ -354,7 +345,7 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
-    props.setSessionEditMode(editMode);
+    !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
 
   /**/

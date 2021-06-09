@@ -57,7 +57,10 @@ function ModulePicker(props) {
 
   const addModule = (moduletype) => {
     let newModule = {
-      id: props.modules === null ? 0 : Math.max(...props.modules.map((e) => e.id)) + 1,
+      id:
+        props.modules === null
+          ? 0
+          : Math.max(...props.modules.map((e) => e.id)) + 1,
       name: moduletypes[selectedType].name,
       type: selectedType,
       score:
@@ -94,14 +97,21 @@ function ModulePicker(props) {
       color: Math.floor(Math.random() * 15.99),
     };
 
-    if(selectedType === 1 || selectedType === 2){
+    if (selectedType === 1 || selectedType === 2) {
       newModule.root = selectedRoot;
       newModule.scale = selectedScale;
       newModule.range = selectedRange;
     }
 
-    props.setModules((prevModules) => prevModules === null ? [newModule]: [...prevModules, newModule]);
+    let newModules;
+
+    props.setModules((prevModules) => {
+      newModules =
+        prevModules === null ? [newModule] : [...prevModules, newModule];
+      return newModules;
+    });
     props.setModulePicker(false);
+    props.loadNewModuleInstrument(newModule, newModules.length-1);
   };
 
   const handleSizeSelect = (event) => {
