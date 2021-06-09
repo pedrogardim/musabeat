@@ -23,11 +23,6 @@ function ChannelStrip(props) {
     props.handleSliderStop(props.index, v);
   };
 
-  useEffect(() => {
-    if (props.module.volume !== instrument.volume.value)
-      props.instruments.volume.value = props.module.volume;
-  }, []);
-
   return (
     <div
       className="mixer-channel-strip"

@@ -147,27 +147,27 @@ function Workspace(props) {
       //console.log(instrument)
       //sequencer
       if (module.type === 0) {
-        moduleInstruments[moduleIndex] = (
-          new Tone.Players(module.instrument.urls, () =>
+        moduleInstruments[moduleIndex] = new Tone.Players(
+          module.instrument.urls,
+          () =>
             setInstrumentsLoaded((prev) => {
               let a = [...prev];
               a[moduleIndex] = true;
               return a;
             })
-          ).toDestination()
-        );
+        ).toDestination();
       }
       //player
       else if (module.type === 3) {
-        moduleInstruments[moduleIndex] = (
-          new Tone.GrainPlayer(module.instrument.url, () =>
+        moduleInstruments[moduleIndex] = new Tone.GrainPlayer(
+          module.instrument.url,
+          () =>
             setInstrumentsLoaded((prev) => {
               let a = [...prev];
               a[moduleIndex] = true;
               return a;
             })
-          ).toDestination()
-        );
+        ).toDestination();
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
@@ -184,11 +184,11 @@ function Workspace(props) {
           })
         );
       } //load from obj
-      else if (
-        typeof module.instrument === "object"
-      ) {
-        console.log(module.instrument)
-        moduleInstruments[moduleIndex] = loadSynthFromGetObject(module.instrument);
+      else if (typeof module.instrument === "object") {
+        console.log(module.instrument);
+        moduleInstruments[moduleIndex] = loadSynthFromGetObject(
+          module.instrument
+        );
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
           a[moduleIndex] = true;
@@ -315,7 +315,10 @@ function Workspace(props) {
   useEffect(() => {
     //console.log(instrumentsLoaded);
     if (!instrumentsLoaded.includes(false) && sessionSize > 0) {
-      instruments.map((e, i) => (e._volume.mute = modules[i].muted));
+      instruments.map((e, i) => {
+        e._volume.mute = modules[i].muted;
+        e.volume.value = modules[i].volume;
+      });
       Tone.Transport.seconds = 0;
       props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
       console.log("session ready!");
@@ -344,7 +347,7 @@ function Workspace(props) {
   }, [editMode]);
 
   useEffect(() => {
-    console.log(instruments)
+    //console.log(instruments)
   }, [instruments]);
 
   /**/
