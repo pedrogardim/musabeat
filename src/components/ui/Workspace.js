@@ -315,9 +315,12 @@ function Workspace(props) {
   useEffect(() => {
     //console.log(instrumentsLoaded);
     if (!instrumentsLoaded.includes(false) && sessionSize > 0) {
+      //temp
       instruments.map((e, i) => {
-        e._volume.mute = modules[i].muted;
-        e.volume.value = modules[i].volume;
+        if (!!e) {
+          e._volume.mute = modules[i].muted;
+          e.volume.value = modules[i].volume;
+        }
       });
       Tone.Transport.seconds = 0;
       props.hidden ? Tone.Transport.start() : Tone.Transport.pause();

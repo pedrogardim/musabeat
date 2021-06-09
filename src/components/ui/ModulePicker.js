@@ -58,7 +58,7 @@ function ModulePicker(props) {
   const addModule = (moduletype) => {
     let newModule = {
       id:
-        props.modules === null
+        (props.modules === null || props.modules ===[])
           ? 0
           : Math.max(...props.modules.map((e) => e.id)) + 1,
       name: moduletypes[selectedType].name,
@@ -77,6 +77,8 @@ function ModulePicker(props) {
               return chord;
             })
           : [{ time: 0, duration: 0 }],
+      volume:0,
+      muted: false,
       instrument:
         selectedType === 0
           ? {

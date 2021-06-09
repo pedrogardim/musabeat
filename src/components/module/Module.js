@@ -58,9 +58,6 @@ function Module(props) {
       let newModules = [...prevModules];
       newModules = newModules
         .filter((e) => e.id !== props.index)
-        .map((e, i) => {
-          return { ...e, id: i };
-        });
       return newModules;
     });
   };
