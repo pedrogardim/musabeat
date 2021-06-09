@@ -147,12 +147,7 @@ function Workspace(props) {
       //console.log(instrument)
       //sequencer
       if (module.type === 0) {
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[moduleIndex] = false;
-          return a;
-        });
-        moduleInstruments.push(
+        moduleInstruments[moduleIndex] = (
           new Tone.Players(module.instrument.urls, () =>
             setInstrumentsLoaded((prev) => {
               let a = [...prev];
@@ -164,12 +159,7 @@ function Workspace(props) {
       }
       //player
       else if (module.type === 3) {
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[moduleIndex] = false;
-          return a;
-        });
-        moduleInstruments.push(
+        moduleInstruments[moduleIndex] = (
           new Tone.GrainPlayer(module.instrument.url, () =>
             setInstrumentsLoaded((prev) => {
               let a = [...prev];
@@ -195,14 +185,18 @@ function Workspace(props) {
         );
       } //load from obj
       else if (
-        typeof module.instrument === "object" &&
-        module.instrument.name !== "Players" &&
-        module.instrument.name !== "GrainPlayer" &&
-        instruments[moduleIndex] === null
+        typeof module.instrument === "object"
       ) {
-        moduleInstruments.push(loadSynthFromGetObject(props.module.instrument));
+        console.log(module.instrument)
+        moduleInstruments[moduleIndex] = loadSynthFromGetObject(module.instrument);
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[moduleIndex] = true;
+          return a;
+        });
       }
     });
+
     setInstruments(moduleInstruments);
   };
 
@@ -321,9 +315,10 @@ function Workspace(props) {
   useEffect(() => {
     //console.log(instrumentsLoaded);
     if (!instrumentsLoaded.includes(false) && sessionSize > 0) {
-      console.log("started!");
+      instruments.map((e, i) => (e._volume.mute = modules[i].muted));
       Tone.Transport.seconds = 0;
       props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
+      console.log("session ready!");
     }
     props.hidden &&
       props.setPlayingLoadingProgress(
@@ -348,6 +343,10 @@ function Workspace(props) {
     !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
 
+  useEffect(() => {
+    console.log(instruments)
+  }, [instruments]);
+
   /**/
 
   return (
@@ -369,6 +368,7 @@ function Workspace(props) {
               instrument={instruments[moduleIndex]}
               setInstruments={setInstruments}
               loaded={instrumentsLoaded[moduleIndex]}
+              setInstrumentsLoaded={setInstrumentsLoaded}
               sessionSize={sessionSize}
               setModules={setModules}
               editMode={editMode}
@@ -414,7 +414,13 @@ function Workspace(props) {
       />
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
-      {mixerOpened && <Mixer modules={modules} instruments={instruments} setModules={setModules} />}
+      {mixerOpened && (
+        <Mixer
+          modules={modules}
+          instruments={instruments}
+          setModules={setModules}
+        />
+      )}
       {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab

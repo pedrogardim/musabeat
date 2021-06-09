@@ -30,7 +30,7 @@ import {
 import { FileDrop } from "react-file-drop";
 
 import "./InstrumentEditor.css";
-import { colors } from "../../utils/materialPalette"
+import { colors } from "../../utils/materialPalette";
 
 function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState(null);
@@ -64,9 +64,17 @@ function InstrumentEditor(props) {
 
   const handlePatchSelect = (event) => {
     setSelectedPatch(event.target.value);
-    patchLoader(event.target.value, "", props.setInstrument,props.setBufferLoaded);
+    patchLoader(event.target.value, "", props.setInstrumentsLoaded).then((r) =>
+      props.setInstruments((prev) => {
+        let a = [...prev];
+        a[props.index] = r;
+        return a;
+      })
+    );
 
-    props.updateModules((previous) =>
+    //props.module.instrument = event.target.value 
+
+   props.updateModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
@@ -77,15 +85,13 @@ function InstrumentEditor(props) {
         }
       })
     );
+     
   };
 
   const handleFileDrop = (files, event) => {
     event.preventDefault();
     Tone.Transport.pause();
     let file = files[0];
-
-    
-   
 
     setDraggingOver(false);
 
@@ -108,21 +114,27 @@ function InstrumentEditor(props) {
           });
 
           const user = firebase.auth().currentUser;
-          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name.split(".")[0]}`);
+          const storageRef = firebase
+            .storage()
+            .ref(`/${user.uid}/${file.name.split(".")[0]}`);
           const task = storageRef.put(file);
-      
+
           task.on(
             "state_changed",
             (snapshot) => {
-             console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+              console.log(
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              );
             },
-            (error) => {console.log(error)},
-            () => {storageRef.getDownloadURL().then(r=>{
-              props.onInstrumentMod(r,fileName)
-            })}
+            (error) => {
+              console.log(error);
+            },
+            () => {
+              storageRef.getDownloadURL().then((r) => {
+                props.onInstrumentMod(r, fileName);
+              });
+            }
           );
-
-          
         },
         (e) => {
           alert(

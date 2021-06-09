@@ -85,13 +85,13 @@ function Module(props) {
       } else if (props.module.type === 3) {
         newModules[props.module.id].instrument = { url };
       } else if (props.instrument.name === "Sampler") {
-        let samplerPrms = module.instrument.get();
+        let samplerPrms = props.instrument.get();
         delete samplerPrms.onerror;
         delete samplerPrms.onload;
-        samplerPrms.urls = { ...module.instrument.get().urls, [name]: url };
+        samplerPrms.urls = { ...props.instrument.get().urls, [name]: url };
         newModules[props.module.id].instrument = samplerPrms;
       } else {
-        newModules[props.module.id].instrument = module.instrument.get();
+        newModules[props.module.id].instrument = props.instrument.get();
       }
       return newModules;
     });
@@ -245,6 +245,7 @@ function Module(props) {
               instrument={props.instrument}
               onInstrumentMod={onInstrumentMod}
               setInstruments={props.setInstruments}
+              setInstrumentsLoaded={props.setInstrumentsLoaded}
               updateModules={props.setModules}
               setInstrumentEditorMode={setInstrumentEditorMode}
               index={props.index}
