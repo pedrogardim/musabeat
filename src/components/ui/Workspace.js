@@ -339,7 +339,7 @@ function Workspace(props) {
   useEffect(() => {
     //TODO: Completely clear Tone instance, disposing context
     Tone.Transport.cancel(0);
-    //console.log("transport cleared");
+    console.log("transport cleared");
     return () => {
       instruments.forEach((e) => e.dispose());
     };
@@ -369,7 +369,7 @@ function Workspace(props) {
           <Fragment>
             <Module
               key={module.id}
-              index={module.id}
+              index={moduleIndex}
               module={module}
               instrument={instruments[moduleIndex]}
               setInstruments={setInstruments}

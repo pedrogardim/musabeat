@@ -156,18 +156,12 @@ function Player(props) {
   useEffect(() => {
     props.updateModules((previousModules) => {
       let newmodules = [...previousModules];
-      newmodules[props.module.id].score = score;
+      newmodules[props.index].score = score;
       return newmodules;
     });
   }, [score]);
 
-  /* useEffect(() => {
-    props.updateModules((previousModules) => {
-      let newmodules = [...previousModules];
-      newmodules[props.module.id].instrument = instrument;
-      return newmodules;
-    });
-  }, [instrument]); */
+
 
   useEffect(() => {
     setRescheduleEvent(Tone.Transport.schedule((time) => {

@@ -96,7 +96,7 @@ function ChordProgression(props) {
   const updateChords = () => {
     props.updateModules((previousModules) => {
       let newModules = [...previousModules];
-      newModules[props.module.id].score = chords;
+      newModules[props.index].score = chords;
       return newModules;
     });
   };

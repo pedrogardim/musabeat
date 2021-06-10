@@ -103,7 +103,7 @@ function MelodyGrid(props) {
   const updateModuleSequence = () => {
     props.updateModules((previousModules) => {
       let newModules = [...previousModules];
-      newModules[props.module.id].score = melodyArray;
+      newModules[props.index].score = melodyArray;
       return newModules;
     });
   };

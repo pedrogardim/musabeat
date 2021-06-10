@@ -54,11 +54,19 @@ function Module(props) {
     //Tone.Transport.pause();
     props.setModules((prevModules) => {
       //prevModules.forEach(e=>clearEvents(e.id));
-      clearEvents(props.index);
+      clearEvents(props.module.id);
       let newModules = [...prevModules];
       newModules = newModules
-        .filter((e) => e.id !== props.index)
+        .filter((e,i) => i !== props.index)
       return newModules;
+    });
+
+    props.setInstruments((prevInstruments) => {
+      //prevModules.forEach(e=>clearEvents(e.id));
+      let newInstruments = [...prevInstruments];
+      newInstruments = newInstruments
+        .filter((e,i) => i !== props.index)
+      return newInstruments;
     });
   };
 
@@ -105,6 +113,7 @@ function Module(props) {
           instrument={props.instrument}
           loaded={props.loaded}
           sessionSize={props.sessionSize}
+          index={props.index}
           module={props.module}
           kit={0}
           updateModules={props.setModules}
@@ -119,6 +128,7 @@ function Module(props) {
           }}
           instrument={props.instrument}
           sessionSize={props.sessionSize}
+          index={props.index}
           module={props.module}
           updateModules={props.setModules}
         />
@@ -133,6 +143,7 @@ function Module(props) {
           }}
           instrument={props.instrument}
           sessionSize={props.sessionSize}
+          index={props.index}
           module={props.module}
           updateModules={props.setModules}
         />
@@ -148,6 +159,7 @@ function Module(props) {
           onInstrumentMod={onInstrumentMod}
           setInstruments={props.setInstruments}
           loaded={props.loaded}
+          index={props.index}
           instrument={props.instrument}
           sessionSize={props.sessionSize}
           module={props.module}
@@ -158,6 +170,7 @@ function Module(props) {
   }
 
   useEffect(() => {
+    Tone.Transport.cancel(0)
     return () => {
       //TODO: IMPORTANT: Dispose module instrument on unmount
       //console.log(instrument) -> null

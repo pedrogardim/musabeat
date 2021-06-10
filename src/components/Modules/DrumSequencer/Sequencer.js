@@ -69,7 +69,7 @@ function Sequencer(props) {
   const updateModuleSequence = () => {
     props.updateModules((previousModules) => {
       let newModules = [...previousModules];
-      newModules[props.module.id].score = sequencerArray;
+      newModules[props.index].score = sequencerArray;
       return newModules;
     });
   };
