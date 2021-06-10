@@ -58,7 +58,7 @@ function ModulePicker(props) {
   const addModule = (moduletype) => {
     let newModule = {
       id:
-        (props.modules === null || props.modules ===[])
+        !props.modules || !props.modules.length
           ? 0
           : Math.max(...props.modules.map((e) => e.id)) + 1,
       name: moduletypes[selectedType].name,
@@ -77,7 +77,7 @@ function ModulePicker(props) {
               return chord;
             })
           : [{ time: 0, duration: 0 }],
-      volume:0,
+      volume: 0,
       muted: false,
       instrument:
         selectedType === 0
@@ -96,7 +96,7 @@ function ModulePicker(props) {
               },
             }
           : "-MbBygzylMiMRWrAv1kh",
-      color: Math.floor(Math.random() * 15.99),
+      color: Math.floor(Math.random() * 14.99),
     };
 
     if (selectedType === 1) {
@@ -113,7 +113,7 @@ function ModulePicker(props) {
       return newModules;
     });
     props.setModulePicker(false);
-    props.loadNewModuleInstrument(newModule, newModules.length-1);
+    props.loadNewModuleInstrument(newModule, newModules.length - 1);
   };
 
   const handleSizeSelect = (event) => {

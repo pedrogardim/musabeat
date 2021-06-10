@@ -172,10 +172,6 @@ function SessionExplorer(props) {
     getUserLikes();
   }, [props.currentPage]);
 
-  useEffect(() => {
-    console.log(sessionKeys,sessions,(!!sessions || !!sessions.length),(!sessionKeys || !sessionKeys.length || !sessions.length));
-  }, [sessionKeys,sessions]);
-
   return (
     <div className="session-explorer">
       {(!!sessions.length) ? (

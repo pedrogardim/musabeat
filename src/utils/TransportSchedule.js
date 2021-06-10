@@ -3,10 +3,15 @@ import * as Tone from "tone";
 let scheduledEvents = [];
 
 export const clearEvents = (moduleId) => {
-  //console.log(moduleId)
+  if (moduleId === "all") {
+    Tone.Transport.cancel(0);
+    scheduledEvents = [];
+  }
+
   typeof scheduledEvents[moduleId] !== "undefined" &&
     scheduledEvents[moduleId].length > 0 &&
     scheduledEvents[moduleId].forEach((event) => Tone.Transport.clear(event));
+  delete scheduledEvents[moduleId];
 };
 
 export const scheduleDrumSequence = (
@@ -111,10 +116,6 @@ export const scheduleChordProgression = (
   let moduleLength = Math.ceil(chords[chords.length - 1].time + 0.01);
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
-  //console.log(sessionSize, moduleLength,loopTimes)
-
-  //console.log(loopTimes)
-
   for (let x = 0; x < loopTimes; x++) {
     chords.map((chord, chordIndex) => {
       let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
@@ -126,7 +127,6 @@ export const scheduleChordProgression = (
       chord.rhythm.map((rhythm, rhythmIndex) => {
         let rhythmscheduletime =
           rhythmduration * rhythmIndex + chordtimetostart;
-
         let thisevent = transport.schedule((time) => {
           switch (rhythm) {
             case 0:
@@ -152,6 +152,7 @@ export const scheduleChordProgression = (
   }
 
   scheduledEvents[moduleId] = scheduledChords;
+  console.log(scheduledEvents);
 };
 
 export const scheduleSamples = (

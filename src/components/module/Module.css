@@ -17,7 +17,7 @@
   color: rgba(0, 0, 0, 0.87);
 
   overflow: visible;
-  position:relative;
+  position: relative;
   /* align-items: stretch; */
 
   /*
@@ -60,26 +60,24 @@
   height: 100%;
   width: 30px !important;
   position: absolute !important;
-  right:0 !important;
-  color:white !important;
-
+  right: 0 !important;
+  color: white !important;
 }
 
-.module-back-button{
+.module-back-button {
   height: 100%;
   width: 30px !important;
   position: absolute !important;
-  left:0 !important;
-  color:white !important;
-
+  left: 0 !important;
+  color: white !important;
 }
 
-.module-menu-option *{
-  color:rgba(0, 0, 0, 0.5) !important;
+.module-menu-option * {
+  color: rgba(0, 0, 0, 0.5) !important;
 }
 
-.module-menu-remove-option *{
-  color:rgba(255, 9, 9, 0.733) !important;
+.module-menu-remove-option * {
+  color: rgba(255, 9, 9, 0.733) !important;
 }
 
 .hidden {
@@ -97,47 +95,38 @@
   background-color: white;
 }
 
-.loading-progress{
+.loading-progress {
   position: absolute;
-  top:calc(50% - 20px);
-  left:calc(50% - 20px);
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
 }
 
-.file-drop{
+.file-drop {
   position: absolute;
   width: 100%;
-  height:100%;
-  top:0;
-  left:0;
-  z-index:4;
-
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 4;
 }
 
 .file-drop > .file-drop-target {
   position: absolute;
   width: 100%;
-  height:100%;
-  top:0;
-  left:0;
+  height: 100%;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #3f51b5;
-  opacity:0.5;
-  color:white;
-
-
-
-
+  opacity: 0.5;
+  color: white;
 }
 
-.file-drop > .file-drop-target.file-drop-dragging-over-target{
-
-
+.file-drop > .file-drop-target.file-drop-dragging-over-target {
 }
 
-
-.hidden{
-  display:none !important;
-
+.hidden {
+  display: none !important;
 }

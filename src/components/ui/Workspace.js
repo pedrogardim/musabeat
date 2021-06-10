@@ -28,6 +28,8 @@ import {
   loadSynthFromGetObject,
 } from "../../assets/musicutils";
 
+import { clearEvents } from "../../utils/TransportSchedule";
+
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
 
@@ -185,7 +187,7 @@ function Workspace(props) {
         );
       } //load from obj
       else if (typeof module.instrument === "object") {
-        console.log(module.instrument);
+        //console.log(module.instrument);
         moduleInstruments[moduleIndex] = loadSynthFromGetObject(
           module.instrument
         );
@@ -318,8 +320,15 @@ function Workspace(props) {
       //temp
       instruments.map((e, i) => {
         if (!!e) {
-          e._volume.mute = modules[i].muted;
-          e.volume.value = modules[i].volume;
+          //priorize loaded instrument patch volume
+          //e._volume.mute = modules[i].muted;
+          //e.volume.value = modules[i].volume;
+          setModules((prev) => {
+            let newModules = [...prev];
+            newModules[i].muted = e._volume.mute;
+            newModules[i].volume = e.volume.value;
+            return newModules;
+          });
         }
       });
       Tone.Transport.seconds = 0;
@@ -338,10 +347,10 @@ function Workspace(props) {
 
   useEffect(() => {
     //TODO: Completely clear Tone instance, disposing context
-    Tone.Transport.cancel(0);
-    console.log("transport cleared");
     return () => {
       instruments.forEach((e) => e.dispose());
+      clearEvents("all");
+      console.log("transport cleared");
     };
   }, []);
 

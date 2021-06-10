@@ -24,6 +24,7 @@ function ChordProgression(props) {
   const [editorOpen, setEditorOpen] = useState(false);
 
   const scheduleChords = () => {
+    console.log("chords rescheduled module " + props.index);
     scheduleChordProgression(
       chords,
       instrument,
@@ -121,8 +122,24 @@ function ChordProgression(props) {
   }, [activeChord]);
 
   useEffect(() => {
+    scheduleChords();
+  }, [props.sessionSize]);
+
+  useEffect(() => {
     setActiveChord(selectedChord);
   }, [selectedChord]);
+
+  //temp fix for unwanted unscheduling
+
+  useEffect(() => {
+    scheduleChords();
+  }, [props.index]);
+
+  useEffect(() => {
+    props.module.score !== chords && setChords(props.module.score);
+  }, [props.module]);
+
+  //
 
   return (
     <div className="module-innerwrapper" style={props.style}>
