@@ -18,6 +18,7 @@ import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
+import PatchExplorer from "./PatchExplorer";
 
 import { instruments } from "../../assets/instrumentpatches";
 import { kits } from "../../assets/drumkits";
@@ -33,9 +34,8 @@ import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
 
 function InstrumentEditor(props) {
-  const [selectedPatch, setSelectedPatch] = useState(null);
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchesList, setPatchesList] = useState([]);
+  const [patchExplorer, setPatchExplorer] = useState(false);
 
   const ieWrapper = useRef(null);
   /* 
@@ -46,46 +46,6 @@ function InstrumentEditor(props) {
 
   }
  */
-  const loadDBPatches = () => {
-    //temp
-    firebase
-      .database()
-      .ref("/patches/")
-      .once("value")
-      .then((snapshot) => {
-        let array = Object.keys(snapshot.val()).map((e, i, a) => [
-          e,
-          snapshot.val()[e].name,
-        ]);
-        //console.log(array);
-        setPatchesList(array);
-      });
-  };
-
-  const handlePatchSelect = (event) => {
-    setSelectedPatch(event.target.value);
-    patchLoader(event.target.value, "", props.setInstrumentsLoaded).then((r) =>
-      props.setInstruments((prev) => {
-        let a = [...prev];
-        a[props.index] = r;
-        return a;
-      })
-    );
-
-    //props.module.instrument = event.target.value
-
-    props.updateModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module };
-          newModule.instrument = event.target.value;
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
-  };
 
   const handleFileDrop = (files, event) => {
     event.preventDefault();
@@ -107,10 +67,6 @@ function InstrumentEditor(props) {
             props.instrument.name === "Sampler"
               ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
               : file.name.split(".")[0];
-
-          props.instrument.add(fileName, audiobuffer, (e) => {
-            setSelectedPatch(null);
-          });
 
           const user = firebase.auth().currentUser;
           const storageRef = firebase
@@ -295,10 +251,6 @@ function InstrumentEditor(props) {
     mainContent = list;
   }
 
-  useEffect(() => {
-    props.module.type !== 0 && loadDBPatches();
-  }, []);
-
   /* 
   useEffect(() => {
     setInstrument(props.instrument);
@@ -325,28 +277,20 @@ function InstrumentEditor(props) {
       }}
       ref={ieWrapper}
     >
-      <Select
-        native
-        className="instrument-editor-patch-select"
-        value={selectedPatch}
-        onChange={handlePatchSelect}
-      >
-        {props.module.type === 0
-          ? kits.map((kit, kitIndex) => (
-              <option key={kitIndex} value={kitIndex}>
-                {kit.name}
-              </option>
-            ))
-          : patchesList.map((kit, kitIndex) => (
-              <option key={kitIndex} value={kit[0]}>
-                {kit[1]}
-              </option>
-            ))}
-      </Select>
+      <PatchExplorer
+        patchExplorer={patchExplorer}
+        index={props.index}
+        setModules={props.setModules}
+        setPatchExplorer={setPatchExplorer}
+        instrument={props.instrument}
+        setInstruments={props.setInstruments}
+        setInstrumentsLoaded={props.setInstrumentsLoaded}
+        module={props.module}
+      />
 
       <div className="break" />
 
-      {mainContent}
+      {!patchExplorer && mainContent}
       {draggingOver && props.instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {

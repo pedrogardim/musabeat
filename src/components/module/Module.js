@@ -225,22 +225,22 @@ function Module(props) {
           onClose={closeMenu}
         >
           <MenuItem
-            onClick={handleSettingsButtonMode}
-            className="module-menu-option"
-          >
-            <Icon className="module-menu-option-icon">settings</Icon>
-            Module Settings
-          </MenuItem>
-          <MenuItem
             onClick={handleInstrumentButtonMode}
             className="module-menu-option"
           >
             <Icon>piano</Icon>
-            Instrument Editor
+            Instrument
           </MenuItem>
-          <MenuItem onClick={removeModule}>
-            <Icon className="module-menu-remove-option">delete</Icon>
-            Remove Module
+          <MenuItem
+            onClick={handleSettingsButtonMode}
+            className="module-menu-option"
+          >
+            <Icon className="module-menu-option-icon">settings</Icon>
+            Settings
+          </MenuItem>
+          <MenuItem className="module-menu-option" onClick={removeModule}>
+            <Icon>delete</Icon>
+            Remove
           </MenuItem>
         </Menu>
       </div>

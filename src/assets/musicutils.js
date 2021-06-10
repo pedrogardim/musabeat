@@ -271,6 +271,8 @@ export const filterTypes = [
   "peaking",
 ];
 
+export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
+
 export const chordNametoNotes = (arg) => {
   let chordroot,
     chordtype,
@@ -586,11 +588,11 @@ export const patchLoader = async (
           let a = [...prev];
           a[moduleIndex] = true;
           return a;
-        }),options.baseUrl
+        }),
+      options.baseUrl
     ).toDestination();
 
     instr.set(options);
-
   } else {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];

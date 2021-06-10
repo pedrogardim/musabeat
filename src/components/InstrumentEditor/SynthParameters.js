@@ -60,7 +60,7 @@ function SynthParameters(props) {
 
   useEffect(() => {
     setInstrumentParamenters(props.instrument.get());
-    console.log(props.instrument.get());
+    //console.log(props.instrument.get());
   }, [props.instrument]);
 
   mainContent = (
