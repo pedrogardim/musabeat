@@ -103,12 +103,18 @@ function SessionGalleryItem(props) {
         )}
       </div>
       <div className="session-gallery-item-module-footer">
-        {props.playingLoadingProgress !== 100 && props.playingSession ? (
+        {props.playingLoadingProgress !== 100 &&
+        props.playingSession &&
+        !!props.session.modules ? (
           <CircularProgress value={props.playingLoadingProgress} />
-        ) : (
+        ) : 
+          !!props.session.modules ||
+          props.playingLoadingProgress === 100 ? (
           <IconButton onClick={props.setPlayingSession}>
             <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
           </IconButton>
+        ) : (
+          ""
         )}
         <Tooltip title={props.session.likes}>
           <IconButton>

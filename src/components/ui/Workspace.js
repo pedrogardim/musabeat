@@ -384,7 +384,7 @@ function Workspace(props) {
         ))
       ) : (
         <Fragment>
-          <Typography variant="h1">😛</Typography>
+          <Typography variant="h1">:v</Typography>
           <div className="break" />
           <p>No Modules!</p>
         </Fragment>
@@ -432,7 +432,7 @@ function Workspace(props) {
       <Fab
         color="primary"
         className="fixed-fab"
-        style={{ right: "calc(50% - 12px)" }}
+        style={{ right: "calc(50% - 27px)" }}
         onClick={props.togglePlaying}
       >
         <Icon>{props.isPlaying ? "pause" : "play_arrow"}</Icon>

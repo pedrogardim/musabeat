@@ -222,6 +222,7 @@ function App() {
           currentPage === "exploreSessions") && (
           <SessionExplorer
             setCurrentPage={setCurrentPage}
+            createNewSession={createNewSession}
             currentPage={currentPage}
             setOpenedSession={setOpenedSession}
             user={user}

@@ -44,6 +44,7 @@ function SessionExplorer(props) {
     !isUser && setSessions(Object.values(sessionKeys));
 
     isUser &&
+      !!sessionKeys &&
       (await Promise.all(
         sessionKeys.map(async (e, i) => {
           let sessionRef = firebase.database().ref("sessions").child(e);
@@ -171,9 +172,13 @@ function SessionExplorer(props) {
     getUserLikes();
   }, [props.currentPage]);
 
+  useEffect(() => {
+    console.log(sessionKeys,sessions,(!!sessions || !!sessions.length),(!sessionKeys || !sessionKeys.length || !sessions.length));
+  }, [sessionKeys,sessions]);
+
   return (
     <div className="session-explorer">
-      {!!sessions.length ? (
+      {(!!sessions.length) ? (
         <Fragment>
           {sessions.map((session, sessionIndex) => (
             <SessionGalleryItem
@@ -195,6 +200,16 @@ function SessionExplorer(props) {
               likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
             />
           ))}
+        </Fragment>
+      ) : (!sessionKeys || !sessionKeys.length) ? (
+        <Fragment>
+          <Typography variant="h1">:p</Typography>
+          <div className="break" />
+          <p>No sessions here...</p>
+          <div className="break" />
+          <Button onClick={props.createNewSession} color="primary">
+            Create New Session!
+          </Button>
         </Fragment>
       ) : (
         <CircularProgress />
