@@ -321,14 +321,15 @@ function Workspace(props) {
       instruments.map((e, i) => {
         if (!!e) {
           //priorize loaded instrument patch volume
-          //e._volume.mute = modules[i].muted;
-          //e.volume.value = modules[i].volume;
-          setModules((prev) => {
-            let newModules = [...prev];
-            newModules[i].muted = e._volume.mute;
-            newModules[i].volume = e.volume.value;
-            return newModules;
-          });
+          e._volume.mute = modules[i].muted;
+          e.volume.value = modules[i].volume;
+          //setModules((prev) => {
+          //  let newModules = [...prev];
+          //  newModules[i].muted = newModules[i].instrument.volume =
+          //    e._volume.mute;
+          //  newModules[i].volume = e.volume.value;
+          //  return newModules;
+          //});
         }
       });
       Tone.Transport.seconds = 0;
@@ -421,12 +422,14 @@ function Workspace(props) {
           modules={modules}
         />
       )}
-      <Exporter
-        sessionSize={sessionSize}
-        sessionData={starterSession}
-        modules={modules}
-        modulesInstruments={instruments}
-      />
+      {!props.hidden && (
+        <Exporter
+          sessionSize={sessionSize}
+          sessionData={starterSession}
+          modules={modules}
+          modulesInstruments={instruments}
+        />
+      )}
       {/*<Drawer>{drawerCont}</Drawer>*/}
 
       {mixerOpened && (

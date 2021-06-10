@@ -107,9 +107,7 @@ function SessionGalleryItem(props) {
         props.playingSession &&
         !!props.session.modules ? (
           <CircularProgress value={props.playingLoadingProgress} />
-        ) : 
-          !!props.session.modules ||
-          props.playingLoadingProgress === 100 ? (
+        ) : !!props.session.modules || props.playingLoadingProgress === 100 ? (
           <IconButton onClick={props.setPlayingSession}>
             <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
           </IconButton>
@@ -117,11 +115,8 @@ function SessionGalleryItem(props) {
           ""
         )}
         <Tooltip title={props.session.likes}>
-          <IconButton>
-            <Icon
-              onClick={props.handleUserLike}
-              color={props.likedByUser ? "secondary" : "none"}
-            >
+          <IconButton onClick={props.handleUserLike}>
+            <Icon color={props.likedByUser ? "secondary" : "none"}>
               favorite
             </Icon>
           </IconButton>

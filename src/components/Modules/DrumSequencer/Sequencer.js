@@ -57,8 +57,7 @@ function Sequencer(props) {
     );
   };
 
-  const playDrumSound = (note, time) =>
-    props.instrument.player(note).start(time !== undefined ? time : 0);
+  const playDrumSound = (note) => props.instrument.player(note).start();
 
   const handleBottomNavClick = (value) => {
     setCurrentMeasure(value);

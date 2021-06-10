@@ -8,11 +8,7 @@ import "./ChannelStrip.css";
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
 function ChannelStrip(props) {
-  const [volume, setVolume] = useState(
-    props.module.volume !== undefined
-      ? props.module.volume
-      : props.instrument.volume.value.toFixed(2)
-  );
+  const [volume, setVolume] = useState(props.module.volume.toFixed(2));
 
   const handleSliderMove = (e, v) => {
     setVolume(v);

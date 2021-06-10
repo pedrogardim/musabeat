@@ -18,14 +18,21 @@ function SideMenu(props) {
   const handleClose = () => props.setSideMenu(false);
 
   const handleClick = (opt) => {
-    props.setOpenedSession(null)
-    opt === "New Session" ? props.createNewSession() : opt === "Explore" ? props.setCurrentPage("exploreSessions") : props.setSideMenu(false);
-    props.setSideMenu(false)
+    props.setOpenedSession(null);
+    opt === "New Session"
+      ? props.createNewSession()
+      : opt === "Explore"
+      ? props.setCurrentPage("exploreSessions")
+      : props.setSideMenu(false);
+    props.setSideMenu(false);
   };
 
   return (
     <Drawer anchor={"left"} open={props.open} onClose={handleClose}>
-      <Typography style={{ textAlign: "center" ,height:64,lineHeight:"64px"}} variant="h6">
+      <Typography
+        style={{ textAlign: "center", height: 64, lineHeight: "64px" }}
+        variant="h6"
+      >
         --Musa Logo--
       </Typography>
       <Divider />
@@ -36,6 +43,7 @@ function SideMenu(props) {
             onClick={() => {
               handleClick(text);
             }}
+            key={text}
           >
             <ListItemIcon>
               <Icon>

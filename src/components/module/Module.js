@@ -56,16 +56,14 @@ function Module(props) {
       //prevModules.forEach(e=>clearEvents(e.id));
       clearEvents(props.module.id);
       let newModules = [...prevModules];
-      newModules = newModules
-        .filter((e,i) => i !== props.index)
+      newModules = newModules.filter((e, i) => i !== props.index);
       return newModules;
     });
 
     props.setInstruments((prevInstruments) => {
       //prevModules.forEach(e=>clearEvents(e.id));
       let newInstruments = [...prevInstruments];
-      newInstruments = newInstruments
-        .filter((e,i) => i !== props.index)
+      newInstruments = newInstruments.filter((e, i) => i !== props.index);
       return newInstruments;
     });
   };
@@ -84,19 +82,19 @@ function Module(props) {
     props.setModules((prev) => {
       let newModules = [...prev];
       if (props.module.type === 0) {
-        newModules[props.module.id].instrument = {
-          urls: { ...prev[props.module.id].instrument.urls, [name]: url },
+        newModules[props.index].instrument = {
+          urls: { ...prev[props.index].instrument.urls, [name]: url },
         };
       } else if (props.module.type === 3) {
-        newModules[props.module.id].instrument = { url };
+        newModules[props.index].instrument = { url };
       } else if (props.instrument.name === "Sampler") {
         let samplerPrms = props.instrument.get();
         delete samplerPrms.onerror;
         delete samplerPrms.onload;
         samplerPrms.urls = { ...props.instrument.get().urls, [name]: url };
-        newModules[props.module.id].instrument = samplerPrms;
+        newModules[props.index].instrument = samplerPrms;
       } else {
-        newModules[props.module.id].instrument = props.instrument.get();
+        newModules[props.index].instrument = props.instrument.get();
       }
       return newModules;
     });
@@ -170,8 +168,8 @@ function Module(props) {
   }
 
   useEffect(() => {
-    Tone.Transport.cancel(0)
     return () => {
+      clearEvents(props.module.id);
       //TODO: IMPORTANT: Dispose module instrument on unmount
       //console.log(instrument) -> null
       //instrument.dispose();
