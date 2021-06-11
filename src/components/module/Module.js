@@ -57,6 +57,18 @@ function Module(props) {
     closeMenu();
   };
 
+  const setInstrument = (newInstrument) => {
+    props.setInstruments((prev) =>
+      prev.map((e, i) => (i === props.index ? newInstrument : e))
+    );
+  };
+
+  const setInstrumentLoaded = (loaded) => {
+    props.setInstrumentsLoaded((prev) =>
+      prev.map((e, i) => (i === props.index ? loaded : e))
+    );
+  };
+
   const removeModule = () => {
     //Tone.Transport.pause();
     props.setModules((prevModules) => {
@@ -115,6 +127,21 @@ function Module(props) {
     });
   };
 
+  const handleFileClick = (fileUrl, audiobuffer) => {
+    if (props.module.type === 3) {
+      setInstrumentLoaded(false);
+      props.instrument.dispose();
+      let newPlayer = new Tone.GrainPlayer(
+        audiobuffer ? audiobuffer : fileUrl,
+        setInstrumentLoaded(true)
+      ).toDestination();
+
+      setInstrument(newPlayer);
+      onInstrumentMod(fileUrl);
+      setModulePage(null);
+    }
+  };
+
   switch (props.module.type) {
     case 0:
       moduleContent = (
@@ -170,8 +197,8 @@ function Module(props) {
             display: modulePage !== null ? "none" : "flex",
           }}
           onInstrumentMod={onInstrumentMod}
-          setInstruments={props.setInstruments}
-          setInstrumentsLoaded={props.setInstrumentsLoaded}
+          setInstrument={setInstrument}
+          setInstrumentLoaded={setInstrumentLoaded}
           loaded={props.loaded}
           index={props.index}
           instrument={props.instrument}
@@ -301,7 +328,9 @@ function Module(props) {
               index={props.index}
             />
           )}
-          {modulePage === "FileExplorer" && <FileExplorer compact />}
+          {modulePage === "FileExplorer" && (
+            <FileExplorer onFileClick={handleFileClick} compact />
+          )}
           {modulePage === "Settings" && (
             <ModuleSettings
               instrument={props.instrument}

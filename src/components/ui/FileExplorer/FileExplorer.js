@@ -32,6 +32,19 @@ function FileExplorer(props) {
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
 
+  const handleFileSelect = (e, index) => {
+    props.compact &&
+      !e.target.classList.contains("MuiIcon-root") &&
+      refList[index]
+        .getDownloadURL()
+        .then((url) =>
+          props.onFileClick(
+            url,
+            players[index] !== undefined && players[index].buffer
+          )
+        );
+  };
+
   const getUserFilesList = async () => {
     const user = firebase.auth().currentUser;
     const dbRef = firebase.storage().ref().child(user.uid);
@@ -94,8 +107,8 @@ function FileExplorer(props) {
   };
 
   useEffect(() => {
-    props.user !== null && getUserFilesList();
-  }, [props.user]);
+    getUserFilesList();
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -146,7 +159,10 @@ function FileExplorer(props) {
               )}
               <TableBody>
                 {filedata.map((row, index) => (
-                  <TableRow key={row.name}>
+                  <TableRow
+                    key={row.name}
+                    onClick={(e) => handleFileSelect(e, index)}
+                  >
                     <TableCell style={{ width: props.compact ? 20 : 50 }}>
                       {loadingPlay === index ? (
                         <CircularProgress size={27} />

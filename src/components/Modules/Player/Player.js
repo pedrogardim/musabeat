@@ -15,6 +15,7 @@ import { scheduleSamples } from "../../../utils/TransportSchedule";
 import "./Player.css";
 
 import { colors } from "../../../utils/materialPalette";
+import { ContactSupportOutlined } from "@material-ui/icons";
 
 function Player(props) {
   const playerWrapper = useRef(null);
@@ -29,14 +30,10 @@ function Player(props) {
 
     let newInstrument = new Tone.GrainPlayer(
       audiobuffer,
-      props.setInstrumentsLoaded((prev) =>
-        prev.map((e, i) => (i === props.index ? true : e))
-      )
+      props.setInstrumentLoaded(true)
     ).toDestination();
 
-    props.setInstruments((prev) =>
-      prev.map((e, i) => (i === props.index ? newInstrument : e))
-    );
+    props.setInstrument(newInstrument);
   };
 
   const toggleCursor = (state) => {
@@ -143,11 +140,7 @@ function Player(props) {
           alert(
             "Upps.. there was an error decoding your audio file, try to convert it to other format"
           );
-          props.setInstrumentsLoaded((prev) => {
-            let a = [...prev];
-            a[props.index] = true;
-            return a;
-          });
+          props.setInstrumentLoaded(true);
         }
       );
     });
@@ -190,13 +183,13 @@ function Player(props) {
   }, [props.sessionSize]);
 
   useEffect(() => {
+    console.log(props.instrument, props.loaded);
     setScore((prev) => {
-      console.log("SET SCORE TRIGGERED");
       let newScore = [...prev];
-      newScore[0].duration = props.instrument.buffer.duration;
+      newScore[0].duration = props.instrument.buffer._buffer.duration;
       return newScore;
     });
-  }, [props.instrument]);
+  }, [props.loaded]);
 
   return (
     <div

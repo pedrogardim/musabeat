@@ -31,8 +31,13 @@
   justify-content: center;
 }
 
-.file-compact th:hover {
-  background-color: #00000033;
+.fet-compact tr {
+  transition: background-color 0.1s;
+}
+
+.fet-compact tr:hover {
+  background-color: #00000012;
+  cursor: pointer;
 }
 
 .fet-compact {

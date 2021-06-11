@@ -1,26 +1,13 @@
--Chord rhythm editor
-
--Work on instrument editor
-    -better filter control
-
 -Ctrl + Z, Ctrl + C,  Ctrl + V
 
 -Update modules at sampler cursor drag
 
--Screen Controls
-
--Remove modules option
-
 -Work on adapt subdivision algorhythm
 -Generate chord on Chord Progression
 
--Input module "name" and color 
--(Manual Chord input) ?
--Sampler instrument, instrument editor (not module)
-
 -Change session bpm and timesig (+/- easy)
 
-(Different samples into sampler module)?
+(Different samples into player module)?
 
 -Effects controller
 
@@ -32,14 +19,8 @@
 
 -(((More patches)))
 
-==Add Backend
+==========
 
--Host user samples
-
--lightweight preview
-
--Cloud sharing
--Colaborative editing
 
 -Synth patch from comunity
 
