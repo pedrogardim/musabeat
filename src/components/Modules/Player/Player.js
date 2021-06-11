@@ -14,18 +14,16 @@ import { scheduleSamples } from "../../../utils/TransportSchedule";
 
 import "./Player.css";
 
-import { colors } from "../../../utils/materialPalette"
-
+import { colors } from "../../../utils/materialPalette";
 
 //TODO
 
 function Player(props) {
   const playerWrapper = useRef(null);
   const [score, setScore] = useState(props.module.score);
-  //const [instrument, setInstrument] = useState(props.module.instrument);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
-  const [rescheduleEvent,setRescheduleEvent] = useState(null);
+  const [rescheduleEvent, setRescheduleEvent] = useState(null);
 
   const [draggingOver, setDraggingOver] = useState(false);
 
@@ -34,7 +32,8 @@ function Player(props) {
       ? setCursorAnimator(
           setInterval(() => {
             //temp fix
-            playerWrapper.current !== null && Tone.Transport.state === "started" &&
+            playerWrapper.current !== null &&
+              Tone.Transport.state === "started" &&
               setCursorPosition(
                 (Tone.Transport.seconds /
                   Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
@@ -45,16 +44,17 @@ function Player(props) {
       : clearInterval(cursorAnimator);
   };
 
-
   const scheduleEvents = () => {
-    scheduleSamples(
-      score,
-      props.instrument,
-      Tone.Transport.seconds,
-      Tone.Transport,
-      props.module.id
-    );
-    console.log("player scheduled");
+    !!props.instrument &&
+      !!props.module.instrument.url &&
+      scheduleSamples(
+        score,
+        props.instrument,
+        Tone.Transport.seconds,
+        Tone.Transport,
+        props.module.id
+      );
+    //console.log("player scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -78,15 +78,14 @@ function Player(props) {
 
     Tone.Transport.pause();
 
-    props.setBufferLoaded(false);
+    props.setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[props.index] = false;
+      return a;
+    });
     setDraggingOver(false);
 
     let file = files[0];
-
-    //UPLOAD
-   
-
-    //
 
     file.arrayBuffer().then((arraybuffer) => {
       props.instrument.context.rawContext.decodeAudioData(
@@ -96,47 +95,76 @@ function Player(props) {
 
           if (audiobuffer.duration > 180) {
             alert("Try importing a smaller audio file");
-            props.setBufferLoaded(true);
+            props.setInstrumentsLoaded((prev) => {
+              let a = [...prev];
+              a[props.index] = true;
+              return a;
+            });
             return;
           }
 
-          const user = firebase.auth().currentUser;
-          const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
-          const task = storageRef.put(file);
-      
-          task.on(
-            "state_changed",
-            (snapshot) => {
-             console.log((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-            },
-            (error) => {console.log(error)},
-            () => {storageRef.getDownloadURL().then(r=>{
-              props.onInstrumentMod(r)
-            })}
-          );
+          console.log(setScore, audiobuffer.duration, score[0]);
 
-          props.setInstrument((prev) => {
-            prev.dispose();
-            return new Tone.GrainPlayer(
-              audiobuffer,
-              props.setBufferLoaded(true)
-            ).toDestination();
-          });
-
-          //update score duration
+          //URGENT TODO: following 2 functions are not being triggered
 
           setScore((prev) => {
+            console.log("setScore triggered");
             let newScore = [...prev];
             newScore[0].duration = audiobuffer.duration;
             return newScore;
           });
+
+          props.setInstruments((prev) => {
+            console.log("setScore triggered");
+            let a = [...prev];
+            prev[props.index].dispose();
+            prev[props.index] = new Tone.GrainPlayer(
+              audiobuffer,
+              props.setInstrumentsLoaded((prev) => {
+                let a = [...prev];
+                a[props.index] = true;
+                return a;
+              })
+            ).toDestination();
+
+            return a;
+          });
+
+          const user = firebase.auth().currentUser;
+          const storageRef = firebase
+            .storage()
+            .ref(`/${user.uid}/${file.name}`);
+          const task = storageRef.put(file);
+
+          task.on(
+            "state_changed",
+            (snapshot) => {
+              console.log(
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              );
+            },
+            (error) => {
+              console.log(error);
+            },
+            () => {
+              storageRef.getDownloadURL().then((r) => {
+                props.onInstrumentMod(r);
+              });
+            }
+          );
+
+          //update score duration
         },
         //decode audio error
         (e) => {
           alert(
             "Upps.. there was an error decoding your audio file, try to convert it to other format"
           );
-          props.setBufferLoaded(true);
+          props.setInstrumentsLoaded((prev) => {
+            let a = [...prev];
+            a[props.index] = true;
+            return a;
+          });
         }
       );
     });
@@ -154,19 +182,20 @@ function Player(props) {
   }, [score, props.instrument]);
 
   useEffect(() => {
-    props.updateModules((previousModules) => {
+    props.setModules((previousModules) => {
       let newmodules = [...previousModules];
       newmodules[props.index].score = score;
       return newmodules;
     });
+    console.log("score useEffect triggered");
   }, [score]);
 
-
-
   useEffect(() => {
-    setRescheduleEvent(Tone.Transport.schedule((time) => {
-      scheduleEvents();
-    }, Tone.Transport.loopEnd-0.01))
+    setRescheduleEvent(
+      Tone.Transport.schedule((time) => {
+        scheduleEvents();
+      }, Tone.Transport.loopEnd - 0.01)
+    );
     return () => {
       clearInterval(cursorAnimator);
       Tone.Transport.clear(rescheduleEvent);
@@ -174,20 +203,19 @@ function Player(props) {
   }, []);
 
   useEffect(() => {
-    setRescheduleEvent(Tone.Transport.schedule((time) => {
-      scheduleEvents();
-    }, Tone.Transport.loopEnd-0.01))
+    setRescheduleEvent(
+      Tone.Transport.schedule((time) => {
+        scheduleEvents();
+      }, Tone.Transport.loopEnd - 0.01)
+    );
   }, [props.sessionSize]);
-
-  useEffect(() => {
-    clearInterval(cursorAnimator);
-    //console.log("triggered");
-  }, [props.module.id]);
 
   return (
     <div
       className="module-innerwrapper"
-      style={(props.style, { backgroundColor: colors[props.module.color]["900"] })}
+      style={
+        (props.style, { backgroundColor: colors[props.module.color]["900"] })
+      }
     >
       <div
         className="sampler"
@@ -212,6 +240,7 @@ function Player(props) {
             Drop your files here!
           </FileDrop>
         )}
+        {!!props.instrument && score[0].duration > 0 && (
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
@@ -222,7 +251,8 @@ function Player(props) {
             score={score[0]}
             setScore={setScore}
           />
-        
+        )}
+
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}

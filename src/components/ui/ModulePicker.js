@@ -95,6 +95,10 @@ function ModulePicker(props) {
                 9: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
               },
             }
+          : selectedType === 3
+          ? {
+              url: "",
+            }
           : "-MbBygzylMiMRWrAv1kh",
       color: Math.floor(Math.random() * 14.99),
     };

@@ -24,7 +24,7 @@ function ChordProgression(props) {
   const [editorOpen, setEditorOpen] = useState(false);
 
   const scheduleChords = () => {
-    console.log("chords rescheduled module " + props.index);
+    //console.log("chords rescheduled module " + props.index);
     scheduleChordProgression(
       chords,
       instrument,

@@ -152,7 +152,7 @@ export const scheduleChordProgression = (
   }
 
   scheduledEvents[moduleId] = scheduledChords;
-  console.log(scheduledEvents);
+  //console.log(scheduledEvents);
 };
 
 export const scheduleSamples = (

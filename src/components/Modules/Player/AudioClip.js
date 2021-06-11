@@ -38,7 +38,6 @@ function AudioClip(props) {
 
     props.setScore((prev) => {
       let newScore = [...prev];
-
       newScore[props.index].time = newTime;
       return newScore;
     });
@@ -63,7 +62,8 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    props.instrument !== null &&
+    !!props.instrument &&
+      !!props.instrument.buffer.length &&
       setWaveForm(
         drawClipWave(
           props.instrument.buffer.toArray(),
@@ -72,6 +72,8 @@ function AudioClip(props) {
           props.color
         )
       );
+
+    console.log(clipWidth);
   }, [props.instrument, clipWidth]);
 
   return (

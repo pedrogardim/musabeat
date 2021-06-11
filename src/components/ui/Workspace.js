@@ -144,15 +144,22 @@ function Workspace(props) {
       }
       //player
       else if (module.type === 3) {
-        moduleInstruments[moduleIndex] = new Tone.GrainPlayer(
-          module.instrument.url,
-          () =>
-            setInstrumentsLoaded((prev) => {
-              let a = [...prev];
-              a[moduleIndex] = true;
-              return a;
-            })
-        ).toDestination();
+        moduleInstruments[moduleIndex] = !!module.instrument.url
+          ? new Tone.GrainPlayer(module.instrument.url, () =>
+              setInstrumentsLoaded((prev) => {
+                let a = [...prev];
+                a[moduleIndex] = true;
+                return a;
+              })
+            ).toDestination()
+          : new Tone.GrainPlayer().toDestination();
+
+        !module.instrument.url &&
+          setInstrumentsLoaded((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = true;
+            return a;
+          });
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
@@ -203,19 +210,23 @@ function Workspace(props) {
       ).toDestination();
     }
     //player
-    else if (module === 3) {
-      setInstrumentsLoaded((prev) => {
-        let a = [...prev];
-        a[index] = false;
-        return a;
-      });
-      instrument = new Tone.GrainPlayer(module.instrument.url, () =>
+    else if (module.type === 3) {
+      instrument = !!module.instrument.url
+        ? new Tone.GrainPlayer(module.instrument.url, () =>
+            setInstrumentsLoaded((prev) => {
+              let a = [...prev];
+              a[index] = true;
+              return a;
+            })
+          ).toDestination()
+        : new Tone.GrainPlayer().toDestination();
+
+      !module.instrument.url &&
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
           a[index] = true;
           return a;
-        })
-      ).toDestination();
+        });
     }
     //load from patch id
     else if (typeof module.instrument === "string") {

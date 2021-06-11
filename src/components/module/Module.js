@@ -168,12 +168,13 @@ function Module(props) {
           }}
           onInstrumentMod={onInstrumentMod}
           setInstruments={props.setInstruments}
+          setInstrumentsLoaded={props.setInstrumentsLoaded}
           loaded={props.loaded}
           index={props.index}
           instrument={props.instrument}
           sessionSize={props.sessionSize}
           module={props.module}
-          updateModules={props.setModules}
+          setModules={props.setModules}
         />
       );
       break;
