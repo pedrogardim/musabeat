@@ -174,7 +174,7 @@ function App() {
           />
         )}
         {currentPage === "userFiles" && (
-          <FileExplorer setCurrentPage={setCurrentPage} user={user} />
+          <FileExplorer setCurrentPage={setCurrentPage} />
         )}
         <SideMenu
           open={sideMenu}

@@ -1,28 +1,41 @@
-.file-explorer{
-    position: fixed;
-  height: 100%;
+.file-explorer {
+  position: absolute;
+  height: calc(100% - 30px);
   width: 100%;
-  padding-top:80px;
-  top: 0;
+  bottom: 0;
   z-index: 2;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-content: center;
+  background-color: white;
 }
 
-.file-explorer-table{
-    width:60% !important;
- 
+.file-explorer-column {
+  position: relative;
+  flex: 1 1 40%;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.file-compact th:hover {
+  background-color: #00000033;
+}
+
+.fet-compact button {
+  height: 32px !important;
+  width: 32px !important;
+}
+
+.fet-compact button {
+  height: 32px !important;
+  width: 32px !important;
 }
 
 @media only screen and (max-width: 800px) {
-    .file-explorer-table{
-        width:95% !important;
-     
-    }
+  .file-explorer-table {
+    width: 95% !important;
   }
-
-
+}

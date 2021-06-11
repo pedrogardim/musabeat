@@ -13,6 +13,9 @@ import {
   Typography,
   Icon,
   IconButton,
+  Divider,
+  List,
+  ListItem,
 } from "@material-ui/core";
 
 import "./FileExplorer.css";
@@ -30,7 +33,8 @@ function FileExplorer(props) {
   const [sideMenu, setSideMenu] = useState(false);
 
   const getUserFilesList = async () => {
-    const dbRef = firebase.storage().ref().child(props.user.uid);
+    const user = firebase.auth().currentUser;
+    const dbRef = firebase.storage().ref().child(user.uid);
     const refList = (await dbRef.list()).items;
     setRefList(refList);
 
@@ -94,7 +98,7 @@ function FileExplorer(props) {
 
   useEffect(() => {
     return () => {
-      players.forEach((player) => player.dispose());
+      players.forEach((player) => !!player && player.dispose());
     };
   }, []);
 
@@ -104,56 +108,83 @@ function FileExplorer(props) {
 
   return (
     <div className="file-explorer">
-      {!!filedata.length ? (
-        <TableContainer component={Paper} className="file-explorer-table">
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ width: 50 }}></TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell align="right">Size</TableCell>
-                <TableCell align="right">Type</TableCell>
-                <TableCell style={{ width: 50 }} align="right">
-                  Download
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filedata.map((row, index) => (
-                <TableRow key={row.name}>
-                  <TableCell style={{ width: 50 }}>
-                    {loadingPlay === index ? (
-                      <CircularProgress />
-                    ) : currentPlaying === index ? (
-                      <IconButton onClick={() => stopSound(index)}>
-                        <Icon>stop</Icon>
-                      </IconButton>
-                    ) : (
-                      <IconButton onClick={() => playSound(index)}>
-                        <Icon>play_arrow</Icon>
-                      </IconButton>
-                    )}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{formatBytes(row.size)}</TableCell>
-                  <TableCell align="right">
-                    {row.contentType.replace("audio/", "")}
-                  </TableCell>
-                  <TableCell style={{ width: 50 }} align="right">
-                    <IconButton onClick={() => handleDownload(index)}>
-                      <Icon>file_download</Icon>
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <CircularProgress />
+      {props.compact && (
+        <Fragment>
+          <div className="file-explorer-column">
+            <List>
+              <ListItem divider button>
+                User Files
+              </ListItem>
+            </List>
+          </div>
+          <Divider orientation="vertical" />
+        </Fragment>
       )}
+      <div className="file-explorer-column">
+        {!!filedata.length ? (
+          <TableContainer className="file-explorer-table">
+            <Table
+              size="small"
+              className={props.compact ? "fet-compact" : "fet-normal"}
+            >
+              {!props.compact && (
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ width: 50 }}></TableCell>
+                    <TableCell>Name</TableCell>
+                    <Fragment>
+                      <TableCell align="right">Size</TableCell>
+                      <TableCell align="right">Type</TableCell>
+                      <TableCell style={{ width: 50 }} align="right">
+                        Download
+                      </TableCell>
+                    </Fragment>
+                  </TableRow>
+                </TableHead>
+              )}
+              <TableBody>
+                {filedata.map((row, index) => (
+                  <TableRow key={row.name}>
+                    <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                      {loadingPlay === index ? (
+                        <CircularProgress size={24} />
+                      ) : currentPlaying === index ? (
+                        <IconButton onClick={() => stopSound(index)}>
+                          <Icon>stop</Icon>
+                        </IconButton>
+                      ) : (
+                        <IconButton onClick={() => playSound(index)}>
+                          <Icon>play_arrow</Icon>
+                        </IconButton>
+                      )}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      {row.name}
+                    </TableCell>
+                    {!props.compact && (
+                      <Fragment>
+                        <TableCell align="right">
+                          {formatBytes(row.size)}
+                        </TableCell>
+                        <TableCell align="right">
+                          {row.contentType.replace("audio/", "")}
+                        </TableCell>
+                        <TableCell align="right">
+                          <IconButton onClick={() => handleDownload(index)}>
+                            <Icon>file_download</Icon>
+                          </IconButton>
+                        </TableCell>
+                      </Fragment>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <CircularProgress />
+        )}
+      </div>
     </div>
   );
 }

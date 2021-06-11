@@ -24,34 +24,37 @@ import MelodyGrid from "../Modules/MelodyGrid/MelodyGrid";
 import Player from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
+import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
 import { colors } from "../../utils/materialPalette";
 
 import "./Module.css";
 
 function Module(props) {
-  const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
-  const [settingsMode, setSettingsMode] = useState(false);
+  const [modulePage, setModulePage] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [renameDialog, setRenameDialog] = useState(false);
 
   let moduleContent = <span>Nothing Here</span>;
 
   const handleInstrumentButtonMode = () => {
-    setInstrumentEditorMode((prev) => (prev ? false : true));
-    setSettingsMode(false);
+    setModulePage("Instrument");
     closeMenu();
   };
 
   const handleSettingsButtonMode = () => {
-    setSettingsMode((prev) => (prev ? false : true));
-    setInstrumentEditorMode(false);
+    setModulePage("Settings");
+    closeMenu();
+  };
+
+  const handleFileExplorerButton = () => {
+    setModulePage("FileExplorer");
     closeMenu();
   };
 
   const handleBackButtonClick = () => {
-    setSettingsMode(false);
-    setInstrumentEditorMode(false);
+    setModulePage(null);
+    closeMenu();
   };
 
   const removeModule = () => {
@@ -117,7 +120,7 @@ function Module(props) {
       moduleContent = (
         <Sequencer
           style={{
-            display: instrumentEditorMode || settingsMode ? "none" : "flex",
+            display: modulePage !== null ? "none" : "flex",
             backgroundColor: colors[props.module.color][500],
           }}
           instrument={props.instrument}
@@ -134,7 +137,7 @@ function Module(props) {
       moduleContent = (
         <MelodyGrid
           style={{
-            display: instrumentEditorMode || settingsMode ? "none" : "flex",
+            display: modulePage !== null ? "none" : "flex",
           }}
           instrument={props.instrument}
           sessionSize={props.sessionSize}
@@ -148,7 +151,7 @@ function Module(props) {
       moduleContent = (
         <ChordProgression
           style={{
-            display: instrumentEditorMode || settingsMode ? "none" : "block",
+            display: modulePage !== null ? "none" : "block",
             overflow: "hidden",
           }}
           instrument={props.instrument}
@@ -164,7 +167,7 @@ function Module(props) {
       moduleContent = (
         <Player
           style={{
-            display: instrumentEditorMode || settingsMode ? "none" : "flex",
+            display: modulePage !== null ? "none" : "flex",
           }}
           onInstrumentMod={onInstrumentMod}
           setInstruments={props.setInstruments}
@@ -219,7 +222,7 @@ function Module(props) {
       }
     >
       <div className="module-header">
-        {(instrumentEditorMode || settingsMode) && (
+        {modulePage !== null && (
           <IconButton
             className="module-back-button"
             onClick={handleBackButtonClick}
@@ -228,7 +231,7 @@ function Module(props) {
           </IconButton>
         )}
         <span className="module-title">{props.module.name}</span>
-        {settingsMode && (
+        {modulePage === "Settings" && (
           <Tooltip title="Rename module">
             <IconButton
               onClick={() => setRenameDialog(true)}
@@ -254,13 +257,23 @@ function Module(props) {
           open={Boolean(menuAnchorEl)}
           onClose={closeMenu}
         >
-          <MenuItem
-            onClick={handleInstrumentButtonMode}
-            className="module-menu-option"
-          >
-            <Icon>piano</Icon>
-            Instrument
-          </MenuItem>
+          {props.module.type === 3 ? (
+            <MenuItem
+              onClick={handleFileExplorerButton}
+              className="module-menu-option"
+            >
+              <Icon>graphic_eq</Icon>
+              Load audio file
+            </MenuItem>
+          ) : (
+            <MenuItem
+              onClick={handleInstrumentButtonMode}
+              className="module-menu-option"
+            >
+              <Icon>piano</Icon>
+              Instrument
+            </MenuItem>
+          )}
           <MenuItem
             onClick={handleSettingsButtonMode}
             className="module-menu-option"
@@ -276,7 +289,7 @@ function Module(props) {
       </div>
       {props.loaded ? (
         <Fragment>
-          {instrumentEditorMode && (
+          {modulePage === "Instrument" && (
             <InstrumentEditor
               module={props.module}
               setModules={props.setModules}
@@ -285,21 +298,21 @@ function Module(props) {
               setInstruments={props.setInstruments}
               setInstrumentsLoaded={props.setInstrumentsLoaded}
               updateModules={props.setModules}
-              setInstrumentEditorMode={setInstrumentEditorMode}
               index={props.index}
             />
           )}
-          {settingsMode && (
+          {modulePage === "FileExplorer" && <FileExplorer compact />}
+          {modulePage === "Settings" && (
             <ModuleSettings
               instrument={props.instrument}
               module={props.module}
               setModules={props.setModules}
-              setSettingsMode={setSettingsMode}
+              setSettingsMode={() => setModulePage(null)}
               index={props.index}
             />
           )}
 
-          {moduleContent}
+          {modulePage === null && moduleContent}
         </Fragment>
       ) : (
         <CircularProgress
@@ -312,14 +325,3 @@ function Module(props) {
 }
 
 export default Module;
-
-{
-  /* <div
-  className="expand-bar"
-  onClick={() => setExpanded(expanded ? false : true)}
->
-  <Icon className="expand-bar-icon">
-    {expanded ? "expand_less" : "expand_more"}
-  </Icon>
-</div>; */
-}
