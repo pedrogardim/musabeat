@@ -58,20 +58,19 @@ function App() {
     Tone.start();
     switch (event.code) {
       case "Space":
-        togglePlaying();
+        event.target.classList[0] === "workspace" && togglePlaying(event);
         break;
     }
   };
 
-  const togglePlaying = () => {
-    if (openedSession !== null && currentPage === null) {
-      if (Tone.Transport.state !== "started") {
-        Tone.Transport.start();
-        setIsPlaying(true);
-      } else {
-        Tone.Transport.pause();
-        setIsPlaying(false);
-      }
+  const togglePlaying = (event) => {
+    event.preventDefault();
+    if (Tone.Transport.state !== "started") {
+      Tone.Transport.start();
+      setIsPlaying(true);
+    } else {
+      Tone.Transport.pause();
+      setIsPlaying(false);
     }
   };
 

@@ -264,15 +264,6 @@ function Workspace(props) {
     }
   };
 
-  const handleKeyPress = (event) => {
-    Tone.start();
-
-    switch (event.code) {
-      case "Space":
-        event.preventDefault();
-    }
-  };
-
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
@@ -355,7 +346,6 @@ function Workspace(props) {
       style={{
         display: props.hidden ? "none" : "flex",
       }}
-      onKeyDown={handleKeyPress}
     >
       {modules !== null && !!modules.length ? (
         modules.map((module, moduleIndex) => (
