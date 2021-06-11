@@ -1,13 +1,9 @@
 import React, { useState, useRef } from "react";
 
 import {
-  Paper,
-  Typography,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
   TextField,
@@ -19,6 +15,7 @@ function NameInput(props) {
   const handleSubmit = () => {
     let value = inputRef.current.children[0].children[0].value;
     props.onSubmit(value);
+    props.onClose();
   };
 
   return (

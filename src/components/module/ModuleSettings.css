@@ -1,18 +1,17 @@
 .module-settings {
-    background-color: white;
-    flex: 1 0;
-    display: flex;
-    overflow-y: overlay;
-  
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    align-items: center;
-    align-content: center;
+  background-color: white;
+  flex: 1 0;
+  display: flex;
+  overflow-y: overlay;
 
-  }
-  
-  .break {
-    width: 100%;
-    height: 0px;
-  }
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: center;
+  align-content: center;
+}
+
+.break {
+  width: 100%;
+  height: 0px;
+}

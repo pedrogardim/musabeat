@@ -6,6 +6,9 @@ import {
   FormControl,
   Typography,
   Slider,
+  Tooltip,
+  IconButton,
+  Icon,
 } from "@material-ui/core";
 
 import {
@@ -320,16 +323,17 @@ function ModuleSettings(props) {
           labelId="color-select-label"
           value={props.module.color}
           onChange={handleColorSelect}
-          style={{backgroundColor:colors[props.module.color][500]}}
+          style={{ backgroundColor: colors[props.module.color][500] }}
         >
           {colors.map((value, index) => (
-            <option key={`color${index}`} value={index} style={{backgroundColor:colors[index][500]}}>
-              
-            </option>
+            <option
+              key={`color${index}`}
+              value={index}
+              style={{ backgroundColor: colors[index][500] }}
+            ></option>
           ))}
         </Select>
       </FormControl>
-      
     </div>
   );
 }

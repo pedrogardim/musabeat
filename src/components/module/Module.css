@@ -130,3 +130,13 @@
 .hidden {
   display: none !important;
 }
+
+.module-settings-rename-btn {
+  color: white !important;
+  height: 30px !important;
+  width: 16px !important;
+}
+
+.module-settings-rename-btn span {
+  font-size: 16px !important;
+}

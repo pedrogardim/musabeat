@@ -7,8 +7,11 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
+  Tooltip,
 } from "@material-ui/core";
 import { clearEvents } from "../../utils/TransportSchedule";
+import NameInput from "../../components/ui/Dialogs/NameInput";
+
 import {
   patchLoader,
   loadDrumPatch,
@@ -30,6 +33,7 @@ function Module(props) {
   const [instrumentEditorMode, setInstrumentEditorMode] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [renameDialog, setRenameDialog] = useState(false);
 
   let moduleContent = <span>Nothing Here</span>;
 
@@ -65,6 +69,14 @@ function Module(props) {
       let newInstruments = [...prevInstruments];
       newInstruments = newInstruments.filter((e, i) => i !== props.index);
       return newInstruments;
+    });
+  };
+
+  const handleModuleRename = (name) => {
+    props.setModules((prevModules) => {
+      let newModules = [...prevModules];
+      newModules[props.index].name = name;
+      return newModules;
     });
   };
 
@@ -215,6 +227,23 @@ function Module(props) {
           </IconButton>
         )}
         <span className="module-title">{props.module.name}</span>
+        {settingsMode && (
+          <Tooltip title="Rename module">
+            <IconButton
+              onClick={() => setRenameDialog(true)}
+              className="module-settings-rename-btn"
+            >
+              <Icon>edit</Icon>
+            </IconButton>
+          </Tooltip>
+        )}
+
+        {renameDialog && (
+          <NameInput
+            onSubmit={handleModuleRename}
+            onClose={() => setRenameDialog(false)}
+          />
+        )}
         <IconButton className="module-options-button" onClick={openMenu}>
           <Icon>more_vert</Icon>
         </IconButton>
