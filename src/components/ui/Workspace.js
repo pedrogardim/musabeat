@@ -213,11 +213,9 @@ function Workspace(props) {
     else if (module.type === 3) {
       instrument = !!module.instrument.url
         ? new Tone.GrainPlayer(module.instrument.url, () =>
-            setInstrumentsLoaded((prev) => {
-              let a = [...prev];
-              a[index] = true;
-              return a;
-            })
+            setInstrumentsLoaded((prev) =>
+              prev.map((e, i) => (i === index ? true : e))
+            )
           ).toDestination()
         : new Tone.GrainPlayer().toDestination();
 
@@ -344,9 +342,7 @@ function Workspace(props) {
     !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
 
-  useEffect(() => {
-    //console.log(instruments)
-  }, [instruments]);
+  //useEffect(() => {}, [instruments]);
 
   /**/
 

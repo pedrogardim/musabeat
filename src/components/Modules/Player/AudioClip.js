@@ -62,19 +62,17 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
+    //console.log(props.instrument);
     !!props.instrument &&
-      !!props.instrument.buffer.length &&
       setWaveForm(
         drawClipWave(
-          props.instrument.buffer.toArray(),
+          props.instrument.buffer.toArray(0),
           clipHeight,
           clipWidth,
           props.color
         )
       );
-
-    console.log(clipWidth);
-  }, [props.instrument, clipWidth]);
+  }, [props.instrument, props.loaded, clipWidth]);
 
   return (
     <Draggable
@@ -113,7 +111,8 @@ function AudioClip(props) {
 }
 
 const drawClipWave = (buffer, clipHeight, clipWidth, color) => {
-  let waveArray = typeof buffer[0] === "number" ? buffer : buffer[0];
+  //console.log(buffer);
+  let waveArray = buffer;
 
   let scale = waveArray.length / clipWidth;
 
