@@ -107,12 +107,16 @@ function Player(props) {
 
           //URGENT TODO: following 2 functions are not being triggered
 
+          //update score duration
+
           setScore((prev) => {
             console.log("setScore triggered");
             let newScore = [...prev];
             newScore[0].duration = audiobuffer.duration;
             return newScore;
           });
+
+          //update instrument
 
           props.setInstruments((prev) => {
             console.log("setScore triggered");
@@ -152,8 +156,6 @@ function Player(props) {
               });
             }
           );
-
-          //update score duration
         },
         //decode audio error
         (e) => {
@@ -226,7 +228,8 @@ function Player(props) {
           sessionSize={props.sessionSize}
           color={colors[props.module.color]}
         />
-        {draggingOver && (
+        {/*---tempDisabled--- 
+        draggingOver && (
           <FileDrop
             onDragLeave={(e) => {
               setDraggingOver(false);
@@ -239,7 +242,7 @@ function Player(props) {
           >
             Drop your files here!
           </FileDrop>
-        )}
+        )*/}
         {!!props.instrument && score[0].duration > 0 && (
           <AudioClip
             index={0}

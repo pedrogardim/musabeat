@@ -306,8 +306,8 @@ function Workspace(props) {
       instruments.map((e, i) => {
         if (!!e) {
           //priorize loaded instrument patch volume
-          e._volume.mute = modules[i].muted;
           e.volume.value = modules[i].volume;
+          e._volume.mute = modules[i].muted;
           //setModules((prev) => {
           //  let newModules = [...prev];
           //  newModules[i].muted = newModules[i].instrument.volume =
