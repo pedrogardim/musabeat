@@ -23,8 +23,9 @@ import Workspace from "./components/ui/Workspace";
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import SideMenu from "./components/ui/SideMenu";
-
 import AuthDialog from "./components/ui/AuthDialog";
+
+import { createNewSession } from "./utils/sessionUtils";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -37,63 +38,8 @@ function App() {
   const [openedSession, setOpenedSession] = useState(null);
   const [sessionEditMode, setSessionEditMode] = useState(null);
 
-  const createNewSession = () => {
-    let newSession = {
-      name: "New Session",
-      description: "No description",
-      tags: ["musa"],
-      copied: 0,
-      opened: 0,
-      played: 0,
-      creator: user.uid,
-      editors: [user.uid],
-      bpm: 120,
-      modules: [
-        {
-          id: 0,
-          name: "Sequencer",
-          color: 2,
-          score: [[[0], [3], [2, 0], [3], [0], [3], [2, 0], [3]]],
-          instrument: {
-            urls: {
-              0: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/0.wav",
-              1: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/1.wav",
-              2: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/2.wav",
-              3: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/3.wav",
-              4: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/4.wav",
-              5: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/5.wav",
-              6: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/6.wav",
-              7: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/7.wav",
-              8: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/8.wav",
-              9: "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/808/9.wav",
-            },
-          },
-          type: 0,
-          volume: 0,
-          muted: false,
-        },
-      ],
-      likes: 0,
-      likedBy: ["a"],
-      createdOn: firebase.database.ServerValue.TIMESTAMP,
-    };
-    const sessionsRef = firebase.database().ref(`sessions`);
-    const newSessionRef = sessionsRef.push();
-    newSessionRef.set(newSession, setOpenedSession(newSessionRef.key));
-
-    const userSessionsRef = firebase
-      .database()
-      .ref("users")
-      .child(user.uid)
-      .child("sessions");
-    userSessionsRef.get().then((snapshot) => {
-      let prev = snapshot.val() === null ? [] : snapshot.val();
-      userSessionsRef.set([...prev, newSessionRef.key]);
-    });
-
-    //temp:only show workspace
-
-    setCurrentPage(null);
+  const handleCreateNewSession = (session) => {
+    createNewSession(session, setCurrentPage, setOpenedSession);
   };
 
   const handleAvatarClick = (e) => {
@@ -222,7 +168,7 @@ function App() {
           currentPage === "exploreSessions") && (
           <SessionExplorer
             setCurrentPage={setCurrentPage}
-            createNewSession={createNewSession}
+            createNewSession={handleCreateNewSession}
             currentPage={currentPage}
             setOpenedSession={setOpenedSession}
             user={user}
@@ -236,7 +182,7 @@ function App() {
           setCurrentPage={setCurrentPage}
           setOpenedSession={setOpenedSession}
           setSideMenu={setSideMenu}
-          createNewSession={createNewSession}
+          createNewSession={handleCreateNewSession}
         />
         {openedSession !== null && currentPage === null && (
           <Workspace
@@ -247,6 +193,7 @@ function App() {
             togglePlaying={togglePlaying}
             user={user}
             setSessionEditMode={setSessionEditMode}
+            createNewSession={handleCreateNewSession}
           />
         )}
       </div>

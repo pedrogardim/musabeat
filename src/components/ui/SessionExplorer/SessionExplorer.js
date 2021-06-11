@@ -148,6 +148,7 @@ function SessionExplorer(props) {
   };
 
   const handleSessionSelect = (index) => {
+    //props.setOpenedSession(sessionKeys[input]);
     props.setOpenedSession(sessionKeys[index]);
     props.setCurrentPage(null);
   };
@@ -174,7 +175,7 @@ function SessionExplorer(props) {
 
   return (
     <div className="session-explorer">
-      {(!!sessions.length) ? (
+      {!!sessions.length ? (
         <Fragment>
           {sessions.map((session, sessionIndex) => (
             <SessionGalleryItem
@@ -194,10 +195,11 @@ function SessionExplorer(props) {
               session={session}
               isUser={isUser}
               likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
+              createNewSession={props.createNewSession}
             />
           ))}
         </Fragment>
-      ) : (!sessionKeys || !sessionKeys.length) ? (
+      ) : !sessionKeys || !sessionKeys.length ? (
         <Fragment>
           <Typography variant="h1">:p</Typography>
           <div className="break" />

@@ -48,6 +48,10 @@ function Workspace(props) {
   //to undo and redo
   const [sessionHistory, setSessionHistory] = useState([]);
 
+  const handleSessionCopy = () => {
+    DBSessionRef.get().then((r) => props.createNewSession(r.val()));
+  };
+
   const adaptSessionSize = () => {
     if (modules === null) return;
     let lengths = modules.map((module) =>
@@ -82,32 +86,8 @@ function Workspace(props) {
     }
   };
 
-  const saveNewSession = () => {
-    let parsedSession = {
-      name: "New Session",
-      bpm: Tone.Transport.bpm.value,
-      creator: props.user.uid,
-      editors: [],
-      modules: modules.map((e) => {
-        let module = { ...e };
-        module.instrument = {};
-        if (
-          e.instrument.name !== "Players" &&
-          e.instrument.name !== "GrainPlayer"
-        )
-          module.instrument = e.instrument.get();
-        return module;
-      }),
-    };
-    //console.log(parsedSession[0].instrument, parsedSession);
-    let pushedSessionRef = firebase
-      .database()
-      .ref("sessions")
-      .push(parsedSession);
-    //console.log(pushedSessionRef.key);
-  };
-
   const loadSession = () => {
+    //TODO: optimize this, avoid call from server for each session load
     console.log("loading session: " + props.session);
     if (props.session === null) {
       console.log("session is null!");
@@ -138,6 +118,9 @@ function Workspace(props) {
       setModules(props.session.modules);
       setInstrumentsLoaded(new Array(props.session.modules.length).fill(false));
       Tone.Transport.bpm.value = props.session.bpm;
+      !props.hidden && props.session.editors.includes(props.user.uid)
+        ? setEditMode(true)
+        : setEditMode(false);
 
       loadSessionInstruments(props.session.modules);
     }
@@ -462,11 +445,10 @@ function Workspace(props) {
       <Fab
         className="fixed-fab"
         color="primary"
-        onClick={() => setMixerOpened((prev) => (prev ? false : true))}
         style={{ left: 24 }}
-        onClick={saveNewSession}
+        onClick={handleSessionCopy}
       >
-        <Icon>save</Icon>
+        <Icon>content_copy</Icon>
       </Fab>
       {/*<Button onClick={()=>{instruments.map(e=>{
         let pushedSessionRef = firebase

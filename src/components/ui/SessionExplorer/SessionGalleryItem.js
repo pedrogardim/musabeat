@@ -125,9 +125,11 @@ function SessionGalleryItem(props) {
         {/*<IconButton>
           <Icon>share</Icon>
         </IconButton>*/}
-        <IconButton>
-          <Icon>content_copy</Icon>
-        </IconButton>
+        <Tooltip title="Create a copy">
+          <IconButton onClick={() => props.createNewSession(props.session)}>
+            <Icon>content_copy</Icon>
+          </IconButton>
+        </Tooltip>
         {props.isUser && (
           <Tooltip title="Delete Session">
             <IconButton onClick={() => props.handleSessionDelete(props.index)}>
