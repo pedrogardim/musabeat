@@ -18,20 +18,41 @@
   flex: 1 1 40%;
   overflow-y: scroll;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-explorer-table {
+  overflow-y: scroll;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .file-compact th:hover {
   background-color: #00000033;
 }
 
-.fet-compact button {
-  height: 32px !important;
-  width: 32px !important;
+.fet-compact {
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
 }
 
 .fet-compact button {
   height: 32px !important;
   width: 32px !important;
+}
+
+.fet-normal {
+  width: 80% !important;
+}
+
+.fet-list {
+  height: 100% !important;
+  width: 100% !important;
 }
 
 @media only screen and (max-width: 800px) {

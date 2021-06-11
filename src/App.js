@@ -117,7 +117,7 @@ function App() {
             <Icon>menu</Icon>
           </IconButton>
           <Typography
-            variant="h4"
+            variant="h5"
             className="app-title"
             style={{ marginRight: 8 }}
           >

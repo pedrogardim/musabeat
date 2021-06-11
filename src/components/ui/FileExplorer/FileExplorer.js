@@ -70,16 +70,17 @@ function FileExplorer(props) {
     } else {
       setLoadingPlay(index);
       refList[index].getDownloadURL().then((url) => {
+        let player = new Tone.Player(url, () => {
+          player.state !== "started" && player.start();
+          setCurrentPlaying(index);
+          setLoadingPlay(null);
+        }).toDestination();
+        player.onstop = () => {
+          setCurrentPlaying(null);
+        };
         setPlayers((prev) => {
           let newPlayers = [...prev];
-          let player = new Tone.Player(url, () => {
-            player.state !== "started" && player.start();
-            setCurrentPlaying(index);
-            setLoadingPlay(null);
-          }).toDestination();
-          player.onstop = () => {
-            setCurrentPlaying(null);
-          };
+
           newPlayers[index] = player;
           return newPlayers;
         });
@@ -103,7 +104,7 @@ function FileExplorer(props) {
   }, []);
 
   useEffect(() => {
-    console.log(players);
+    //console.log(players);
   }, [players]);
 
   return (
@@ -111,7 +112,7 @@ function FileExplorer(props) {
       {props.compact && (
         <Fragment>
           <div className="file-explorer-column">
-            <List>
+            <List className="fet-list">
               <ListItem divider button>
                 User Files
               </ListItem>
@@ -124,6 +125,7 @@ function FileExplorer(props) {
         {!!filedata.length ? (
           <TableContainer className="file-explorer-table">
             <Table
+              component={!props.compact ? Paper : "div"}
               size="small"
               className={props.compact ? "fet-compact" : "fet-normal"}
             >
@@ -147,7 +149,7 @@ function FileExplorer(props) {
                   <TableRow key={row.name}>
                     <TableCell style={{ width: props.compact ? 20 : 50 }}>
                       {loadingPlay === index ? (
-                        <CircularProgress size={24} />
+                        <CircularProgress size={27} />
                       ) : currentPlaying === index ? (
                         <IconButton onClick={() => stopSound(index)}>
                           <Icon>stop</Icon>
