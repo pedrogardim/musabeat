@@ -271,6 +271,17 @@ export const filterTypes = [
   "peaking",
 ];
 
+export const effectTypes = [
+  "Compressor",
+  "Chorus",
+  "Reverb",
+  "Distorsion",
+  "BitCrusher",
+  "EQ3",
+  "FeedbackDelay",
+  "Phaser",
+];
+
 export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
 
 export const chordNametoNotes = (arg) => {
@@ -690,6 +701,11 @@ export const loadDrumPatch = (patch, buffers) => {
   let drumPlayers = new Tone.Players(urlMap).toDestination();
 
   return drumPlayers;
+};
+
+export const loadEffect = (type, options) => {
+  //type as effects array index
+  return new Tone[effectTypes[type]](options);
 };
 
 export const detectPitch = (audioBuffer, callback) => {

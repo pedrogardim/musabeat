@@ -12,11 +12,7 @@ import {
 import { clearEvents } from "../../utils/TransportSchedule";
 import NameInput from "../../components/ui/Dialogs/NameInput";
 
-import {
-  patchLoader,
-  loadDrumPatch,
-  loadSynthFromGetObject,
-} from "../../assets/musicutils";
+import { loadEffect, effectTypes } from "../../assets/musicutils";
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
@@ -24,6 +20,8 @@ import MelodyGrid from "../Modules/MelodyGrid/MelodyGrid";
 import Player from "../Modules/Player/Player";
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
+import ModuleEffects from "./ModuleEffects";
+
 import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
 import { colors } from "../../utils/materialPalette";
@@ -34,21 +32,27 @@ function Module(props) {
   const [modulePage, setModulePage] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [renameDialog, setRenameDialog] = useState(false);
+  const [effects, setEffects] = useState(new Array(4).fill(null));
 
   let moduleContent = <span>Nothing Here</span>;
 
   const handleInstrumentButtonMode = () => {
-    setModulePage("Instrument");
+    setModulePage("instrument");
     closeMenu();
   };
 
   const handleSettingsButtonMode = () => {
-    setModulePage("Settings");
+    setModulePage("settings");
     closeMenu();
   };
 
   const handleFileExplorerButton = () => {
-    setModulePage("FileExplorer");
+    setModulePage("fileExplorer");
+    closeMenu();
+  };
+
+  const handleEffectButtonMode = () => {
+    setModulePage("effects");
     closeMenu();
   };
 
@@ -142,6 +146,31 @@ function Module(props) {
     }
   };
 
+  const loadModuleEffects = () => {
+    !!props.module.fx &&
+      !!props.module.fx.length &&
+      setEffects(
+        props.module.fx.map((e, i) => !!e && loadEffect(e.type, e.options))
+      );
+  };
+
+  const onInstrumentCreated = () => {
+    let effectArray = effects.map((e, i) => {
+      return !!e && { type: effectTypes.indexOf(e.name), options: e.get() };
+    });
+
+    !!props.instrument &&
+      props.instrument.chain(
+        ...effects.filter((e) => e !== false),
+        Tone.Destination
+      );
+
+    props.setModules((prev) =>
+      prev.map((e, i) => (i === props.index ? { ...e, fx: effectArray } : e))
+    );
+    console.log(effects);
+  };
+
   switch (props.module.type) {
     case 0:
       moduleContent = (
@@ -211,6 +240,7 @@ function Module(props) {
   }
 
   useEffect(() => {
+    loadModuleEffects();
     return () => {
       clearEvents(props.module.id);
       //TODO: IMPORTANT: Dispose module instrument on unmount
@@ -218,6 +248,10 @@ function Module(props) {
       //instrument.dispose();
     };
   }, []);
+
+  useEffect(() => {
+    onInstrumentCreated();
+  }, [effects]);
 
   useEffect(() => {
     if (
@@ -258,7 +292,7 @@ function Module(props) {
           </IconButton>
         )}
         <span className="module-title">{props.module.name}</span>
-        {modulePage === "Settings" && (
+        {modulePage === "settings" && (
           <Tooltip title="Rename module">
             <IconButton
               onClick={() => setRenameDialog(true)}
@@ -308,6 +342,13 @@ function Module(props) {
             <Icon className="module-menu-option-icon">settings</Icon>
             Settings
           </MenuItem>
+          <MenuItem
+            onClick={handleEffectButtonMode}
+            className="module-menu-option"
+          >
+            <Icon className="module-menu-option-icon">grain</Icon>
+            Effects
+          </MenuItem>
           <MenuItem className="module-menu-option" onClick={removeModule}>
             <Icon>delete</Icon>
             Remove
@@ -316,7 +357,7 @@ function Module(props) {
       </div>
       {props.loaded ? (
         <Fragment>
-          {modulePage === "Instrument" && (
+          {modulePage === "instrument" && (
             <InstrumentEditor
               module={props.module}
               setModules={props.setModules}
@@ -328,16 +369,24 @@ function Module(props) {
               index={props.index}
             />
           )}
-          {modulePage === "FileExplorer" && (
+          {modulePage === "fileExplorer" && (
             <FileExplorer onFileClick={handleFileClick} compact />
           )}
-          {modulePage === "Settings" && (
+          {modulePage === "settings" && (
             <ModuleSettings
               instrument={props.instrument}
               module={props.module}
               setModules={props.setModules}
               setSettingsMode={() => setModulePage(null)}
               index={props.index}
+            />
+          )}
+          {modulePage === "effects" && (
+            <ModuleEffects
+              module={props.module}
+              setModules={props.setModules}
+              effects={effects}
+              setEffects={setEffects}
             />
           )}
 

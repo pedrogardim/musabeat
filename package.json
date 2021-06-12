@@ -13,6 +13,7 @@
     "firebase": "^8.6.3",
     "jquery": "^3.6.0",
     "pitchy": "^2.0.3",
+    "rc-knob": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.3",
