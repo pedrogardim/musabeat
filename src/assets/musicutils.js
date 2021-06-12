@@ -275,7 +275,7 @@ export const effectTypes = [
   "Compressor",
   "Chorus",
   "Reverb",
-  "Distorsion",
+  "Distortion",
   "BitCrusher",
   "EQ3",
   "FeedbackDelay",

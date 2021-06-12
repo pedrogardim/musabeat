@@ -32,7 +32,7 @@ function Module(props) {
   const [modulePage, setModulePage] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [renameDialog, setRenameDialog] = useState(false);
-  const [effects, setEffects] = useState(new Array(4).fill(null));
+  const [effects, setEffects] = useState(new Array(4).fill(false));
 
   let moduleContent = <span>Nothing Here</span>;
 
@@ -154,16 +154,10 @@ function Module(props) {
       );
   };
 
-  const onInstrumentCreated = () => {
+  const onEffectCreated = () => {
     let effectArray = effects.map((e, i) => {
       return !!e && { type: effectTypes.indexOf(e.name), options: e.get() };
     });
-
-    !!props.instrument &&
-      props.instrument.chain(
-        ...effects.filter((e) => e !== false),
-        Tone.Destination
-      );
 
     props.setModules((prev) =>
       prev.map((e, i) => (i === props.index ? { ...e, fx: effectArray } : e))
@@ -243,15 +237,21 @@ function Module(props) {
     loadModuleEffects();
     return () => {
       clearEvents(props.module.id);
-      //TODO: IMPORTANT: Dispose module instrument on unmount
-      //console.log(instrument) -> null
-      //instrument.dispose();
+      effects.map((e) => !!e && e.dispose());
     };
   }, []);
 
   useEffect(() => {
-    onInstrumentCreated();
+    onEffectCreated();
   }, [effects]);
+
+  useEffect(() => {
+    !!props.instrument &&
+      props.instrument.chain(
+        ...effects.filter((e) => e !== false),
+        Tone.Destination
+      );
+  }, [props.instrument, effects]);
 
   useEffect(() => {
     if (
@@ -346,7 +346,7 @@ function Module(props) {
             onClick={handleEffectButtonMode}
             className="module-menu-option"
           >
-            <Icon className="module-menu-option-icon">grain</Icon>
+            <Icon className="module-menu-option-icon">blur_on</Icon>
             Effects
           </MenuItem>
           <MenuItem className="module-menu-option" onClick={removeModule}>

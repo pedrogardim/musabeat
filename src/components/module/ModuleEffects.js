@@ -27,12 +27,18 @@ function ModuleEffects(props) {
     );
   };
 
+  const removeEffect = (index) => {
+    props.effects[index].dispose();
+    props.setEffects((prev) => prev.map((e, i) => (i === index ? false : e)));
+  };
+
   return (
     <div className="module-effects">
       {currentEffect === null ? (
         props.effects.map((e, i) => (
           <Fragment>
             <Effect
+              removeEffect={removeEffect}
               createEffect={createEffect}
               setCurrentEffect={setCurrentEffect}
               effect={e}
@@ -44,6 +50,7 @@ function ModuleEffects(props) {
       ) : (
         <Effect
           createEffect={createEffect}
+          removeEffect={removeEffect}
           setCurrentEffect={setCurrentEffect}
           effect={props.effects[currentEffect]}
           index={currentEffect}

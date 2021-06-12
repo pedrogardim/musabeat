@@ -40,11 +40,16 @@ function Effect(props) {
       {props.effect ? (
         <Fragment>
           <Typography>{props.effect.name}</Typography>
+          <div className="break" />
           {Object.keys(props.effect.get()).map((e, i) => (
             <span>
               {e},{JSON.stringify(props.effect.get()[e])}
             </span>
           ))}
+          <div className="break" />
+          <IconButton onClick={() => props.removeEffect(props.index)}>
+            <Icon>delete</Icon>
+          </IconButton>
         </Fragment>
       ) : (
         <Fragment>
