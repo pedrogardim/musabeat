@@ -290,8 +290,8 @@ export const parametersRange = {
   //comp
   attack: [0, 2, 0.1],
   ratio: [1, 30, 1],
-  knee: [-60, 0, 0.1],
-  threshold: [-60, 0, 0.1],
+  knee: [0, 40, 1],
+  threshold: [-100, 0, 1],
   release: [0, 2, 0.1],
   //chorus
   delayTime: [0, 2000, 10],
@@ -306,13 +306,13 @@ export const parametersRange = {
   distortion: [0, 1, 0.01],
   oversample: [0, 4, 1],
   //BitCrusher
-  bits: [1, 24, 1],
+  bits: [1, 16, 1],
   //EQ3
-  high: [-120, 0, 0.1],
-  highFrequency: [0, 20000, 10],
-  low: [-120, 0, 0.1],
-  lowFrequency: [0, 20000, 10],
-  mid: [-120, 0, 0.1],
+  high: [-24, 24, 0.1],
+  highFrequency: [1000, 20000, 10],
+  low: [-24, 24, 0.1],
+  lowFrequency: [0, 800, 10],
+  mid: [-24, 24, 0.1],
   //FeedbackDelay
   feedback: [0, 1, 0.01],
   maxDelay: [0, 2000, 10],
@@ -323,6 +323,10 @@ export const parametersRange = {
 };
 
 export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
+
+////////////////////////////////////////////////////////////////
+//Functions
+////////////////////////////////////////////////////////////////
 
 export const chordNametoNotes = (arg) => {
   let chordroot,
@@ -745,6 +749,7 @@ export const loadDrumPatch = (patch, buffers) => {
 
 export const loadEffect = (type, options) => {
   //type as effects array index
+  //console.log(options);
   return new Tone[effectTypes[type]](options);
 };
 

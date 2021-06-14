@@ -158,7 +158,7 @@ function Player(props) {
   }, [score, props.instrument]);
 
   useEffect(() => {
-    console.log(score[0].duration);
+    //console.log(score[0].duration);
     props.setModules((previousModules) => {
       let newmodules = [...previousModules];
       newmodules[props.index].score = score;
@@ -183,7 +183,7 @@ function Player(props) {
   }, [props.sessionSize]);
 
   useEffect(() => {
-    console.log(props.instrument, props.loaded);
+    //console.log(props.instrument, props.loaded);
     setScore((prev) => {
       let newScore = [...prev];
       newScore[0].duration = props.instrument.buffer._buffer.duration;

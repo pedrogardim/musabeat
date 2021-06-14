@@ -37,7 +37,7 @@ function ModuleEffects(props) {
       prev.map((e, i) => {
         if (i === props.index) {
           let newModule = { ...e };
-          newModule.fx[effectIndex][paramenter] = value;
+          newModule.fx[effectIndex].options[paramenter] = value;
           return newModule;
         } else {
           return e;
