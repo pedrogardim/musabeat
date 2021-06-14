@@ -282,6 +282,46 @@ export const effectTypes = [
   "Phaser",
 ];
 
+export const parametersRange = {
+  //units
+  db: [-60, 0, 0.1],
+  normalRange: [0, 1, 0.01],
+  //parameters
+  //comp
+  attack: [0, 2, 0.1],
+  ratio: [1, 30, 1],
+  knee: [-60, 0, 0.1],
+  threshold: [-60, 0, 0.1],
+  release: [0, 2, 0.1],
+  //chorus
+  delayTime: [0, 2000, 10],
+  depth: [0, 1, 0.01],
+  frequency: [0, 20000, 10],
+  spread: [0, 360, 1],
+  wet: [0, 1, 0.01],
+  //reverb
+  decay: [0, 4, 0.01],
+  preDelay: [0, 0.065, 0.001],
+  //distortion
+  distortion: [0, 1, 0.01],
+  oversample: [0, 4, 1],
+  //BitCrusher
+  bits: [1, 24, 1],
+  //EQ3
+  high: [-120, 0, 0.1],
+  highFrequency: [0, 20000, 10],
+  low: [-120, 0, 0.1],
+  lowFrequency: [0, 20000, 10],
+  mid: [-120, 0, 0.1],
+  //FeedbackDelay
+  feedback: [0, 1, 0.01],
+  maxDelay: [0, 2000, 10],
+  //Phaser
+  Q: [0, 5, 1],
+  octaves: [0, 20000, 10],
+  stages: [0, 8, 1],
+};
+
 export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
 
 export const chordNametoNotes = (arg) => {

@@ -24,3 +24,13 @@
 .empty-effect {
   background-color: rgba(0, 0, 0, 0.185);
 }
+
+.effect-slider {
+}
+
+.es-h {
+  width: 80% !important;
+}
+.es-v {
+  height: 80% !important;
+}

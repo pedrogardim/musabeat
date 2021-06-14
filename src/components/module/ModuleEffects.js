@@ -32,6 +32,20 @@ function ModuleEffects(props) {
     props.setEffects((prev) => prev.map((e, i) => (i === index ? false : e)));
   };
 
+  const handleParameterChange = (value, paramenter, effectIndex) => {
+    props.setModules((prev) =>
+      prev.map((e, i) => {
+        if (i === props.index) {
+          let newModule = { ...e };
+          newModule.fx[effectIndex][paramenter] = value;
+          return newModule;
+        } else {
+          return e;
+        }
+      })
+    );
+  };
+
   return (
     <div className="module-effects">
       {currentEffect === null ? (
@@ -41,6 +55,8 @@ function ModuleEffects(props) {
               removeEffect={removeEffect}
               createEffect={createEffect}
               setCurrentEffect={setCurrentEffect}
+              currentEffect={currentEffect}
+              handleParameterChange={handleParameterChange}
               effect={e}
               index={i}
             />
@@ -49,9 +65,12 @@ function ModuleEffects(props) {
         ))
       ) : (
         <Effect
+          expanded
           createEffect={createEffect}
           removeEffect={removeEffect}
           setCurrentEffect={setCurrentEffect}
+          currentEffect={currentEffect}
+          handleParameterChange={handleParameterChange}
           effect={props.effects[currentEffect]}
           index={currentEffect}
         />

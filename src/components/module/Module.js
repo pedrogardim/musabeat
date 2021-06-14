@@ -387,6 +387,7 @@ function Module(props) {
               setModules={props.setModules}
               effects={effects}
               setEffects={setEffects}
+              index={props.index}
             />
           )}
 
