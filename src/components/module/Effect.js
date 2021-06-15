@@ -72,7 +72,7 @@ function Effect(props) {
           {Object.keys(props.effect.get())
             .filter((e) => e !== "oversample" && e !== "type")
             .map((e, i) => (
-              <Fragment>
+              <Fragment key={`fx${props.index}-${i}`}>
                 <Tooltip title={e} interactive placement="left">
                   <Slider
                     className={`effect-slider ${
@@ -91,7 +91,12 @@ function Effect(props) {
               </Fragment>
             ))}
           <div className="break" />
-          <IconButton onClick={() => props.removeEffect(props.index)}>
+          <IconButton
+            onClick={() => {
+              props.removeEffect(props.index);
+              closeMenu();
+            }}
+          >
             <Icon>delete</Icon>
           </IconButton>
         </Fragment>

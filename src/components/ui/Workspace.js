@@ -116,7 +116,6 @@ function Workspace(props) {
       });
     } else if (typeof props.session === "object") {
       setModules(props.session.modules);
-      setInstrumentsLoaded(new Array(props.session.modules.length).fill(false));
       Tone.Transport.bpm.value = props.session.bpm;
       !props.hidden && props.session.editors.includes(props.user.uid)
         ? setEditMode(true)
@@ -127,20 +126,36 @@ function Workspace(props) {
   };
 
   const loadSessionInstruments = (sessionModules) => {
+    setInstruments(new Array(sessionModules.length).fill(false));
     let moduleInstruments = [];
     sessionModules.map((module, moduleIndex) => {
       //console.log(instrument)
       //sequencer
       if (module.type === 0) {
-        moduleInstruments[moduleIndex] = new Tone.Players(
-          module.instrument.urls,
-          () =>
-            setInstrumentsLoaded((prev) => {
+        if (typeof module.instrument === "string") {
+          console.log(`loading drums: ${module.instrument}`);
+          loadDrumPatch(
+            module.instrument,
+            setInstrumentsLoaded,
+            moduleIndex
+          ).then((r) =>
+            setInstruments((prev) => {
               let a = [...prev];
-              a[moduleIndex] = true;
+              a[moduleIndex] = r;
               return a;
             })
-        ).toDestination();
+          );
+        } else {
+          moduleInstruments[moduleIndex] = new Tone.Players(
+            module.instrument.urls,
+            () =>
+              setInstrumentsLoaded((prev) => {
+                let a = [...prev];
+                a[moduleIndex] = true;
+                return a;
+              })
+          ).toDestination();
+        }
       }
       //player
       else if (module.type === 3) {
@@ -273,6 +288,42 @@ function Workspace(props) {
     }
   };
 
+  const onSessionReady = () => {
+    if (!props.hidden && DBSessionRef !== null) {
+      DBSessionRef.child("modules").on("value", (snapshot) => {
+        updateFromDatabase(snapshot.val());
+      });
+    }
+
+    instruments.map((e, i) => {
+      if (!!e) {
+        //priorize loaded instrument patch volume
+        e.volume.value = modules[i].volume;
+        e._volume.mute = modules[i].muted;
+        //setModules((prev) => {
+        //  let newModules = [...prev];
+        //  newModules[i].muted = newModules[i].instrument.volume =
+        //    e._volume.mute;
+        //  newModules[i].volume = e.volume.value;
+        //  return newModules;
+        //});
+      }
+    });
+
+    props.hidden &&
+      props.setPlayingLoadingProgress(
+        Math.floor(
+          (instrumentsLoaded.filter((e) => e !== false).length /
+            instrumentsLoaded.length) *
+            100
+        )
+      );
+
+    Tone.Transport.seconds = 0;
+    props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
+    console.log("session ready!");
+  };
+
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
@@ -286,47 +337,9 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
-    if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.child("modules").on("value", (snapshot) => {
-        updateFromDatabase(snapshot.val());
-      });
-      DBSessionRef.get().then((snapshot) => {
-        const modulesData = snapshot.val();
-        //setInstrumentsLoaded(new Array(modulesData.length).fill(false));
-      });
-    }
-  }, [DBSessionRef]);
-
-  useEffect(() => {
     //console.log(instrumentsLoaded);
-    if (!instrumentsLoaded.includes(false) && sessionSize > 0) {
-      //temp
-      instruments.map((e, i) => {
-        if (!!e) {
-          //priorize loaded instrument patch volume
-          e.volume.value = modules[i].volume;
-          e._volume.mute = modules[i].muted;
-          //setModules((prev) => {
-          //  let newModules = [...prev];
-          //  newModules[i].muted = newModules[i].instrument.volume =
-          //    e._volume.mute;
-          //  newModules[i].volume = e.volume.value;
-          //  return newModules;
-          //});
-        }
-      });
-      Tone.Transport.seconds = 0;
-      props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
-      console.log("session ready!");
-    }
-    props.hidden &&
-      props.setPlayingLoadingProgress(
-        Math.floor(
-          (instrumentsLoaded.filter((e) => e !== false).length /
-            instrumentsLoaded.length) *
-            100
-        )
-      );
+    !instrumentsLoaded.includes(false) && sessionSize > 0 && onSessionReady();
+    //temp
   }, [instrumentsLoaded]);
 
   useEffect(() => {
@@ -337,6 +350,10 @@ function Workspace(props) {
       console.log("transport cleared");
     };
   }, []);
+
+  useEffect(() => {
+    console.log(instruments);
+  }, [instruments]);
 
   useEffect(() => {
     !props.hidden && props.setSessionEditMode(editMode);

@@ -21,53 +21,69 @@ import {
   CircularProgress,
   Tooltip,
   Typography,
+  Avatar,
 } from "@material-ui/core";
 
 import {
   patchLoader,
   loadDrumPatch,
   instrumentsCategories,
+  drumCategories,
 } from "../../assets/musicutils";
 
 function PatchExplorer(props) {
+  const isDrum = props.module.type === 0;
+  const categories = !isDrum ? instrumentsCategories : drumCategories;
+
   const [patchesList, setPatchesList] = useState([]);
+  const [patchesCreatorList, setPatchesCreatorList] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedPatch, setSelectedPatch] = useState(<CircularProgress />);
   const [savePatchDialog, setSavePatchDialog] = useState(false);
 
   const fetchPatchName = async (patchKey) => {
-    let nameRef = firebase.database().ref(`patches/${patchKey}/name`).get();
+    let nameRef = firebase
+      .database()
+      .ref(`${!isDrum ? "patches" : "drumpatches"}/${patchKey}/name`)
+      .get();
     let name = (await nameRef).val();
     setSelectedPatch(name);
   };
 
-  const fetchPatchesByCategory = (category) => {
-    //temp
-    firebase
-      .database()
-      .ref("patches")
-      .orderByChild("categ")
-      .equalTo(category)
-      .once("value")
-      .then((snapshot) => {
-        let array = Object.keys(snapshot.val()).map((e, i, a) => {
-          return {
-            key: e,
-            patch: snapshot.val()[e],
-          };
-        });
-        //console.log(array);
-        setPatchesList(array);
+  const fetchPatches = (category) => {
+    let patchesRef =
+      category === "all"
+        ? firebase
+            .database()
+            .ref(!isDrum ? "patches" : "drumpatches")
+            .limitToFirst(50)
+        : firebase
+            .database()
+            .ref(!isDrum ? "patches" : "drumpatches")
+            .orderByChild("categ")
+            .equalTo(category);
+
+    patchesRef.once("value").then((snapshot) => {
+      if (!snapshot.val()) {
+        setPatchesList([]);
+        return;
+      }
+      let array = Object.keys(snapshot.val()).map((e, i, a) => {
+        return {
+          key: e,
+          patch: snapshot.val()[e],
+        };
       });
+      //console.log(array);
+      setPatchesList(array);
+    });
   };
 
   const fetchUserPatches = () => {
     var user = firebase.auth().currentUser;
-
-    //temp
     firebase
       .database()
-      .ref("patches")
+      .ref(isDrum ? "drumpatches" : "patches")
       .orderByChild("creator")
       .equalTo(user.uid)
       .once("value")
@@ -117,17 +133,28 @@ function PatchExplorer(props) {
     console.log(name, category);
     let user = firebase.auth().currentUser;
 
-    let patch = {
-      base: props.instrument._dummyVoice.name.replace("Synth", ""),
-      name: !!name ? name : "Untitled Patch",
-      creator: user.uid,
-      options: props.instrument.get(),
-      volume: props.module.volume,
-    };
+    let patch = !isDrum
+      ? {
+          base: props.instrument._dummyVoice.name.replace("Synth", ""),
+          name: !!name ? name : "Untitled Patch",
+          creator: user.uid,
+          categ: category,
+          options: props.instrument.get(),
+          volume: props.module.volume,
+        }
+      : {
+          name: !!name ? name : "Untitled Drum Patch",
+          creator: user.uid,
+          categ: category,
+          urls: props.module.instrument.urls,
+          volume: props.module.volume,
+        };
 
     if (typeof category === "number") patch.categ = parseInt(category);
 
-    const sessionsRef = firebase.database().ref("patches");
+    const sessionsRef = firebase
+      .database()
+      .ref(!isDrum ? "patches" : "drumpatches");
     const newSessionRef = sessionsRef.push();
     newSessionRef.set(patch);
 
@@ -146,11 +173,33 @@ function PatchExplorer(props) {
     props.setPatchExplorer(false);
   };
 
+  const loadPatchCreatorInfo = async (creatorKey) => {
+    setPatchesCreatorList([]);
+    await Promise.all(
+      patchesList.map(async (e, i) => {
+        let userProfileRef = firebase
+          .database()
+          .ref(`users/${e.patch.creator}/profile`);
+        let userProfile = (await userProfileRef.get()).val();
+        //console.log(session);
+        setPatchesCreatorList((prev) => [...prev, userProfile]);
+      })
+    );
+  };
+
   useEffect(() => {
     typeof props.module.instrument === "string"
       ? fetchPatchName(props.module.instrument)
       : setSelectedPatch("Custom patch");
   }, [props.module]);
+
+  useEffect(() => {
+    fetchUserPatches();
+  }, []);
+
+  useEffect(() => {
+    patchesList.length && loadPatchCreatorInfo();
+  }, [patchesList]);
 
   return !props.patchExplorer ? (
     <Paper className="patch-explorer-compact">
@@ -185,12 +234,25 @@ function PatchExplorer(props) {
           User Patches
           <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
         </ListItem>
-        {instrumentsCategories.map((e, i) => (
+        <Divider />
+        <ListItem
+          key={"allcateg"}
+          dense
+          button
+          divider
+          onClick={() => fetchPatches("all")}
+          className="patch-explorer-first-column-item"
+        >
+          All
+          <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
+        </ListItem>
+        {categories.map((e, i) => (
           <ListItem
+            key={e}
             dense
             button
             divider
-            onClick={() => fetchPatchesByCategory(i)}
+            onClick={() => fetchPatches(i)}
             className="patch-explorer-first-column-item"
           >
             {e}
@@ -203,6 +265,7 @@ function PatchExplorer(props) {
         {!!patchesList.length ? (
           patchesList.map((e, i) => (
             <ListItem
+              key={`liipe${i}`}
               dense
               button
               divider
@@ -210,6 +273,28 @@ function PatchExplorer(props) {
               onClick={() => handlePatchSelect(e.key, e.patch)}
             >
               {e.patch.name}
+              {e.patch.creator !== undefined && (
+                <Tooltip
+                  title={
+                    patchesCreatorList[i] && patchesCreatorList[i].displayName
+                  }
+                >
+                  <Avatar
+                    style={{
+                      height: 16,
+                      width: 16,
+                      marginLeft: 8,
+                      fontSize: 10,
+                    }}
+                    alt={
+                      patchesCreatorList[i] && patchesCreatorList[i].displayName
+                    }
+                    src={
+                      patchesCreatorList[i] && patchesCreatorList[i].photoURL
+                    }
+                  ></Avatar>
+                </Tooltip>
+              )}
               {e.patch.base === "Sampler" && (
                 <Tooltip arrow placement="top" title="Sampler">
                   <Icon style={{ fontSize: 16, marginLeft: 4 }}>

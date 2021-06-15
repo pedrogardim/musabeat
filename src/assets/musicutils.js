@@ -324,6 +324,8 @@ export const parametersRange = {
 
 export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
 
+export const drumCategories = ["Electronic", "Acoustic", "FX", "Ethnic"];
+
 ////////////////////////////////////////////////////////////////
 //Functions
 ////////////////////////////////////////////////////////////////
@@ -730,19 +732,24 @@ export const loadSynthFromGetObject = (obj) => {
   return instr;
 };
 
-export const loadDrumPatch = (patch, buffers) => {
-  let urlMap = {};
+export const loadDrumPatch = async (
+  input,
+  setInstrumentsLoaded,
+  moduleIndex
+) => {
   //drum patch with stardard configuration
-  labels.forEach((element, index) => {
-    urlMap[index] =
-      "https://raw.githubusercontent.com/pedrogardim/musa_loops_old/master/assets/samples/drums/" +
-      kits[patch].baseUrl +
-      "/" +
-      index +
-      ".wav";
-  });
+  let patchRef = firebase.database().ref(`/drumpatches/${input}`);
 
-  let drumPlayers = new Tone.Players(urlMap).toDestination();
+  let patch = (await patchRef.get()).val();
+
+  let drumPlayers = new Tone.Players(patch.urls, () =>
+    setInstrumentsLoaded((prev) => {
+      //console.log("======LOADED=======")
+      let a = [...prev];
+      a[moduleIndex] = true;
+      return a;
+    })
+  ).toDestination();
 
   return drumPlayers;
 };

@@ -22,7 +22,7 @@ function SavePatch(props) {
 
   const handleSubmit = () => {
     let value = inputRef.current.children[0].children[0].value;
-    props.onSubmit(value, selectedCategory);
+    props.onSubmit(value, parseInt(selectedCategory));
   };
 
   const handleChange = (e) => {

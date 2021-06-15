@@ -50,7 +50,7 @@ function ModuleEffects(props) {
     <div className="module-effects">
       {currentEffect === null ? (
         props.effects.map((e, i) => (
-          <Fragment>
+          <Fragment key={`fx2-${props.index}-${i}`}>
             <Effect
               removeEffect={removeEffect}
               createEffect={createEffect}

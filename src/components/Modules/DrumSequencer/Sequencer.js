@@ -23,6 +23,7 @@ function Sequencer(props) {
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const [soundsMap, setSoundsMap] = useState([]);
 
   const inputNote = (x, y) => {
     setSequence((previousSequence) =>
@@ -86,14 +87,8 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-  }, [props.instrument]);
-
-  /* 
-  useEffect(() => {
-    currentMeasure > props.module.score.length && setCurrentMeasure(0);
-    setSequence(props.module.score);
-  }, [props.module.score]);
- */
+    setSoundsMap(Array.from(props.instrument._buffers._buffers.keys()));
+  }, [props.instrument, props.loaded]);
 
   useEffect(() => {
     scheduleNotes();
@@ -107,7 +102,7 @@ function Sequencer(props) {
       onMouseOut={() => setHovered(false)}
     >
       <div className="sequencer">
-        {Object.keys(props.module.instrument.urls).map((drumsound, row) => (
+        {soundsMap.map((drumsound, row) => (
           <div className="sequencer-row" key={drumsound}>
             {hovered && (
               <Typography className="sequencer-row-label" variant="overline">
