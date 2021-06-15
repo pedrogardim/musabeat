@@ -1,15 +1,14 @@
-.filter-editor{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    position:relative;
-
+.filter-editor {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  position: relative;
+  align-content: flex-start;
+  height: 100%;
 }
 
-.filter-editor-labels{
-    line-height:10px !important;
-    font-size:10px !important;
-
-
+.filter-editor-labels {
+  line-height: 10px !important;
+  font-size: 10px !important;
 }

@@ -10,11 +10,13 @@ import "./FilterEditor.css";
 
 function FilterEditor(props) {
   //temp
+
   const [filterState, setFilterState] = useState(
-    !(
-      props.instrument.get().filter.frequency === 20001 &&
-      props.instrument.get().filter.type === "notch"
-    )
+    //!(
+    //  props.instrument.get().filter.frequency === 20001 &&
+    //  props.instrument.get().filter.type === "notch"
+    //)
+    true
   );
 
   const [tempFilter, setTempFilter] = useState(() => {
@@ -24,7 +26,7 @@ function FilterEditor(props) {
     });
   });
   const [frequency, setFrequency] = useState(tempFilter.get().frequency);
-  const [filterQ, setFilterQ] = useState(tempFilter.get().frequency);
+  const [filterQ, setFilterQ] = useState(tempFilter.get().Q);
 
   const [filterFR, setFilterFR] = useState(tempFilter.getFrequencyResponse(64));
   const [filterFRWave, setFilterFRWave] = useState(drawWave(filterFR));
@@ -38,7 +40,7 @@ function FilterEditor(props) {
   };
 
   const registerToSynth = () => {
-    let filterOptions = props.handleFilterChange(tempFilter.get());
+    props.handleFilterChange(tempFilter.get());
     //setFilterFR(tempFilter.getFrequencyResponse(64));
 
     //tempFilter.dispose();
@@ -58,12 +60,12 @@ function FilterEditor(props) {
   };
 
   useEffect(() => {
-    setFilterState(
+    /*  setFilterState(
       !(
         tempFilter.get().frequency === 20001 &&
         tempFilter.get().type === "notch"
       )
-    );
+    ); */
   }, [tempFilter]);
 
   useEffect(() => {
@@ -81,17 +83,19 @@ function FilterEditor(props) {
 
   return (
     <div className="filter-editor">
-      <Typography variant="overline">Filter</Typography>
+      <Typography variant="overline">
+        {/*<IconButton
+          color={filterState ? "primary" : "default"}
+          onClick={toggleFilter}
+          size="small"
+          className="turnonoff-button"
+        >
+          <Icon>power_settings_new</Icon>
+        </IconButton>*/}
+        Filter
+      </Typography>
       <div className="break" />
-      <IconButton
-        color={filterState ? "primary" : "default"}
-        onClick={toggleFilter}
-        size="small"
-        className="turnonoff-button"
-        style={{ position: "absolute", top: 0, left: 0 }}
-      >
-        <Icon>power_settings_new</Icon>
-      </IconButton>
+
       <svg
         width="128px"
         height="64px"
@@ -106,7 +110,7 @@ function FilterEditor(props) {
         valueLabelDisplay="auto"
         min={20}
         max={20000}
-        step={1}
+        step={10}
         value={frequency}
         onChange={(e, v) => handleParameterChange("frequency", v)}
         onChangeCommitted={registerToSynth}
@@ -119,7 +123,7 @@ function FilterEditor(props) {
         valueLabelDisplay="auto"
         min={0}
         max={5}
-        step={0.01}
+        step={0.1}
         value={filterQ}
         onChange={(e, v) => handleParameterChange("Q", v)}
         onChangeCommitted={registerToSynth}

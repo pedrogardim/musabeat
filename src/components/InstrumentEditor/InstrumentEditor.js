@@ -117,7 +117,7 @@ function InstrumentEditor(props) {
 
     props.setInstrument(newInstrument);
 
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
@@ -144,7 +144,7 @@ function InstrumentEditor(props) {
 
     props.setInstrument(newInstrument);
 
-    props.updateModules((previous) =>
+    props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };

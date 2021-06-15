@@ -221,7 +221,7 @@ function PatchExplorer(props) {
           ))
         ) : (
           <div className="empty-wrapper">
-            <Typography variant="h3">:3</Typography>
+            <Typography variant="h3">;-;</Typography>
             <div className="break" />
             <span>Patches you save will apper here..</span>
           </div>

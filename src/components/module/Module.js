@@ -162,7 +162,7 @@ function Module(props) {
     props.setModules((prev) =>
       prev.map((e, i) => (i === props.index ? { ...e, fx: effectArray } : e))
     );
-    console.log(effects);
+    //console.log(effects);
   };
 
   switch (props.module.type) {
@@ -365,7 +365,7 @@ function Module(props) {
               onInstrumentMod={onInstrumentMod}
               setInstruments={props.setInstruments}
               setInstrumentsLoaded={props.setInstrumentsLoaded}
-              updateModules={props.setModules}
+              setModules={props.setModules}
               index={props.index}
             />
           )}

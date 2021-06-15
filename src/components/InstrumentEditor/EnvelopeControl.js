@@ -42,21 +42,22 @@ function EnvelopeControl(props) {
         variant="overline"
         className="instrument-editor-envelope-label"
       >
+        {Object.keys(envelope).includes("octaves") && (
+          <IconButton
+            color={envelope.octaves !== 0 ? "primary" : "default"}
+            onClick={toggleFilterEnvelope}
+            size="small"
+            className="turnonoff-button"
+          >
+            <Icon>power_settings_new</Icon>
+          </IconButton>
+        )}
         {props.envelopeType
           .toLowerCase()
           .replace("envelope", " ADSR")
           .replace("modulation", "mod")}
       </Typography>
-      {Object.keys(envelope).includes("octaves") && (
-        <IconButton
-          color={envelope.octaves !== 0 ? "primary" : "default"}
-          onClick={toggleFilterEnvelope}
-          size="small"
-          className="turnonoff-button"
-        >
-          <Icon>power_settings_new</Icon>
-        </IconButton>
-      )}
+
       {Object.keys(envelope).map(
         (element, index) =>
           (element === "attack" ||
@@ -76,7 +77,7 @@ function EnvelopeControl(props) {
                 orientation="vertical"
                 value={envelope[element]}
                 min={0}
-                step={0.01}
+                step={0.1}
                 max={element === "sustain" ? 1 : 2}
                 onChangeCommitted={() => props.onInstrumentMod()}
                 onChange={(e, v) => handleChange(element, v)}

@@ -70,7 +70,7 @@ function Effect(props) {
           <Typography>{props.effect.name}</Typography>
           <div className="break" />
           {Object.keys(props.effect.get())
-            .filter((e) => e !== "oversample")
+            .filter((e) => e !== "oversample" && e !== "type")
             .map((e, i) => (
               <Fragment>
                 <Tooltip title={e} interactive placement="left">

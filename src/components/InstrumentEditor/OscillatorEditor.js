@@ -39,7 +39,7 @@ function OscillatorEditor(props) {
       if (oscillator.includes(e)) oscillatorWave = e;
     });
     oscTypes.forEach((e) => {
-      if (oscillator.includes(e)) oscillatorWave = e;
+      if (oscillator.includes(e)) oscillatorType = e;
     });
     oscillatorPartials = oscillator
       .replace(oscillatorWave, "")
@@ -88,6 +88,7 @@ function OscillatorEditor(props) {
 
   useEffect(() => {
     drawOscWave();
+    console.log(oscWave, oscType, oscPartials);
   }, [oscWave, oscType, oscPartials]);
 
   useEffect(() => {
@@ -95,7 +96,7 @@ function OscillatorEditor(props) {
   }, [props.instrument]);
 
   return (
-    <Card className="oscillator-editor">
+    <div className="oscillator-editor">
       <Typography variant="overline">Oscillator</Typography>
       <svg
         width="128px"
@@ -131,25 +132,27 @@ function OscillatorEditor(props) {
           ))}
         </Select>
       </FormControl>
-      <Slider
-        style={{ width: "70%" }}
-        disabled={oscType === "pwm" || oscType === "pulse"}
-        valueLabelDisplay="auto"
-        value={oscPartials}
-        onChange={handleOscPartialsSelect}
-        onChangeCommitted={() => {
-          props.onInstrumentMod();
-        }}
-        min={0}
-        max={24}
-        valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
-      />
+      {
+        <Slider
+          style={{ width: "70%" }}
+          disabled={oscType === "pwm" || oscType === "pulse"}
+          valueLabelDisplay="auto"
+          value={oscPartials}
+          onChange={handleOscPartialsSelect}
+          onChangeCommitted={() => {
+            props.onInstrumentMod();
+          }}
+          min={0}
+          max={24}
+          valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
+        />
+      }
 
       {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
             console.log(e)
 
         })*/}
-    </Card>
+    </div>
   );
 }
 
