@@ -90,7 +90,9 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-    setSoundsMap(Array.from(props.instrument._buffers._buffers.keys()));
+    props.instrument &&
+      props.loaded &&
+      setSoundsMap(Array.from(props.instrument._buffers._buffers.keys()));
   }, [props.instrument, props.loaded]);
 
   useEffect(() => {

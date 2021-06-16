@@ -132,7 +132,9 @@ function Workspace(props) {
   };
 
   const loadSessionInstruments = (sessionModules) => {
-    setInstruments(new Array(sessionModules.length).fill(false));
+    setInstruments(Array(sessionModules.length).fill(false));
+    setInstrumentsLoaded(Array(sessionModules.length).fill(false));
+
     let moduleInstruments = [];
     sessionModules.map((module, moduleIndex) => {
       //console.log(instrument)
@@ -288,11 +290,11 @@ function Workspace(props) {
   };
 
   const updateFromDatabase = (modulesData) => {
-    //console.log(JSON.stringify(modules),JSON.stringify(modulesData))
-    if (JSON.stringify(modules) !== JSON.stringify(modulesData)) {
+    if (!compareObjectsArray(modules, modulesData)) {
       //console.log("ITS DIFFERENT!!!")
       //console.log("moduled loaded from server:" + modulesData);
       setModules(modulesData);
+      //console.log("UPDATED");
     } else {
       //console.log("ITS THE SAME!!!");
     }
@@ -307,16 +309,8 @@ function Workspace(props) {
 
     instruments.map((e, i) => {
       if (!!e) {
-        //priorize loaded instrument patch volume
         e.volume.value = modules[i].volume;
         e._volume.mute = modules[i].muted;
-        //setModules((prev) => {
-        //  let newModules = [...prev];
-        //  newModules[i].muted = newModules[i].instrument.volume =
-        //    e._volume.mute;
-        //  newModules[i].volume = e.volume.value;
-        //  return newModules;
-        //});
       }
     });
 
@@ -347,8 +341,11 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
-    //console.log(instrumentsLoaded);
-    !instrumentsLoaded.includes(false) && sessionSize > 0 && onSessionReady();
+    console.log(instrumentsLoaded);
+    instrumentsLoaded &&
+      !instrumentsLoaded.includes(false) &&
+      sessionSize > 0 &&
+      onSessionReady();
     //temp
   }, [instrumentsLoaded]);
 
@@ -360,10 +357,6 @@ function Workspace(props) {
       console.log("transport cleared");
     };
   }, []);
-
-  useEffect(() => {
-    console.log(instruments);
-  }, [instruments]);
 
   useEffect(() => {
     !props.hidden && props.setSessionEditMode(editMode);
@@ -385,6 +378,7 @@ function Workspace(props) {
         modules.map((module, moduleIndex) => (
           <Fragment>
             <Module
+              tabIndex={-1}
               key={module.id}
               index={moduleIndex}
               module={module}
@@ -421,6 +415,7 @@ function Workspace(props) {
 
       {modulePicker && (
         <ModulePicker
+          tabIndex={-1}
           open={modulePicker}
           onClose={() => setModulePicker(false)}
           setModulePicker={setModulePicker}
@@ -449,6 +444,7 @@ function Workspace(props) {
       {/*setModulesVolume={setModulesVolume}*/}
 
       <Fab
+        tabIndex={-1}
         color="primary"
         className="fixed-fab"
         style={{ right: "calc(50% - 27px)" }}
@@ -458,6 +454,7 @@ function Workspace(props) {
       </Fab>
       {editMode && (
         <Fab
+          tabIndex={-1}
           className="fixed-fab"
           color="primary"
           onClick={() => setMixerOpened((prev) => (prev ? false : true))}
@@ -467,6 +464,7 @@ function Workspace(props) {
       )}
 
       <Fab
+        tabIndex={-1}
         className="fixed-fab"
         color="primary"
         style={{ left: 24 }}
@@ -486,3 +484,26 @@ function Workspace(props) {
 }
 
 export default Workspace;
+
+const compareObjectsArray = (arr1, arr2) => {
+  const parseArr = (parsingArray) =>
+    JSON.stringify(
+      parsingArray.map((parsingObj) =>
+        Object.keys(parsingObj)
+          .sort()
+          .reduce((obj, key) => {
+            obj[key] = parsingObj[key];
+            return obj;
+          }, {})
+      )
+    );
+
+  //console.log(
+  //  parseArr(arr1),
+  //  "><===><",
+  //  parseArr(arr2),
+  //  parseArr(arr1) === parseArr(arr2) ? "equal" : "different"
+  //);
+
+  return parseArr(arr1) === parseArr(arr2);
+};
