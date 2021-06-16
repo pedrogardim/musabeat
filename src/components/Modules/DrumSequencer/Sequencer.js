@@ -5,7 +5,10 @@ import * as Tone from "tone";
 
 import { labels } from "../../../assets/drumkits";
 
-import { scheduleDrumSequence } from "../../../utils/TransportSchedule";
+import {
+  scheduleDrumSequence,
+  clearEvents,
+} from "../../../utils/TransportSchedule";
 import { loadDrumPatch } from "../../../assets/musicutils";
 
 import {
@@ -45,17 +48,17 @@ function Sequencer(props) {
   };
 
   const scheduleNotes = () => {
-    let scheduledNotes = [];
-
-    scheduledNotes = scheduleDrumSequence(
-      sequencerArray,
-      props.instrument,
-      Tone.Transport,
-      setCurrentBeat,
-      setCurrentMeasure,
-      props.module.id,
-      props.sessionSize
-    );
+    !props.module.muted
+      ? scheduleDrumSequence(
+          sequencerArray,
+          props.instrument,
+          Tone.Transport,
+          setCurrentBeat,
+          setCurrentMeasure,
+          props.module.id,
+          props.sessionSize
+        )
+      : clearEvents(props.module.id);
   };
 
   const playDrumSound = (note) => props.instrument.player(note).start();

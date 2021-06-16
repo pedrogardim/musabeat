@@ -12,7 +12,10 @@ import { IconButton, Icon, Fab } from "@material-ui/core";
 
 import "./ChordProgression.css";
 
-import { scheduleChordProgression } from "../../../utils/TransportSchedule";
+import {
+  clearEvents,
+  scheduleChordProgression,
+} from "../../../utils/TransportSchedule";
 import { colors } from "../../../utils/materialPalette";
 
 function ChordProgression(props) {
@@ -24,16 +27,17 @@ function ChordProgression(props) {
   const [editorOpen, setEditorOpen] = useState(false);
 
   const scheduleChords = () => {
-    //console.log("chords rescheduled module " + props.index);
-    scheduleChordProgression(
-      chords,
-      instrument,
-      Tone.Transport,
-      setActiveChord,
-      setActiveRhythm,
-      props.module.id,
-      props.sessionSize
-    );
+    !props.module.muted
+      ? scheduleChordProgression(
+          chords,
+          instrument,
+          Tone.Transport,
+          setActiveChord,
+          setActiveRhythm,
+          props.module.id,
+          props.sessionSize
+        )
+      : clearEvents(props.module.id);
   };
 
   const handleClick = (chordindex) => {

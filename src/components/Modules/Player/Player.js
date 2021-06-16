@@ -10,7 +10,7 @@ import Draggable from "react-draggable";
 import { FileDrop } from "react-file-drop";
 import { CircularProgress, Typography } from "@material-ui/core";
 
-import { scheduleSamples } from "../../../utils/TransportSchedule";
+import { scheduleSamples, clearEvents } from "../../../utils/TransportSchedule";
 
 import "./Player.css";
 
@@ -54,15 +54,15 @@ function Player(props) {
   };
 
   const scheduleEvents = () => {
-    !!props.instrument &&
-      !!props.module.instrument.url &&
-      scheduleSamples(
-        score,
-        props.instrument,
-        Tone.Transport.seconds,
-        Tone.Transport,
-        props.module.id
-      );
+    !!props.instrument && !!props.module.instrument.url && !props.module.muted
+      ? scheduleSamples(
+          score,
+          props.instrument,
+          Tone.Transport.seconds,
+          Tone.Transport,
+          props.module.id
+        )
+      : clearEvents(props.module.id);
     //!!props.instrument &&
     //  !!props.module.instrument.url &&
     //  console.log("player scheduled");
