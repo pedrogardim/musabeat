@@ -43,6 +43,8 @@ function Workspace(props) {
   const [editMode, setEditMode] = useState(false);
 
   const [DBSessionRef, setDBSessionRef] = useState(null);
+  //used at the time only for passing session name to Exporter
+  const [sessionData, setSessionData] = useState(null);
 
   //a copy of the instruments, to be able to use them on export function
   //to undo and redo
@@ -101,10 +103,13 @@ function Workspace(props) {
       sessionRef.get().then((snapshot) => {
         let sessionData = snapshot.val();
         //console.log(snapshot.val().modules + "-----");
+        setSessionData(sessionData);
+
         if (sessionData.hasOwnProperty("modules")) {
           loadSessionInstruments(sessionData.modules);
           setModules(sessionData.modules);
         }
+
         Tone.Transport.bpm.value = sessionData.bpm;
 
         let editors = sessionData.editors;
@@ -112,6 +117,7 @@ function Workspace(props) {
           ? setEditMode(true)
           : setEditMode(false);
         let name = sessionData.name;
+
         props.setAppTitle(name);
       });
     } else if (typeof props.session === "object") {
@@ -211,18 +217,22 @@ function Workspace(props) {
     let instrument;
     //console.log("inserting new instrument on" + index);
     if (module.type === 0) {
-      setInstrumentsLoaded((prev) => {
-        let a = [...prev];
-        a[index] = false;
-        return a;
-      });
-      instrument = new Tone.Players(module.instrument.urls, () =>
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[index] = true;
-          return a;
-        })
-      ).toDestination();
+      if (typeof module.instrument === "string") {
+        loadDrumPatch(module.instrument, setInstrumentsLoaded, index).then(
+          (r) =>
+            setInstruments((prev) => {
+              let a = [...prev];
+              a[index] = r;
+              return a;
+            })
+        );
+      } else {
+        instrument = new Tone.Players(module.instrument.urls, () =>
+          setInstrumentsLoaded((prev) =>
+            prev.map((e, i) => (i === index ? true : e))
+          )
+        ).toDestination();
+      }
     }
     //player
     else if (module.type === 3) {
@@ -422,7 +432,7 @@ function Workspace(props) {
       {!props.hidden && (
         <Exporter
           sessionSize={sessionSize}
-          sessionData={starterSession}
+          sessionData={sessionData}
           modules={modules}
           modulesInstruments={instruments}
         />

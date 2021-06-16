@@ -2,11 +2,11 @@ import {
   scheduleDrumSequence,
   scheduleChordProgression,
   scheduleMelodyGrid,
-  scheduleSamples
+  scheduleSamples,
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
-import { loadSynthFromGetObject} from "../assets/musicutils";
+import { loadSynthFromGetObject } from "../assets/musicutils";
 import * as Tone from "tone";
 
 export const bounceSessionExport = async (
@@ -17,10 +17,10 @@ export const bounceSessionExport = async (
   sessionSize
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
-   let exportDuration = Tone.Time("1m").toSeconds() * 2;
+  let exportDuration = Tone.Transport.loopEnd;
 
   let instrumentBuffers = modules.map((module, i) =>
-  instruments[i].name === "Players" || instruments[i].name === "Sampler"
+    instruments[i].name === "Players" || instruments[i].name === "Sampler"
       ? instruments[i]._buffers
       : instruments[i].name === "Player"
       ? instruments[i]._buffer
@@ -37,59 +37,62 @@ export const bounceSessionExport = async (
 
     modules.map((module, moduleIndex) => {
       let originalInstrument = instruments[moduleIndex];
-      let thisinstrument; 
-      
-      switch (module.type) {
-        case 0:
-          thisinstrument = new Tone.Players().toDestination();
-          thisinstrument._buffers = instrumentBuffers[moduleIndex];
+      let thisinstrument;
 
-          scheduleDrumSequence(
-            module.score,
-            thisinstrument,
-            transport,
-            () => {},
-            () => {},
-            "",
-            sessionSize
-          );
-          break;
-        case 1:
-          thisinstrument = loadSynthFromGetObject(originalInstrument.get()); 
+      if (!module.muted) {
+        switch (module.type) {
+          case 0:
+            thisinstrument = new Tone.Players().toDestination();
+            thisinstrument._buffers = instrumentBuffers[moduleIndex];
+            thisinstrument.volume.value = module.volume;
 
-          scheduleMelodyGrid(
-            module.score,
-            thisinstrument,
-            transport,
-            () => {},
-            () => {},
-            "",
-            sessionSize
-          );
-          break;
-        case 2:
-          thisinstrument = loadSynthFromGetObject(originalInstrument.get()); 
+            scheduleDrumSequence(
+              module.score,
+              thisinstrument,
+              transport,
+              () => {},
+              () => {},
+              "",
+              sessionSize
+            );
+            break;
+          case 1:
+            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            thisinstrument.volume.value = module.volume;
 
-          scheduleChordProgression(
-            module.score,
-            thisinstrument,
-            transport,
-            () => {},
-            () => {},
-            "",
-            sessionSize
-          );
-          break;
+            scheduleMelodyGrid(
+              module.score,
+              thisinstrument,
+              transport,
+              () => {},
+              () => {},
+              "",
+              sessionSize
+            );
+            break;
+          case 2:
+            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            thisinstrument.volume.value = module.volume;
+
+            scheduleChordProgression(
+              module.score,
+              thisinstrument,
+              transport,
+              () => {},
+              () => {},
+              "",
+              sessionSize
+            );
+            break;
           case 3:
-            thisinstrument = new Tone.GrainPlayer(instrumentBuffers[moduleIndex]).toDestination()
-            scheduleSamples(
-            module.score,
-            thisinstrument,
-            0,
-            transport,
-            ""
-          );
-          break;
+            thisinstrument = new Tone.GrainPlayer(
+              instrumentBuffers[moduleIndex]
+            ).toDestination();
+            thisinstrument.volume.value = module.volume;
+
+            scheduleSamples(module.score, thisinstrument, 0, transport, "");
+            break;
+        }
       }
     });
 
@@ -100,11 +103,11 @@ export const bounceSessionExport = async (
 
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
-    downloadURI(url, "Session.wav");
+    downloadURI(url, `${sessionData.name}.wav`);
     setIsReady(true);
 
     //});
-  }); 
+  });
 };
 
 const downloadURI = (uri, name) => {

@@ -19,17 +19,20 @@ function Chord(props) {
         let currentChordRhythm = newChords[currentChordIndex].rhythm;
 
         let newChord = {
-          notes: [],
+          notes: 0,
           duration: currentChordDuration,
           time: direction
             ? currentChordDuration + newChords[currentChordIndex].time
             : newChords[currentChordIndex].time,
-          rhythm: direction
-            ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
-            : currentChordRhythm.slice(
-                currentChordRhythm.length / 2,
-                currentChordRhythm.length
-              ),
+          rhythm:
+            currentChordRhythm.length > 1
+              ? direction
+                ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
+                : currentChordRhythm.slice(
+                    currentChordRhythm.length / 2,
+                    currentChordRhythm.length
+                  )
+              : [1],
         };
 
         let currentChord = {
@@ -38,12 +41,15 @@ function Chord(props) {
           time:
             newChords[currentChordIndex].time +
             (1 - direction) * currentChordDuration,
-          rhythm: !direction
-            ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
-            : currentChordRhythm.slice(
-                currentChordRhythm.length / 2,
-                currentChordRhythm.length
-              ),
+          rhythm:
+            currentChordRhythm.length > 1
+              ? !direction
+                ? currentChordRhythm.slice(0, currentChordRhythm.length / 2 - 1)
+                : currentChordRhythm.slice(
+                    currentChordRhythm.length / 2,
+                    currentChordRhythm.length
+                  )
+              : [1],
         };
 
         newChords[currentChordIndex] = currentChord;
@@ -60,6 +66,19 @@ function Chord(props) {
       let newChords = prev
         .map((chord, index) => {
           let newChord = { ...chord };
+          if (
+            index === props.index - 1 &&
+            chord.duration === removedChordDuration &&
+            Math.floor(chord.time) === Math.floor(prev[props.index].time)
+          ) {
+            newChord.duration += removedChordDuration;
+          } else if (
+            index === props.index + 1 &&
+            chord.duration === removedChordDuration &&
+            Math.floor(chord.time) === Math.floor(prev[props.index].time)
+          ) {
+            newChord.duration += removedChordDuration;
+          }
           newChord.time =
             index > props.index
               ? chord.time - removedChordDuration

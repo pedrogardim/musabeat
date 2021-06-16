@@ -186,7 +186,8 @@ function Player(props) {
     //console.log(props.instrument, props.loaded);
     setScore((prev) => {
       let newScore = [...prev];
-      newScore[0].duration = props.instrument.buffer._buffer.duration;
+      console.log(props.instrument);
+      newScore[0].duration = props.instrument.buffer.duration;
       return newScore;
     });
   }, [props.loaded]);

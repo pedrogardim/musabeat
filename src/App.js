@@ -39,7 +39,7 @@ function App() {
   const [sessionEditMode, setSessionEditMode] = useState(null);
 
   const handleCreateNewSession = (session) => {
-    createNewSession(session, setCurrentPage, setOpenedSession);
+    user && createNewSession(session, setCurrentPage, setOpenedSession);
   };
 
   const handleAvatarClick = (e) => {

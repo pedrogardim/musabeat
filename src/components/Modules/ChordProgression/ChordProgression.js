@@ -76,10 +76,10 @@ function ChordProgression(props) {
       let newChords = [...prev];
       for (let x = 0; x < measuresToAdd; x++) {
         newChords.push({
-          notes: [],
+          notes: 0,
           duration: 1,
           time: Math.ceil(newChords[newChords.length - 1].time) + 1,
-          rhythm: newChords[newChords.length - 1].rhythm,
+          rhythm: [...newChords[newChords.length - 1].rhythm],
         });
       }
       return newChords;
@@ -144,30 +144,33 @@ function ChordProgression(props) {
   return (
     <div className="module-innerwrapper" style={props.style}>
       <div className="chord-prog">
-        {chords.map(
-          (chord, chordIndex) =>
-            (chordIndex === 0 ||
-              Math.floor(chord.time) !==
-                Math.floor(chords[chordIndex - 1].time)) && (
-              <div className="measure">
-                {chords.map(
-                  (inChord, inChordIndex) =>
-                    Math.floor(inChord.time) === chordIndex && (
-                      <Chord
-                        key={inChordIndex}
-                        index={inChordIndex}
-                        active={activeChord === inChordIndex}
-                        name={chordNotestoName(inChord.notes)}
-                        setChords={setChords}
-                        onClick={() => handleClick(inChordIndex)}
-                        color={colors[props.module.color]}
-                        duration={inChord.duration}
-                      />
-                    )
-                )}
-              </div>
-            )
-        )}
+        {Array(Math.floor(Math.max(...chords.map((e) => e.time)) + 1))
+          .fill(0)
+          .map((chord, chordIndex) => (
+            <div className="measure">
+              {chords
+                .filter((e) => Math.floor(e.time) === chordIndex)
+                .map((inChord, inChordIndex) => (
+                  <Chord
+                    key={`chord${inChordIndex + chordIndex}`}
+                    index={chords
+                      .map((e) => JSON.stringify(e))
+                      .indexOf(JSON.stringify(inChord))}
+                    active={
+                      activeChord ===
+                      chords
+                        .map((e) => JSON.stringify(e))
+                        .indexOf(JSON.stringify(inChord))
+                    }
+                    name={chordNotestoName(inChord.notes)}
+                    setChords={setChords}
+                    onClick={() => handleClick(inChordIndex)}
+                    color={colors[props.module.color]}
+                    duration={inChord.duration}
+                  />
+                ))}
+            </div>
+          ))}
         <div className="break" />
         <IconButton size="small" onClick={addMeasure}>
           <Icon>add</Icon>

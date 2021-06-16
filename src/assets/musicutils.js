@@ -377,7 +377,7 @@ export const chordNametoNotes = (arg) => {
 };
 
 export const chordNotestoName = (arg) => {
-  if (arg.length === 0) {
+  if (!arg || arg.length === 0) {
     return "N.C";
   }
 

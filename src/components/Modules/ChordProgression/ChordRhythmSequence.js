@@ -63,8 +63,7 @@ function ChordRhythmSequence(props) {
   };
 
   useEffect(() => {
-
-    if(props.activeChord === null) return;
+    if (props.activeChord === null) return;
 
     var chordIndex = props.activeChord === null ? 0 : props.activeChord;
     setCurrentMeasure(Math.floor(props.chords[chordIndex].time));
@@ -81,28 +80,30 @@ function ChordRhythmSequence(props) {
 
   useEffect(() => {
     getRhythmFromMeasure();
-  }, [currentMeasure,props.chords]);
-
+  }, [currentMeasure, props.chords]);
 
   return (
-    <div
-      className="chord-rhythm-sequence"
-    >
+    <div className="chord-rhythm-sequence">
       {measureRhythm.map((chord, chordIndex) => (
         <div
           className={
             "chord-rhythm-chord " +
             (measureChordIndex === chordIndex && "active-chord-rhythm-chord")
           }
+          style={{
+            width:
+              props.chords[chordIndex] &&
+              props.chords[chordIndex].duration * 100 + "%",
+          }}
         >
           <IconButton
-            onClick={() => updateRhythmSteps(chordIndex,true)}
+            onClick={() => updateRhythmSteps(chordIndex, true)}
             className="add-step-chord-rhythm-button"
           >
             <Icon>add</Icon>
           </IconButton>
           <IconButton
-            onClick={() => updateRhythmSteps(chordIndex,false)}
+            onClick={() => updateRhythmSteps(chordIndex, false)}
             className="remove-step-chord-rhythm-button"
           >
             <Icon>remove</Icon>

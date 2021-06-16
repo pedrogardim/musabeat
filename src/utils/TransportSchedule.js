@@ -134,7 +134,7 @@ export const scheduleChordProgression = (
               break;
             case 1:
               instrument.triggerAttackRelease(
-                chord.notes,
+                chord.notes !== 0 ? chord.notes : [],
                 rhythmduration,
                 time
               );
