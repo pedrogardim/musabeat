@@ -81,11 +81,11 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-    props.module.score !== sequencerArray && updateModuleSequence();
+    updateModuleSequence();
   }, [sequencerArray]);
 
   useEffect(() => {
-    props.module.score !== sequencerArray && setSequence(props.module.score);
+    setSequence(props.module.score);
   }, [props.module]);
 
   useEffect(() => {

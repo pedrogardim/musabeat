@@ -27,6 +27,7 @@ import {
   patchLoader,
   loadDrumPatch,
   loadSynthFromGetObject,
+  adaptSequencetoSubdiv,
 } from "../../assets/musicutils";
 
 import { clearEvents } from "../../utils/TransportSchedule";
@@ -342,17 +343,17 @@ function Workspace(props) {
   };
 
   const handleCopy = () => {
-    ///temp
-    if (module.type !== 0 && module.type !== 1) return;
-
+    if (focusedModule == null) return;
     let currentMeasure = Tone.Transport.position.split(":")[0];
     let module = modules[focusedModule];
+
+    if (module.type !== 0 && module.type !== 1) return;
 
     let copiedData =
       module.type === 0 || module.type === 1
         ? [...module.score[currentMeasure]]
         : null;
-    setClipboard(copiedData);
+    setClipboard([module.type, copiedData]);
     setSnackbarMessage(
       `Measure copied from module ${focusedModule + 1} "${module.name}"`
     );
@@ -361,21 +362,74 @@ function Workspace(props) {
   };
 
   const handlePaste = () => {
-    ///temp
-    if (module.type !== 0 && module.type !== 1) return;
+    if (focusedModule == null) return;
+    if (!clipboard) {
+      setSnackbarMessage("Nothing to paste");
+      return;
+    }
 
     let currentMeasure = Tone.Transport.position.split(":")[0];
     let module = modules[focusedModule];
 
+    if (clipboard[0] !== module.type) {
+      setSnackbarMessage(
+        "The content you are trying to paste belongs to a different type of module"
+      );
+      return;
+    }
+
+    if (module.type !== 0 && module.type !== 1) return;
+
+    let subdivisionChanged = false;
+
     setModules((prev) => {
       let newModules = [...prev];
+
+      if (
+        clipboard.length !==
+        newModules[focusedModule].score[currentMeasure].length
+      ) {
+        newModules[focusedModule].score = newModules[focusedModule].score.map(
+          (e) => adaptSequencetoSubdiv(e, clipboard.length)
+        );
+        subdivisionChanged = true;
+      }
+
       newModules[focusedModule].score[currentMeasure] = [...clipboard];
+
       return newModules;
     });
     setSnackbarMessage(
-      `Copied measure pasted on module ${focusedModule + 1} "${module.name}"`
+      `Copied measure pasted on module ${focusedModule + 1} "${module.name}" ${
+        subdivisionChanged
+          ? "Steps on target was changed to " + clipboard.length
+          : ""
+      }`
     );
     //console.log("paste", [...clipboard]);
+  };
+
+  const handleBackspace = () => {
+    if (focusedModule == null) return;
+    let currentMeasure = Tone.Transport.position.split(":")[0];
+    let module = modules[focusedModule];
+    let measureLength = modules[focusedModule].score[currentMeasure].length;
+
+    if (module.type !== 0 && module.type !== 1) return;
+
+    setModules((prev) => {
+      let newModules = [...prev];
+      newModules[focusedModule].score[currentMeasure] = new Array(
+        measureLength
+      ).fill(0);
+
+      return newModules;
+    });
+    setSnackbarMessage(
+      `Measure ${currentMeasure + 1} cleared, from module ${
+        focusedModule + 1
+      } "${module.name}"`
+    );
   };
 
   const handleSnackbarClose = () => {
@@ -393,6 +447,11 @@ function Workspace(props) {
           handlePaste();
           break;
       }
+    }
+    switch (e.keyCode) {
+      case 8:
+        handleBackspace();
+        break;
     }
   };
 
