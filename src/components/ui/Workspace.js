@@ -41,6 +41,8 @@ function Workspace(props) {
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  //to avoid running startup scripts for each new instrument
+  const [initialLoad, setInitialLoad] = useState(false);
 
   const [DBSessionRef, setDBSessionRef] = useState(null);
   //used at the time only for passing session name to Exporter
@@ -326,6 +328,7 @@ function Workspace(props) {
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     console.log("session ready!");
+    setInitialLoad(true);
   };
 
   useEffect(() => {
@@ -345,6 +348,7 @@ function Workspace(props) {
     instrumentsLoaded &&
       !instrumentsLoaded.includes(false) &&
       sessionSize > 0 &&
+      !initialLoad &&
       onSessionReady();
     //temp
   }, [instrumentsLoaded]);

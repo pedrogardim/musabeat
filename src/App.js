@@ -19,6 +19,8 @@ import {
 
 import firebase from "firebase";
 
+import logo from "./assets/img/logo.svg";
+
 import Workspace from "./components/ui/Workspace";
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
@@ -116,13 +118,8 @@ function App() {
           >
             <Icon>menu</Icon>
           </IconButton>
-          <Typography
-            variant="h5"
-            className="app-title"
-            style={{ marginRight: 8 }}
-          >
-            {appTitle}
-          </Typography>
+          <img className="app-logo" style={{ height: 30 }} src={logo} />
+
           {!sessionEditMode && !!openedSession && (
             <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
               <Icon>visibility</Icon>
@@ -144,6 +141,9 @@ function App() {
             setUser={setUser}
           />
         )}
+        <Typography variant="h4" className="app-title">
+          {appTitle}
+        </Typography>
         <Menu
           style={{ marginTop: 48 }}
           anchorEl={userOption}

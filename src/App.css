@@ -16,6 +16,12 @@ body {
 
 .app-title {
   margin-left: 16px !important;
+  position: absolute;
+  top: 24px;
+}
+.app-logo {
+  margin-left: 16px;
+  height: 30px;
 }
 
 .app-wrapper {
