@@ -168,7 +168,13 @@ function ChordProgression(props) {
                     }
                     name={chordNotestoName(inChord.notes)}
                     setChords={setChords}
-                    onClick={() => handleClick(inChordIndex)}
+                    onClick={() =>
+                      handleClick(
+                        chords
+                          .map((e) => JSON.stringify(e))
+                          .indexOf(JSON.stringify(inChord))
+                      )
+                    }
                     color={colors[props.module.color]}
                     duration={inChord.duration}
                   />

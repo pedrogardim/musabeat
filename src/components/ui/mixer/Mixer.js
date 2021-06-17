@@ -28,7 +28,7 @@ function Mixer(props) {
   };
 
   return (
-    <div className="mixer" style={props.style}>
+    <div className="mixer" tabIndex="-1" style={props.style}>
       {props.modules.map((module, index) => (
         <ChannelStrip
           index={index}

@@ -24,9 +24,12 @@ function Player(props) {
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [rescheduleEvent, setRescheduleEvent] = useState(null);
   const [draggingOver, setDraggingOver] = useState(false);
+  const [audiobufferDuration, setAudiobufferDuration] = useState(null);
 
   const loadPlayer = (audiobuffer) => {
     props.instrument.dispose();
+
+    setAudiobufferDuration(audiobuffer.duration);
 
     let newInstrument = new Tone.GrainPlayer(
       audiobuffer,
@@ -54,7 +57,10 @@ function Player(props) {
   };
 
   const scheduleEvents = () => {
-    !!props.instrument && !!props.module.instrument.url && !props.module.muted
+    !!props.instrument &&
+    !!props.module.instrument.url &&
+    !props.module.muted &&
+    Tone.Transport.state === "started"
       ? scheduleSamples(
           score,
           props.instrument,
@@ -63,9 +69,9 @@ function Player(props) {
           props.module.id
         )
       : clearEvents(props.module.id);
-    //!!props.instrument &&
-    //  !!props.module.instrument.url &&
-    //  console.log("player scheduled");
+    !!props.instrument &&
+      !!props.module.instrument.url &&
+      console.log("player scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -89,9 +95,7 @@ function Player(props) {
 
     Tone.Transport.pause();
 
-    props.setInstrumentsLoaded((prev) =>
-      prev.map((e, i) => (i === props.index ? false : e))
-    );
+    props.setInstrumentLoaded(true);
     setDraggingOver(false);
 
     let file = files[0];
@@ -102,11 +106,8 @@ function Player(props) {
         (audiobuffer) => {
           if (audiobuffer.duration > 180) {
             alert("Try importing a smaller audio file");
-            props.setInstrumentsLoaded((prev) => {
-              let a = [...prev];
-              a[props.index] = true;
-              return a;
-            });
+            props.setInstrumentLoaded(true);
+
             return;
           }
 
@@ -178,19 +179,21 @@ function Player(props) {
     setRescheduleEvent(
       Tone.Transport.schedule((time) => {
         scheduleEvents();
+        props.instrument.stop(time);
       }, Tone.Transport.loopEnd - 0.01)
     );
   }, [props.sessionSize]);
 
   useEffect(() => {
     //console.log(props.instrument, props.loaded);
-    setScore((prev) => {
-      let newScore = [...prev];
-      console.log(props.instrument);
-      newScore[0].duration = props.instrument.buffer.duration;
-      return newScore;
-    });
-  }, [props.loaded]);
+    audiobufferDuration &&
+      setScore((prev) => {
+        let newScore = [...prev];
+        console.log(audiobufferDuration);
+        newScore[0].duration = audiobufferDuration;
+        return newScore;
+      });
+  }, []);
 
   return (
     <div

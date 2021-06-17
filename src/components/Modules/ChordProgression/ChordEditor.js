@@ -27,6 +27,7 @@ import {
 import { colors } from "../../../utils/materialPalette";
 
 import "./ChordEditor.css";
+import { useEffect } from "react";
 
 function ChordEditor(props) {
   const inputRef = useRef(null);
@@ -34,6 +35,7 @@ function ChordEditor(props) {
   const [textInputValue, setTextInputValue] = useState(
     chordNotestoName(props.chords[props.selectedChord].notes)
   );
+  const [nullChord, setNullChord] = useState(false);
 
   const changeChordOnBtnClick = (notes) => {
     props.setChords((prev) => {
@@ -44,15 +46,26 @@ function ChordEditor(props) {
   };
 
   const changeChordOnInput = (e) => {
+    setTextInputValue(e.target.value);
     let chord = chordNametoNotes(e.target.value);
-    //console.log(chord);
-    chord !== null &&
+    console.log(chord);
+    setNullChord(8);
+    !chord && setNullChord(true);
+    if (chord) {
+      setNullChord(false);
       props.setChords((prev) => {
         let newChords = [...prev];
         newChords[props.selectedChord].notes = chord;
         return newChords;
       });
+    }
   };
+
+  useEffect(() => {
+    setTextInputValue(
+      chordNotestoName(props.chords[props.selectedChord].notes)
+    );
+  }, [props.chords]);
 
   return (
     <Dialog open="true" onClose={props.onClose}>
@@ -60,11 +73,14 @@ function ChordEditor(props) {
       <DialogContent className="chord-editor-cont">
         <Paper className="chord-editor-text-input-cont">
           <InputBase
-            className="chord-editor-text-input"
+            className={`chord-editor-text-input ${
+              nullChord ? "nullChord" : "correctChord"
+            }`}
             label={<p>Chord Name</p>}
             ref={inputRef}
             defaultValue={textInputValue}
             onChange={changeChordOnInput}
+            value={textInputValue}
           />
         </Paper>
 

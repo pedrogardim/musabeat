@@ -45,20 +45,14 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    let timePerPixel =
-      props.parentRef.current.offsetWidth /
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
     window.addEventListener("resize", updateClipPosition);
-    setClipPosition(props.score.time * timePerPixel);
-    setClipWidth(props.score.duration * timePerPixel);
-    setClipHeight(props.parentRef.current.offsetHeight);
   }, []);
 
   useEffect(() => {
     //watch to window resize to update clips position
     updateClipPosition();
-  }, [props.sessionSize, props.score]);
+  }, [props.sessionSize, props.score, props.instrument]);
 
   useEffect(() => {
     //watch to window resize to update clips position
