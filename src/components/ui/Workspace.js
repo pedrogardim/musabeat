@@ -9,6 +9,7 @@ import {
   Button,
   Typography,
   Tooltip,
+  Snackbar,
 } from "@material-ui/core";
 
 import { instruments } from "../../assets/instrumentpatches";
@@ -41,6 +42,11 @@ function Workspace(props) {
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   const [editMode, setEditMode] = useState(false);
+
+  const [focusedModule, setFocusedModule] = useState(null);
+  const [clipboard, setClipboard] = useState(null);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+
   //to avoid running startup scripts for each new instrument
   const [initialLoad, setInitialLoad] = useState(false);
 
@@ -331,6 +337,65 @@ function Workspace(props) {
     setInitialLoad(true);
   };
 
+  const unfocusModules = (e) => {
+    e.target.classList.contains("workspace") && setFocusedModule(null);
+  };
+
+  const handleCopy = () => {
+    ///temp
+    if (module.type !== 0 && module.type !== 1) return;
+
+    let currentMeasure = Tone.Transport.position.split(":")[0];
+    let module = modules[focusedModule];
+
+    let copiedData =
+      module.type === 0 || module.type === 1
+        ? [...module.score[currentMeasure]]
+        : null;
+    setClipboard(copiedData);
+    setSnackbarMessage(
+      `Measure copied from module ${focusedModule + 1} "${module.name}"`
+    );
+
+    //console.log("copied", copiedData);
+  };
+
+  const handlePaste = () => {
+    ///temp
+    if (module.type !== 0 && module.type !== 1) return;
+
+    let currentMeasure = Tone.Transport.position.split(":")[0];
+    let module = modules[focusedModule];
+
+    setModules((prev) => {
+      let newModules = [...prev];
+      newModules[focusedModule].score[currentMeasure] = [...clipboard];
+      return newModules;
+    });
+    setSnackbarMessage(
+      `Copied measure pasted on module ${focusedModule + 1} "${module.name}"`
+    );
+    //console.log("paste", [...clipboard]);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarMessage(null);
+  };
+
+  const handleKeyDown = (e) => {
+    //console.log(e);
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.keyCode) {
+        case 67:
+          handleCopy();
+          break;
+        case 86:
+          handlePaste();
+          break;
+      }
+    }
+  };
+
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
@@ -377,6 +442,8 @@ function Workspace(props) {
       style={{
         display: props.hidden ? "none" : "flex",
       }}
+      onClick={unfocusModules}
+      onKeyDown={handleKeyDown}
     >
       {modules !== null && !!modules.length ? (
         modules.map((module, moduleIndex) => (
@@ -393,6 +460,7 @@ function Workspace(props) {
               sessionSize={sessionSize}
               setModules={setModules}
               editMode={editMode}
+              setFocusedModule={setFocusedModule}
             />
             {moduleIndex % 3 == 1 && <div className="break" />}
           </Fragment>
@@ -476,6 +544,27 @@ function Workspace(props) {
       >
         <Icon>content_copy</Icon>
       </Fab>
+
+      <Snackbar
+        open={!!snackbarMessage}
+        message={snackbarMessage}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        action={
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <Icon fontSize="small">close</Icon>
+          </IconButton>
+        }
+      />
       {/*<Button onClick={()=>{instruments.map(e=>{
         let pushedSessionRef = firebase
         .database()

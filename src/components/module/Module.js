@@ -61,6 +61,15 @@ function Module(props) {
     closeMenu();
   };
 
+  const handleClearMeasure = () => {
+    let currentMeasure = Tone.Transport.position.split(":")[0];
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      newModules[props.index].score[currentMeasure] = new Array(8).fill(0);
+      return newModules;
+    });
+  };
+
   const setInstrument = (newInstrument) => {
     props.setInstruments((prev) =>
       prev.map((e, i) => (i === props.index ? newInstrument : e))
@@ -285,6 +294,7 @@ function Module(props) {
           props.module.type === 2 || (props.module.type === 3 && "hidden"),
         pointerEvents: props.editMode ? "auto" : "none",
       }}
+      onClick={() => props.setFocusedModule(props.index)}
       className={
         "module " +
         //(props.module.type === 3 && " module-compact ") +
@@ -327,6 +337,15 @@ function Module(props) {
           open={Boolean(menuAnchorEl)}
           onClose={closeMenu}
         >
+          {(props.module.type === 0 || props.module.type === 1) && (
+            <MenuItem
+              onClick={handleClearMeasure}
+              className="module-menu-option"
+            >
+              <Icon>block</Icon>
+              Clear measure
+            </MenuItem>
+          )}
           {props.module.type === 3 ? (
             <MenuItem
               onClick={handleFileExplorerButton}
@@ -344,6 +363,7 @@ function Module(props) {
               Instrument
             </MenuItem>
           )}
+
           <MenuItem
             onClick={handleSettingsButtonMode}
             className="module-menu-option"
