@@ -112,15 +112,11 @@ function Player(props) {
       props.setInstrumentLoaded(true);
       return;
     } else {
-      let newDuration = audiobuffer.duration.toFixed(2);
-      console.log(
-        "%cAudio Duration: " + newDuration,
-        "background: #222; color: #bada55"
-      );
-
       props.setModules((previousModules) => {
         let newmodules = [...previousModules];
-        newmodules[props.index].score[0].duration = parseFloat(newDuration);
+        newmodules[props.index].score[0].duration = parseFloat(
+          audiobuffer.duration.toFixed(2)
+        );
         return newmodules;
       });
       loadPlayer(audiobuffer);
@@ -159,7 +155,7 @@ function Player(props) {
   //TODO: Optimize performance: clear on play/plause
   useEffect(() => {
     return () => {
-      console.log("cleared");
+      //console.log("cleared");
       clearInterval(cursorAnimator);
       Tone.Transport.clear(rescheduleEvent);
     };
@@ -174,9 +170,16 @@ function Player(props) {
     scheduleEvents();
   }, [score, props.instrument]);
 
-  /* useEffect(() => {
-    console.log("updated score on module:", score);
-  }, [score]); */
+  useEffect(() => {
+    //console.log(props.instrument.buffer);
+    props.setModules((previousModules) => {
+      let newmodules = [...previousModules];
+      newmodules[props.index].score[0].duration = parseFloat(
+        props.instrument.buffer.duration.toFixed(2)
+      );
+      return newmodules;
+    });
+  }, [props.loaded]);
 
   useEffect(() => {
     if (props.module.score !== score) setScore(props.module.score);

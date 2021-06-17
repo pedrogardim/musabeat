@@ -137,8 +137,17 @@ function Module(props) {
       props.instrument.dispose();
       let newPlayer = new Tone.GrainPlayer(
         audiobuffer ? audiobuffer : fileUrl,
-        setInstrumentLoaded(true)
+        () => setInstrumentLoaded(true)
       ).toDestination();
+
+      audiobuffer &&
+        props.setModules((previousModules) => {
+          let newmodules = [...previousModules];
+          newmodules[props.index].score[0].duration = parseFloat(
+            audiobuffer.duration.toFixed(2)
+          );
+          return newmodules;
+        });
 
       setInstrument(newPlayer);
       onInstrumentMod(fileUrl);

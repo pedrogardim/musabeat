@@ -490,6 +490,8 @@ function Workspace(props) {
 export default Workspace;
 
 const compareObjectsArray = (arr1, arr2) => {
+  if (!arr1 || !arr2) return false;
+
   const parseArr = (parsingArray) =>
     JSON.stringify(
       parsingArray.map((parsingObj) =>

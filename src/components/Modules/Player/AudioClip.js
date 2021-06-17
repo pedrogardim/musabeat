@@ -57,7 +57,7 @@ function AudioClip(props) {
 
   useEffect(() => {
     //watch to window resize to update clips position
-    console.log(clipWidth, clipHeight);
+    //console.log(clipWidth, clipHeight);
     props.loaded &&
       drawClipWave(
         props.instrument.buffer.toArray(0),
@@ -134,7 +134,7 @@ const drawClipWave = (buffer, clipHeight, clipWidth, color, index) => {
     let rectHeight = Math.abs(
       Math.floor(waveArray[Math.floor(x * 2 * scale)] * clipHeight)
     );
-    console.log("rect");
+    //console.log("rect");
     ctx.fillRect(x * 2, clipHeight / 2 - rectHeight / 2, 1, rectHeight);
   }
 };
