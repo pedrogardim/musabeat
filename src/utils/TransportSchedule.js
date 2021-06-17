@@ -170,8 +170,14 @@ export const scheduleSamples = (
     let isCursorinBetween =
       cursorTime > event.time && cursorTime < event.time + event.duration;
 
-    let eventOffset = isCursorinBetween ? cursorTime - event.time : 0;
-    let eventTime = isCursorinBetween ? cursorTime : event.time;
+    let eventOffset = parseFloat(
+      (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
+    );
+    let eventTime = parseFloat(
+      (isCursorinBetween ? cursorTime : event.time).toFixed(3)
+    );
+
+    console.log(eventTime, eventOffset);
 
     let thisevent = transport.schedule((time) => {
       instrument.start(time, eventOffset, event.duration);

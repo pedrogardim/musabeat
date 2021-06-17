@@ -143,7 +143,7 @@ function Workspace(props) {
       //sequencer
       if (module.type === 0) {
         if (typeof module.instrument === "string") {
-          console.log(`loading drums: ${module.instrument}`);
+          //console.log(`loading drums: ${module.instrument}`);
           loadDrumPatch(
             module.instrument,
             setInstrumentsLoaded,
@@ -334,7 +334,7 @@ function Workspace(props) {
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
-    console.log(modules);
+    console.log("Modules", modules);
     !props.hidden && saveToDatabase(modules);
   }, [modules]);
 
@@ -344,7 +344,7 @@ function Workspace(props) {
   }, [props.session]);
 
   useEffect(() => {
-    console.log(instrumentsLoaded);
+    //console.log(instrumentsLoaded);
     instrumentsLoaded &&
       !instrumentsLoaded.includes(false) &&
       sessionSize > 0 &&

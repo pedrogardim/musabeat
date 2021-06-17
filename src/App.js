@@ -119,12 +119,6 @@ function App() {
             <Icon>menu</Icon>
           </IconButton>
           <img className="app-logo" style={{ height: 30 }} src={logo} />
-
-          {!sessionEditMode && !!openedSession && (
-            <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
-              <Icon>visibility</Icon>
-            </Tooltip>
-          )}
           <Avatar
             onClick={handleAvatarClick}
             className="main-avatar"
@@ -143,6 +137,11 @@ function App() {
         )}
         <Typography variant="h4" className="app-title">
           {appTitle}
+          {!sessionEditMode && !!openedSession && (
+            <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
+              <Icon>visibility</Icon>
+            </Tooltip>
+          )}
         </Typography>
         <Menu
           style={{ marginTop: 48 }}

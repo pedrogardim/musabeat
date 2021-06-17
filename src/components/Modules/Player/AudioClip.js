@@ -32,6 +32,7 @@ function AudioClip(props) {
   };
 
   const handleDragStop = () => {
+    console.log("dragStop triggered");
     let newTime =
       (clipPosition / props.parentRef.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();

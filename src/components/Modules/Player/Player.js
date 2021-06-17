@@ -24,12 +24,9 @@ function Player(props) {
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [rescheduleEvent, setRescheduleEvent] = useState(null);
   const [draggingOver, setDraggingOver] = useState(false);
-  const [audiobufferDuration, setAudiobufferDuration] = useState(null);
 
   const loadPlayer = (audiobuffer) => {
     props.instrument.dispose();
-
-    setAudiobufferDuration(audiobuffer.duration);
 
     let newInstrument = new Tone.GrainPlayer(
       audiobuffer,
@@ -57,9 +54,10 @@ function Player(props) {
   };
 
   const scheduleEvents = () => {
-    !!props.instrument &&
-    !!props.module.instrument.url &&
+    //console.log(props.instrument);
     !props.module.muted &&
+    props.instrument &&
+    props.instrument.loaded &&
     Tone.Transport.state === "started"
       ? scheduleSamples(
           score,
@@ -69,8 +67,10 @@ function Player(props) {
           props.module.id
         )
       : clearEvents(props.module.id);
-    !!props.instrument &&
-      !!props.module.instrument.url &&
+    !props.module.muted &&
+      props.instrument &&
+      props.instrument.loaded &&
+      Tone.Transport.state === "started" &&
       console.log("player scheduled");
   };
 
@@ -90,64 +90,78 @@ function Player(props) {
     scheduleEvents();
   };
 
-  const handleFileDrop = (files, event) => {
+  const handleFileDrop = async (files, event) => {
     event.preventDefault();
 
     Tone.Transport.pause();
 
-    props.setInstrumentLoaded(true);
+    props.setInstrumentLoaded(false);
     setDraggingOver(false);
 
     let file = files[0];
 
-    file.arrayBuffer().then((arraybuffer) => {
-      props.instrument.context.rawContext.decodeAudioData(
-        arraybuffer,
-        (audiobuffer) => {
-          if (audiobuffer.duration > 180) {
-            alert("Try importing a smaller audio file");
-            props.setInstrumentLoaded(true);
+    let arrayBuffer = await file.arrayBuffer();
 
-            return;
-          }
+    let audiobuffer = await props.instrument.context.rawContext.decodeAudioData(
+      arrayBuffer
+    );
 
-          loadPlayer(audiobuffer);
+    if ((await audiobuffer) > 180) {
+      alert("Try importing a smaller audio file");
+      props.setInstrumentLoaded(true);
+      return;
+    } else {
+      let newDuration = audiobuffer.duration.toFixed(2);
+      console.log(
+        "%cAudio Duration: " + newDuration,
+        "background: #222; color: #bada55"
+      );
 
-          const user = firebase.auth().currentUser;
-          const storageRef = firebase
-            .storage()
-            .ref(`/${user.uid}/${file.name}`);
-          const task = storageRef.put(file);
+      props.setModules((previousModules) => {
+        let newmodules = [...previousModules];
+        newmodules[props.index].score[0].duration = parseFloat(newDuration);
+        return newmodules;
+      });
+      loadPlayer(audiobuffer);
 
-          task.on(
-            "state_changed",
-            (snapshot) => {
-              //console.log(
-              //  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-              //);
-            },
-            (error) => {
-              console.log(error);
-            },
-            () => {
-              storageRef.getDownloadURL().then((r) => {
-                props.onInstrumentMod(r);
-              });
-            }
-          );
+      const user = firebase.auth().currentUser;
+      const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+      const task = storageRef.put(file);
+
+      task.on(
+        "state_changed",
+        (snapshot) => {
+          //console.log(
+          //  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          //);
         },
-        //decode audio error
-        (e) => {
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          storageRef.getDownloadURL().then((r) => {
+            props.onInstrumentMod(r);
+          });
+        }
+      );
+    }
+
+    //decode audio error
+    /* (e) => {
           alert(
             "Upps.. there was an error decoding your audio file, try to convert it to other format"
           );
           props.setInstrumentLoaded(true);
-        }
-      );
-    });
+        } */
   };
 
   //TODO: Optimize performance: clear on play/plause
+  useEffect(() => {
+    return () => {
+      clearInterval(cursorAnimator);
+      Tone.Transport.clear(rescheduleEvent);
+    };
+  }, []);
 
   useEffect(() => {
     toggleCursor(true);
@@ -159,20 +173,12 @@ function Player(props) {
   }, [score, props.instrument]);
 
   useEffect(() => {
-    //console.log(score[0].duration);
-    props.setModules((previousModules) => {
-      let newmodules = [...previousModules];
-      newmodules[props.index].score = score;
-      return newmodules;
-    });
+    console.log("updated score on module:", score);
   }, [score]);
 
   useEffect(() => {
-    return () => {
-      clearInterval(cursorAnimator);
-      Tone.Transport.clear(rescheduleEvent);
-    };
-  }, []);
+    if (props.module.score !== score) setScore(props.module.score);
+  }, [props.module]);
 
   useEffect(() => {
     Tone.Transport.clear(rescheduleEvent);
@@ -182,18 +188,7 @@ function Player(props) {
         props.instrument.stop(time);
       }, Tone.Transport.loopEnd - 0.01)
     );
-  }, [props.sessionSize]);
-
-  useEffect(() => {
-    //console.log(props.instrument, props.loaded);
-    audiobufferDuration &&
-      setScore((prev) => {
-        let newScore = [...prev];
-        console.log(audiobufferDuration);
-        newScore[0].duration = audiobufferDuration;
-        return newScore;
-      });
-  }, []);
+  }, [props.sessionSize, score]);
 
   return (
     <div
