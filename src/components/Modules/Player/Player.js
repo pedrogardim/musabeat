@@ -53,25 +53,26 @@ function Player(props) {
       : clearInterval(cursorAnimator);
   };
 
-  const scheduleEvents = () => {
+  const scheduleEvents = (atRestart) => {
     //console.log(props.instrument);
+    console.log(
+      !props.module.muted,
+      !!props.instrument,
+      props.instrument.loaded,
+      Tone.Transport.state === "started"
+    );
     !props.module.muted &&
-    props.instrument &&
+    !!props.instrument &&
     props.instrument.loaded &&
     Tone.Transport.state === "started"
       ? scheduleSamples(
           score,
           props.instrument,
-          Tone.Transport.seconds,
+          atRestart ? 0 : Tone.Transport.seconds,
           Tone.Transport,
           props.module.id
         )
       : clearEvents(props.module.id);
-    !props.module.muted &&
-      props.instrument &&
-      props.instrument.loaded &&
-      Tone.Transport.state === "started" &&
-      console.log("player scheduled");
   };
 
   const handleCursorDrag = (event, element) => {
@@ -158,6 +159,7 @@ function Player(props) {
   //TODO: Optimize performance: clear on play/plause
   useEffect(() => {
     return () => {
+      console.log("cleared");
       clearInterval(cursorAnimator);
       Tone.Transport.clear(rescheduleEvent);
     };
@@ -172,9 +174,9 @@ function Player(props) {
     scheduleEvents();
   }, [score, props.instrument]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log("updated score on module:", score);
-  }, [score]);
+  }, [score]); */
 
   useEffect(() => {
     if (props.module.score !== score) setScore(props.module.score);
@@ -182,12 +184,12 @@ function Player(props) {
 
   useEffect(() => {
     Tone.Transport.clear(rescheduleEvent);
-    setRescheduleEvent(
-      Tone.Transport.schedule((time) => {
-        scheduleEvents();
-        props.instrument.stop(time);
-      }, Tone.Transport.loopEnd - 0.01)
-    );
+    let event = Tone.Transport.scheduleOnce((time) => {
+      console.log("should schedule");
+      scheduleEvents(true);
+      props.instrument.stop(time);
+    }, Tone.Transport.loopEnd - 0.01);
+    setRescheduleEvent(event);
   }, [props.sessionSize, score]);
 
   return (
