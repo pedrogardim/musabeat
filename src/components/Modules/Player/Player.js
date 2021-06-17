@@ -55,12 +55,12 @@ function Player(props) {
 
   const scheduleEvents = (atRestart) => {
     //console.log(props.instrument);
-    console.log(
+    /* console.log(
       !props.module.muted,
       !!props.instrument,
       props.instrument.loaded,
       Tone.Transport.state === "started"
-    );
+    ); */
     !props.module.muted &&
     !!props.instrument &&
     props.instrument.loaded &&
@@ -184,11 +184,11 @@ function Player(props) {
 
   useEffect(() => {
     Tone.Transport.clear(rescheduleEvent);
-    let event = Tone.Transport.scheduleOnce((time) => {
-      console.log("should schedule");
+    let event = Tone.Transport.schedule((time) => {
+      //console.log("should schedule");
       scheduleEvents(true);
       props.instrument.stop(time);
-    }, Tone.Transport.loopEnd - 0.01);
+    }, Tone.Transport.loopEnd - 0.02);
     setRescheduleEvent(event);
   }, [props.sessionSize, score]);
 
@@ -215,6 +215,7 @@ function Player(props) {
             }}
             onDrop={(files, event) => handleFileDrop(files, event)}
             className={"file-drop"}
+            index={props.index}
             style={{
               backgroundColor: colors[props.module.color][300],
             }}
@@ -222,7 +223,7 @@ function Player(props) {
             Drop your files here!
           </FileDrop>
         )}
-        {!!props.instrument && score[0].duration > 0 && (
+        {!!props.instrument && props.loaded && score[0].duration > 0 && (
           <AudioClip
             index={0}
             sessionSize={props.sessionSize}
