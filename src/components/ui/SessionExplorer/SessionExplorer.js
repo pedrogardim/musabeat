@@ -178,25 +178,28 @@ function SessionExplorer(props) {
       {!!sessions.length ? (
         <Fragment>
           {sessions.map((session, sessionIndex) => (
-            <SessionGalleryItem
-              handleSessionSelect={handleSessionSelect}
-              handleUserLike={() => handleUserLike(sessionIndex)}
-              handleSessionDelete={setDeleteDialog}
-              setPlayingSession={() =>
-                setPlayingSession((prev) =>
-                  prev === sessionIndex ? null : sessionIndex
-                )
-              }
-              playingLoadingProgress={playingLoadingProgress}
-              setRenameDialog={setRenameDialog}
-              playingSession={playingSession === sessionIndex}
-              key={`sgi${sessionIndex}`}
-              index={sessionIndex}
-              session={session}
-              isUser={isUser}
-              likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
-              createNewSession={props.createNewSession}
-            />
+            <Fragment>
+              <SessionGalleryItem
+                handleSessionSelect={handleSessionSelect}
+                handleUserLike={() => handleUserLike(sessionIndex)}
+                handleSessionDelete={setDeleteDialog}
+                setPlayingSession={() =>
+                  setPlayingSession((prev) =>
+                    prev === sessionIndex ? null : sessionIndex
+                  )
+                }
+                playingLoadingProgress={playingLoadingProgress}
+                setRenameDialog={setRenameDialog}
+                playingSession={playingSession === sessionIndex}
+                key={`sgi${sessionIndex}`}
+                index={sessionIndex}
+                session={session}
+                isUser={isUser}
+                likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
+                createNewSession={props.createNewSession}
+              />
+              {sessionIndex % 4 === 3 && <div className="break" />}
+            </Fragment>
           ))}
         </Fragment>
       ) : !sessionKeys || !sessionKeys.length ? (
