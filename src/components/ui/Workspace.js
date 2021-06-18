@@ -99,7 +99,7 @@ function Workspace(props) {
 
   const loadSession = () => {
     //TODO: optimize this, avoid call from server for each session load
-    console.log("loading session: " + props.session);
+    console.log("loading session: ", props.session);
     if (props.session === null) {
       console.log("session is null!");
       setModules([]);
@@ -122,9 +122,7 @@ function Workspace(props) {
         Tone.Transport.bpm.value = sessionData.bpm;
 
         let editors = sessionData.editors;
-        editors.includes(props.user.uid)
-          ? setEditMode(true)
-          : setEditMode(false);
+        props.user && editors.includes(props.user.uid) && setEditMode(true);
         let name = sessionData.name;
 
         props.setAppTitle(name);
@@ -132,10 +130,15 @@ function Workspace(props) {
     } else if (typeof props.session === "object") {
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
-      !props.hidden && props.session.editors.includes(props.user.uid)
-        ? setEditMode(true)
-        : setEditMode(false);
-
+      if (
+        (!props.hidden &&
+          props.user &&
+          props.session.editors.includes(props.user.uid)) ||
+        !props.session.creator
+      ) {
+        setEditMode(true);
+        props.setAppTitle(props.session.name);
+      }
       loadSessionInstruments(props.session.modules);
     }
   };

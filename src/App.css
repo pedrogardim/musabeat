@@ -18,7 +18,16 @@ body {
   margin-left: 16px !important;
   position: absolute;
   top: 24px;
+  display: flex;
+  align-items: center;
 }
+
+.app-title-alert {
+  font-size: 28px !important;
+  margin-left: 16px;
+  animation: flashing-alert-icon 4s ease 0s infinite alternate both !important;
+}
+
 .app-logo {
   margin-left: 16px;
   height: 30px;
@@ -49,4 +58,13 @@ body {
   height: 24px;
   width: 24px;
   color: white !important;
+}
+
+@keyframes flashing-alert-icon {
+  0% {
+    color: rgba(0, 0, 0, 0.137);
+  }
+  100% {
+    color: rgba(0, 0, 0, 0.493);
+  }
 }

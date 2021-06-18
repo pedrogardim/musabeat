@@ -1,7 +1,9 @@
 import firebase from "firebase";
 
 export const createNewSession = (session, setCurrentPage, setOpenedSession) => {
-  let userId = firebase.auth().currentUser.uid;
+  let userId = firebase.auth().currentUser
+    ? firebase.auth().currentUser.uid
+    : null;
 
   let sessionTemplate = {
     description: "No description",
@@ -38,6 +40,12 @@ export const createNewSession = (session, setCurrentPage, setOpenedSession) => {
     session !== undefined ? session : sessionTemplate,
     clearStats
   );
+
+  if (!userId) {
+    setOpenedSession(newSession);
+    setCurrentPage(null);
+    return;
+  }
 
   const sessionsRef = firebase.database().ref("sessions");
   const newSessionRef = sessionsRef.push();

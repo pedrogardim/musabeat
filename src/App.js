@@ -38,10 +38,11 @@ function App() {
   const [sideMenu, setSideMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
+
   const [sessionEditMode, setSessionEditMode] = useState(null);
 
   const handleCreateNewSession = (session) => {
-    user && createNewSession(session, setCurrentPage, setOpenedSession);
+    createNewSession(session, setCurrentPage, setOpenedSession);
   };
 
   const handleAvatarClick = (e) => {
@@ -135,14 +136,20 @@ function App() {
             setUser={setUser}
           />
         )}
-        <Typography variant="h4" className="app-title">
-          {appTitle}
+        <div className="app-title">
+          <Typography variant="h4">{appTitle}</Typography>
           {!sessionEditMode && !!openedSession && (
             <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
-              <Icon>visibility</Icon>
+              <Icon className="app-title-alert">visibility</Icon>
             </Tooltip>
           )}
-        </Typography>
+          {sessionEditMode && !user && !!openedSession && (
+            <Tooltip title="You are not logged in! Changes will not be saved">
+              <Icon className="app-title-alert">no_accounts</Icon>
+            </Tooltip>
+          )}
+        </div>
+
         <Menu
           style={{ marginTop: 48 }}
           anchorEl={userOption}
