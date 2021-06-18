@@ -282,45 +282,58 @@ export const effectTypes = [
   "Phaser",
 ];
 
-export const parametersRange = {
+export const fxParametersRange = [
   //units
-  db: [-60, 0, 0.1],
-  normalRange: [0, 1, 0.01],
-  //parameters
-  //comp
-  attack: [0, 2, 0.1],
-  ratio: [1, 30, 1],
-  knee: [0, 40, 1],
-  threshold: [-100, 0, 1],
-  release: [0, 2, 0.1],
-  //chorus
-  delayTime: [0, 2000, 10],
-  depth: [0, 1, 0.01],
-  frequency: [0, 20000, 10],
-  spread: [0, 360, 1],
-  wet: [0, 1, 0.01],
-  //reverb
-  decay: [0, 4, 0.01],
-  preDelay: [0, 0.065, 0.001],
-  //distortion
-  distortion: [0, 1, 0.01],
-  oversample: [0, 4, 1],
-  //BitCrusher
-  bits: [1, 16, 1],
-  //EQ3
-  high: [-24, 24, 0.1],
-  highFrequency: [1000, 20000, 10],
-  low: [-24, 24, 0.1],
-  lowFrequency: [0, 800, 10],
-  mid: [-24, 24, 0.1],
-  //FeedbackDelay
-  feedback: [0, 1, 0.01],
-  maxDelay: [0, 2000, 10],
-  //Phaser
-  Q: [0, 5, 1],
-  octaves: [0, 20000, 10],
-  stages: [0, 8, 1],
-};
+  {
+    attack: [0, 2, 0.1],
+    ratio: [1, 30, 1],
+    knee: [0, 40, 1],
+    threshold: [-100, 0, 1],
+    release: [0, 2, 0.1],
+  },
+  {
+    feedback: [0, 1, 0.01],
+    frequency: [0, 10, 0.5],
+    delayTime: [0, 20, 1],
+    depth: [0, 1, 0.01],
+    spread: [0, 360, 1],
+    wet: [0, 1, 0.01],
+  },
+  {
+    decay: [0, 4, 0.01],
+    preDelay: [0, 0.065, 0.001],
+    wet: [0, 1, 0.01],
+  },
+  {
+    distortion: [0, 1, 0.01],
+    oversample: [0, 4, 1],
+    wet: [0, 1, 0.01],
+  },
+  {
+    bits: [1, 16, 1],
+    wet: [0, 1, 0.01],
+  },
+  {
+    high: [-24, 24, 0.1],
+    highFrequency: [1000, 20000, 10],
+    low: [-24, 24, 0.1],
+    lowFrequency: [0, 800, 10],
+    mid: [-24, 24, 0.1],
+  },
+  {
+    feedback: [0, 1, 0.01],
+    maxDelay: [0, 2000, 10],
+    wet: [0, 1, 0.01],
+  },
+  {
+    frequency: [0, 10, 0.5],
+    octaves: [0, 4, 1],
+    stages: [0, 8, 1],
+    Q: [0, 20, 1],
+    wet: [0, 1, 0.01],
+    baseFrequency: [0, 2000, 10],
+  },
+];
 
 export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
 

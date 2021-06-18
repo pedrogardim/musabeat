@@ -20,7 +20,7 @@ import { Donut, Basic } from "react-dial-knob";
 import "./ModuleEffects.css";
 
 import { colors } from "../../utils/materialPalette";
-import { effectTypes, parametersRange } from "../../assets/musicutils";
+import { effectTypes, fxParametersRange } from "../../assets/musicutils";
 
 function Effect(props) {
   const [addEffectMenu, setAddEffectMenu] = useState(null);
@@ -78,9 +78,21 @@ function Effect(props) {
                     className={`effect-slider ${
                       props.expanded ? "es-v" : "es-h"
                     }`}
-                    min={parametersRange[e][0]}
-                    max={parametersRange[e][1]}
-                    step={parametersRange[e][2]}
+                    min={
+                      fxParametersRange[effectTypes.indexOf(props.effect.name)][
+                        e
+                      ][0]
+                    }
+                    max={
+                      fxParametersRange[effectTypes.indexOf(props.effect.name)][
+                        e
+                      ][1]
+                    }
+                    step={
+                      fxParametersRange[effectTypes.indexOf(props.effect.name)][
+                        e
+                      ][2]
+                    }
                     value={parameters[i]}
                     orientation={props.expanded ? "vertical" : "horizontal"}
                     valueLabelDisplay="auto"
