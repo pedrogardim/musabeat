@@ -34,6 +34,7 @@ import {
 function PatchExplorer(props) {
   const isDrum = props.module.type === 0;
   const categories = !isDrum ? instrumentsCategories : drumCategories;
+  const user = firebase.auth().currentUser;
 
   const [patchesList, setPatchesList] = useState([]);
   const [patchesCreatorList, setPatchesCreatorList] = useState([]);
@@ -80,7 +81,6 @@ function PatchExplorer(props) {
   };
 
   const fetchUserPatches = () => {
-    var user = firebase.auth().currentUser;
     firebase
       .database()
       .ref(isDrum ? "drumpatches" : "patches")
@@ -194,7 +194,7 @@ function PatchExplorer(props) {
   }, [props.module]);
 
   useEffect(() => {
-    fetchUserPatches();
+    user && fetchUserPatches();
   }, []);
 
   useEffect(() => {
@@ -205,7 +205,7 @@ function PatchExplorer(props) {
     <Paper className="patch-explorer-compact">
       <span>{selectedPatch}</span>
       <div>
-        {selectedPatch === "Custom patch" && (
+        {selectedPatch === "Custom patch" && !!user && (
           <IconButton onClick={() => setSavePatchDialog(true)}>
             <Icon>save</Icon>
           </IconButton>
@@ -224,16 +224,18 @@ function PatchExplorer(props) {
   ) : (
     <div className="patch-explorer">
       <List className="patch-explorer-column">
-        <ListItem
-          dense
-          button
-          divider
-          onClick={fetchUserPatches}
-          className="patch-explorer-first-column-item"
-        >
-          User Patches
-          <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
-        </ListItem>
+        {!!user && (
+          <ListItem
+            dense
+            button
+            divider
+            onClick={fetchUserPatches}
+            className="patch-explorer-first-column-item"
+          >
+            User Patches
+            <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
+          </ListItem>
+        )}
         <Divider />
         <ListItem
           key={"allcateg"}

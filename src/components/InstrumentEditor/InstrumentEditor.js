@@ -69,27 +69,30 @@ function InstrumentEditor(props) {
               : file.name.split(".")[0];
 
           const user = firebase.auth().currentUser;
-          const storageRef = firebase
-            .storage()
-            .ref(`/${user.uid}/${file.name.split(".")[0]}`);
-          const task = storageRef.put(file);
 
-          task.on(
-            "state_changed",
-            (snapshot) => {
-              console.log(
-                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-              );
-            },
-            (error) => {
-              console.log(error);
-            },
-            () => {
-              storageRef.getDownloadURL().then((r) => {
-                props.onInstrumentMod(r, fileName);
-              });
-            }
-          );
+          if (user) {
+            const storageRef = firebase
+              .storage()
+              .ref(`/${user.uid}/${file.name.split(".")[0]}`);
+            const task = storageRef.put(file);
+
+            task.on(
+              "state_changed",
+              (snapshot) => {
+                console.log(
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                );
+              },
+              (error) => {
+                console.log(error);
+              },
+              () => {
+                storageRef.getDownloadURL().then((r) => {
+                  props.onInstrumentMod(r, fileName);
+                });
+              }
+            );
+          }
         },
         (e) => {
           alert(

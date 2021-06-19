@@ -147,6 +147,8 @@ function Workspace(props) {
     setInstruments(Array(sessionModules.length).fill(false));
     setInstrumentsLoaded(Array(sessionModules.length).fill(false));
 
+    //console.log("session instr loading");
+
     let moduleInstruments = [];
     sessionModules.map((module, moduleIndex) => {
       //console.log(instrument)

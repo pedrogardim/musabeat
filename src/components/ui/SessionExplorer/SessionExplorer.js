@@ -56,50 +56,53 @@ function SessionExplorer(props) {
   };
 
   const handleUserLike = (index) => {
-    let newUserLikes = userLikes.includes(sessionKeys[index])
-      ? userLikes.filter((e) => e !== sessionKeys[index])
-      : [...userLikes, sessionKeys[index]];
+    //else:loggin pop-up
+    if (props.user) {
+      let newUserLikes = userLikes.includes(sessionKeys[index])
+        ? userLikes.filter((e) => e !== sessionKeys[index])
+        : [...userLikes, sessionKeys[index]];
 
-    setUserLikes(newUserLikes);
+      setUserLikes(newUserLikes);
 
-    //add session to user "likes" array
+      //add session to user "likes" array
 
-    let userLikesRef = firebase
-      .database()
-      .ref("users")
-      .child(props.user.uid)
-      .child("likes");
-    userLikesRef.set(newUserLikes);
+      let userLikesRef = firebase
+        .database()
+        .ref("users")
+        .child(props.user.uid)
+        .child("likes");
+      userLikesRef.set(newUserLikes);
 
-    //add user to session "likedBy" array and increment like number on session
+      //add user to session "likedBy" array and increment like number on session
 
-    let sessionRef = firebase
-      .database()
-      .ref("sessions")
-      .child(sessionKeys[index]);
-    sessionRef.get().then((snapshot) => {
-      let session = snapshot.val();
+      let sessionRef = firebase
+        .database()
+        .ref("sessions")
+        .child(sessionKeys[index]);
+      sessionRef.get().then((snapshot) => {
+        let session = snapshot.val();
 
-      session.likes = session.hasOwnProperty("likedBy")
-        ? session.likedBy.includes(props.user.uid)
-          ? session.likes - 1
-          : session.likes + 1
-        : 1;
+        session.likes = session.hasOwnProperty("likedBy")
+          ? session.likedBy.includes(props.user.uid)
+            ? session.likes - 1
+            : session.likes + 1
+          : 1;
 
-      session.likedBy = session.hasOwnProperty("likedBy")
-        ? session.likedBy.includes(props.user.uid)
-          ? session.likedBy.filter((e) => e !== props.user.uid)
-          : [...session.likedBy, props.user.uid]
-        : [props.user.uid];
+        session.likedBy = session.hasOwnProperty("likedBy")
+          ? session.likedBy.includes(props.user.uid)
+            ? session.likedBy.filter((e) => e !== props.user.uid)
+            : [...session.likedBy, props.user.uid]
+          : [props.user.uid];
 
-      sessionRef.set(session);
+        sessionRef.set(session);
 
-      setSessions((prev) => {
-        let newSessions = [...prev];
-        newSessions[index] = session;
-        return newSessions;
+        setSessions((prev) => {
+          let newSessions = [...prev];
+          newSessions[index] = session;
+          return newSessions;
+        });
       });
-    });
+    }
   };
 
   const handleSessionDelete = () => {

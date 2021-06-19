@@ -122,25 +122,30 @@ function Player(props) {
       loadPlayer(audiobuffer);
 
       const user = firebase.auth().currentUser;
-      const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
-      const task = storageRef.put(file);
 
-      task.on(
-        "state_changed",
-        (snapshot) => {
-          //console.log(
-          //  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          //);
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          storageRef.getDownloadURL().then((r) => {
-            props.onInstrumentMod(r);
-          });
-        }
-      );
+      console.log(user);
+
+      if (user) {
+        const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
+        const task = storageRef.put(file);
+
+        task.on(
+          "state_changed",
+          (snapshot) => {
+            //console.log(
+            //  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            //);
+          },
+          (error) => {
+            console.log(error);
+          },
+          () => {
+            storageRef.getDownloadURL().then((r) => {
+              props.onInstrumentMod(r);
+            });
+          }
+        );
+      }
     }
 
     //decode audio error
@@ -170,7 +175,7 @@ function Player(props) {
     scheduleEvents();
   }, [score, props.instrument]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     //console.log(props.instrument.buffer);
     props.setModules((previousModules) => {
       let newmodules = [...previousModules];
@@ -179,7 +184,7 @@ function Player(props) {
       );
       return newmodules;
     });
-  }, [props.loaded]);
+  }, [props.loaded]); */
 
   useEffect(() => {
     if (props.module.score !== score) setScore(props.module.score);
