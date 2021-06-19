@@ -37,6 +37,7 @@ function Player(props) {
   };
 
   const toggleCursor = (state) => {
+    clearInterval(cursorAnimator);
     state
       ? setCursorAnimator(
           setInterval(() => {
@@ -167,7 +168,7 @@ function Player(props) {
   }, []);
 
   useEffect(() => {
-    toggleCursor(true);
+    toggleCursor(Tone.Transport.state);
     scheduleEvents();
   }, [Tone.Transport.state]);
 
@@ -204,13 +205,20 @@ function Player(props) {
     <div
       className="module-innerwrapper"
       style={
-        (props.style, { backgroundColor: colors[props.module.color]["900"] })
+        (props.style,
+        {
+          backgroundColor: colors[props.module.color]["900"],
+          overflowX: "overlay",
+        })
       }
     >
       <div
         className="sampler"
         ref={playerWrapper}
         onDragEnter={() => setDraggingOver(true)}
+        style={{
+          width: props.moduleZoom * 100 + "%",
+        }}
       >
         <BackgroundGrid
           sessionSize={props.sessionSize}
@@ -242,6 +250,7 @@ function Player(props) {
             score={score[0]}
             setScore={setScore}
             loaded={props.loaded}
+            moduleZoom={props.moduleZoom}
           />
         )}
 

@@ -64,6 +64,14 @@
   color: white !important;
 }
 
+.module-zoom-button {
+  height: 100%;
+  width: 30px !important;
+  right: 30px !important;
+  position: absolute !important;
+  color: white !important;
+}
+
 .module-back-button {
   height: 100%;
   width: 30px !important;

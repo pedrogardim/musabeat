@@ -1,9 +1,10 @@
 .sampler {
   background-color: "";
-  height: calc(100%);
-  width: calc(100%);
-  overflow: hidden !important;
-  position: relative
+  height: 100%;
+  width: 100%;
+  overflow-y: hidden !important;
+
+  position: relative;
 }
 
 .sampler-cursor {

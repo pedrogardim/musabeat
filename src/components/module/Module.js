@@ -34,6 +34,8 @@ function Module(props) {
   const [renameDialog, setRenameDialog] = useState(false);
   const [effects, setEffects] = useState(new Array(4).fill(false));
 
+  const [moduleZoom, setModuleZoom] = useState(1);
+
   let moduleContent = <span>Nothing Here</span>;
 
   const handleInstrumentButtonMode = () => {
@@ -61,18 +63,6 @@ function Module(props) {
     closeMenu();
   };
 
-  /*  const handleClearMeasure = () => {
-    let currentMeasure = Tone.Transport.position.split(":")[0];
-
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      newModules[props.index].score[currentMeasure] = new Array(
-        newModules[props.index].score[currentMeasure].length
-      ).fill(0);
-      return newModules;
-    });
-  };
- */
   const setInstrument = (newInstrument) => {
     props.setInstruments((prev) =>
       prev.map((e, i) => (i === props.index ? newInstrument : e))
@@ -117,6 +107,13 @@ function Module(props) {
 
   const closeMenu = () => {
     setMenuAnchorEl(null);
+  };
+
+  const handleZoom = () => {
+    setModuleZoom((prev) => (prev <= props.sessionSize ? prev * 2 : 1));
+    console.log(props.sessionSize, moduleZoom);
+
+    console.log(moduleZoom * 100 + "%");
   };
 
   const onInstrumentMod = (url, name, isRemoving) => {
@@ -249,6 +246,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           module={props.module}
           setModules={props.setModules}
+          moduleZoom={moduleZoom}
         />
       );
       break;
@@ -288,6 +286,10 @@ function Module(props) {
         : props.instrument.releaseAll();
     }
   }, [Tone.Transport.state]);
+  /* 
+  useEffect(() => {
+    console.log(moduleZoom);
+  }, [moduleZoom]); */
 
   return (
     <div
@@ -330,6 +332,11 @@ function Module(props) {
             onSubmit={handleModuleRename}
             onClose={() => setRenameDialog(false)}
           />
+        )}
+        {props.module.type === 3 && (
+          <IconButton className="module-zoom-button" onClick={handleZoom}>
+            <Icon>search</Icon>
+          </IconButton>
         )}
         <IconButton className="module-options-button" onClick={openMenu}>
           <Icon>more_vert</Icon>

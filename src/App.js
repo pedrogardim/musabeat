@@ -38,7 +38,6 @@ function App() {
   const [sideMenu, setSideMenu] = useState(false);
   const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
-
   const [sessionEditMode, setSessionEditMode] = useState(null);
 
   const handleCreateNewSession = (session) => {
