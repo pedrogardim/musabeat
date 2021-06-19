@@ -17,8 +17,6 @@
   white-space: nowrap;
   display: inline-block;
   overflow: hidden;
-
-
 }
 .session-gallery-item-subtitle {
   width: 80%;
@@ -88,12 +86,18 @@ p {
 
 .session-gallery-item-editname-button {
   position: absolute !important;
-  height:16px !important;
-  width:16px !important;
+  height: 16px !important;
+  width: 16px !important;
   top: 12px !important;
-  right:  8px!important;
+  right: 8px !important;
 }
 
 .session-gallery-item-editname-button span {
-  font-size:16px !important;
+  font-size: 16px !important;
+}
+
+@media only screen and (max-width: 480px) {
+  .session-gallery-item {
+    flex-grow: 1 !important;
+  }
 }

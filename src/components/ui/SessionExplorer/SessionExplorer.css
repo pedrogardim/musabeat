@@ -1,7 +1,8 @@
 .session-explorer {
+  position: absolute;
   min-height: 100vh;
-  width: 100%;
-  left: 10%;
+  width: 60%;
+  left: 20%;
   top: 0;
   z-index: 2;
   display: flex;
@@ -10,10 +11,17 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
-  padding: 80px 0 80px 0;
+  padding: 80px 0;
 }
 
 .break {
   width: 100%;
   height: 0;
+}
+
+@media only screen and (max-width: 1024px) {
+  .session-explorer {
+    width: 100%;
+    left: 0;
+  }
 }

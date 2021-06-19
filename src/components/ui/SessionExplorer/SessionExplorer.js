@@ -201,7 +201,7 @@ function SessionExplorer(props) {
                 likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
                 createNewSession={props.createNewSession}
               />
-              {sessionIndex % 4 === 3 && <div className="break" />}
+              {/* sessionIndex % 4 === 3 && <div className="break" /> */}
             </Fragment>
           ))}
         </Fragment>
