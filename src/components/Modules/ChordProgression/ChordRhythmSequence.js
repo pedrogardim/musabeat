@@ -91,9 +91,15 @@ function ChordRhythmSequence(props) {
             (measureChordIndex === chordIndex && "active-chord-rhythm-chord")
           }
           style={{
-            width:
-              props.chords[chordIndex] &&
-              props.chords[chordIndex].duration * 100 + "%",
+            width: props.chords.filter(
+              (e) => Math.floor(e.time) === currentMeasure
+            )[chordIndex]
+              ? props.chords.filter(
+                  (e) => Math.floor(e.time) === currentMeasure
+                )[chordIndex].duration *
+                  100 +
+                "%"
+              : 0,
           }}
         >
           <IconButton

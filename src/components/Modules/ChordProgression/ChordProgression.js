@@ -6,8 +6,6 @@ import ChordRhythmSequence from "./ChordRhythmSequence";
 
 import * as Tone from "tone";
 
-import { chordNotestoName } from "../../../assets/musicutils";
-
 import { IconButton, Icon, Fab } from "@material-ui/core";
 
 import "./ChordProgression.css";
@@ -20,7 +18,7 @@ import { colors } from "../../../utils/materialPalette";
 
 function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
-  const [activeChord, setActiveChord] = useState(null);
+  const [activeChord, setActiveChord] = useState(0);
   const [activeRhythm, setActiveRhythm] = useState(null);
   const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
@@ -82,7 +80,7 @@ function ChordProgression(props) {
         newChords.push({
           notes: 0,
           duration: 1,
-          time: Math.ceil(newChords[newChords.length - 1].time) + 1,
+          time: Math.floor(newChords[newChords.length - 1].time) + 1,
           rhythm: [...newChords[newChords.length - 1].rhythm],
         });
       }
@@ -166,7 +164,7 @@ function ChordProgression(props) {
                         .map((e) => JSON.stringify(e))
                         .indexOf(JSON.stringify(inChord))
                     }
-                    name={chordNotestoName(inChord.notes)}
+                    setActiveChord={setActiveChord}
                     setChords={setChords}
                     onClick={() =>
                       handleClick(
@@ -175,8 +173,9 @@ function ChordProgression(props) {
                           .indexOf(JSON.stringify(inChord))
                       )
                     }
+                    chord={inChord}
+                    onlyChord={chords.length === 1}
                     color={colors[props.module.color]}
-                    duration={inChord.duration}
                   />
                 ))}
             </div>
