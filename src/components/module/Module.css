@@ -34,6 +34,26 @@
   height: 12.5vw !important;
 }
 
+.module-fullscreen {
+  position: fixed !important;
+  max-width: 9999px;
+  max-height: 9999px;
+  top: 60px;
+
+  width: 90vw;
+  height: 90vh;
+  z-index: 3;
+}
+
+.module-fs-backdrop {
+  position: fixed !important;
+  z-index: 3;
+  background: white !important;
+  top: 0;
+  height: 100vh;
+  width: 200vw;
+}
+
 .module-muted {
   filter: saturate(0) brightness(1.5) contrast(0.8);
 }

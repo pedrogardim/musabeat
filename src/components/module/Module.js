@@ -33,6 +33,7 @@ function Module(props) {
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [renameDialog, setRenameDialog] = useState(false);
   const [effects, setEffects] = useState(new Array(4).fill(false));
+  const [fullScreen, setFullScreen] = useState(false);
 
   const [moduleZoom, setModuleZoom] = useState(1);
 
@@ -292,62 +293,73 @@ function Module(props) {
   }, [moduleZoom]); */
 
   return (
-    <div
-      style={{
-        backgroundColor: colors[props.module.color][700],
-        overflow:
-          props.module.type === 2 || (props.module.type === 3 && "hidden"),
-        pointerEvents: props.editMode ? "auto" : "none",
-      }}
-      onClick={() => props.setFocusedModule(props.index)}
-      className={
-        "module " +
-        //(props.module.type === 3 && " module-compact ") +
-        (props.module.muted && " module-muted")
-      }
-    >
-      <div className="module-header">
-        {modulePage !== null && (
-          <IconButton
-            className="module-back-button"
-            onClick={handleBackButtonClick}
-          >
-            <Icon style={{ fontSize: 20 }}>arrow_back_ios</Icon>
-          </IconButton>
-        )}
-        <span className="module-title">{props.module.name}</span>
-        {modulePage === "settings" && (
-          <Tooltip title="Rename module">
+    <Fragment>
+      {fullScreen && <div className="module-fs-backdrop" />}
+      <div
+        style={{
+          backgroundColor: colors[props.module.color][700],
+          overflow:
+            props.module.type === 2 || (props.module.type === 3 && "hidden"),
+          pointerEvents: props.editMode ? "auto" : "none",
+        }}
+        onClick={() => props.setFocusedModule(props.index)}
+        className={
+          "module " +
+          //(props.module.type === 3 && " module-compact ") +
+          (props.module.muted && " module-muted ") +
+          (fullScreen && " module-fullscreen")
+        }
+      >
+        <div className="module-header">
+          {modulePage !== null && (
             <IconButton
-              onClick={() => setRenameDialog(true)}
-              className="module-settings-rename-btn"
+              className="module-back-button"
+              onClick={handleBackButtonClick}
             >
-              <Icon>edit</Icon>
+              <Icon style={{ fontSize: 20 }}>arrow_back_ios</Icon>
             </IconButton>
-          </Tooltip>
-        )}
+          )}
+          <span className="module-title">{props.module.name}</span>
+          {modulePage === "settings" && (
+            <Tooltip title="Rename module">
+              <IconButton
+                onClick={() => setRenameDialog(true)}
+                className="module-settings-rename-btn"
+              >
+                <Icon>edit</Icon>
+              </IconButton>
+            </Tooltip>
+          )}
 
-        {renameDialog && (
-          <NameInput
-            onSubmit={handleModuleRename}
-            onClose={() => setRenameDialog(false)}
-          />
-        )}
-        {props.module.type === 3 && (
-          <IconButton className="module-zoom-button" onClick={handleZoom}>
-            <Icon>search</Icon>
+          {renameDialog && (
+            <NameInput
+              onSubmit={handleModuleRename}
+              onClose={() => setRenameDialog(false)}
+            />
+          )}
+
+          {props.module.type === 3 && (
+            <IconButton className="module-zoom-button" onClick={handleZoom}>
+              <Icon>search</Icon>
+            </IconButton>
+          )}
+          <IconButton className="module-options-button" onClick={openMenu}>
+            <Icon>more_vert</Icon>
           </IconButton>
-        )}
-        <IconButton className="module-options-button" onClick={openMenu}>
-          <Icon>more_vert</Icon>
-        </IconButton>
-        <Menu
-          anchorEl={menuAnchorEl}
-          keepMounted
-          open={Boolean(menuAnchorEl)}
-          onClose={closeMenu}
-        >
-          {/* (props.module.type === 0 || props.module.type === 1) && (
+          <Menu
+            anchorEl={menuAnchorEl}
+            keepMounted
+            open={Boolean(menuAnchorEl)}
+            onClose={closeMenu}
+          >
+            <MenuItem
+              className=""
+              onClick={() => setFullScreen((prev) => !prev)}
+            >
+              <Icon>fullscreen</Icon>
+              Fullscreen
+            </MenuItem>
+            {/* (props.module.type === 0 || props.module.type === 1) && (
             <MenuItem
               onClick={handleClearMeasure}
               className="module-menu-option"
@@ -356,89 +368,90 @@ function Module(props) {
               Clear measure
             </MenuItem>
           ) */}
-          {props.module.type === 3 ? (
-            <MenuItem
-              onClick={handleFileExplorerButton}
-              className="module-menu-option"
-            >
-              <Icon>graphic_eq</Icon>
-              Load audio file
-            </MenuItem>
-          ) : (
-            <MenuItem
-              onClick={handleInstrumentButtonMode}
-              className="module-menu-option"
-            >
-              <Icon>piano</Icon>
-              Instrument
-            </MenuItem>
-          )}
+            {props.module.type === 3 ? (
+              <MenuItem
+                onClick={handleFileExplorerButton}
+                className="module-menu-option"
+              >
+                <Icon>graphic_eq</Icon>
+                Load audio file
+              </MenuItem>
+            ) : (
+              <MenuItem
+                onClick={handleInstrumentButtonMode}
+                className="module-menu-option"
+              >
+                <Icon>piano</Icon>
+                Instrument
+              </MenuItem>
+            )}
 
-          <MenuItem
-            onClick={handleSettingsButtonMode}
-            className="module-menu-option"
-          >
-            <Icon className="module-menu-option-icon">settings</Icon>
-            Settings
-          </MenuItem>
-          <MenuItem
-            onClick={handleEffectButtonMode}
-            className="module-menu-option"
-          >
-            <Icon className="module-menu-option-icon">blur_on</Icon>
-            Effects
-          </MenuItem>
-          <MenuItem className="module-menu-option" onClick={removeModule}>
-            <Icon>delete</Icon>
-            Remove
-          </MenuItem>
-        </Menu>
+            <MenuItem
+              onClick={handleSettingsButtonMode}
+              className="module-menu-option"
+            >
+              <Icon className="module-menu-option-icon">settings</Icon>
+              Settings
+            </MenuItem>
+            <MenuItem
+              onClick={handleEffectButtonMode}
+              className="module-menu-option"
+            >
+              <Icon className="module-menu-option-icon">blur_on</Icon>
+              Effects
+            </MenuItem>
+            <MenuItem className="module-menu-option" onClick={removeModule}>
+              <Icon>delete</Icon>
+              Remove
+            </MenuItem>
+          </Menu>
+        </div>
+        {props.loaded ? (
+          <Fragment>
+            {modulePage === "instrument" && (
+              <InstrumentEditor
+                module={props.module}
+                setModules={props.setModules}
+                instrument={props.instrument}
+                onInstrumentMod={onInstrumentMod}
+                setInstruments={props.setInstruments}
+                setInstrumentsLoaded={props.setInstrumentsLoaded}
+                setModules={props.setModules}
+                index={props.index}
+              />
+            )}
+            {modulePage === "fileExplorer" && (
+              <FileExplorer onFileClick={handleFileClick} compact />
+            )}
+            {modulePage === "settings" && (
+              <ModuleSettings
+                instrument={props.instrument}
+                module={props.module}
+                setModules={props.setModules}
+                setSettingsMode={() => setModulePage(null)}
+                index={props.index}
+              />
+            )}
+            {modulePage === "effects" && (
+              <ModuleEffects
+                module={props.module}
+                setModules={props.setModules}
+                effects={effects}
+                setEffects={setEffects}
+                index={props.index}
+              />
+            )}
+
+            {modulePage === null && moduleContent}
+          </Fragment>
+        ) : (
+          <CircularProgress
+            className="loading-progress"
+            style={{ color: colors[props.module.color][300] }}
+          />
+        )}
       </div>
-      {props.loaded ? (
-        <Fragment>
-          {modulePage === "instrument" && (
-            <InstrumentEditor
-              module={props.module}
-              setModules={props.setModules}
-              instrument={props.instrument}
-              onInstrumentMod={onInstrumentMod}
-              setInstruments={props.setInstruments}
-              setInstrumentsLoaded={props.setInstrumentsLoaded}
-              setModules={props.setModules}
-              index={props.index}
-            />
-          )}
-          {modulePage === "fileExplorer" && (
-            <FileExplorer onFileClick={handleFileClick} compact />
-          )}
-          {modulePage === "settings" && (
-            <ModuleSettings
-              instrument={props.instrument}
-              module={props.module}
-              setModules={props.setModules}
-              setSettingsMode={() => setModulePage(null)}
-              index={props.index}
-            />
-          )}
-          {modulePage === "effects" && (
-            <ModuleEffects
-              module={props.module}
-              setModules={props.setModules}
-              effects={effects}
-              setEffects={setEffects}
-              index={props.index}
-            />
-          )}
-
-          {modulePage === null && moduleContent}
-        </Fragment>
-      ) : (
-        <CircularProgress
-          className="loading-progress"
-          style={{ color: colors[props.module.color][300] }}
-        />
-      )}
-    </div>
+    </Fragment>
   );
 }
 
