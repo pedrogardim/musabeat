@@ -92,6 +92,13 @@ function Module(props) {
       newInstruments = newInstruments.filter((e, i) => i !== props.index);
       return newInstruments;
     });
+
+    props.setInstrumentsLoaded((prevLoaded) => {
+      //prevModules.forEach(e=>clearEvents(e.id));
+      let newLoaded = [...prevLoaded];
+      newLoaded = newLoaded.filter((e, i) => i !== props.index);
+      return newLoaded;
+    });
   };
 
   const handleModuleRename = (name) => {
@@ -294,7 +301,12 @@ function Module(props) {
 
   return (
     <Fragment>
-      {fullScreen && <div className="module-fs-backdrop" />}
+      {fullScreen && (
+        <div
+          className="module-fs-backdrop"
+          onClick={() => setFullScreen(false)}
+        />
+      )}
       <div
         style={{
           backgroundColor: colors[props.module.color][700],

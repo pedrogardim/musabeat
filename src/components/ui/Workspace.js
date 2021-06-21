@@ -19,6 +19,8 @@ import { starterSession } from "../../assets/starterSession";
 import "./Workspace.css";
 
 import Module from "../Module/Module";
+import PlaceholderModule from "../Module/PlaceholderModule";
+
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Mixer from "./mixer/Mixer";
@@ -115,6 +117,7 @@ function Workspace(props) {
         setSessionData(sessionData);
 
         if (sessionData.hasOwnProperty("modules")) {
+          setInstrumentsLoaded(Array(sessionData.modules.length).fill(false));
           loadSessionInstruments(sessionData.modules);
           setModules(sessionData.modules);
         }
@@ -145,7 +148,6 @@ function Workspace(props) {
 
   const loadSessionInstruments = (sessionModules) => {
     setInstruments(Array(sessionModules.length).fill(false));
-    setInstrumentsLoaded(Array(sessionModules.length).fill(false));
 
     //console.log("session instr loading");
 
@@ -509,7 +511,7 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
-      {modules !== null && !!modules.length ? (
+      {modules !== null ? (
         modules.map((module, moduleIndex) => (
           <Fragment>
             <Module
@@ -529,12 +531,16 @@ function Workspace(props) {
             {moduleIndex % 3 == 1 && <div className="break" />}
           </Fragment>
         ))
-      ) : (
+      ) : !modules ? (
+        [1, 1, 1, 1].map(() => <PlaceholderModule />)
+      ) : !modules.length && !instrumentsLoaded.length ? (
         <Fragment>
           <Typography variant="h1">:v</Typography>
           <div className="break" />
           <p>No Modules!</p>
         </Fragment>
+      ) : (
+        ""
       )}
       <div className="break" />
       {editMode && (
