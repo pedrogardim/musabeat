@@ -102,7 +102,7 @@ function SessionGalleryItem(props) {
           </Paper>
         )}
       </div>
-      <div className="session-gallery-item-module-footer">
+      <div className="session-gallery-item-footer">
         {props.playingLoadingProgress !== 100 &&
         props.playingSession &&
         !!props.session.modules ? (

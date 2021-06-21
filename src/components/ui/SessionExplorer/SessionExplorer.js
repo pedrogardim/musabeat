@@ -14,6 +14,7 @@ import {
 } from "@material-ui/core";
 
 import SessionGalleryItem from "./SessionGalleryItem";
+import PlaceholderSGI from "./PlaceholderSGI";
 import NameInput from "../Dialogs/NameInput";
 import Workspace from "../Workspace";
 
@@ -205,7 +206,7 @@ function SessionExplorer(props) {
             </Fragment>
           ))}
         </Fragment>
-      ) : !sessionKeys || !sessionKeys.length ? (
+      ) : isUser && !sessionKeys ? (
         <Fragment>
           <Typography variant="h1">:p</Typography>
           <div className="break" />
@@ -215,8 +216,12 @@ function SessionExplorer(props) {
             Create New Session!
           </Button>
         </Fragment>
+      ) : !sessions.length ? (
+        Array(isUser ? 3 : 15)
+          .fill(1)
+          .map((e) => <PlaceholderSGI />)
       ) : (
-        <CircularProgress />
+        ""
       )}
       {deleteDialog !== null && (
         <Dialog open="true" onClose={() => setDeleteDialog(null)}>

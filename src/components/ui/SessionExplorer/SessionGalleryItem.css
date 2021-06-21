@@ -76,12 +76,13 @@ p {
   justify-content: center;
 }
 
-.session-gallery-item-module-footer {
+.session-gallery-item-footer {
   height: 36px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: nowrap;
 }
 
 .session-gallery-item-editname-button {
