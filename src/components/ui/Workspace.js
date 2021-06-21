@@ -45,6 +45,7 @@ function Workspace(props) {
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
@@ -443,7 +444,19 @@ function Workspace(props) {
     setSnackbarMessage(null);
   };
 
+  const togglePlaying = (e) => {
+    e.preventDefault();
+    if (Tone.Transport.state !== "started") {
+      Tone.Transport.start();
+      setIsPlaying(true);
+    } else {
+      Tone.Transport.pause();
+      setIsPlaying(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
+    Tone.start();
     //console.log(e);
     if (e.ctrlKey || e.metaKey) {
       switch (e.keyCode) {
@@ -456,6 +469,15 @@ function Workspace(props) {
       }
     }
     switch (e.keyCode) {
+      case 32:
+        console.log(
+          e.target.classList[0] === "workspace",
+          !instrumentsLoaded.includes(false)
+        );
+        e.target.classList[0] === "workspace" &&
+          !instrumentsLoaded.includes(false) &&
+          togglePlaying(e);
+        break;
       case 8:
         handleBackspace();
         break;
@@ -592,7 +614,7 @@ function Workspace(props) {
         style={{ right: "calc(50% - 27px)" }}
         onClick={props.togglePlaying}
       >
-        <Icon>{props.isPlaying ? "pause" : "play_arrow"}</Icon>
+        <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
       </Fab>
       {editMode && (
         <Fab

@@ -56,26 +56,6 @@ function App() {
     setUserOption(false);
   };
 
-  const handleKeyPress = (event) => {
-    Tone.start();
-    switch (event.code) {
-      case "Space":
-        event.target.classList[0] === "workspace" && togglePlaying(event);
-        break;
-    }
-  };
-
-  const togglePlaying = (event) => {
-    event.preventDefault();
-    if (Tone.Transport.state !== "started") {
-      Tone.Transport.start();
-      setIsPlaying(true);
-    } else {
-      Tone.Transport.pause();
-      setIsPlaying(false);
-    }
-  };
-
   const updateAppTitle = () => {
     setAppTitle(
       currentPage === "userSessions"
@@ -127,7 +107,7 @@ function App() {
           />
         </Toolbar>
       </AppBar>
-      <div className="app-wrapper" onKeyDown={handleKeyPress}>
+      <div className="app-wrapper">
         {authDialog && (
           <AuthDialog
             authDialog={authDialog}
@@ -193,8 +173,6 @@ function App() {
             className="workspace"
             setAppTitle={setAppTitle}
             session={openedSession}
-            isPlaying={isPlaying}
-            togglePlaying={togglePlaying}
             user={user}
             setSessionEditMode={setSessionEditMode}
             createNewSession={handleCreateNewSession}
