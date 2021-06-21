@@ -20,6 +20,7 @@
     "react-file-drop": "^3.1.2",
     "react-resizable": "^3.0.1",
     "react-rnd": "^10.2.4",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "tone": "^14.7.77",
     "web-vitals": "^1.1.1"

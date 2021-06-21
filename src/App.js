@@ -4,6 +4,15 @@ import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
 import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  withRouter,
+  useHistory,
+} from "react-router-dom";
+
+import {
   Fab,
   Icon,
   IconButton,
@@ -39,6 +48,10 @@ function App() {
   const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
   const [sessionEditMode, setSessionEditMode] = useState(null);
+
+  const history = useHistory();
+
+  const handlePageNav = (route) => history.push(`/${route}`);
 
   const handleCreateNewSession = (session) => {
     createNewSession(session, setCurrentPage, setOpenedSession);
@@ -137,50 +150,75 @@ function App() {
           onClose={() => setUserOption(false)}
         >
           <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
-          <MenuItem onClick={() => setCurrentPage("userSessions")}>
+          <MenuItem onClick={() => handlePageNav("sessions")}>
             My Sessions
           </MenuItem>
-          <MenuItem onClick={() => setCurrentPage("userFiles")}>
-            My Samples
-          </MenuItem>
+          <MenuItem onClick={() => handlePageNav("files")}>My Samples</MenuItem>
           <MenuItem onClick={() => setUserOption(false)}>
             My Synth Patches
           </MenuItem>
           <MenuItem onClick={handleLogOut}>Logout</MenuItem>
         </Menu>
-        {(currentPage === "userSessions" ||
-          currentPage === "exploreSessions") && (
-          <SessionExplorer
-            setCurrentPage={setCurrentPage}
-            createNewSession={handleCreateNewSession}
-            currentPage={currentPage}
-            setOpenedSession={setOpenedSession}
-            user={user}
-          />
-        )}
-        {currentPage === "userFiles" && (
-          <FileExplorer setCurrentPage={setCurrentPage} />
-        )}
+
         <SideMenu
           open={sideMenu}
-          setCurrentPage={setCurrentPage}
+          handlePageNav={handlePageNav}
           setOpenedSession={setOpenedSession}
           setSideMenu={setSideMenu}
           createNewSession={handleCreateNewSession}
         />
-        {openedSession !== null && currentPage === null && (
-          <Workspace
-            className="workspace"
-            setAppTitle={setAppTitle}
-            session={openedSession}
-            user={user}
-            setSessionEditMode={setSessionEditMode}
-            createNewSession={handleCreateNewSession}
-          />
-        )}
+
+        <Switch>
+          <Route exact path="/">
+            <p>Home!</p>
+          </Route>
+          <Route exact path="/explore">
+            <SessionExplorer
+              setCurrentPage={setCurrentPage}
+              createNewSession={handleCreateNewSession}
+              setOpenedSession={setOpenedSession}
+              history={history}
+              user={user}
+            />
+          </Route>
+          <Route exact path="/sessions">
+            <SessionExplorer
+              isUser
+              setCurrentPage={setCurrentPage}
+              createNewSession={handleCreateNewSession}
+              setOpenedSession={setOpenedSession}
+              history={history}
+              user={user}
+            />
+          </Route>
+          <Route exact path="/files">
+            <FileExplorer setCurrentPage={setCurrentPage} />
+          </Route>
+          <Route exact path="/session/:key">
+            <Workspace
+              className="workspace"
+              setAppTitle={setAppTitle}
+              session={openedSession}
+              user={user}
+              setSessionEditMode={setSessionEditMode}
+              createNewSession={handleCreateNewSession}
+            />
+          </Route>
+
+          {openedSession !== null && currentPage === null && (
+            <Workspace
+              className="workspace"
+              setAppTitle={setAppTitle}
+              session={openedSession}
+              user={user}
+              setSessionEditMode={setSessionEditMode}
+              createNewSession={handleCreateNewSession}
+            />
+          )}
+        </Switch>
       </div>
     </Fragment>
   );
 }
 
-export default App;
+export default withRouter(App);

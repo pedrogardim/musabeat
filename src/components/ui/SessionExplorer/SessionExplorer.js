@@ -31,20 +31,18 @@ function SessionExplorer(props) {
   const [playingSession, setPlayingSession] = useState(null);
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
-  const isUser = props.currentPage === "userSessions";
-
   const getSessionList = async () => {
-    //console.log(isUser ? "fetching user sessions" : "fetching explore");
-    let dbRef = isUser
+    //console.log(props.props.isUser ? "fetching user sessions" : "fetching explore");
+    let dbRef = props.isUser
       ? firebase.database().ref("users").child(props.user.uid).child("sessions")
       : firebase.database().ref("sessions");
     const sessionKeys = (await dbRef.get()).val();
-    isUser
+    props.isUser
       ? setSessionKeys(sessionKeys)
       : setSessionKeys(Object.keys(sessionKeys));
-    !isUser && setSessions(Object.values(sessionKeys));
+    !props.isUser && setSessions(Object.values(sessionKeys));
 
-    isUser &&
+    props.isUser &&
       !!sessionKeys &&
       (await Promise.all(
         sessionKeys.map(async (e, i) => {
@@ -152,9 +150,9 @@ function SessionExplorer(props) {
   };
 
   const handleSessionSelect = (index) => {
-    //props.setOpenedSession(sessionKeys[input]);
-    props.setOpenedSession(sessionKeys[index]);
-    props.setCurrentPage(null);
+    //props.setOpenedSession(sessionKeys[index]);
+    //props.setCurrentPage(null);
+    props.history.push(`/session/${sessionKeys[index].substring(1)}`);
   };
 
   useEffect(() => {
@@ -175,7 +173,7 @@ function SessionExplorer(props) {
     setSessions([]);
     getSessionList();
     props.user && getUserLikes();
-  }, [props.currentPage]);
+  }, [props.isUser]);
 
   return (
     <div className="session-explorer">
@@ -198,7 +196,7 @@ function SessionExplorer(props) {
                 key={`sgi${sessionIndex}`}
                 index={sessionIndex}
                 session={session}
-                isUser={isUser}
+                isUser={props.isUser}
                 likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
                 createNewSession={props.createNewSession}
               />
@@ -206,7 +204,7 @@ function SessionExplorer(props) {
             </Fragment>
           ))}
         </Fragment>
-      ) : isUser && !sessionKeys ? (
+      ) : props.isUser && !sessionKeys ? (
         <Fragment>
           <Typography variant="h1">:p</Typography>
           <div className="break" />
@@ -217,7 +215,7 @@ function SessionExplorer(props) {
           </Button>
         </Fragment>
       ) : !sessions.length ? (
-        Array(isUser ? 3 : 15)
+        Array(props.isUser ? 3 : 15)
           .fill(1)
           .map((e) => <PlaceholderSGI />)
       ) : (

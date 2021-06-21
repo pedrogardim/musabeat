@@ -22,7 +22,7 @@ function SideMenu(props) {
     opt === "New Session"
       ? props.createNewSession()
       : opt === "Explore"
-      ? props.setCurrentPage("exploreSessions")
+      ? props.handlePageNav("explore")
       : props.setSideMenu(false);
     props.setSideMenu(false);
   };

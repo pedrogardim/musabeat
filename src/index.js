@@ -1,10 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
 import firebase from "firebase";
+
+import { BrowserRouter } from "react-router-dom";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD5Tg5t1YD72Q3weL5rYTlxroSH4QwEV-k",
@@ -13,17 +15,19 @@ const firebaseConfig = {
   storageBucket: "musamusicapp-c5d73.appspot.com",
   messagingSenderId: "851928058346",
   appId: "1:851928058346:web:95d91a745251985bab8a93",
-  measurementId: "G-4ZRP9FY1VG"
+  measurementId: "G-4ZRP9FY1VG",
 };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 ReactDOM.render(
-  <React.StrictMode>
+  //<React.StrictMode>
+  <BrowserRouter>
     <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+  </BrowserRouter>,
+  //</React.StrictMode>,
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -2,6 +2,8 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
+import { useParams } from "react-router-dom";
+
 import {
   Fab,
   Icon,
@@ -50,6 +52,8 @@ function Workspace(props) {
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
+
+  const sessionKey = "-" + useParams().key;
 
   //to avoid running startup scripts for each new instrument
   const [initialLoad, setInitialLoad] = useState(false);
@@ -102,14 +106,14 @@ function Workspace(props) {
 
   const loadSession = () => {
     //TODO: optimize this, avoid call from server for each session load
-    console.log("loading session: ", props.session);
-    if (props.session === null) {
+    console.log("loading session: ", sessionKey);
+    if (sessionKey === null) {
       console.log("session is null!");
       setModules([]);
-    } else if (typeof props.session === "string") {
+    } else if (typeof sessionKey === "string") {
       let sessionRef =
-        props.session !== null &&
-        firebase.database().ref("sessions").child(props.session);
+        sessionKey !== null &&
+        firebase.database().ref("sessions").child(sessionKey);
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editmode and get title
       sessionRef.get().then((snapshot) => {
@@ -131,19 +135,19 @@ function Workspace(props) {
 
         props.setAppTitle(name);
       });
-    } else if (typeof props.session === "object") {
-      setModules(props.session.modules);
-      Tone.Transport.bpm.value = props.session.bpm;
+    } else if (typeof sessionKey === "object") {
+      setModules(sessionKey.modules);
+      Tone.Transport.bpm.value = sessionKey.bpm;
       if (
         (!props.hidden &&
           props.user &&
-          props.session.editors.includes(props.user.uid)) ||
-        !props.session.creator
+          sessionKey.editors.includes(props.user.uid)) ||
+        !sessionKey.creator
       ) {
         setEditMode(true);
-        props.setAppTitle(props.session.name);
+        props.setAppTitle(sessionKey.name);
       }
-      loadSessionInstruments(props.session.modules);
+      loadSessionInstruments(sessionKey.modules);
     }
   };
 
