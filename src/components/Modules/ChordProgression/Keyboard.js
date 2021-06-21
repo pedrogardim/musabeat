@@ -17,9 +17,13 @@ function Keyboard(props) {
           : [...newChords[props.selectedChord].notes, note]
         : [note];
       console.log(chordNotes);
-      newChords[props.selectedChord].notes = [...chordNotes];
+      newChords[props.selectedChord].notes = chordNotes.sort(
+        (a, b) =>
+          Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
+      );
       return newChords;
     });
+    props.playChordPreview();
   };
   return (
     <div className="keyboard">
