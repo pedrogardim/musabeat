@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import {
   Paper,
@@ -18,6 +18,8 @@ import {
   InputBase,
 } from "@material-ui/core";
 
+import Keyboard from "./Keyboard";
+
 import {
   getChordsFromScale,
   chordNotestoName,
@@ -27,7 +29,6 @@ import {
 import { colors } from "../../../utils/materialPalette";
 
 import "./ChordEditor.css";
-import { useEffect } from "react";
 
 function ChordEditor(props) {
   const inputRef = useRef(null);
@@ -65,10 +66,11 @@ function ChordEditor(props) {
     setTextInputValue(
       chordNotestoName(props.chords[props.selectedChord].notes)
     );
+    props.playChordPreview();
   }, [props.chords]);
 
   return (
-    <Dialog open="true" onClose={props.onClose}>
+    <Dialog open="true" onClose={props.onClose} maxWidth="md" fullWidth>
       <DialogTitle>Chord</DialogTitle>
       <DialogContent className="chord-editor-cont">
         <Paper className="chord-editor-text-input-cont">
@@ -89,6 +91,7 @@ function ChordEditor(props) {
           <Fab
             color="primary"
             className="chord-editor-fab"
+            style={{ background: colors[props.module.color][600] }}
             onClick={() => changeChordOnBtnClick(e, i)}
           >
             {chordNotestoName(e)}
@@ -99,6 +102,15 @@ function ChordEditor(props) {
             <Icon>delete</Icon>
           </IconButton>
         </Tooltip>
+        <div className="break" />
+
+        <Keyboard
+          index={props.index}
+          color={props.module.color}
+          setChords={props.setChords}
+          selectedChord={props.selectedChord}
+          notes={props.chords[props.selectedChord].notes}
+        />
       </DialogContent>
       <IconButton
         onClick={props.onClose}

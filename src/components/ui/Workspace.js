@@ -470,10 +470,6 @@ function Workspace(props) {
     }
     switch (e.keyCode) {
       case 32:
-        console.log(
-          e.target.classList[0] === "workspace",
-          !instrumentsLoaded.includes(false)
-        );
         e.target.classList[0] === "workspace" &&
           !instrumentsLoaded.includes(false) &&
           togglePlaying(e);

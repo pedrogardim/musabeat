@@ -1,3 +1,8 @@
+.chord-editor {
+  max-width: 100% !important;
+  width: 80% !important;
+}
+
 .chord-editor-fab {
   margin: 8px !important;
   height: 48px !important;

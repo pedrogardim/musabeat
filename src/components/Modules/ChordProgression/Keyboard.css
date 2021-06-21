@@ -1,0 +1,23 @@
+.keyboard {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  position: relative;
+}
+
+.keyboard-key {
+  height: 100%;
+}
+.keyboard-black-key {
+  height: 60%;
+  position: absolute;
+  width: calc(100% / 78);
+}
+
+.keyboard-white-key {
+  width: calc(100% / 49);
+}
+
+.keyboard-key-active {
+  background-color: blue;
+}

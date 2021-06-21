@@ -146,40 +146,41 @@ function ChordProgression(props) {
   return (
     <div className="module-innerwrapper" style={props.style}>
       <div className="chord-prog">
-        {Array(Math.floor(Math.max(...chords.map((e) => e.time)) + 1))
-          .fill(0)
-          .map((chord, chordIndex) => (
-            <div className="measure">
-              {chords
-                .filter((e) => Math.floor(e.time) === chordIndex)
-                .map((inChord, inChordIndex) => (
-                  <Chord
-                    key={`chord${inChordIndex + chordIndex}`}
-                    index={chords
-                      .map((e) => JSON.stringify(e))
-                      .indexOf(JSON.stringify(inChord))}
-                    active={
-                      activeChord ===
-                      chords
+        {chords &&
+          Array(Math.floor(Math.max(...chords.map((e) => e.time)) + 1))
+            .fill(0)
+            .map((chord, chordIndex) => (
+              <div className="measure">
+                {chords
+                  .filter((e) => Math.floor(e.time) === chordIndex)
+                  .map((inChord, inChordIndex) => (
+                    <Chord
+                      key={`chord${inChordIndex + chordIndex}`}
+                      index={chords
                         .map((e) => JSON.stringify(e))
-                        .indexOf(JSON.stringify(inChord))
-                    }
-                    setActiveChord={setActiveChord}
-                    setChords={setChords}
-                    onClick={() =>
-                      handleClick(
+                        .indexOf(JSON.stringify(inChord))}
+                      active={
+                        activeChord ===
                         chords
                           .map((e) => JSON.stringify(e))
                           .indexOf(JSON.stringify(inChord))
-                      )
-                    }
-                    chord={inChord}
-                    onlyChord={chords.length === 1}
-                    color={colors[props.module.color]}
-                  />
-                ))}
-            </div>
-          ))}
+                      }
+                      setActiveChord={setActiveChord}
+                      setChords={setChords}
+                      onClick={() =>
+                        handleClick(
+                          chords
+                            .map((e) => JSON.stringify(e))
+                            .indexOf(JSON.stringify(inChord))
+                        )
+                      }
+                      chord={inChord}
+                      onlyChord={chords.length === 1}
+                      color={colors[props.module.color]}
+                    />
+                  ))}
+              </div>
+            ))}
         <div className="break" />
         <IconButton size="small" onClick={addMeasure}>
           <Icon>add</Icon>
@@ -199,8 +200,10 @@ function ChordProgression(props) {
       </div>
       {editorOpen && (
         <ChordEditor
+          index={props.index}
           chords={chords}
           selectedChord={selectedChord}
+          playChordPreview={() => playChordPreview(activeChord)}
           module={props.module}
           setChords={setChords}
           onClose={() => setEditorOpen(false)}

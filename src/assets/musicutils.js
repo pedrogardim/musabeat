@@ -378,9 +378,10 @@ export const chordNametoNotes = (arg) => {
   )
     return null;
 
-  let harmonizedchord = Tone.Frequency(chordroot + "3").harmonize(
-    chordtypes[chordtype]
-  );
+  let harmonizedchord = Tone.Frequency(chordroot + "4").harmonize([
+    -12,
+    ...chordtypes[chordtype],
+  ]);
   let finishedchord = [];
   harmonizedchord.forEach((e) =>
     finishedchord.push(Tone.Frequency(e).toNote())
@@ -394,7 +395,11 @@ export const chordNotestoName = (arg) => {
     return "N.C";
   }
 
-  let chordroot = Tone.Frequency(arg[0]).toFrequency();
+  let notes = arg.sort(
+    (a, b) => Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
+  );
+
+  let chordroot = Tone.Frequency(notes[0]).toFrequency();
   let chordtype = "...";
   let additionalnotes = [];
   let additionalnotesstring = "";
@@ -403,7 +408,7 @@ export const chordNotestoName = (arg) => {
 
   //transform the note array into intervals array, putting everyone inside the same octave and removing duplicated.
 
-  arg.forEach(function (element, index) {
+  notes.forEach(function (element, index) {
     if (index === 0) return;
     let thisinterval;
     let thisfrequency = Tone.Frequency(element).toFrequency();
