@@ -91,7 +91,6 @@ function App() {
 
   useEffect(() => {
     console.log(user);
-    setCurrentPage(null);
     updateAppTitle();
   }, [user]);
 

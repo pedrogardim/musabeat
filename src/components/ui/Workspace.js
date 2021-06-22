@@ -502,6 +502,22 @@ function Workspace(props) {
   };
 
   useEffect(() => {
+    instruments.forEach((e) => e.dispose());
+    clearEvents("all");
+    console.log("transport cleared");
+
+    let session = {
+      description: "No description",
+      tags: ["musa"],
+      bpm: Tone.Transport.bpm.value,
+      modules: modules,
+    };
+
+    props.createNewSession(session);
+    //!props.session.length && Tone.Transport.start()
+  }, [props.user]);
+
+  useEffect(() => {
     adaptSessionSize();
     //registerSession();
     console.log("Modules", modules);
