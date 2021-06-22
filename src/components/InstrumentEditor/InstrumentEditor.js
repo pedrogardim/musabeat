@@ -54,6 +54,8 @@ function InstrumentEditor(props) {
 
     setDraggingOver(false);
 
+    props.setInstrumentLoaded(false);
+
     file.arrayBuffer().then((arraybuffer) => {
       props.instrument.context.rawContext.decodeAudioData(
         arraybuffer,
@@ -67,6 +69,18 @@ function InstrumentEditor(props) {
             props.instrument.name === "Sampler"
               ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
               : file.name.split(".")[0];
+
+          props.instrument.name === "Players"
+            ? props.instrument.add(
+                fileName,
+                audiobuffer,
+                props.setInstrumentLoaded(true)
+              )
+            : props.intrument.add(
+                Tone.Frequency(detectPitch(audiobuffer)[0]).toNote(),
+                audiobuffer,
+                props.setInstrumentLoaded(true)
+              );
 
           const user = firebase.auth().currentUser;
 
@@ -167,93 +181,91 @@ function InstrumentEditor(props) {
 
   let list = [];
 
-  if (props.instrument.name === "Players") {
-    let bufferObjects = [];
-
-    props.instrument._buffers._buffers.forEach((e, i, a) =>
-      bufferObjects.push([e, i])
-    );
-    mainContent = (
-      <Fragment>
-        <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-          {bufferObjects.map((e, i) => (
-            <Fragment>
-              <AudioFileItem
-                key={i}
-                index={i}
-                instrument={props.instrument}
-                handleFileDelete={handlePlayersFileDelete}
-                buffer={e[0]}
-                fileName={e[1]}
-              />
-              <Divider />
-            </Fragment>
-          ))}
-        </List>
-      </Fragment>
-    );
-  } else if (props.instrument.name === "Sampler") {
-    let bufferObjects = [];
-    props.instrument._buffers._buffers.forEach((e, i, a) =>
-      bufferObjects.push([e, i])
-    );
-    mainContent = (
-      <Fragment>
-        <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-          {bufferObjects.map((e, i) => (
-            <Fragment>
-              <AudioFileItem
-                key={i}
-                index={i}
-                instrument={props.instrument}
-                handleFileDelete={handleSamplerFileDelete}
-                buffer={e[0]}
-                fileName={Tone.Frequency(e[1], "midi").toNote()}
-              />
-              <Divider />
-            </Fragment>
-          ))}
-        </List>
-      </Fragment>
-    );
-  } else {
-    list.push(
-      <div className="instrument-editor-column" key={0}>
-        <OscillatorEditor
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-        />
-      </div>
-    );
-    list.push(
-      <div className="instrument-editor-column" key={1}>
-        <SynthParameters
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-        />
-      </div>
-    );
-    list.push(
-      <div
-        className="instrument-editor-column"
-        style={{ flexDirection: "column" }}
-        key={2}
-      >
-        {Object.keys(props.instrument.get()).map(
-          (envelope, envelopeIndex) =>
-            envelope.toLowerCase().includes("envelope") && (
-              <EnvelopeControl
-                onInstrumentMod={props.onInstrumentMod}
-                instrument={props.instrument}
-                envelopeType={envelope}
-              />
-            )
-        )}
-      </div>
-    );
-    mainContent = list;
+  if (props.instrument) {
+    if (props.module.type === 0) {
+      console.log(props.instrument);
+      let bufferObjects = [];
+      props.instrument._buffers._buffers.forEach((e, i, a) =>
+        bufferObjects.push([e, i])
+      );
+      mainContent = (
+        <Fragment>
+          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+            {bufferObjects.map((e, i) => (
+              <Fragment>
+                <AudioFileItem
+                  key={i}
+                  index={i}
+                  instrument={props.instrument}
+                  handleFileDelete={handlePlayersFileDelete}
+                  buffer={e[0]}
+                  fileName={e[1]}
+                />
+                <Divider />
+              </Fragment>
+            ))}
+          </List>
+        </Fragment>
+      );
+    } else if (props.instrument.name === "Sampler") {
+      let bufferObjects = [];
+      props.instrument._buffers._buffers.forEach((e, i, a) =>
+        bufferObjects.push([e, i])
+      );
+      mainContent = (
+        <Fragment>
+          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+            {bufferObjects.map((e, i) => (
+              <Fragment>
+                <AudioFileItem
+                  key={i}
+                  index={i}
+                  instrument={props.instrument}
+                  handleFileDelete={handleSamplerFileDelete}
+                  buffer={e[0]}
+                  fileName={Tone.Frequency(e[1], "midi").toNote()}
+                />
+                <Divider />
+              </Fragment>
+            ))}
+          </List>
+        </Fragment>
+      );
+    } else {
+      mainContent = (
+        <Fragment>
+          <div className="instrument-editor-column" key={0}>
+            <OscillatorEditor
+              onInstrumentMod={props.onInstrumentMod}
+              instrument={props.instrument}
+            />
+          </div>
+          <div className="instrument-editor-column" key={1}>
+            <SynthParameters
+              onInstrumentMod={props.onInstrumentMod}
+              instrument={props.instrument}
+            />
+          </div>
+          <div
+            className="instrument-editor-column"
+            style={{ flexDirection: "column" }}
+            key={2}
+          >
+            {Object.keys(props.instrument.get()).map(
+              (envelope, envelopeIndex) =>
+                envelope.toLowerCase().includes("envelope") && (
+                  <EnvelopeControl
+                    onInstrumentMod={props.onInstrumentMod}
+                    instrument={props.instrument}
+                    envelopeType={envelope}
+                  />
+                )
+            )}
+          </div>
+        </Fragment>
+      );
+    }
   }
-
   /* 
   useEffect(() => {
     setInstrument(props.instrument);

@@ -760,6 +760,13 @@ export const loadDrumPatch = async (
 
   let patch = (await patchRef.get()).val();
 
+  setInstrumentsLoaded((prev) => {
+    //console.log("======LOADED=======")
+    let a = [...prev];
+    a[moduleIndex] = false;
+    return a;
+  });
+
   let drumPlayers = new Tone.Players(patch.urls, () =>
     setInstrumentsLoaded((prev) => {
       //console.log("======LOADED=======")

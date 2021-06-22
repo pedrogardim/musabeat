@@ -14,7 +14,10 @@ import {
   Select,
 } from "@material-ui/core";
 
-import { instrumentsCategories } from "../../../assets/musicutils";
+import {
+  instrumentsCategories,
+  drumCategories,
+} from "../../../assets/musicutils";
 
 function SavePatch(props) {
   const inputRef = useRef(null);
@@ -37,11 +40,17 @@ function SavePatch(props) {
         <div className="break" style={{ height: 16 }} />
         <Select native onChange={handleChange} value={selectedCategory}>
           <option value={null}>No Category</option>
-          {instrumentsCategories.map((e, i) => (
-            <option key={"spd" + e} value={i}>
-              {e}
-            </option>
-          ))}
+          {props.isDrum
+            ? drumCategories.map((e, i) => (
+                <option key={"spd" + e} value={i}>
+                  {e}
+                </option>
+              ))
+            : instrumentsCategories.map((e, i) => (
+                <option key={"spd" + e} value={i}>
+                  {e}
+                </option>
+              ))}
         </Select>
       </DialogContent>
       <DialogActions>

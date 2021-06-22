@@ -130,9 +130,7 @@ function Module(props) {
     props.setModules((prev) => {
       let newModules = [...prev];
       if (props.module.type === 0) {
-        newModules[props.index].instrument = {
-          urls: { ...prev[props.index].instrument.urls, [name]: url },
-        };
+        newModules[props.index].instrument[name] = url;
       } else if (props.module.type === 3) {
         newModules[props.index].instrument = { url };
       } else if (props.instrument.name === "Sampler") {
@@ -428,6 +426,7 @@ function Module(props) {
                 onInstrumentMod={onInstrumentMod}
                 setInstruments={props.setInstruments}
                 setInstrumentsLoaded={props.setInstrumentsLoaded}
+                setInstrumentLoaded={setInstrumentLoaded}
                 setModules={props.setModules}
                 index={props.index}
               />

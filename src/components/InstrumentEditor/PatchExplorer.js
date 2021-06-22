@@ -104,13 +104,22 @@ function PatchExplorer(props) {
   };
 
   const handlePatchSelect = (patchKey, patch) => {
-    patchLoader(patchKey, "", props.setInstrumentsLoaded).then((r) =>
-      props.setInstruments((prev) => {
-        let a = [...prev];
-        a[props.index] = r;
-        return a;
-      })
-    );
+    isDrum
+      ? loadDrumPatch(patchKey, props.setInstrumentsLoaded, props.index).then(
+          (r) =>
+            props.setInstruments((prev) => {
+              let a = [...prev];
+              a[props.index] = r;
+              return a;
+            })
+        )
+      : patchLoader(patchKey, "", props.setInstrumentsLoaded).then((r) =>
+          props.setInstruments((prev) => {
+            let a = [...prev];
+            a[props.index] = r;
+            return a;
+          })
+        );
 
     props.setModules((previous) =>
       previous.map((module, i) => {
@@ -138,14 +147,14 @@ function PatchExplorer(props) {
           base: props.instrument._dummyVoice.name.replace("Synth", ""),
           name: !!name ? name : "Untitled Patch",
           creator: user.uid,
-          categ: category,
+          categ: !!category ? category : 0,
           options: props.instrument.get(),
           volume: props.module.volume,
         }
       : {
           name: !!name ? name : "Untitled Drum Patch",
           creator: user.uid,
-          categ: category,
+          categ: !!category ? category : 0,
           urls: props.module.instrument.urls,
           volume: props.module.volume,
         };
@@ -216,6 +225,7 @@ function PatchExplorer(props) {
       </div>
       {savePatchDialog && (
         <SavePatch
+          isDrum
           onClose={() => setSavePatchDialog(false)}
           onSubmit={saveUserPatch}
         />

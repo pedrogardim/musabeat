@@ -54,7 +54,7 @@ function Workspace(props) {
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
 
-  const [sessionTitle, setSessionTitle] = useState(false);
+  const [sessionTitle, setSessionTitle] = useState(null);
 
   const sessionKey = "-" + useParams().key;
 
@@ -113,15 +113,7 @@ function Workspace(props) {
     if (props.hidden) {
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
-      if (
-        (!props.hidden &&
-          props.user &&
-          props.session.editors.includes(props.user.uid)) ||
-        !props.session.creator
-      ) {
-        setEditMode(true);
-        setSessionTitle(props.session.name);
-      }
+      setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
       console.log("session is null!");
@@ -163,12 +155,13 @@ function Workspace(props) {
         Tone.Transport.bpm.value = sessionData.bpm;
 
         let editors = sessionData.editors;
+        console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
         let name = sessionData.name;
 
         setSessionTitle(name);
       });
-    } else if (typeof sessionKey === "object") {
+    } /* else if (typeof sessionKey === "object") {
       setModules(sessionKey.modules);
       Tone.Transport.bpm.value = sessionKey.bpm;
       if (
@@ -179,9 +172,10 @@ function Workspace(props) {
       ) {
         setEditMode(true);
         setSessionTitle(sessionKey.name);
+        setSessionEditors(props.session.creator);
       }
       loadSessionInstruments(sessionKey.modules);
-    }
+    } */
   };
 
   const loadSessionInstruments = (sessionModules) => {
@@ -529,9 +523,12 @@ function Workspace(props) {
       modules: modules,
     };
 
-    props.user &&
-      props.user.uid !== firebase.auth().currentUser.uid &&
+    if (props.user && props.user.uid !== firebase.auth().currentUser.uid) {
       props.createNewSession(session);
+      return;
+    }
+
+    props.user && loadSession();
     //!props.session.length && Tone.Transport.start()
   }, [props.user]);
 
@@ -541,11 +538,6 @@ function Workspace(props) {
     console.log("Modules", modules);
     !props.hidden && saveToDatabase(modules);
   }, [modules]);
-
-  useEffect(() => {
-    loadSession();
-    //!props.session.length && Tone.Transport.start()
-  }, [props.session]);
 
   useEffect(() => {
     //console.log(instrumentsLoaded);
