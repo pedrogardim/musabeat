@@ -33,16 +33,22 @@ function SessionExplorer(props) {
 
   const getSessionList = async () => {
     //console.log(props.props.isUser ? "fetching user sessions" : "fetching explore");
-    let dbRef = props.isUser
-      ? firebase.database().ref("users").child(props.user.uid).child("sessions")
-      : firebase.database().ref("sessions");
-    const sessionKeys = (await dbRef.get()).val();
-    props.isUser
-      ? setSessionKeys(sessionKeys)
-      : setSessionKeys(Object.keys(sessionKeys));
-    !props.isUser && setSessions(Object.values(sessionKeys));
 
-    props.isUser &&
+    let dbRef = props.isUser
+      ? firebase
+          .database()
+          .ref("sessions")
+          .orderByChild("creator")
+          .equalTo(props.user.uid)
+      : //? firebase.database().ref("users").child(props.user.uid).child("sessions")
+        firebase.database().ref("sessions");
+    const sessionKeys = (await dbRef.get()).val();
+    console.log(sessionKeys);
+    //setSessionKeys(sessionKeys)
+    setSessionKeys(Object.keys(sessionKeys));
+    setSessions(Object.values(sessionKeys));
+
+    /* props.isUser &&
       !!sessionKeys &&
       (await Promise.all(
         sessionKeys.map(async (e, i) => {
@@ -51,7 +57,7 @@ function SessionExplorer(props) {
           //console.log(session);
           setSessions((prev) => [...prev, session]);
         })
-      ));
+      )); */
   };
 
   const handleUserLike = (index) => {
@@ -173,7 +179,7 @@ function SessionExplorer(props) {
     setSessions([]);
     getSessionList();
     props.user && getUserLikes();
-  }, [props.isUser]);
+  }, [props.isUser, props.user]);
 
   return (
     <div className="session-explorer">
