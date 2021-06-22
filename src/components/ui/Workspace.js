@@ -36,6 +36,7 @@ import {
 } from "../../assets/musicutils";
 
 import { clearEvents } from "../../utils/TransportSchedule";
+import { createNewSession } from "../../utils/sessionUtils";
 
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
@@ -118,9 +119,11 @@ function Workspace(props) {
     } else if (sessionKey === null) {
       console.log("session is null!");
       setModules([]);
-    } else if (sessionKey === "-newSession") {
+    }
+    //
+    else if (sessionKey === "-newSession") {
       if (props.session === null) {
-        props.createNewSession();
+        props.createNewSession(null);
         return;
       }
       setModules(props.session.modules);
@@ -135,7 +138,9 @@ function Workspace(props) {
         setSessionTitle(props.session.name);
       }
       loadSessionInstruments(props.session.modules);
-    } else if (typeof sessionKey === "string") {
+    }
+    //
+    else if (typeof sessionKey === "string") {
       let sessionRef =
         sessionKey !== null &&
         firebase.database().ref("sessions").child(sessionKey);
@@ -528,9 +533,9 @@ function Workspace(props) {
       return;
     }
 
-    props.user && loadSession();
+    loadSession();
     //!props.session.length && Tone.Transport.start()
-  }, [props.user]);
+  }, [props.user, props.session]);
 
   useEffect(() => {
     adaptSessionSize();

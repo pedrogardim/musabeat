@@ -156,6 +156,7 @@ function App() {
           <Route exact path="/session/:key">
             <Workspace
               setAppTitle={setAppTitle}
+              setOpenedSession={setOpenedSession}
               session={openedSession}
               user={user}
               setSessionEditMode={setSessionEditMode}

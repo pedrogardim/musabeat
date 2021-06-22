@@ -1,5 +1,7 @@
 import firebase from "firebase";
 
+import { useLocation } from "react-router-dom";
+
 export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   let userId = firebase.auth().currentUser
     ? firebase.auth().currentUser.uid
@@ -38,7 +40,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
 
   let newSession = Object.assign(
     {},
-    session !== undefined ? session : sessionTemplate,
+    session ? session : sessionTemplate,
     clearStats
   );
 

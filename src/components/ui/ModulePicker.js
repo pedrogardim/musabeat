@@ -41,6 +41,11 @@ const moduletypes = [
       "Drag audio files to play, and manipulate them on time and pitch",
     icon: "graphic_eq",
   },
+  {
+    name: "Piano Roll",
+    description: "Classic DAW form of making music!",
+    icon: "graphic_eq",
+  },
 ];
 
 const stepValues = [4, 8, 12, 16, 24, 32];

@@ -19,6 +19,8 @@ import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
 import MelodyGrid from "../Modules/MelodyGrid/MelodyGrid";
 import Player from "../Modules/Player/Player";
+import PianoRoll from "../Modules/PianoRoll/PianoRoll";
+
 import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 import ModuleEffects from "./ModuleEffects";
@@ -283,6 +285,21 @@ function Module(props) {
         />
       );
       break;
+
+    case 4:
+      moduleContent = (
+        <PianoRoll
+          style={{
+            display: modulePage !== null ? "none" : "flex",
+          }}
+          instrument={props.instrument}
+          sessionSize={props.sessionSize}
+          index={props.index}
+          module={props.module}
+          updateModules={props.setModules}
+        />
+      );
+      break;
   }
 
   useEffect(() => {
@@ -336,7 +353,7 @@ function Module(props) {
         style={{
           backgroundColor: colors[props.module.color][700],
           overflow:
-            props.module.type === 2 || (props.module.type === 3 && "hidden"),
+            (props.module.type === 2 || props.module.type === 3) && "hidden",
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
