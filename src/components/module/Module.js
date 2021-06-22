@@ -296,7 +296,9 @@ function Module(props) {
           sessionSize={props.sessionSize}
           index={props.index}
           module={props.module}
-          updateModules={props.setModules}
+          setModules={props.setModules}
+          moduleZoom={moduleZoom}
+          fullScreen={fullScreen}
         />
       );
       break;
@@ -352,8 +354,7 @@ function Module(props) {
       <div
         style={{
           backgroundColor: colors[props.module.color][700],
-          overflow:
-            (props.module.type === 2 || props.module.type === 3) && "hidden",
+          overflow: props.module.type >= 2 && "hidden",
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
@@ -392,11 +393,12 @@ function Module(props) {
             />
           )}
 
-          {props.module.type === 3 && (
-            <IconButton className="module-zoom-button" onClick={handleZoom}>
-              <Icon>search</Icon>
-            </IconButton>
-          )}
+          {props.module.type === 3 ||
+            (props.module.type === 4 && (
+              <IconButton className="module-zoom-button" onClick={handleZoom}>
+                <Icon>search</Icon>
+              </IconButton>
+            ))}
           <IconButton className="module-options-button" onClick={openMenu}>
             <Icon>more_vert</Icon>
           </IconButton>

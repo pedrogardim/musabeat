@@ -87,6 +87,14 @@ function Workspace(props) {
             (module.score[0].duration + module.score[0].time) /
               Tone.Time("1m").toSeconds()
           )
+        : module.type === 4
+        ? Math.ceil(
+            Math.max(
+              ...module.score
+                .sort((a, b) => a.time + a.duration - (b.time + b.duration))
+                .map((e) => e.time + e.duration)
+            )
+          )
         : module.score.length
     );
     let longestModule = Math.max(...lengths);

@@ -1,0 +1,33 @@
+.piano-roll {
+  display: flex;
+  flex-direction: column-reverse;
+  top: 0px;
+  height: calc(100%);
+  width: 100%;
+  position: absolute;
+  overflow-y: overlay;
+}
+
+.piano-roll-row {
+  min-height: 30px;
+  flex: 0 0 30px;
+  height: 30px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.piano-roll-row-label {
+  position: absolute;
+}
+
+.piano-roll-row-tile {
+  flex: 1 1 1px;
+}
+
+.piano-roll-note {
+  /* position: absolute; */
+  min-height: 30px;
+}
