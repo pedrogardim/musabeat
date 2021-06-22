@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Fragment } from "react";
 import * as Tone from "tone";
+import firebase from "firebase";
 
 import {
   IconButton,
@@ -65,9 +66,11 @@ function Module(props) {
   };
 
   const setInstrument = (newInstrument) => {
-    props.setInstruments((prev) =>
-      prev.map((e, i) => (i === props.index ? newInstrument : e))
-    );
+    props.setInstruments((prev) => {
+      let newInstruments = [...prev];
+      newInstruments[props.index] = newInstrument;
+      return newInstruments;
+    });
   };
 
   const setInstrumentLoaded = (loaded) => {
@@ -127,23 +130,47 @@ function Module(props) {
   const onInstrumentMod = (url, name, isRemoving) => {
     //update instrument info in module object
 
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      if (props.module.type === 0) {
-        newModules[props.index].instrument[name] = url;
-      } else if (props.module.type === 3) {
-        newModules[props.index].instrument = { url };
-      } else if (props.instrument.name === "Sampler") {
-        let samplerPrms = props.instrument.get();
-        delete samplerPrms.onerror;
-        delete samplerPrms.onload;
-        samplerPrms.urls = { ...props.instrument.get().urls, [name]: url };
-        newModules[props.index].instrument = samplerPrms;
+    if (props.module.type === 0) {
+      if (typeof props.module.instrument === "string") {
+        firebase
+          .database()
+          .ref(`drumpatches/${props.module.instrument}/urls`)
+          .get()
+          .then((urls) => {
+            let urlsObj = urls.val();
+            !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
+            props.setModules((prev) => {
+              let newModules = [...prev];
+              newModules[props.index].instrument = { urls: urlsObj };
+              return newModules;
+            });
+          });
       } else {
-        newModules[props.index].instrument = props.instrument.get();
+        let urlsObj = { ...props.module.instrument.urls };
+        !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
+        props.setModules((prev) => {
+          let newModules = [...prev];
+          newModules[props.index].instrument = { urls: urlsObj };
+          return newModules;
+        });
       }
-      return newModules;
-    });
+    } else {
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        if (props.module.type === 3) {
+          newModules[props.index].instrument = { url };
+        } else if (props.instrument.name === "Sampler") {
+          let samplerPrms = props.instrument.get();
+          delete samplerPrms.onerror;
+          delete samplerPrms.onload;
+          samplerPrms.urls = { ...props.instrument.get().urls, [name]: url };
+          newModules[props.index].instrument = samplerPrms;
+        } else {
+          newModules[props.index].instrument = props.instrument.get();
+        }
+        return newModules;
+      });
+    }
   };
 
   const handleFileClick = (fileUrl, audiobuffer) => {
@@ -425,6 +452,7 @@ function Module(props) {
                 instrument={props.instrument}
                 onInstrumentMod={onInstrumentMod}
                 setInstruments={props.setInstruments}
+                setInstrument={setInstrument}
                 setInstrumentsLoaded={props.setInstrumentsLoaded}
                 setInstrumentLoaded={setInstrumentLoaded}
                 setModules={props.setModules}

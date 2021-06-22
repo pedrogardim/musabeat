@@ -133,21 +133,7 @@ function InstrumentEditor(props) {
     props.instrument.dispose();
 
     props.setInstrument(newInstrument);
-
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module };
-          newModule.instrument = {};
-          //newModule.instrument = newInstrument.get();
-          //newModule.score = [];
-          //newModule.score = filteredScore;
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+    props.onInstrumentMod("", fileName, true);
   };
 
   const handleSamplerFileDelete = (fileName) => {
@@ -183,7 +169,7 @@ function InstrumentEditor(props) {
 
   if (props.instrument) {
     if (props.module.type === 0) {
-      console.log(props.instrument);
+      //console.log(props.instrument);
       let bufferObjects = [];
       props.instrument._buffers._buffers.forEach((e, i, a) =>
         bufferObjects.push([e, i])

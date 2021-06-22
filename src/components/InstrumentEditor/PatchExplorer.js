@@ -147,14 +147,14 @@ function PatchExplorer(props) {
           base: props.instrument._dummyVoice.name.replace("Synth", ""),
           name: !!name ? name : "Untitled Patch",
           creator: user.uid,
-          categ: !!category ? category : 0,
+          categ: !!category || isNaN(category) ? category : 0,
           options: props.instrument.get(),
           volume: props.module.volume,
         }
       : {
           name: !!name ? name : "Untitled Drum Patch",
           creator: user.uid,
-          categ: !!category ? category : 0,
+          categ: !!category || isNaN(category) ? category : 0,
           urls: props.module.instrument.urls,
           volume: props.module.volume,
         };
