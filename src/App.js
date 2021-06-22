@@ -51,10 +51,10 @@ function App() {
 
   const history = useHistory();
 
-  const handlePageNav = (route) => history.push(`/${route}`);
+  const handlePageNav = (route, additional) => history.push(`/${route}`);
 
   const handleCreateNewSession = (session) => {
-    createNewSession(session, setCurrentPage, setOpenedSession);
+    createNewSession(session, handlePageNav, setOpenedSession);
   };
 
   const handleAvatarClick = (e) => {
@@ -92,7 +92,6 @@ function App() {
   useEffect(() => {
     console.log(user);
     setCurrentPage(null);
-    setOpenedSession(null);
     updateAppTitle();
   }, [user]);
 
@@ -162,8 +161,8 @@ function App() {
 
         <SideMenu
           open={sideMenu}
-          handlePageNav={handlePageNav}
           setOpenedSession={setOpenedSession}
+          handlePageNav={handlePageNav}
           setSideMenu={setSideMenu}
           createNewSession={handleCreateNewSession}
         />
@@ -176,7 +175,6 @@ function App() {
             <SessionExplorer
               setCurrentPage={setCurrentPage}
               createNewSession={handleCreateNewSession}
-              setOpenedSession={setOpenedSession}
               history={history}
               user={user}
             />
@@ -186,7 +184,6 @@ function App() {
               isUser
               setCurrentPage={setCurrentPage}
               createNewSession={handleCreateNewSession}
-              setOpenedSession={setOpenedSession}
               history={history}
               user={user}
             />
@@ -196,7 +193,6 @@ function App() {
           </Route>
           <Route exact path="/session/:key">
             <Workspace
-              className="workspace"
               setAppTitle={setAppTitle}
               session={openedSession}
               user={user}
@@ -204,17 +200,6 @@ function App() {
               createNewSession={handleCreateNewSession}
             />
           </Route>
-
-          {openedSession !== null && currentPage === null && (
-            <Workspace
-              className="workspace"
-              setAppTitle={setAppTitle}
-              session={openedSession}
-              user={user}
-              setSessionEditMode={setSessionEditMode}
-              createNewSession={handleCreateNewSession}
-            />
-          )}
         </Switch>
       </div>
     </Fragment>

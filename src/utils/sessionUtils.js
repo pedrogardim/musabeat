@@ -1,6 +1,6 @@
 import firebase from "firebase";
 
-export const createNewSession = (session, setCurrentPage, setOpenedSession) => {
+export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   let userId = firebase.auth().currentUser
     ? firebase.auth().currentUser.uid
     : null;
@@ -43,13 +43,16 @@ export const createNewSession = (session, setCurrentPage, setOpenedSession) => {
 
   if (!userId) {
     setOpenedSession(newSession);
-    setCurrentPage(null);
+    handlePageNav(`session/newSession`);
     return;
   }
 
   const sessionsRef = firebase.database().ref("sessions");
   const newSessionRef = sessionsRef.push();
-  newSessionRef.set(newSession, setOpenedSession(newSessionRef.key));
+  newSessionRef.set(
+    newSession,
+    handlePageNav(`session/${newSessionRef.key.substring(1)}`)
+  );
 
   const userSessionsRef = firebase
     .database()
@@ -60,8 +63,4 @@ export const createNewSession = (session, setCurrentPage, setOpenedSession) => {
     let prev = snapshot.val() === null ? [] : snapshot.val();
     userSessionsRef.set([...prev, newSessionRef.key]);
   });
-
-  //temp:only show workspace
-
-  setCurrentPage(null);
 };

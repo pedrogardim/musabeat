@@ -110,6 +110,23 @@ function Workspace(props) {
     if (sessionKey === null) {
       console.log("session is null!");
       setModules([]);
+    } else if (sessionKey === "-newSession") {
+      if (props.session === null) {
+        props.createNewSession();
+        return;
+      }
+      setModules(props.session.modules);
+      Tone.Transport.bpm.value = props.session.bpm;
+      if (
+        (!props.hidden &&
+          props.user &&
+          props.session.editors.includes(props.user.uid)) ||
+        !props.session.creator
+      ) {
+        setEditMode(true);
+        props.setAppTitle(props.session.name);
+      }
+      loadSessionInstruments(props.session.modules);
     } else if (typeof sessionKey === "string") {
       let sessionRef =
         sessionKey !== null &&
@@ -516,6 +533,7 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
+    console.log("editMode", editMode);
     !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
 

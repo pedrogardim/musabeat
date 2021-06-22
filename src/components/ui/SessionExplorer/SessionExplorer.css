@@ -1,6 +1,7 @@
 .session-explorer {
   position: absolute;
-  height: calc(100% - 160px);
+  /* height: calc(100% - 160px); */
+  min-height: 100%;
   width: calc(100% - 200px);
   left: 0;
   top: 0;
