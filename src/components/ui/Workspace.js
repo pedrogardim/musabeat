@@ -110,7 +110,20 @@ function Workspace(props) {
   const loadSession = () => {
     //TODO: optimize this, avoid call from server for each session load
     console.log("loading session: ", sessionKey);
-    if (sessionKey === null) {
+    if (props.hidden) {
+      setModules(props.session.modules);
+      Tone.Transport.bpm.value = props.session.bpm;
+      if (
+        (!props.hidden &&
+          props.user &&
+          props.session.editors.includes(props.user.uid)) ||
+        !props.session.creator
+      ) {
+        setEditMode(true);
+        setSessionTitle(props.session.name);
+      }
+      loadSessionInstruments(props.session.modules);
+    } else if (sessionKey === null) {
       console.log("session is null!");
       setModules([]);
     } else if (sessionKey === "-newSession") {
