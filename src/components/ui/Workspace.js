@@ -54,6 +54,8 @@ function Workspace(props) {
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
 
+  const [sessionTitle, setSessionTitle] = useState(false);
+
   const sessionKey = "-" + useParams().key;
 
   //to avoid running startup scripts for each new instrument
@@ -125,7 +127,7 @@ function Workspace(props) {
         !props.session.creator
       ) {
         setEditMode(true);
-        props.setAppTitle(props.session.name);
+        setSessionTitle(props.session.name);
       }
       loadSessionInstruments(props.session.modules);
     } else if (typeof sessionKey === "string") {
@@ -151,7 +153,7 @@ function Workspace(props) {
         props.user && editors.includes(props.user.uid) && setEditMode(true);
         let name = sessionData.name;
 
-        props.setAppTitle(name);
+        setSessionTitle(name);
       });
     } else if (typeof sessionKey === "object") {
       setModules(sessionKey.modules);
@@ -163,7 +165,7 @@ function Workspace(props) {
         !sessionKey.creator
       ) {
         setEditMode(true);
-        props.setAppTitle(sessionKey.name);
+        setSessionTitle(sessionKey.name);
       }
       loadSessionInstruments(sessionKey.modules);
     }
@@ -514,7 +516,9 @@ function Workspace(props) {
       modules: modules,
     };
 
-    props.createNewSession(session);
+    props.user &&
+      props.user.uid !== firebase.auth().currentUser.uid &&
+      props.createNewSession(session);
     //!props.session.length && Tone.Transport.start()
   }, [props.user]);
 
@@ -569,6 +573,21 @@ function Workspace(props) {
       onKeyDown={handleKeyDown}
     >
       <SessionProgressBar />
+
+      <div className="app-title">
+        <Typography variant="h4">{sessionTitle}</Typography>
+        {!editMode && (
+          <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
+            <Icon className="app-title-alert">visibility</Icon>
+          </Tooltip>
+        )}
+        {editMode && !props.user && (
+          <Tooltip title="You are not logged in! Changes will not be saved">
+            <Icon className="app-title-alert">no_accounts</Icon>
+          </Tooltip>
+        )}
+      </div>
+
       {modules !== null ? (
         modules.map((module, moduleIndex) => (
           <Fragment>

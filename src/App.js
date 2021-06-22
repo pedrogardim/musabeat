@@ -45,7 +45,6 @@ function App() {
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
-  const [currentPage, setCurrentPage] = useState(null);
   const [openedSession, setOpenedSession] = useState(null);
   const [sessionEditMode, setSessionEditMode] = useState(null);
 
@@ -69,35 +68,14 @@ function App() {
     setUserOption(false);
   };
 
-  const updateAppTitle = () => {
-    setAppTitle(
-      currentPage === "userSessions"
-        ? "My Sessions"
-        : currentPage === "exploreSessions"
-        ? "Explore"
-        : currentPage === "userFiles"
-        ? "My Samples"
-        : currentPage === null && user !== null
-        ? `Welcome ${user.displayName.split(" ")[0]} ${
-            user.displayName.split(" ")[1]
-          }!`
-        : "Welcome!"
-    );
-  };
-
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
   }, []);
 
   useEffect(() => {
     console.log(user);
-    updateAppTitle();
+    //updateAppTitle();
   }, [user]);
-
-  useEffect(() => {
-    console.log(currentPage);
-    updateAppTitle();
-  }, [currentPage]);
 
   return (
     <Fragment>
@@ -126,19 +104,6 @@ function App() {
             setUser={setUser}
           />
         )}
-        <div className="app-title">
-          <Typography variant="h4">{appTitle}</Typography>
-          {!sessionEditMode && !!openedSession && (
-            <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
-              <Icon className="app-title-alert">visibility</Icon>
-            </Tooltip>
-          )}
-          {sessionEditMode && !user && !!openedSession && (
-            <Tooltip title="You are not logged in! Changes will not be saved">
-              <Icon className="app-title-alert">no_accounts</Icon>
-            </Tooltip>
-          )}
-        </div>
 
         <Menu
           style={{ marginTop: 48 }}
@@ -172,7 +137,6 @@ function App() {
           </Route>
           <Route exact path="/explore">
             <SessionExplorer
-              setCurrentPage={setCurrentPage}
               createNewSession={handleCreateNewSession}
               history={history}
               user={user}
@@ -181,14 +145,13 @@ function App() {
           <Route exact path="/sessions">
             <SessionExplorer
               isUser
-              setCurrentPage={setCurrentPage}
               createNewSession={handleCreateNewSession}
               history={history}
               user={user}
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer setCurrentPage={setCurrentPage} />
+            <FileExplorer />
           </Route>
           <Route exact path="/session/:key">
             <Workspace

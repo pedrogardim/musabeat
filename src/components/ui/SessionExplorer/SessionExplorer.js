@@ -43,7 +43,7 @@ function SessionExplorer(props) {
       : //? firebase.database().ref("users").child(props.user.uid).child("sessions")
         firebase.database().ref("sessions");
     const sessionKeys = (await dbRef.get()).val();
-    console.log(sessionKeys);
+    //console.log(sessionKeys);
     //setSessionKeys(sessionKeys)
     setSessionKeys(Object.keys(sessionKeys));
     setSessions(Object.values(sessionKeys));
