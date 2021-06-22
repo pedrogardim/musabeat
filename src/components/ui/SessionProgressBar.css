@@ -1,0 +1,7 @@
+.session-progress-bar {
+  position: fixed;
+  background-color: #f50057;
+  top: 64px;
+  height: 8px;
+  left: 0;
+}

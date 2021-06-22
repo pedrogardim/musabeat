@@ -26,6 +26,7 @@ import PlaceholderModule from "../Module/PlaceholderModule";
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
 import Mixer from "./mixer/Mixer";
+import SessionProgressBar from "./SessionProgressBar";
 
 import {
   patchLoader,
@@ -567,6 +568,7 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
+      <SessionProgressBar />
       {modules !== null ? (
         modules.map((module, moduleIndex) => (
           <Fragment>
