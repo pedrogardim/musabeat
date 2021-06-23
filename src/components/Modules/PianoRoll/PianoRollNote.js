@@ -66,7 +66,7 @@ function PianoRollNote(props) {
 
     let noteY = 31 * (83 - (Tone.Frequency(props.note.note).toMidi() - 24));
 
-    setNotePosition({ x: noteX, y: noteX });
+    setNotePosition({ x: noteX, y: noteY });
     //console.log(noteY, noteX, noteHeight, noteWidth);
   };
 
@@ -76,9 +76,9 @@ function PianoRollNote(props) {
     }
   }, [props.parentRef.current, props.fullScreen, props.moduleZoom]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     console.log(notePosition);
-  }, [notePosition]);
+  }, [notePosition]); */
 
   return (
     <Rnd

@@ -48,10 +48,7 @@ function PianoRoll(props) {
     ];
 
     let delta = [
-      83 -
-        Math.floor(
-          (clickedPos[0] - modulePos[0] + PRWrapper.current.offsetHeight) / 31
-        ),
+      83 - Math.floor((clickedPos[0] - modulePos[0]) / 31),
       (clickedPos[1] - modulePos[1]) /
         (PRWrapper.current.offsetWidth / (props.sessionSize * 8)),
     ];
