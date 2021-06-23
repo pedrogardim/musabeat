@@ -2,10 +2,9 @@
   display: flex;
   flex-direction: column-reverse;
   top: 0px;
-  height: calc(100%);
-  width: 100%;
+
   position: absolute;
-  overflow-y: overlay;
+  overflow: hidden;
 }
 
 .piano-roll-row {
@@ -25,6 +24,11 @@
 
 .piano-roll-row-tile {
   flex: 1 1 1px;
+}
+
+.piano-roll-note {
+  /* position: absolute; */
+  min-height: 30px;
 }
 
 .piano-roll-note {

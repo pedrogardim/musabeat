@@ -50,12 +50,7 @@ function PianoRoll(props) {
     let delta = [
       83 -
         Math.floor(
-          (clickedPos[0] -
-            modulePos[0] +
-            (PRWrapper.current.scrollTop +
-              PRWrapper.current.scrollHeight -
-              PRWrapper.current.offsetHeight)) /
-            31
+          (clickedPos[0] - modulePos[0] + PRWrapper.current.offsetHeight) / 31
         ),
       (clickedPos[1] - modulePos[1]) /
         (PRWrapper.current.offsetWidth / (props.sessionSize * 8)),
@@ -114,7 +109,9 @@ function PianoRoll(props) {
   const changeNote = (note, index) => {
     setNotes((prev) => {
       let newNotes = [...prev];
-      newNotes[index] = { ...newNotes, note };
+      newNotes[index] = Object.assign({}, prev[index], note);
+      console.log(newNotes[index]);
+
       return newNotes;
     });
   };
@@ -139,7 +136,7 @@ function PianoRoll(props) {
         (props.style,
         {
           backgroundColor: colors[props.module.color]["900"],
-          overflowX: "overlay",
+          overflow: "scroll",
         })
       }
     >
@@ -189,6 +186,7 @@ function PianoRoll(props) {
         {(props.fullScreen || props.moduleZoom) &&
           notes.map((e, i) => (
             <PianoRollNote
+              index={i}
               key={"prn" + i}
               parentRef={PRWrapper}
               color={colors[props.module.color]}
@@ -197,16 +195,19 @@ function PianoRoll(props) {
               changeNote={changeNote}
             />
           ))}
+        <Draggable
+          axis="x"
+          onDrag={handleCursorDrag}
+          onStart={handleCursorDragStart}
+          onStop={handleCursorDragStop}
+          position={{ x: cursorPosition, y: 0 }}
+        >
+          <div
+            className="sampler-cursor"
+            style={{ backgroundColor: "white" }}
+          />
+        </Draggable>
       </div>
-      <Draggable
-        axis="x"
-        onDrag={handleCursorDrag}
-        onStart={handleCursorDragStart}
-        onStop={handleCursorDragStop}
-        position={{ x: cursorPosition, y: 0 }}
-      >
-        <div className="sampler-cursor" style={{ backgroundColor: "white" }} />
-      </Draggable>
     </div>
   );
 }

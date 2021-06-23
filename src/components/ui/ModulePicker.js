@@ -33,7 +33,7 @@ const moduletypes = [
     name: "Chord Progression",
     description:
       "Create chord progressions, or generate random ones based on scales",
-    icon: "piano",
+    icon: "font_download",
   },
   {
     name: "Player",
@@ -44,7 +44,7 @@ const moduletypes = [
   {
     name: "Piano Roll",
     description: "Classic DAW form of making music!",
-    icon: "graphic_eq",
+    icon: "piano",
   },
 ];
 
