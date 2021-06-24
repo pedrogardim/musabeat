@@ -3,20 +3,17 @@ import React, { useState, useEffect, useRef } from "react";
 import PianoRollNote from "./PianoRollNote";
 import * as Tone from "tone";
 
-import { labels } from "../../../assets/drumkits";
-
-import {
-  scheduleDrumSequence,
-  clearEvents,
-} from "../../../utils/TransportSchedule";
-import { loadDrumPatch } from "../../../assets/musicutils";
-
 import {
   CircularProgress,
   BottomNavigation,
   BottomNavigationAction,
   Typography,
 } from "@material-ui/core";
+
+import {
+  schedulePianoRoll,
+  clearEvents,
+} from "../../../utils/TransportSchedule";
 
 import Draggable from "react-draggable";
 
@@ -28,14 +25,20 @@ function PianoRoll(props) {
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
-
   const [notes, setNotes] = useState([]);
-  const [currentBeat, setCurrentBeat] = useState(0);
-  const [currentMeasure, setCurrentMeasure] = useState(0);
-  const [hovered, setHovered] = useState(false);
-  const [soundsMap, setSoundsMap] = useState([]);
 
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
+
+  const scheduleEvents = () => {
+    !props.module.muted && !!props.instrument
+      ? schedulePianoRoll(
+          notes,
+          props.instrument,
+          Tone.Transport,
+          props.module.id
+        )
+      : clearEvents(props.module.id);
+  };
 
   const handleDblClick = (event) => {
     let clickedPos = [
@@ -50,17 +53,17 @@ function PianoRoll(props) {
     let delta = [
       83 - Math.floor((clickedPos[0] - modulePos[0]) / 31),
       (clickedPos[1] - modulePos[1]) /
-        (PRWrapper.current.offsetWidth / (props.sessionSize * 8)),
+        (PRWrapper.current.offsetWidth / (props.module.size * 8)),
     ];
 
     let newNote = {
       note: Tone.Frequency(delta[0] + 24, "midi").toNote(),
-      time: (Tone.Time("1m").toSeconds() * delta[1]) / (props.sessionSize * 8),
+      time: (Tone.Time("1m").toSeconds() * delta[1]) / (props.module.size * 8),
       duration: "8n",
       velocity: 0.7,
     };
 
-    console.log(newNote);
+    //console.log(newNote);
 
     setNotes((prev) => {
       let newNotes = [...prev];
@@ -107,8 +110,7 @@ function PianoRoll(props) {
     setNotes((prev) => {
       let newNotes = [...prev];
       newNotes[index] = Object.assign({}, prev[index], note);
-      console.log(newNotes[index]);
-
+      //console.log(newNotes[index]);
       return newNotes;
     });
   };
@@ -119,6 +121,7 @@ function PianoRoll(props) {
   }, [Tone.Transport.state]);
 
   useEffect(() => {
+    scheduleEvents();
     props.setModules((previousModules) => {
       let newModules = [...previousModules];
       newModules[props.index].score = notes;
@@ -132,7 +135,7 @@ function PianoRoll(props) {
       style={
         (props.style,
         {
-          backgroundColor: colors[props.module.color]["900"],
+          backgroundColor: colors[props.module.color][900],
           overflow: "scroll",
         })
       }
@@ -152,6 +155,10 @@ function PianoRoll(props) {
               className="piano-roll-row"
               style={{
                 borderBottom: `solid 1px ${colors[props.module.color][800]}`,
+                backgroundColor:
+                  Tone.Frequency(i + 24, "midi")
+                    .toNote()
+                    .includes("#") && "rgba(0,0,0,0.1)",
               }}
             >
               <span
@@ -160,7 +167,7 @@ function PianoRoll(props) {
               >
                 {Tone.Frequency(i + 24, "midi").toNote()}
               </span>
-              {Array(props.sessionSize * 8)
+              {Array(props.module.size * 8)
                 .fill(0)
                 .map((ee, ii) => (
                   <div
@@ -189,7 +196,9 @@ function PianoRoll(props) {
               color={colors[props.module.color]}
               note={notes[i]}
               moduleZoom={props.moduleZoom}
+              fullScreen={props.fullScreen}
               changeNote={changeNote}
+              size={props.module.size}
             />
           ))}
         <Draggable

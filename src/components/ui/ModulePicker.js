@@ -101,6 +101,10 @@ function ModulePicker(props) {
       newModule.range = selectedRange;
     }
 
+    if (selectedType === 4) {
+      newModule.size = 1;
+    }
+
     let newModules;
 
     props.setModules((prevModules) => {

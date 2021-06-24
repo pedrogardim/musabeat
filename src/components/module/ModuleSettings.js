@@ -73,13 +73,17 @@ function ModuleSettings(props) {
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
-          let oldLength = module.score.length;
-          let newScore = [];
-          for (let x = 0; x < newLength; x++) {
-            newScore[x] = module.score[x % oldLength];
-          }
+          if (props.module.type === 4) {
+            newModule.size = newLength;
+          } else {
+            let oldLength = module.score.length;
+            let newScore = [];
+            for (let x = 0; x < newLength; x++) {
+              newScore[x] = module.score[x % oldLength];
+            }
 
-          newModule.score = newScore;
+            newModule.score = newScore;
+          }
 
           return newModule;
         } else {
@@ -311,6 +315,25 @@ function ModuleSettings(props) {
         </FormControl>,
       ];
 
+      break;
+    case 4:
+      mainContent = (
+        <FormControl>
+          <InputLabel id="length-select-label">Length (In measures)</InputLabel>
+          <Select
+            native
+            labelId="length-select-label"
+            value={props.module.size}
+            onChange={handleLengthSelect}
+          >
+            {lengthValues.map((value, index) => (
+              <option key={index} value={value}>
+                {value}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+      );
       break;
   }
 
