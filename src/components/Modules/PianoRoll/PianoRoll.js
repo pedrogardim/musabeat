@@ -35,7 +35,10 @@ function PianoRoll(props) {
           notes,
           props.instrument,
           Tone.Transport,
-          props.module.id
+          props.module.id,
+          props.module.size,
+          props.sessionSize
+          
         )
       : clearEvents(props.module.id);
   };

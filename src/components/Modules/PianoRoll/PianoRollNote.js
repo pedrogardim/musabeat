@@ -38,7 +38,7 @@ function PianoRollNote(props) {
     justifyContent: "center",
     border: `solid 1px ${props.color[100]}`,
     background: props.color[500],
-    color: props.color[800],
+    color: props.color[100],
   };
 
   const handleDrag = (event, data) => {

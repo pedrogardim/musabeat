@@ -188,18 +188,29 @@ export const scheduleSamples = (
   scheduledEvents[moduleId] = scheduledSounds;
 };
 
-export const schedulePianoRoll = (score, instrument, transport, moduleId) => {
+export const schedulePianoRoll = (
+  score,
+  instrument,
+  transport,
+  moduleId,
+  moduleSize,
+  sessionSize
+) => {
   console.log("PR Scheduled");
   moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledNotes = [];
 
-  score.map((e, i) => {
-    let event = transport.schedule((time) => {
-      instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
-    }, e.time);
-    scheduledNotes.push(event);
-  });
+  let loopTimes = parseInt(sessionSize) / moduleSize;
+
+  for (let x = 0; x < loopTimes; x++) {
+    score.map((e, i) => {
+      let event = transport.schedule((time) => {
+        instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
+      }, e.time + Tone.Time("1m").toSeconds() * moduleSize * x);
+      scheduledNotes.push(event);
+    });
+  }
 
   scheduledEvents[moduleId] = scheduledNotes;
 };
