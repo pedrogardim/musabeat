@@ -77,12 +77,13 @@ function App() {
             <Icon>menu</Icon>
           </IconButton>
           <img className="app-logo" style={{ height: 30 }} src={logo} />
-          <Avatar
-            onClick={handleAvatarClick}
-            className="main-avatar"
-            alt={user && user.displayName}
-            src={user && user.photoURL}
-          />
+          <IconButton className="main-avatar">
+            <Avatar
+              onClick={handleAvatarClick}
+              alt={user && user.displayName}
+              src={user && user.photoURL}
+            />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <div className="app-wrapper">

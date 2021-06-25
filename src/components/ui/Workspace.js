@@ -12,6 +12,7 @@ import {
   Typography,
   Tooltip,
   Snackbar,
+  Avatar,
 } from "@material-ui/core";
 
 import { instruments } from "../../assets/instrumentpatches";
@@ -22,6 +23,8 @@ import "./Workspace.css";
 
 import Module from "../Module/Module";
 import PlaceholderModule from "../Module/PlaceholderModule";
+
+import WorkspaceTitle from "./WorkspaceTitle";
 
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
@@ -38,6 +41,7 @@ import {
 
 import { clearEvents } from "../../utils/TransportSchedule";
 import { createNewSession } from "../../utils/sessionUtils";
+import { getDefaultNormalizer } from "@testing-library/react";
 
 Tone.Transport.loop = true;
 Tone.Transport.loopStart = 0;
@@ -562,7 +566,9 @@ function Workspace(props) {
   }, [modules]);
 
   useEffect(() => {
-    !props.hidden && saveToDatabase(sessionData);
+    if (sessionData) {
+      !props.hidden && saveToDatabase(sessionData);
+    }
   }, [sessionData]);
 
   useEffect(() => {
@@ -605,19 +611,11 @@ function Workspace(props) {
     >
       <SessionProgressBar />
 
-      <div className="app-title">
-        <Typography variant="h4">{sessionData && sessionData.name}</Typography>
-        {!editMode && (
-          <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
-            <Icon className="app-title-alert">visibility</Icon>
-          </Tooltip>
-        )}
-        {editMode && !props.user && (
-          <Tooltip title="You are not logged in! Changes will not be saved">
-            <Icon className="app-title-alert">no_accounts</Icon>
-          </Tooltip>
-        )}
-      </div>
+      <WorkspaceTitle
+        sessionData={sessionData}
+        editMode={editMode}
+        user={props.user}
+      />
 
       {modules !== null ? (
         modules.map((module, moduleIndex) => (
@@ -762,7 +760,7 @@ function Workspace(props) {
 
 export default Workspace;
 
-const compareObjectsArray = (arr1, arr2) => {
+/* const compareObjectsArray = (arr1, arr2) => {
   if (!arr1 || !arr2) return false;
 
   const parseArr = (parsingArray) =>
@@ -786,3 +784,4 @@ const compareObjectsArray = (arr1, arr2) => {
 
   return parseArr(arr1) === parseArr(arr2);
 };
+ */

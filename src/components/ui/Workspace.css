@@ -9,9 +9,9 @@
   flex-wrap: wrap;
 
   align-items: center;
-  align-content: center;
+  align-content: flex-start;
   justify-content: center;
-  padding: 80px 0 80px 0;
+  padding: 128px 0 96px 0;
 }
 
 .ws-fab-cont {

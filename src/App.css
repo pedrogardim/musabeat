@@ -35,6 +35,9 @@ body *::-webkit-scrollbar-thumb {
   top: 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .app-title-alert {
@@ -61,8 +64,8 @@ body *::-webkit-scrollbar-thumb {
 }
 
 .main-avatar {
-  height: 24px;
-  width: 24px;
+  height: 40px;
+  width: 40px;
   position: absolute !important;
   right: 32px !important;
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
