@@ -196,7 +196,7 @@ export const schedulePianoRoll = (
   moduleSize,
   sessionSize
 ) => {
-  console.log("PR Scheduled");
+  //console.log("PR Scheduled");
   moduleId !== undefined && clearEvents(moduleId);
 
   let scheduledNotes = [];

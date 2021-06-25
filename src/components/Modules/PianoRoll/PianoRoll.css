@@ -8,9 +8,7 @@
 }
 
 .piano-roll-row {
-  min-height: 30px;
-  flex: 0 0 30px;
-  height: 30px;
+  flex: 0 0 1px;
   width: 100%;
   position: relative;
   display: flex;

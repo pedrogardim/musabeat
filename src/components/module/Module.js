@@ -404,13 +404,17 @@ function Module(props) {
           {(props.module.type === 3 || props.module.type === 4) && (
             <IconButton
               className="module-zoom-button"
-              tabIndex="-1"
+              tabIndex={-1}
               onClick={handleZoom}
             >
               <Icon>search</Icon>
             </IconButton>
           )}
-          <IconButton className="module-options-button" onClick={openMenu}>
+          <IconButton
+            tabIndex={-1}
+            className="module-options-button"
+            onClick={openMenu}
+          >
             <Icon>more_vert</Icon>
           </IconButton>
           <Menu
@@ -418,10 +422,12 @@ function Module(props) {
             keepMounted
             open={Boolean(menuAnchorEl)}
             onClose={closeMenu}
+            tabIndex={-1}
           >
             <MenuItem
               className=""
               onClick={() => setFullScreen((prev) => !prev)}
+              tabIndex={-1}
             >
               <Icon>fullscreen</Icon>
               Fullscreen
@@ -439,6 +445,7 @@ function Module(props) {
               <MenuItem
                 onClick={handleFileExplorerButton}
                 className="module-menu-option"
+                tabIndex={-1}
               >
                 <Icon>graphic_eq</Icon>
                 Load audio file
@@ -447,6 +454,7 @@ function Module(props) {
               <MenuItem
                 onClick={handleInstrumentButtonMode}
                 className="module-menu-option"
+                tabIndex={-1}
               >
                 <Icon>piano</Icon>
                 Instrument
@@ -456,6 +464,7 @@ function Module(props) {
             <MenuItem
               onClick={handleSettingsButtonMode}
               className="module-menu-option"
+              tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">settings</Icon>
               Settings
@@ -463,11 +472,16 @@ function Module(props) {
             <MenuItem
               onClick={handleEffectButtonMode}
               className="module-menu-option"
+              tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">blur_on</Icon>
               Effects
             </MenuItem>
-            <MenuItem className="module-menu-option" onClick={removeModule}>
+            <MenuItem
+              className="module-menu-option"
+              onClick={removeModule}
+              tabIndex={-1}
+            >
               <Icon>delete</Icon>
               Remove
             </MenuItem>

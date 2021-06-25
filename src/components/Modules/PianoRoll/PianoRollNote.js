@@ -2,27 +2,10 @@ import React, { useState, useEffect } from "react";
 
 import * as Tone from "tone";
 
-import { labels } from "../../../assets/drumkits";
-
 //import Draggable from "react-draggable";
 import { Rnd } from "react-rnd";
 
-import {
-  scheduleDrumSequence,
-  clearEvents,
-} from "../../../utils/TransportSchedule";
-import { loadDrumPatch } from "../../../assets/musicutils";
-
-import {
-  CircularProgress,
-  BottomNavigation,
-  BottomNavigationAction,
-  Typography,
-} from "@material-ui/core";
-
 import "./PianoRoll.css";
-import { colors } from "../../../utils/materialPalette";
-import { Time } from "tone";
 
 function PianoRollNote(props) {
   const [notePosition, setNotePosition] = useState({ x: 0, y: 0 });
@@ -30,7 +13,9 @@ function PianoRollNote(props) {
 
   //const [noteSize, setNoteSize] = useState({ width: 0, height: 30 });
 
-  let noteHeight = 31;
+  let noteHeight = props.parentRef.current
+    ? props.parentRef.current.offsetHeight / 84
+    : 16;
 
   const style = {
     display: "flex",
@@ -39,6 +24,7 @@ function PianoRollNote(props) {
     border: `solid 1px ${props.color[100]}`,
     background: props.color[500],
     color: props.color[100],
+    borderRadius: 3,
   };
 
   const handleDrag = (event, data) => {
@@ -50,7 +36,7 @@ function PianoRollNote(props) {
     let newTime =
       (data.x * Tone.Time("1m").toSeconds() * props.size) /
       props.parentRef.current.offsetWidth;
-    let newNote = Tone.Frequency(-data.y / 31 + 107, "midi").toNote();
+    let newNote = Tone.Frequency(-data.y / noteHeight + 107, "midi").toNote();
     //console.log(newNote, newTime);
     let noteObj = { note: newNote, time: newTime };
     props.changeNote(noteObj, props.index);
@@ -70,18 +56,18 @@ function PianoRollNote(props) {
   };
 
   const updateNotePosition = () => {
-    console.log("updateNotePosition triggered");
+    noteHeight = props.parentRef.current.offsetHeight / 84;
     let noteX =
       (props.note.time / (Tone.Time("1m").toSeconds() * props.size)) *
       props.parentRef.current.offsetWidth;
-    noteHeight = 30;
     setNoteWidth(
       (Tone.Time(props.note.duration).toSeconds() /
         (Tone.Time("1m").toSeconds() * props.size)) *
         props.parentRef.current.offsetWidth
     );
 
-    let noteY = 31 * (83 - (Tone.Frequency(props.note.note).toMidi() - 24));
+    let noteY =
+      noteHeight * (83 - (Tone.Frequency(props.note.note).toMidi() - 24));
 
     setNotePosition({ x: noteX, y: noteY });
     //console.log(noteY, noteX, noteHeight, noteWidth);
@@ -91,7 +77,14 @@ function PianoRollNote(props) {
     if (props.parentRef.current) {
       updateNotePosition();
     }
-  }, [props.parentRef.current, props.fullScreen, props.moduleZoom, props.size]);
+  }, [
+    props.parentRef.current,
+    props.fullScreen,
+    props.moduleZoom,
+    props.size,
+    props.parentRef.current.offsetHeight,
+    props.parentRef.current.offsetWidth,
+  ]);
 
   /*  useEffect(() => {
     console.log(notePosition);
@@ -115,14 +108,14 @@ function PianoRollNote(props) {
       onResize={handleResize}
       onResizeStop={handleResizeStop}
       position={notePosition}
-      size={{ height: 30, width: noteWidth }}
+      size={{ height: noteHeight, width: noteWidth }}
       bounds={".piano-roll"}
-      dragGrid={[1, 31]}
+      dragGrid={[1, noteHeight]}
       default={{
         x: notePosition.x,
         y: notePosition.y,
         width: 60,
-        height: 30,
+        height: noteHeight,
       }}
     >
       {props.note.note}

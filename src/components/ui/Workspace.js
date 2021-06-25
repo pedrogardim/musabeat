@@ -180,7 +180,7 @@ function Workspace(props) {
         Tone.Transport.bpm.value = sessionData.bpm;
 
         let editors = sessionData.editors;
-        console.log(editors);
+        //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
         let name = sessionData.name;
       });
@@ -594,7 +594,7 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
-    console.log("editMode", editMode);
+    //console.log("editMode", editMode);
     !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
 
