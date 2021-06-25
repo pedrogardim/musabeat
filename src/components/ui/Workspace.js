@@ -79,6 +79,7 @@ function Workspace(props) {
   };
 
   const adaptSessionSize = () => {
+    //console.log("checked");
     if (modules === null) return;
     let lengths = modules.map((module) =>
       module.type === 2
@@ -88,7 +89,9 @@ function Workspace(props) {
           )
         : module.type === 3
         ? Math.ceil(
-            (module.score[0].duration + module.score[0].time) /
+            (module.score[0].duration +
+              module.score[0].time +
+              Tone.Time("1m").toSeconds() * 0.5) /
               Tone.Time("1m").toSeconds()
           )
         : module.type === 4

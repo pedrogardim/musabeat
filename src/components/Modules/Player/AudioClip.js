@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import * as Tone from "tone";
 
 import { Resizable, ResizableBox } from "react-resizable";
-import Draggable from "react-draggable";
+//import Draggable from "react-draggable";
+import { Rnd } from "react-rnd";
 
 import "./AudioClip.css";
 
@@ -44,6 +45,27 @@ function AudioClip(props) {
     });
   };
 
+  const handleResize = () => {};
+
+  const handleResizeStop = (e, handle, target, delta) => {
+    if (handle === "right") {
+      let newDuration =
+        (target.offsetWidth * props.sessionSize * Tone.Time("1m").toSeconds()) /
+        props.parentRef.current.offsetWidth;
+
+      let maxDuration = props.instrument.buffer.duration;
+
+      if (newDuration <= maxDuration) {
+        setClipWidth(target.offsetWidth);
+        props.setScore((prev) => {
+          let newScore = [...prev];
+          newScore[props.index].duration = newDuration;
+          return newScore;
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     //watch to window resize to update clips position
 
@@ -66,10 +88,13 @@ function AudioClip(props) {
     //console.log(clipWidth, clipHeight);
     props.loaded &&
       drawClipWave(
-        props.instrument.buffer.toArray(0),
+        props.instrument.buffer,
         clipHeight,
         clipWidth,
+        props.score.duration,
+        props.score.offset,
         props.color,
+        props.parentRef.current.offsetWidth,
         props.index
       );
   }, [
@@ -81,49 +106,61 @@ function AudioClip(props) {
   ]);
 
   return (
-    <Draggable
-      axis="x"
+    <Rnd
+      dragAxis="x"
+      enableResizing={{
+        top: false,
+        right: true,
+        bottom: false,
+        left: true,
+        topRight: false,
+        bottomRight: false,
+        bottomLeft: false,
+        topLeft: false,
+      }}
+      className="sampler-audio-clip"
+      id={"clip" + props.index}
+      style={{
+        width: clipWidth + "px",
+        backgroundColor: props.color[700],
+        border: "solid 2px " + props.color[400],
+      }}
       onDrag={handleDrag}
-      onStart={handleDragStart}
-      onStop={handleDragStop}
+      onDragStop={handleDragStop}
+      onDragStart={handleDragStart}
+      onResize={handleResize}
+      onResizeStop={handleResizeStop}
       position={{ x: clipPosition, y: 0 }}
+      size={{ height: "100%", width: clipWidth }}
+      bounds={".sampler"}
+      default={{
+        x: clipPosition,
+        y: 0,
+        width: clipWidth,
+        height: clipHeight,
+      }}
     >
-      {/*TODO:*/}
-      {/*<Resizable
-        resizeHandles={["e"]}
+      <canvas
+        className="sampler-audio-clip-wave"
+        id={`canvas-${props.index}`}
         height={clipHeight}
         width={clipWidth}
-        onResize={handleResize}
-      >*/}
-      <div
-        className="sampler-audio-clip"
-        id={"clip" + props.index}
-        style={{
-          width: clipWidth + "px",
-          backgroundColor: props.color[700],
-          border: "solid 2px " + props.color[400],
-        }}
-      >
-        <canvas
-          className="sampler-audio-clip-wave"
-          id={`canvas-${props.index}`}
-          height={clipHeight}
-          width={clipWidth}
-          style={{ height: clipHeight, width: clipWidth }}
-        />
-        {/*<svg
-          className="sampler-audio-clip-wave"
-          preserveAspectRatio="xMinYMin slice"
-        >
-          {waveForm}
-        </svg>*/}
-      </div>
-      {/*</Resizable>*/}
-    </Draggable>
+        style={{ height: clipHeight, width: clipWidth }}
+      />
+    </Rnd>
   );
 }
 
-const drawClipWave = (buffer, clipHeight, clipWidth, color, index) => {
+const drawClipWave = (
+  buffer,
+  clipHeight,
+  clipWidth,
+  duration,
+  offset,
+  color,
+  parentWidth,
+  index
+) => {
   if (clipHeight === 0 || clipWidth === 0) return;
 
   const canvas = document.getElementById(`canvas-${index}`);
@@ -131,12 +168,16 @@ const drawClipWave = (buffer, clipHeight, clipWidth, color, index) => {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  let waveArray = buffer;
-  let scale = waveArray.length / clipWidth;
+  let rightOffset =
+    ((duration - buffer.duration) * parentWidth) /
+    Tone.Time(Tone.Transport.loopEnd).toSeconds();
+
+  let waveArray = buffer.toArray(0);
+  let scale = waveArray.length / (clipWidth - rightOffset);
 
   ctx.fillStyle = color[100];
 
-  for (let x = 0; x < clipWidth / 2; x++) {
+  for (let x = 0; x < (clipWidth - rightOffset) / 2; x++) {
     let rectHeight = Math.abs(
       Math.floor(waveArray[Math.floor(x * 2 * scale)] * clipHeight)
     );
