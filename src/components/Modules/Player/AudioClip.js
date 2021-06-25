@@ -51,9 +51,15 @@ function AudioClip(props) {
   }, []);
 
   useEffect(() => {
-    //watch to window resize to update clips position
     updateClipPosition();
-  }, [props.sessionSize, props.score, props.instrument, props.moduleZoom]);
+  }, [
+    props.sessionSize,
+    props.score,
+    props.instrument,
+    props.instrument.loaded,
+    props.moduleZoom,
+    props.fullScreen,
+  ]);
 
   useEffect(() => {
     //watch to window resize to update clips position

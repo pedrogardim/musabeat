@@ -28,10 +28,9 @@ function Player(props) {
   const loadPlayer = (audiobuffer) => {
     props.instrument.dispose();
 
-    let newInstrument = new Tone.GrainPlayer(
-      audiobuffer,
-      props.setInstrumentLoaded(true)
-    ).toDestination();
+    let newInstrument = new Tone.GrainPlayer(audiobuffer).toDestination();
+
+    props.updateOnAudioFileLoaded();
 
     props.setInstrument(newInstrument);
   };
@@ -113,13 +112,13 @@ function Player(props) {
       props.setInstrumentLoaded(true);
       return;
     } else {
-      props.setModules((previousModules) => {
+      /* props.setModules((previousModules) => {
         let newmodules = [...previousModules];
         newmodules[props.index].score[0].duration = parseFloat(
           audiobuffer.duration.toFixed(2)
         );
         return newmodules;
-      });
+      }); */
       loadPlayer(audiobuffer);
 
       const user = firebase.auth().currentUser;
@@ -192,6 +191,12 @@ function Player(props) {
   }, [props.module]);
 
   useEffect(() => {
+    //TEMP: function on "module" component to make score adapts to audio file
+    //console.log("IS LOADED?", props.instrument.loaded);
+    props.updateOnAudioFileLoaded();
+  }, [props.instrument.loaded]);
+
+  useEffect(() => {
     Tone.Transport.clear(rescheduleEvent);
     let event = Tone.Transport.schedule((time) => {
       //console.log("should schedule");
@@ -251,6 +256,7 @@ function Player(props) {
             setScore={setScore}
             loaded={props.loaded}
             moduleZoom={props.moduleZoom}
+            fullScreen={props.fullScreen}
           />
         )}
 
