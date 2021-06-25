@@ -74,32 +74,35 @@ function PianoRoll(props) {
 
   const toggleCursor = (state) => {
     clearInterval(cursorAnimator);
-    state
-      ? setCursorAnimator(
-          setInterval(() => {
-            //temp fix
-            PRWrapper.current !== null &&
-              Tone.Transport.state === "started" &&
-              setCursorPosition(
-                (Tone.Transport.seconds /
-                  Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-                  PRWrapper.current.offsetWidth
-              );
-          }, 32)
-        )
-      : clearInterval(cursorAnimator);
+    state &&
+      setCursorAnimator(
+        setInterval(() => {
+          let cursorPosition =
+            props.module.size === props.sessionSize
+              ? Tone.Transport.seconds /
+                props.module.size /
+                Tone.Time("1m").toSeconds()
+              : (Tone.Transport.seconds / Tone.Time("1m").toSeconds()) %
+                props.module.size;
+          //temp fix
+          PRWrapper.current !== null &&
+            Tone.Transport.state === "started" &&
+            setCursorPosition(cursorPosition * PRWrapper.current.offsetWidth);
+        }, 32)
+      );
   };
 
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
       (element.x / PRWrapper.current.offsetWidth) *
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      Tone.Time("1m").toSeconds() *
+      props.module.size;
 
     setCursorPosition(element.x);
   };
 
   const handleCursorDragStart = (event, element) => {
-    props.instrument.stop(0);
+    props.instrument.releaseAll(0);
   };
 
   const handleCursorDragStop = (event, element) => {
@@ -198,6 +201,7 @@ function PianoRoll(props) {
               moduleZoom={props.moduleZoom}
               fullScreen={props.fullScreen}
               changeNote={changeNote}
+              sessionSize={props.sessionSize}
               size={props.module.size}
             />
           ))}

@@ -395,7 +395,11 @@ function Module(props) {
 
           {props.module.type === 3 ||
             (props.module.type === 4 && (
-              <IconButton className="module-zoom-button" onClick={handleZoom}>
+              <IconButton
+                className="module-zoom-button"
+                tabIndex="-1"
+                onClick={handleZoom}
+              >
                 <Icon>search</Icon>
               </IconButton>
             ))}

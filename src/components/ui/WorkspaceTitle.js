@@ -47,9 +47,9 @@ function WorkspaceTitle(props) {
     props.sessionData && getSessionTitleInfo();
   }, [props.sessionData]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     console.log(editorProfiles);
-  }, [editorProfiles]);
+  }, [editorProfiles]); */
 
   return (
     <div className="app-title">
