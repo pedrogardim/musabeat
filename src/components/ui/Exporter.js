@@ -12,15 +12,24 @@ function Exporter(props) {
 
   const handleButtonClick = () => {
     setIsReady(false);
-    bounceSessionExport(modules, props.modulesInstruments, sessionData, setIsReady, props.sessionSize);
+    bounceSessionExport(
+      modules,
+      props.modulesInstruments,
+      sessionData,
+      setIsReady,
+      props.sessionSize
+    );
   };
 
   return (
-    <div className="exporter">
-      <Fab className="fixed-fab" style={{right:96}} color="primary" onClick={handleButtonClick}>
-        <Icon>file_download</Icon>
-      </Fab>
-    </div>
+    <Fab
+      color="primary"
+      className="ws-fab ws-fab-export"
+      tabIndex={-1}
+      onClick={handleButtonClick}
+    >
+      <Icon>file_download</Icon>
+    </Fab>
   );
 }
 

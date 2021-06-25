@@ -3,27 +3,16 @@ import "./App.css";
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  withRouter,
-  useHistory,
-} from "react-router-dom";
+import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
 import {
-  Fab,
   Icon,
   IconButton,
   Avatar,
   Menu,
   MenuItem,
-  Drawer,
-  Typography,
   Toolbar,
   AppBar,
-  Tooltip,
 } from "@material-ui/core";
 
 import firebase from "firebase";

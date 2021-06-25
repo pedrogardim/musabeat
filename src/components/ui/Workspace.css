@@ -1,8 +1,9 @@
 .workspace {
   background-color: #282c34;
+  position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
-  background:white;
-  min-height:100vh;
+  background: white;
+  min-height: 100vh;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -10,12 +11,40 @@
   align-items: center;
   align-content: center;
   justify-content: center;
-  padding:80px 0 80px 0;
+  padding: 80px 0 80px 0;
 }
 
-.fixed-fab{
-  position:fixed !important;
-  bottom:32px;
-  right:32px;
-  z-index:2
+.ws-fab-cont {
+  position: fixed !important;
+  width: calc(100vw - 64px);
+  bottom: 32px;
+  right: 32px;
+  height: 56px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+}
+
+.ws-fab {
+  place-self: center;
+}
+
+.ws-fab-copy {
+  grid-area: 1/1;
+}
+
+.ws-fab-play {
+  grid-area: 1/8;
+}
+
+.ws-fab-mix {
+  grid-area: 1/13;
+}
+
+.ws-fab-export {
+  grid-area: 1/14;
+}
+
+.ws-fab-settings {
+  grid-area: 1/15;
 }

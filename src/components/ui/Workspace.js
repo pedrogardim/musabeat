@@ -25,6 +25,7 @@ import PlaceholderModule from "../Module/PlaceholderModule";
 
 import ModulePicker from "./ModulePicker";
 import Exporter from "./Exporter";
+import SessionSettings from "./SessionSettings";
 import Mixer from "./mixer/Mixer";
 import SessionProgressBar from "./SessionProgressBar";
 
@@ -43,6 +44,8 @@ Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
   const [modules, setModules] = useState(null);
+  const [sessionData, setSessionData] = useState(null);
+
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
   const [sessionSize, setSessionSize] = useState(0);
@@ -55,8 +58,6 @@ function Workspace(props) {
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
 
-  const [sessionTitle, setSessionTitle] = useState(null);
-
   const sessionKey = "-" + useParams().key;
 
   //to avoid running startup scripts for each new instrument
@@ -64,7 +65,6 @@ function Workspace(props) {
 
   const [DBSessionRef, setDBSessionRef] = useState(null);
   //used at the time only for passing session name to Exporter
-  const [sessionData, setSessionData] = useState(null);
 
   //a copy of the instruments, to be able to use them on export function
   //to undo and redo
@@ -135,6 +135,9 @@ function Workspace(props) {
         props.createNewSession(null);
         return;
       }
+      let data = { ...props.session };
+      delete data.modules;
+      setSessionData(data);
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
       if (
@@ -144,7 +147,6 @@ function Workspace(props) {
         !props.session.creator
       ) {
         setEditMode(true);
-        setSessionTitle(props.session.name);
       }
       loadSessionInstruments(props.session.modules);
     }
@@ -158,7 +160,9 @@ function Workspace(props) {
       sessionRef.get().then((snapshot) => {
         let sessionData = snapshot.val();
         //console.log(snapshot.val().modules + "-----");
-        setSessionData(sessionData);
+        let data = { ...sessionData };
+        delete data.modules;
+        setSessionData(data);
 
         if (sessionData.hasOwnProperty("modules")) {
           setInstrumentsLoaded(Array(sessionData.modules.length).fill(false));
@@ -172,8 +176,6 @@ function Workspace(props) {
         console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
         let name = sessionData.name;
-
-        setSessionTitle(name);
       });
     } /* else if (typeof sessionKey === "object") {
       setModules(sessionKey.modules);
@@ -185,7 +187,6 @@ function Workspace(props) {
         !sessionKey.creator
       ) {
         setEditMode(true);
-        setSessionTitle(sessionKey.name);
         setSessionEditors(props.session.creator);
       }
       loadSessionInstruments(sessionKey.modules);
@@ -342,8 +343,12 @@ function Workspace(props) {
     });
   };
 
-  const saveToDatabase = () => {
-    DBSessionRef !== null && DBSessionRef.child("modules").set(modules);
+  const saveToDatabase = (input) => {
+    if (DBSessionRef !== null) {
+      input.length !== undefined
+        ? DBSessionRef.child("modules").set(modules)
+        : DBSessionRef.set({ ...sessionData, modules: modules });
+    }
     /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
           ? DBSessionRef.child("modules").set(modules)
@@ -352,19 +357,22 @@ function Workspace(props) {
   };
 
   const updateFromDatabase = (modulesData) => {
-    if (!compareObjectsArray(modules, modulesData)) {
-      //console.log("ITS DIFFERENT!!!")
-      //console.log("moduled loaded from server:" + modulesData);
-      setModules(modulesData);
-      //console.log("UPDATED");
-    } else {
-      //console.log("ITS THE SAME!!!");
-    }
+    //if (!compareObjectsArray(modules, modulesData)) {
+    //console.log("ITS DIFFERENT!!!")
+    //console.log("moduled loaded from server:" + modulesData);
+    let data = { ...modulesData };
+    delete data.modules;
+    setSessionData(data);
+    setModules(modulesData.modules);
+    //console.log("UPDATED");
+    //} else {
+    //console.log("ITS THE SAME!!!");
+    //}
   };
 
   const onSessionReady = () => {
     if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.child("modules").on("value", (snapshot) => {
+      DBSessionRef.on("value", (snapshot) => {
         updateFromDatabase(snapshot.val());
       });
     }
@@ -554,6 +562,10 @@ function Workspace(props) {
   }, [modules]);
 
   useEffect(() => {
+    !props.hidden && saveToDatabase(sessionData);
+  }, [sessionData]);
+
+  useEffect(() => {
     //console.log(instrumentsLoaded);
     instrumentsLoaded &&
       !instrumentsLoaded.includes(false) &&
@@ -594,7 +606,7 @@ function Workspace(props) {
       <SessionProgressBar />
 
       <div className="app-title">
-        <Typography variant="h4">{sessionTitle}</Typography>
+        <Typography variant="h4">{sessionData && sessionData.name}</Typography>
         {!editMode && (
           <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
             <Icon className="app-title-alert">visibility</Icon>
@@ -662,15 +674,6 @@ function Workspace(props) {
           modules={modules}
         />
       )}
-      {!props.hidden && (
-        <Exporter
-          sessionSize={sessionSize}
-          sessionData={sessionData}
-          modules={modules}
-          modulesInstruments={instruments}
-        />
-      )}
-      {/*<Drawer>{drawerCont}</Drawer>*/}
 
       {mixerOpened && (
         <Mixer
@@ -681,35 +684,50 @@ function Workspace(props) {
       )}
       {/*setModulesVolume={setModulesVolume}*/}
 
-      <Fab
-        tabIndex={-1}
-        color="primary"
-        className="fixed-fab"
-        style={{ right: "calc(50% - 27px)" }}
-        onClick={props.togglePlaying}
-      >
-        <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
-      </Fab>
-      {editMode && (
+      <div className="ws-fab-cont">
         <Fab
           tabIndex={-1}
-          className="fixed-fab"
           color="primary"
-          onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+          className="ws-fab ws-fab-copy"
+          onClick={handleSessionCopy}
         >
-          <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+          <Icon>content_copy</Icon>
         </Fab>
-      )}
 
-      <Fab
-        tabIndex={-1}
-        className="fixed-fab"
-        color="primary"
-        style={{ left: 24 }}
-        onClick={handleSessionCopy}
-      >
-        <Icon>content_copy</Icon>
-      </Fab>
+        <Fab
+          tabIndex={-1}
+          color="primary"
+          className="ws-fab ws-fab-play"
+          onClick={props.togglePlaying}
+        >
+          <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
+        </Fab>
+
+        {editMode && (
+          <Fab
+            tabIndex={-1}
+            className="ws-fab ws-fab-mix"
+            color="primary"
+            onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+          >
+            <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+          </Fab>
+        )}
+
+        {!props.hidden && (
+          <Exporter
+            sessionSize={sessionSize}
+            sessionData={sessionData}
+            modules={modules}
+            modulesInstruments={instruments}
+          />
+        )}
+
+        <SessionSettings
+          sessionData={sessionData}
+          setSessionData={setSessionData}
+        />
+      </div>
 
       <Snackbar
         open={!!snackbarMessage}
