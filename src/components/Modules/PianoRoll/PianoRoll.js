@@ -25,7 +25,9 @@ function PianoRoll(props) {
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(
+    props.module.score ? props.module.score : []
+  );
 
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
 
@@ -38,7 +40,6 @@ function PianoRoll(props) {
           props.module.id,
           props.module.size,
           props.sessionSize
-          
         )
       : clearEvents(props.module.id);
   };
@@ -80,17 +81,14 @@ function PianoRoll(props) {
     state &&
       setCursorAnimator(
         setInterval(() => {
-          let cursorPosition =
-            props.module.size === props.sessionSize
-              ? Tone.Transport.seconds /
-                props.module.size /
-                Tone.Time("1m").toSeconds()
-              : (Tone.Transport.seconds / Tone.Time("1m").toSeconds()) %
-                props.module.size;
-          //temp fix
           PRWrapper.current !== null &&
             Tone.Transport.state === "started" &&
-            setCursorPosition(cursorPosition * PRWrapper.current.offsetWidth);
+            setCursorPosition(
+              ((Tone.Transport.seconds %
+                (Tone.Time("1m").toSeconds() * props.module.size)) /
+                (Tone.Time("1m").toSeconds() * props.module.size)) *
+                PRWrapper.current.offsetWidth
+            );
         }, 32)
       );
   };
@@ -134,6 +132,10 @@ function PianoRoll(props) {
       return newModules;
     });
   }, [notes]);
+
+  useEffect(() => {
+    scheduleEvents();
+  }, [props.loaded, props.instrument]);
 
   return (
     <div

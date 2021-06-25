@@ -77,8 +77,7 @@ function PianoRollNote(props) {
     noteHeight = 30;
     setNoteWidth(
       (Tone.Time(props.note.duration).toSeconds() /
-        Tone.Time("1m").toSeconds()) *
-        props.size *
+        (Tone.Time("1m").toSeconds() * props.size)) *
         props.parentRef.current.offsetWidth
     );
 
@@ -92,7 +91,7 @@ function PianoRollNote(props) {
     if (props.parentRef.current) {
       updateNotePosition();
     }
-  }, [props.parentRef.current, props.fullScreen, props.moduleZoom]);
+  }, [props.parentRef.current, props.fullScreen, props.moduleZoom, props.size]);
 
   /*  useEffect(() => {
     console.log(notePosition);

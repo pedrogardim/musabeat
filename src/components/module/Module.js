@@ -296,6 +296,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           index={props.index}
           module={props.module}
+          loaded={props.loaded}
           setModules={props.setModules}
           moduleZoom={moduleZoom}
           fullScreen={fullScreen}
