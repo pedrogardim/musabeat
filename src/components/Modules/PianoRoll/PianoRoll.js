@@ -3,13 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import PianoRollNote from "./PianoRollNote";
 import * as Tone from "tone";
 
-import {
-  CircularProgress,
-  BottomNavigation,
-  BottomNavigationAction,
-  Typography,
-} from "@material-ui/core";
-
+import { Typography } from "@material-ui/core";
 import {
   schedulePianoRoll,
   clearEvents,
@@ -25,6 +19,7 @@ function PianoRoll(props) {
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
+  const [hovered, setHovered] = useState(false);
   const [notes, setNotes] = useState(
     props.module.score ? props.module.score : []
   );
@@ -122,6 +117,14 @@ function PianoRoll(props) {
     });
   };
 
+  const handleMouseOver = (event) => {
+    let hoverX =
+      (event.nativeEvent.pageX -
+        PRWrapper.current.getBoundingClientRect().left) /
+      PRWrapper.current.offsetWidth;
+    setHovered(hoverX < 0.5 ? "left" : "right");
+  };
+
   useEffect(() => {
     toggleCursor(Tone.Transport.state);
     //scheduleEvents();
@@ -157,6 +160,8 @@ function PianoRoll(props) {
         style={{
           width: props.moduleZoom * 100 + "%",
         }}
+        onMouseOver={handleMouseOver}
+        onMouseOut={() => setHovered(false)}
       >
         {Array(12 * 7)
           .fill(0)
@@ -173,12 +178,18 @@ function PianoRoll(props) {
                 minHeight: props.fullScreen ? 32 : 16,
               }}
             >
-              <span
-                className="piano-roll-row-label"
-                style={{ color: colors[props.module.color][100] }}
-              >
-                {Tone.Frequency(i + 24, "midi").toNote()}
-              </span>
+              {hovered && (
+                <Typography
+                  variant="overline"
+                  className="piano-roll-row-label"
+                  style={{
+                    color: colors[props.module.color][100],
+                    textAlign: hovered === "left" ? "right" : "left",
+                  }}
+                >
+                  {Tone.Frequency(i + 24, "midi").toNote()}
+                </Typography>
+              )}
               {Array(props.module.size * 8)
                 .fill(0)
                 .map((ee, ii) => (
