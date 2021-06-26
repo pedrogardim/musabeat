@@ -6,7 +6,6 @@ import {
   Icon,
   Popper,
   Paper,
-  Card,
   Typography,
   Input,
   Slider,

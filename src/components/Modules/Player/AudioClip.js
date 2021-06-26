@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 
 import * as Tone from "tone";
 
-import { Resizable, ResizableBox } from "react-resizable";
-//import Draggable from "react-draggable";
+import Draggable from "react-draggable";
 import { Rnd } from "react-rnd";
+
+import { Icon } from "@material-ui/core";
 
 import "./AudioClip.css";
 
@@ -15,13 +16,18 @@ function AudioClip(props) {
 
   const [waveForm, setWaveForm] = useState([]);
 
+  const [pitchTime, setPitchTime] = useState([]);
+
   const updateClipPosition = () => {
     if (props.parentRef.current === null) return;
     let timePerPixel =
       props.parentRef.current.offsetWidth /
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
     setClipPosition(props.score.time * timePerPixel);
-    setClipWidth(props.score.duration * timePerPixel);
+    setClipWidth(
+      (props.score.duration * timePerPixel) /
+        (props.score.playbackRate ? props.score.playbackRate : 1)
+    );
     setClipHeight(props.parentRef.current.offsetHeight);
   };
 
@@ -44,7 +50,6 @@ function AudioClip(props) {
       return newScore;
     });
   };
-
   const handleResize = () => {};
 
   const handleResizeStop = (e, handle, target, delta) => {

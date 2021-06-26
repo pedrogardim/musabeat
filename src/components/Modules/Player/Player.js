@@ -5,6 +5,7 @@ import firebase from "firebase";
 
 import AudioClip from "./AudioClip";
 import BackgroundGrid from "./BackgroundGrid";
+import PlayerOptions from "./PlayerOptions";
 
 import Draggable from "react-draggable";
 import { FileDrop } from "react-file-drop";
@@ -123,7 +124,7 @@ function Player(props) {
 
       const user = firebase.auth().currentUser;
 
-      console.log(user);
+      //console.log(user);
 
       if (user) {
         const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
@@ -280,6 +281,12 @@ function Player(props) {
             style={{ backgroundColor: "white" }}
           />
         </Draggable>
+
+        <PlayerOptions
+          instrument={props.instrument}
+          score={score}
+          setScore={setScore}
+        />
       </div>
     </div>
   );
