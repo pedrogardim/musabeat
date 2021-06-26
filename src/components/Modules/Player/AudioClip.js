@@ -55,14 +55,19 @@ function AudioClip(props) {
 
       let maxDuration = props.instrument.buffer.duration;
 
-      if (newDuration <= maxDuration) {
-        setClipWidth(target.offsetWidth);
-        props.setScore((prev) => {
-          let newScore = [...prev];
-          newScore[props.index].duration = newDuration;
-          return newScore;
-        });
-      }
+      setClipWidth(
+        newDuration <= maxDuration
+          ? target.offsetWidth
+          : (maxDuration * props.parentRef.current.offsetWidth) /
+              (props.sessionSize * Tone.Time("1m").toSeconds())
+      );
+
+      props.setScore((prev) => {
+        let newScore = [...prev];
+        newScore[props.index].duration =
+          newDuration <= maxDuration ? newDuration : maxDuration;
+        return newScore;
+      });
     }
   };
 

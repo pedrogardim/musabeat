@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import SequencerTile from "./SequencerTile";
 import * as Tone from "tone";
@@ -22,6 +22,7 @@ import "./Sequencer.css";
 import { colors } from "../../../utils/materialPalette";
 
 function Sequencer(props) {
+  const parentRef = useRef(null);
   const [sequencerArray, setSequence] = useState(props.module.score);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
@@ -77,6 +78,14 @@ function Sequencer(props) {
     });
   };
 
+  const handleMouseOver = (event) => {
+    let hoverX =
+      (event.nativeEvent.pageX -
+        parentRef.current.getBoundingClientRect().left) /
+      parentRef.current.offsetWidth;
+    setHovered(hoverX < 0.5 ? "left" : "right");
+  };
+
   //===================
 
   useEffect(() => {
@@ -103,14 +112,18 @@ function Sequencer(props) {
     <div
       className="module-innerwrapper"
       style={props.style}
-      onMouseOver={() => setHovered(true)}
+      onMouseOver={handleMouseOver}
       onMouseOut={() => setHovered(false)}
     >
-      <div className="sequencer">
+      <div className="sequencer" ref={parentRef}>
         {soundsMap.map((drumsound, row) => (
           <div className="sequencer-row" key={drumsound}>
             {hovered && (
-              <Typography className="sequencer-row-label" variant="overline">
+              <Typography
+                className="sequencer-row-label"
+                variant="overline"
+                style={{ textAlign: hovered === "left" ? "right" : "left" }}
+              >
                 {isNaN(drumsound) ? drumsound : labels[parseInt(drumsound)]}
               </Typography>
             )}

@@ -407,7 +407,9 @@ function Workspace(props) {
   };
 
   const unfocusModules = (e) => {
-    e.target.classList.contains("workspace") && setFocusedModule(null);
+    e.target.classList &&
+      e.target.classList.contains("workspace") &&
+      setFocusedModule(null);
   };
 
   const handleCopy = () => {

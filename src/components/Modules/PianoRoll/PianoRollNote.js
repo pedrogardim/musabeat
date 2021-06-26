@@ -82,8 +82,8 @@ function PianoRollNote(props) {
     props.fullScreen,
     props.moduleZoom,
     props.size,
-    props.parentRef.current.offsetHeight,
-    props.parentRef.current.offsetWidth,
+    //props.parentRef.current.offsetHeight,
+    //props.parentRef.current.offsetWidth,
   ]);
 
   /*  useEffect(() => {

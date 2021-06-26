@@ -8,16 +8,24 @@
   display: flex;
   flex: 1;
   flex-direction: row;
+  position: relative;
 }
 
 .melody-grid-bottomnav {
   height: 30px !important;
 }
 
-.melody-grid-row-label{
-    position:absolute;
-    text-align:right !important;
-    line-height: calc(200%)!important;
-    margin-left: -72px !important;
-    width:64px;
+.melody-grid-row-label {
+  position: absolute;
+  height: 100% !important;
+  vertical-align: middle !important;
+  /* line-height: 100% !important; */
+
+  pointer-events: none;
+  color: white !important;
+  /* mix-blend-mode: difference;
+  filter: saturate(0); */
+  width: calc(100% - 8px);
+  transition: 0.2s;
+  left: 4px;
 }

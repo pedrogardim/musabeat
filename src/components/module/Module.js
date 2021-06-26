@@ -362,13 +362,11 @@ function Module(props) {
       <div
         style={{
           backgroundColor: colors[props.module.color][700],
-          overflow: props.module.type >= 2 && "hidden",
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
         className={
           "module " +
-          //(props.module.type === 3 && " module-compact ") +
           (props.module.muted && " module-muted ") +
           (fullScreen && " module-fullscreen")
         }

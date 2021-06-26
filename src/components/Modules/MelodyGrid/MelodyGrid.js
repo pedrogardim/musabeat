@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import SequencerTile from "../DrumSequencer/SequencerTile";
 import * as Tone from "tone";
@@ -23,11 +23,10 @@ import "./MelodyGrid.css";
 import { colors } from "../../../utils/materialPalette";
 
 function MelodyGrid(props) {
-  const loadedSequence = props.module.score;
-
+  const parentRef = useRef(null);
   const [isBufferLoaded, setIsBufferLoaded] = useState(true);
   const [instrument, setInstrument] = useState(props.instrument);
-  const [melodyArray, setMelodyArray] = useState(loadedSequence);
+  const [melodyArray, setMelodyArray] = useState(props.module.score);
   const [gridScale, setGridScale] = useState([
     "C3",
     "D3",
@@ -138,6 +137,14 @@ function MelodyGrid(props) {
     //TODO: Handle Hidden Notes
   };
 
+  const handleMouseOver = (event) => {
+    let hoverX =
+      (event.nativeEvent.pageX -
+        parentRef.current.getBoundingClientRect().left) /
+      parentRef.current.offsetWidth;
+    setHovered(hoverX < 0.5 ? "left" : "right");
+  };
+
   useEffect(() => {
     setInstrument(props.instrument);
   }, [props.instrument]);
@@ -175,14 +182,18 @@ function MelodyGrid(props) {
     <div
       className="module-innerwrapper"
       style={props.style}
-      onMouseOver={() => setHovered(true)}
+      onMouseOver={handleMouseOver}
       onMouseOut={() => setHovered(false)}
     >
-      <div className="melody-grid">
+      <div className="melody-grid" ref={parentRef}>
         {gridScale.map((drumsound, row) => (
           <div className="melody-grid-row" key={row}>
             {hovered && (
-              <Typography className="melody-grid-row-label" variant="overline">
+              <Typography
+                className="melody-grid-row-label"
+                variant="overline"
+                style={{ textAlign: hovered === "left" ? "right" : "left" }}
+              >
                 {drumsound}
               </Typography>
             )}
