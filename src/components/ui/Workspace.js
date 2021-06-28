@@ -51,7 +51,7 @@ function Workspace(props) {
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
 
-  const sessionKey = "-" + useParams().key;
+  const sessionKey = useParams().key;
 
   //to avoid running startup scripts for each new instrument
   const [initialLoad, setInitialLoad] = useState(false);
@@ -64,7 +64,7 @@ function Workspace(props) {
   //const [sessionHistory, setSessionHistory] = useState([]);
 
   const handleSessionCopy = () => {
-    DBSessionRef.get().then((r) => props.createNewSession(r.val()));
+    DBSessionRef.get().then((r) => props.createNewSession(r.data()));
   };
 
   const adaptSessionSize = () => {
@@ -126,7 +126,7 @@ function Workspace(props) {
       setModules([]);
     }
     //
-    else if (sessionKey === "-newSession") {
+    else if (sessionKey === "newSession") {
       if (props.session === null) {
         props.createNewSession(null);
         return;
@@ -150,11 +150,11 @@ function Workspace(props) {
     else if (typeof sessionKey === "string") {
       let sessionRef =
         sessionKey !== null &&
-        firebase.database().ref("sessions").child(sessionKey);
+        firebase.firestore().collection("sessions").doc(sessionKey);
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editmode and get title
       sessionRef.get().then((snapshot) => {
-        let sessionData = snapshot.val();
+        let sessionData = snapshot.data();
         //console.log(snapshot.val().modules + "-----");
         let data = { ...sessionData };
         delete data.modules;
@@ -341,8 +341,8 @@ function Workspace(props) {
   const saveToDatabase = (input) => {
     if (DBSessionRef !== null) {
       input.length !== undefined
-        ? DBSessionRef.child("modules").set(modules)
-        : DBSessionRef.set({ ...sessionData, modules: modules });
+        ? DBSessionRef.update({ modules: modules })
+        : DBSessionRef.update({ ...sessionData, modules: modules });
     }
     /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
@@ -367,8 +367,8 @@ function Workspace(props) {
 
   const onSessionReady = () => {
     if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.on("value", (snapshot) => {
-        updateFromDatabase(snapshot.val());
+      DBSessionRef.onSnapshot((snapshot) => {
+        updateFromDatabase(snapshot.data());
       });
     }
 
@@ -755,13 +755,6 @@ function Workspace(props) {
           </IconButton>
         }
       />
-      {/*<Button onClick={()=>{instruments.map(e=>{
-        let pushedSessionRef = firebase
-        .database()
-        .ref("patches")
-        .push(e);
-      console.log(pushedSessionRef.key);
-      })}}>PUSHHH</Button>*/}
     </div>
   );
 }

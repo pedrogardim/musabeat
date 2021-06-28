@@ -33,28 +33,38 @@ function SessionExplorer(props) {
   const [playingSession, setPlayingSession] = useState(null);
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
-  const getSessionList = async (value) => {
+  const getSessionList = (value) => {
     //console.log(props.props.isUser ? "fetching user sessions" : "fetching explore");
 
-    let dbRef = props.isUser
+    const dbRef = props.isUser
       ? firebase
-          .database()
-          .ref("sessions")
-          .orderByChild("creator")
-          .equalTo(props.user.uid)
+          .firestore()
+          .collection("sessions")
+          .where("creator", "==", props.user.uid)
       : value
-      ? firebase.database().ref("sessions").orderByChild("name").equalTo(value)
-      : firebase.database().ref("sessions");
-    const sessionKeys = (await dbRef.get()).val();
+      ? firebase
+          .firestore()
+          .collection("sessions")
+          .where("name", ">=", value)
+          .where("name", "<=", value + "\uf8ff")
+      : firebase.firestore().collection("sessions");
 
-    setSessionKeys(Object.keys(sessionKeys));
-    setSessions(Object.values(sessionKeys));
+    dbRef.get().then((snapshot) => {
+      let data = [];
+      snapshot.forEach((e) => data.push(e.data()));
+      console.log(data);
+
+      setSessionKeys(Object.keys(data));
+      setSessions(Object.values(data));
+    });
   };
 
   const handleUserLike = (index) => {
     //else:loggin pop-up
     if (props.user) {
-      let newUserLikes = userLikes.includes(sessionKeys[index])
+      let isLiked = userLikes.includes(sessionKeys[index]);
+
+      let newUserLikes = isLiked
         ? userLikes.filter((e) => e !== sessionKeys[index])
         : [...userLikes, sessionKeys[index]];
 
@@ -63,35 +73,25 @@ function SessionExplorer(props) {
       //add session to user "likes" array
 
       let userLikesRef = firebase
-        .database()
-        .ref("users")
-        .child(props.user.uid)
-        .child("likes");
+        .firestore()
+        .collection("sessions")
+        .doc(sessionKeys[index])
+        .update({
+          likes: isLiked
+            ? firebase.firestore.FieldValue.arrayRemove(props.user.uid)
+            : firebase.firestore.FieldValue.arrayUnion(props.user.uid),
+        });
       userLikesRef.set(newUserLikes);
 
       //add user to session "likedBy" array and increment like number on session
 
       let sessionRef = firebase
-        .database()
-        .ref("sessions")
-        .child(sessionKeys[index]);
+        .firestore()
+        .collection("sessions")
+        .doc(sessionKeys[index]);
+
       sessionRef.get().then((snapshot) => {
-        let session = snapshot.val();
-
-        session.likes = session.hasOwnProperty("likedBy")
-          ? session.likedBy.includes(props.user.uid)
-            ? session.likes - 1
-            : session.likes + 1
-          : 1;
-
-        session.likedBy = session.hasOwnProperty("likedBy")
-          ? session.likedBy.includes(props.user.uid)
-            ? session.likedBy.filter((e) => e !== props.user.uid)
-            : [...session.likedBy, props.user.uid]
-          : [props.user.uid];
-
-        sessionRef.set(session);
-
+        let session = snapshot.data();
         setSessions((prev) => {
           let newSessions = [...prev];
           newSessions[index] = session;
@@ -103,21 +103,11 @@ function SessionExplorer(props) {
 
   const handleSessionDelete = () => {
     let index = deleteDialog;
-    const sessionRef = firebase
-      .database()
-      .ref(`sessions/${sessionKeys[index]}`);
-    sessionRef.remove();
-    const userSessionsRef = firebase
-      .database()
-      .ref(`users/${props.user.uid}/sessions`);
-
-    userSessionsRef
-      .get()
-      .then((snapshot) =>
-        userSessionsRef.set(
-          snapshot.val().filter((e) => e !== sessionKeys[index])
-        )
-      );
+    firebase
+      .firestore()
+      .collection("sessions")
+      .doc(sessionKeys[index])
+      .delete();
 
     setSessions((prev) => prev.filter((e, i) => i !== index));
     setSessionKeys((prev) => prev.filter((e, i) => i !== index));
@@ -127,22 +117,24 @@ function SessionExplorer(props) {
 
   const handleSessionRename = (newName) => {
     let index = renameDialog;
-    const sessionRefName = firebase
-      .database()
-      .ref(`sessions/${sessionKeys[index]}/name`);
-    sessionRefName.set(newName);
+    firebase
+      .firestore()
+      .collection("sessions")
+      .doc(sessionKeys[index])
+      .update({ name: newName });
     sessions[index].name = newName;
     setRenameDialog(null);
   };
 
   const getUserLikes = () => {
     let dbLikesRef = firebase
-      .database()
-      .ref("users")
-      .child(props.user.uid)
-      .child("likes");
+      .firestore()
+      .collection("sessions")
+      .where("likedBy", "array-contains", props.user.uid);
     dbLikesRef.get().then((snapshot) => {
-      !!snapshot.val() && setUserLikes(snapshot.val());
+      let data = [];
+      snapshot.forEach((e) => data.push(snapshot.data()));
+      setUserLikes(data);
     });
   };
 

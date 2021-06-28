@@ -12,7 +12,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     tags: ["musa"],
     bpm: 120,
     modules: [
-      {
+      /* {
         id: 0,
         name: "Sequencer",
         color: 2,
@@ -21,7 +21,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
         type: 0,
         volume: 0,
         muted: false,
-      },
+      }, */
     ],
   };
 
@@ -55,20 +55,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     return;
   }
 
-  const sessionsRef = firebase.database().ref("sessions");
-  const newSessionRef = sessionsRef.push();
-  newSessionRef.set(
-    newSession,
-    handlePageNav(`session/${newSessionRef.key.substring(1)}`)
-  );
-
-  const userSessionsRef = firebase
-    .database()
-    .ref("users")
-    .child(userId)
-    .child("sessions");
-  userSessionsRef.get().then((snapshot) => {
-    let prev = snapshot.val() === null ? [] : snapshot.val();
-    userSessionsRef.set([...prev, newSessionRef.key]);
-  });
+  const sessionsRef = firebase.firestore().collection("sessions");
+  sessionsRef.add(newSession).then((ref) => handlePageNav(`session/${ref.id}`));
 };

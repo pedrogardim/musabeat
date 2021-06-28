@@ -11,6 +11,7 @@ import { BrowserRouter } from "react-router-dom";
 const firebaseConfig = {
   apiKey: "AIzaSyD5Tg5t1YD72Q3weL5rYTlxroSH4QwEV-k",
   authDomain: "musamusicapp-c5d73.firebaseapp.com",
+  databaseURL: "https://musamusicapp-c5d73-default-rtdb.firebaseio.com",
   projectId: "musamusicapp-c5d73",
   storageBucket: "musamusicapp-c5d73.appspot.com",
   messagingSenderId: "851928058346",
