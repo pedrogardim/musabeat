@@ -44,6 +44,11 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     clearStats
   );
 
+  if (userId) {
+    newSession.creator = userId;
+    newSession.editors = [userId];
+  }
+
   if (!userId) {
     setOpenedSession(newSession);
     handlePageNav(`session/newSession`);

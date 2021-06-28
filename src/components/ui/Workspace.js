@@ -612,12 +612,15 @@ function Workspace(props) {
     >
       <SessionProgressBar />
 
-      <WorkspaceTitle
-        sessionData={sessionData}
-        sessionKey={sessionKey}
-        editMode={editMode}
-        user={props.user}
-      />
+      {sessionKey && sessionData && (
+        <WorkspaceTitle
+          sessionData={sessionData}
+          setSessionData={setSessionData}
+          sessionKey={sessionKey}
+          editMode={editMode}
+          user={props.user}
+        />
+      )}
 
       <div className="workspace-module-cont">
         {modules !== null ? (

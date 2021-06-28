@@ -16,15 +16,6 @@ function SessionSettings(props) {
   const [anchorEl, setAnchorEl] = useState(false);
   const sessionData = props.sessionData;
 
-  const handleNameChange = (e) => {
-    let value = e.target.value;
-    props.setSessionData((prev) => {
-      let newData = { ...prev };
-      newData.name = value;
-      return newData;
-    });
-  };
-
   const handleBpmChange = (e, value) => {
     Tone.Transport.bpm.value = value;
     props.setSessionData((prev) => {
@@ -64,11 +55,6 @@ function SessionSettings(props) {
               marginBottom: 16,
             }}
           >
-            <Typography> Session Name</Typography>
-            <Input
-              defaultValue={sessionData.name}
-              onChange={handleNameChange}
-            />
             <Typography> BPM</Typography>
             <Slider
               min={50}

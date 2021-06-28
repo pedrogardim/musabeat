@@ -11,7 +11,7 @@ import {
   Button,
 } from "@material-ui/core";
 
-import TagInput from "../ui/Dialogs/TagInput";
+import SessionInfo from "./Dialogs/SessionInfo";
 
 import "./Workspace.css";
 
@@ -19,7 +19,7 @@ function WorkspaceTitle(props) {
   const [creationDateString, setCreationDateString] = useState(null);
   const [editorProfiles, setEditorProfiles] = useState([]);
   const [expanded, setExpanded] = useState(false);
-  const [tagDialog, setTagDialog] = useState(false);
+  const [infoDialog, setInfoDialog] = useState(false);
 
   const getSessionTitleInfo = async () => {
     if (typeof props.sessionData.createdOn === "number") {
@@ -47,26 +47,15 @@ function WorkspaceTitle(props) {
   const handleTagClick = () => {};
 
   const handleTagDelete = (index) => {
-    console.log("deleting" + index);
-    const sessionTagsRef = firebase
-      .database()
-      .ref(`sessions/${props.sessionKey}/tags`);
-    const newTags = props.sessionData.tags.filter((e, i) => i !== index);
-    sessionTagsRef.set(newTags);
-  };
-
-  const handleTagAdd = (tags) => {
-    const sessionTagsRef = firebase
-      .database()
-      .ref(`sessions/${props.sessionKey}/tags`);
-    const newTags = props.sessionData.tags
-      ? [...props.sessionData.tags, ...tags]
-      : [...tags];
-    sessionTagsRef.set(newTags);
+    props.setSessionData((prev) => {
+      let newSessionData = { ...prev };
+      newSessionData.tags = newSessionData.tags.filter((e, i) => i !== index);
+      return newSessionData;
+    });
   };
 
   useEffect(() => {
-    props.sessionData && getSessionTitleInfo();
+    getSessionTitleInfo();
     setExpanded(false);
   }, [props.sessionKey]);
 
@@ -77,20 +66,25 @@ function WorkspaceTitle(props) {
   return (
     <div className="app-title">
       <Typography variant="h4">
-        {props.sessionData && props.sessionData.name}
+        {props.sessionData.name}
+        {expanded && (
+          <IconButton onClick={() => setInfoDialog(true)}>
+            <Icon>edit</Icon>
+          </IconButton>
+        )}
+        {!(props.editMode && !props.user) && (
+          <IconButton onClick={() => setExpanded((prev) => !prev)}>
+            <Icon
+              style={{
+                transition: "0.2s",
+                transform: expanded ? "rotate(180deg)" : "",
+              }}
+            >
+              expand_more
+            </Icon>
+          </IconButton>
+        )}
       </Typography>
-      {!(props.editMode && !props.user) && (
-        <IconButton onClick={() => setExpanded((prev) => !prev)}>
-          <Icon
-            style={{
-              transition: "0.2s",
-              transform: expanded ? "rotate(180deg)" : "",
-            }}
-          >
-            expand_more
-          </Icon>
-        </IconButton>
-      )}
 
       {!props.editMode && (
         <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
@@ -102,25 +96,36 @@ function WorkspaceTitle(props) {
           <Icon className="app-title-alert">no_accounts</Icon>
         </Tooltip>
       )}
+
+      <div className="break" style={{ margin: 0 }} />
+      {creationDateString && (
+        <Typography variant="overline" style={{ fontSize: 10 }}>
+          {`${props.sessionData.bpm} BPM - ${creationDateString}`}
+        </Typography>
+      )}
       <div className="break" />
 
-      {!(props.editMode && !props.user) &&
-        editorProfiles.map((e) => (
-          <Tooltip title={e.displayName}>
-            <Avatar src={e.photoURL} />
-          </Tooltip>
-        ))}
+      {props.sessionData.editors.length &&
+        editorProfiles.map(
+          (e) =>
+            e !== null && (
+              <Tooltip title={e.displayName}>
+                <Avatar src={e.photoURL} />
+              </Tooltip>
+            )
+        )}
 
       <div className="break" />
 
       {expanded && (
         <Fragment>
-          <Typography>{props.sessionData.description}</Typography>
+          <Typography variant="body2">{`"${props.sessionData.description}"`}</Typography>
           <div className="break" />
-          {props.sessionData.tags && props.sessionData.tags.length ? (
+          {props.sessionData.tags && props.sessionData.tags.length && (
             <Fragment>
               {props.sessionData.tags.map((e, i) => (
                 <Chip
+                  style={{ margin: "0px 4px" }}
                   key={props.index + e}
                   label={e}
                   variant="outlined"
@@ -128,29 +133,16 @@ function WorkspaceTitle(props) {
                   onDelete={() => handleTagDelete(i)}
                 />
               ))}
-              <IconButton
-                onClick={() => setTagDialog(true)}
-                style={{ height: 24, width: 24, margin: 4 }}
-              >
-                <Icon style={{ fontSize: 24 }}>add</Icon>
-              </IconButton>
             </Fragment>
-          ) : (
-            <Button onClick={() => setTagDialog(true)}>ADD TAG</Button>
-          )}
-
-          <div className="break" />
-          {creationDateString && (
-            <Typography variant="overline" style={{ fontSize: 10 }}>
-              {creationDateString}
-            </Typography>
           )}
         </Fragment>
       )}
-      {tagDialog && (
-        <TagInput
-          handleTagAdd={handleTagAdd}
-          onClose={() => setTagDialog(false)}
+      {infoDialog && (
+        <SessionInfo
+          sessionKey={props.sessionKey}
+          sessionData={props.sessionData}
+          setSessionData={props.setSessionData}
+          onClose={() => setInfoDialog(false)}
         />
       )}
     </div>
