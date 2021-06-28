@@ -50,7 +50,7 @@ function SessionExplorer(props) {
       : firebase.firestore().collection("sessions");
 
     dbRef.get().then((snapshot) => {
-      console.log(snapshot.docs.map((e) => [e.id, e.data()]));
+      //console.log(snapshot.docs.map((e) => [e.id, e.data()]));
       setSessionKeys(snapshot.docs.map((e) => e.id));
       setSessions(snapshot.docs.map((e) => e.data()));
     });

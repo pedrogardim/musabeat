@@ -12,16 +12,27 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     tags: ["musa"],
     bpm: 120,
     modules: [
-      /* {
+      {
         id: 0,
         name: "Sequencer",
         color: 2,
-        score: [[[0], [3], [2, 0], [3], [0], [3], [2, 0], [3]]],
+        score: [
+          {
+            0: [0],
+            1: [3],
+            2: [2, 0],
+            3: [3],
+            4: [0],
+            5: [3],
+            6: [2, 0],
+            7: [3],
+          },
+        ],
         instrument: "-McEPecUtSOmHmpiuVOU",
         type: 0,
         volume: 0,
         muted: false,
-      }, */
+      },
     ],
   };
 
@@ -35,7 +46,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     editors: [userId],
     likes: 0,
     likedBy: ["a"],
-    createdOn: firebase.database.ServerValue.TIMESTAMP,
+    createdOn: firebase.firestore.FieldValue.serverTimestamp(),
   };
 
   let newSession = Object.assign(

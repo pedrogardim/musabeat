@@ -32,8 +32,9 @@ export const scheduleDrumSequence = (
 
   for (let x = 0; x < loopTimes; x++) {
     sequence.forEach((measure, measureIndex) => {
-      measure.forEach((beat, beatIndex) => {
-        let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
+      Object.values(measure).forEach((beat, beatIndex) => {
+        let beattimevalue =
+          Tone.Time("1m").toSeconds() / Object.keys(measure).length;
         let beatscheduletime =
           beattimevalue * beatIndex +
           Tone.Time("1m").toSeconds() * measureIndex +
@@ -74,8 +75,9 @@ export const scheduleMelodyGrid = (
 
   for (let x = 0; x < loopTimes; x++) {
     sequence.forEach((measure, measureIndex) => {
-      measure.forEach((beat, beatIndex) => {
-        let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
+      Object.values(measure).forEach((beat, beatIndex) => {
+        let beattimevalue =
+          Tone.Time("1m").toSeconds() / Object.keys(measure).length;
         let beatscheduletime =
           beattimevalue * beatIndex +
           Tone.Time("1m").toSeconds() * measureIndex +
@@ -86,7 +88,7 @@ export const scheduleMelodyGrid = (
             beat.forEach((note) =>
               instrument.triggerAttackRelease(
                 note,
-                Tone.Time("1m").toSeconds() / sequence[measureIndex].length,
+                Tone.Time("1m").toSeconds() / Object.keys(measure).length,
                 time
               )
             );

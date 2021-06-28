@@ -38,21 +38,39 @@ function MelodyGrid(props) {
 
   const inputNote = (x, y) => {
     let note = gridScale[y];
-    setMelodyArray((previousSequence) =>
+    /* setMelodyArray((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
-        measure.map((beat, beatIndex) =>
-          measureIndex === currentMeasure && beatIndex === x
-            ? beat === 0
-              ? [note]
-              : beat.includes(note) && beat.length > 1
-              ? beat.filter((z) => z !== note)
-              : beat.includes(note) && beat.length === 1
-              ? 0
-              : [...beat, note]
-            : beat
+        Object.assign(
+          {},
+          Object.values(measure).map((beat, beatIndex) =>
+            measureIndex === currentMeasure && beatIndex === x
+              ? beat === 0
+                ? [note]
+                : beat.includes(note) && beat.length > 1
+                ? beat.filter((z) => z !== note)
+                : beat.includes(note) && beat.length === 1
+                ? 0
+                : [...beat, note]
+              : beat
+          )
         )
-      )
-    );
+      ) 
+    );*/
+
+    setMelodyArray((previousSequence) => {
+      let newSequence = [...previousSequence];
+      let beat = newSequence[currentMeasure][x];
+      newSequence[currentMeasure][x] =
+        beat === 0
+          ? [note]
+          : beat.includes(note) && beat.length > 1
+          ? beat.filter((z) => z !== note)
+          : beat.includes(note) && beat.length === 1
+          ? 0
+          : [...beat, note];
+      return newSequence;
+    });
+
     playNote(note);
   };
 
@@ -92,7 +110,8 @@ function MelodyGrid(props) {
   const playNote = (note, time) =>
     instrument.triggerAttackRelease(
       note,
-      Tone.Time("1m").toSeconds() / melodyArray[currentMeasure].length,
+      Tone.Time("1m").toSeconds() /
+        Object.keys(melodyArray[currentMeasure]).length,
       time
     );
 
@@ -193,7 +212,7 @@ function MelodyGrid(props) {
                 {drumsound}
               </Typography>
             )}
-            {melodyArray[currentMeasure].map((beat, column) => (
+            {Object.values(melodyArray[currentMeasure]).map((beat, column) => (
               <SequencerTile
                 key={[column, row]}
                 inputNote={inputNote}

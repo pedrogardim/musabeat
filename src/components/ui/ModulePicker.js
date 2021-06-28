@@ -72,7 +72,7 @@ function ModulePicker(props) {
       type: selectedType,
       score:
         selectedType === 0 || selectedType === 1
-          ? [new Array(selectedSteps).fill(0)]
+          ? [{ ...Array(selectedSteps).fill(0) }]
           : selectedType === 2
           ? new Array(selectedSize).fill().map((e, i) => {
               let chord = {

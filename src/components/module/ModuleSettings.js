@@ -44,9 +44,11 @@ function ModuleSettings(props) {
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
-          newModule.subdiv = parseInt(newValue);
           newModule.score = newModule.score.map((array) =>
-            adaptSequencetoSubdiv(array, newValue)
+            Object.assign(
+              {},
+              adaptSequencetoSubdiv(Object.values(array), newValue)
+            )
           );
 
           return newModule;
@@ -157,7 +159,7 @@ function ModuleSettings(props) {
           <Select
             native
             labelId="subdivision"
-            value={props.module.score[0].length}
+            value={Object.values(props.module.score[0]).length}
             onChange={handleStepsSelect}
           >
             {subdivisionValues.map((value, index) => (
@@ -176,7 +178,11 @@ function ModuleSettings(props) {
           <Select
             native
             labelId="length-select-label"
-            value={props.module.size}
+            value={
+              props.module.type === 4
+                ? props.module.size
+                : props.module.score.length
+            }
             onChange={handleLengthSelect}
           >
             {lengthValues.map((value, index) => (

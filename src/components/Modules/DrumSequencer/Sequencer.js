@@ -28,21 +28,39 @@ function Sequencer(props) {
   const [soundsMap, setSoundsMap] = useState([]);
 
   const inputNote = (x, y) => {
-    setSequence((previousSequence) =>
+    /*  setSequence((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
-        measure.map((beat, beatIndex) =>
-          measureIndex === currentMeasure && beatIndex === x
-            ? beat === 0
-              ? [y]
-              : beat.includes(y) && beat.length > 1
-              ? beat.filter((z) => z !== y)
-              : beat.includes(y) && beat.length === 1
-              ? 0
-              : [...beat, isNaN(y) ? y : parseInt(y)]
-            : beat
+        Object.assign(
+          {},
+          Object.values(measure).map((beat, beatIndex) =>
+            measureIndex === currentMeasure && beatIndex === x
+              ? beat === 0
+                ? [y]
+                : beat.includes(y) && beat.length > 1
+                ? beat.filter((z) => z !== y)
+                : beat.includes(y) && beat.length === 1
+                ? 0
+                : [...beat, isNaN(y) ? y : parseInt(y)]
+              : beat
+          )
         )
       )
-    );
+    ); */
+
+    setSequence((previousSequence) => {
+      let newSequence = [...previousSequence];
+      let beat = newSequence[currentMeasure][x];
+      newSequence[currentMeasure][x] =
+        beat === 0
+          ? [y]
+          : beat.includes(y) && beat.length > 1
+          ? beat.filter((z) => z !== y)
+          : beat.includes(y) && beat.length === 1
+          ? 0
+          : [...beat, isNaN(y) ? y : parseInt(y)];
+      return newSequence;
+    });
+
     playDrumSound(y);
   };
 
@@ -125,22 +143,24 @@ function Sequencer(props) {
                 {isNaN(drumsound) ? drumsound : labels[parseInt(drumsound)]}
               </Typography>
             )}
-            {sequencerArray[currentMeasure].map((beat, column) => (
-              <SequencerTile
-                key={[column, drumsound]}
-                inputNote={inputNote}
-                active={
-                  typeof beat === "object" &&
-                  beat.includes(
-                    isNaN(drumsound) ? drumsound : parseInt(drumsound)
-                  )
-                }
-                cursor={currentBeat === column}
-                color={colors[props.module.color]}
-                x={column}
-                y={isNaN(drumsound) ? drumsound : parseInt(drumsound)}
-              />
-            ))}
+            {Object.values(sequencerArray[currentMeasure]).map(
+              (beat, column) => (
+                <SequencerTile
+                  key={[column, drumsound]}
+                  inputNote={inputNote}
+                  active={
+                    typeof beat === "object" &&
+                    beat.includes(
+                      isNaN(drumsound) ? drumsound : parseInt(drumsound)
+                    )
+                  }
+                  cursor={currentBeat === column}
+                  color={colors[props.module.color]}
+                  x={column}
+                  y={isNaN(drumsound) ? drumsound : parseInt(drumsound)}
+                />
+              )
+            )}
           </div>
         ))}
       </div>
