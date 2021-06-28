@@ -12,12 +12,9 @@ import {
   Icon,
   ListItemSecondaryAction,
 } from "@material-ui/core";
-import { PostAddSharp } from "@material-ui/icons";
 
 function AudioFileItem(props) {
-
   const [wavePath, setWavePath] = useState("");
-  const [wave, setWave] = useState("");
 
   const handleClick = () => {
     props.instrument.name === "Sampler"
@@ -26,12 +23,8 @@ function AudioFileItem(props) {
   };
 
   useEffect(
-    () =>
-      drawWave(
-        props.buffer.toArray(),
-        setWavePath
-      ),
-    []
+    () => drawWave(props.buffer.toArray(), setWavePath),
+    [props.buffer]
   );
 
   return (
@@ -61,7 +54,6 @@ function AudioFileItem(props) {
             )
           }
           edge="end"
-
         >
           <Icon>delete</Icon>
         </IconButton>
@@ -71,8 +63,9 @@ function AudioFileItem(props) {
 }
 
 const drawWave = (wavearray, setWavePath) => {
-
-  if(!wavearray.length){return};
+  if (!wavearray.length) {
+    return;
+  }
 
   let pathstring = "M 0 16 ";
 

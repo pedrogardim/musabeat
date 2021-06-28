@@ -3,15 +3,10 @@ import * as Tone from "tone";
 
 import {
   Paper,
-  Typography,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
-  TextField,
   Icon,
   IconButton,
   Fab,
@@ -34,7 +29,8 @@ import "./ChordEditor.css";
 
 function ChordEditor(props) {
   const inputRef = useRef(null);
-  const [scaleChords, setScaleChords] = useState(getChordsFromScale(0, 0, 3));
+  //const [scaleChords, setScaleChords] = useState(getChordsFromScale(0, 0, 3));
+  const scaleChords = getChordsFromScale(0, 0, 3);
   const [textInputValue, setTextInputValue] = useState(
     chordNotestoName(props.chords[props.selectedChord].notes)
   );
@@ -133,7 +129,7 @@ function ChordEditor(props) {
     setTextInputValue(
       chordNotestoName(props.chords[props.selectedChord].notes)
     );
-  }, [props.chords]);
+  }, [props.chords, props.selectedChord]);
 
   return (
     <Dialog open="true" onClose={props.onClose} maxWidth="md" fullWidth>

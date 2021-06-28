@@ -9,10 +9,8 @@ import {
   scheduleDrumSequence,
   clearEvents,
 } from "../../../utils/TransportSchedule";
-import { loadDrumPatch } from "../../../assets/musicutils";
 
 import {
-  CircularProgress,
   BottomNavigation,
   BottomNavigationAction,
   Typography,
@@ -33,11 +31,11 @@ function Sequencer(props) {
     setSequence((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
-          measureIndex == currentMeasure && beatIndex == x
+          measureIndex === currentMeasure && beatIndex === x
             ? beat === 0
               ? [y]
               : beat.includes(y) && beat.length > 1
-              ? beat.filter((z) => z != y)
+              ? beat.filter((z) => z !== y)
               : beat.includes(y) && beat.length === 1
               ? 0
               : [...beat, isNaN(y) ? y : parseInt(y)]
@@ -137,7 +135,7 @@ function Sequencer(props) {
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   )
                 }
-                cursor={currentBeat == column}
+                cursor={currentBeat === column}
                 color={colors[props.module.color]}
                 x={column}
                 y={isNaN(drumsound) ? drumsound : parseInt(drumsound)}

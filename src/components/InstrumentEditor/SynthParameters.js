@@ -1,7 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
 
-import * as Tone from "tone";
-
 import {
   Select,
   Typography,
@@ -9,13 +7,13 @@ import {
   FormControl,
   InputLabel,
 } from "@material-ui/core";
-import { waveTypes, filterTypes } from "../../assets/musicutils";
+import { waveTypes } from "../../assets/musicutils";
 
 import FilterEditor from "./FilterEditor";
 
 import "./InstrumentEditor.css";
 
-const filterRollOffs = [-12, -24, -48, -96];
+//const filterRollOffs = [-12, -24, -48, -96];
 
 function SynthParameters(props) {
   //const [selectedFile, setSelectedFile] = useState(null);

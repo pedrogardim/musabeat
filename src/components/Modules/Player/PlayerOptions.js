@@ -1,5 +1,4 @@
 import React, { useState, useRef, Fragment, useEffect } from "react";
-import * as Tone from "tone";
 
 import {
   IconButton,
@@ -17,8 +16,6 @@ function PlayerOptions(props) {
   const [playbackRate, setPlaybackRate] = useState(
     props.score.playbackRate ? props.score.playbackRate : 1
   );
-
-  const sessionData = props.sessionData;
 
   const handlePitchChange = (e, v) => {
     if (!e.altKey) {
@@ -47,7 +44,7 @@ function PlayerOptions(props) {
 
   useEffect(() => {
     props.instrument.set({ detune: pitch, playbackRate: playbackRate });
-    console.log({ detune: pitch, playbackRate: playbackRate });
+    //console.log({ detune: pitch, playbackRate: playbackRate });
   }, [pitch, playbackRate]);
 
   return (

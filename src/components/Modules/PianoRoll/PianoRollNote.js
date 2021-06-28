@@ -29,7 +29,7 @@ function PianoRollNote(props) {
 
   const handleDrag = (event, data) => {
     setNotePosition({ x: data.x, y: data.y });
-    //console.log(data);
+    console.log(data);
   };
 
   const handleDragStop = (event, data) => {

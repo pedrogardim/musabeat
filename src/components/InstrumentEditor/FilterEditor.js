@@ -1,23 +1,21 @@
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import React, { useState, useEffect } from "react";
 
 import * as Tone from "tone";
 
-import { mapLogScale } from "../../assets/musicutils";
-
-import { Typography, Slider, IconButton, Icon } from "@material-ui/core";
+import { Typography, Slider } from "@material-ui/core";
 
 import "./FilterEditor.css";
 
 function FilterEditor(props) {
   //temp
 
-  const [filterState, setFilterState] = useState(
+  /* const [filterState, setFilterState] = useState(
     //!(
     //  props.instrument.get().filter.frequency === 20001 &&
     //  props.instrument.get().filter.type === "notch"
     //)
     true
-  );
+  ); */
 
   const [tempFilter, setTempFilter] = useState(() => {
     return new Tone.Filter({
@@ -48,7 +46,7 @@ function FilterEditor(props) {
     //setTempFilter(new Tone.Filter(props.instrument.get().filter));
   };
 
-  const toggleFilter = () => {
+  /* const toggleFilter = () => {
     filterState
       ? props.handleFilterChange({
           type: "notch",
@@ -57,7 +55,7 @@ function FilterEditor(props) {
       : props.handleFilterChange(tempFilter.get());
 
     setFilterState((prev) => !prev);
-  };
+  }; */
 
   useEffect(() => {
     /*  setFilterState(
@@ -101,7 +99,8 @@ function FilterEditor(props) {
         height="64px"
         style={{ border: "1px solid #05386b", marginBottom: 8 }}
       >
-        {filterState && <path d={filterFRWave} stroke="#05386b" fill="none" />}
+        {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
+        <path d={filterFRWave} stroke="#05386b" fill="none" />
       </svg>
       <Typography variant="overline" className="filter-editor-labels">
         {"Frequency:" + Math.floor(frequency) + "Hz"}

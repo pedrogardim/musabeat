@@ -50,9 +50,9 @@ function PianoRoll(props) {
     ];
 
     let delta = [
-      83 -
+      82 -
         Math.floor(
-          (clickedPos[0] - modulePos[0]) / (PRWrapper.offsetHeight / 84 + 1)
+          (clickedPos[0] - modulePos[0]) / (PRWrapper.current.offsetHeight / 82)
         ),
       (clickedPos[1] - modulePos[1]) /
         (PRWrapper.current.offsetWidth / (props.module.size * 8)),
@@ -65,7 +65,7 @@ function PianoRoll(props) {
       velocity: 0.7,
     };
 
-    //console.log(newNote);
+    console.log(newNote);
 
     setNotes((prev) => {
       let newNotes = [...prev];
@@ -198,9 +198,9 @@ function PianoRoll(props) {
                     style={{
                       borderLeft:
                         "solid 1px " +
-                        (ii % 8 == 0
+                        (ii % 8 === 0
                           ? colors[props.module.color][500]
-                          : ii % 2 == 0
+                          : ii % 2 === 0
                           ? colors[props.module.color][700]
                           : colors[props.module.color][800]),
                     }}

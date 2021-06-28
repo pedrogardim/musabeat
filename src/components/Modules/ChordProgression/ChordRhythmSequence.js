@@ -10,7 +10,7 @@ import { Icon, IconButton } from "@material-ui/core";
 
 import "./ChordRhythmSequence.css";
 
-const subdivisionValues = [4, 8, 12, 16, 24, 32];
+//const subdivisionValues = [4, 8, 12, 16, 24, 32];
 
 function ChordRhythmSequence(props) {
   const [currentMeasure, setCurrentMeasure] = useState(0);

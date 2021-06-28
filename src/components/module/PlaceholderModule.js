@@ -1,14 +1,10 @@
-import React, { useEffect, useState, Fragment } from "react";
-
 import { Skeleton } from "@material-ui/lab";
 
-import { IconButton, Icon, Typography } from "@material-ui/core";
+import { IconButton, Icon } from "@material-ui/core";
 
 import "./Module.css";
 
-function PlaceholderModule(props) {
-  let moduleContent = <span>Nothing Here</span>;
-
+function PlaceholderModule() {
   return (
     <div
       style={{

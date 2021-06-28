@@ -1,10 +1,9 @@
 import "./ModulePicker.css";
 
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState } from "react";
 
 import {
   IconButton,
-  Card,
   Typography,
   Icon,
   Dialog,
@@ -55,10 +54,13 @@ function ModulePicker(props) {
   const [selectedType, setSelectedType] = useState(0);
   const [selectedSize, setSelectedSize] = useState(1);
   const [selectedSteps, setSelectedSteps] = useState(8);
-  const [selectedInstrument, setSelectedInstrument] = useState(0);
-  const [selectedRoot, setSelectedRoot] = useState(0);
-  const [selectedScale, setSelectedScale] = useState(1);
-  const [selectedRange, setSelectedRange] = useState([3, 6]);
+  //const [selectedRoot, setSelectedRoot] = useState(0);
+  //const [selectedScale, setSelectedScale] = useState(1);
+  //const [selectedRange, setSelectedRange] = useState([3, 6]);
+
+  const selectedRoot = 0;
+  const selectedScale = 1;
+  const selectedRange = [3, 6];
 
   const addModule = (moduletype) => {
     let newModule = {
@@ -122,10 +124,6 @@ function ModulePicker(props) {
 
   const handleStepSelect = (event) => {
     setSelectedSteps(event.target.value);
-  };
-
-  const handleInstrumentSelect = (event) => {
-    setSelectedInstrument(event.target.value);
   };
 
   return (

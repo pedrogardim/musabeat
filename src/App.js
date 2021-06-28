@@ -1,7 +1,6 @@
 import "./App.css";
 
 import React, { useState, useEffect, Fragment } from "react";
-import * as Tone from "tone";
 
 import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
@@ -29,13 +28,10 @@ import { createNewSession } from "./utils/sessionUtils";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [appTitle, setAppTitle] = useState("Welcome!");
-  const [isPlaying, setIsPlaying] = useState(null);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
   const [openedSession, setOpenedSession] = useState(null);
-  const [sessionEditMode, setSessionEditMode] = useState(null);
 
   const history = useHistory();
 
@@ -76,7 +72,12 @@ function App() {
           >
             <Icon>menu</Icon>
           </IconButton>
-          <img className="app-logo" style={{ height: 30 }} src={logo} />
+          <img
+            className="app-logo"
+            alt={"musa"}
+            style={{ height: 30 }}
+            src={logo}
+          />
           <IconButton className="main-avatar">
             <Avatar
               onClick={handleAvatarClick}
@@ -145,11 +146,9 @@ function App() {
           </Route>
           <Route exact path="/session/:key">
             <Workspace
-              setAppTitle={setAppTitle}
               setOpenedSession={setOpenedSession}
               session={openedSession}
               user={user}
-              setSessionEditMode={setSessionEditMode}
               createNewSession={handleCreateNewSession}
             />
           </Route>

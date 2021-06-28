@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import * as Tone from "tone";
 
-import Draggable from "react-draggable";
 import { Rnd } from "react-rnd";
-
-import { Icon } from "@material-ui/core";
 
 import "./AudioClip.css";
 
@@ -13,10 +10,6 @@ function AudioClip(props) {
   const [clipHeight, setClipHeight] = useState(0);
   const [clipWidth, setClipWidth] = useState(0);
   const [clipPosition, setClipPosition] = useState(0);
-
-  const [waveForm, setWaveForm] = useState([]);
-
-  const [pitchTime, setPitchTime] = useState([]);
 
   const updateClipPosition = () => {
     if (props.parentRef.current === null) return;

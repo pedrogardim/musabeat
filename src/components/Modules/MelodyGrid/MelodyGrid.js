@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from "react";
 import SequencerTile from "../DrumSequencer/SequencerTile";
 import * as Tone from "tone";
 
-import * as Drumdata from "../../../assets/drumkits";
-
 import {
   scheduleMelodyGrid,
   clearEvents,
@@ -13,7 +11,6 @@ import {
 import { scales, musicalNotes } from "../../../assets/musicutils";
 
 import {
-  CircularProgress,
   BottomNavigation,
   BottomNavigationAction,
   Typography,
@@ -24,7 +21,6 @@ import { colors } from "../../../utils/materialPalette";
 
 function MelodyGrid(props) {
   const parentRef = useRef(null);
-  const [isBufferLoaded, setIsBufferLoaded] = useState(true);
   const [instrument, setInstrument] = useState(props.instrument);
   const [melodyArray, setMelodyArray] = useState(props.module.score);
   const [gridScale, setGridScale] = useState([
@@ -45,11 +41,11 @@ function MelodyGrid(props) {
     setMelodyArray((previousSequence) =>
       previousSequence.map((measure, measureIndex) =>
         measure.map((beat, beatIndex) =>
-          measureIndex == currentMeasure && beatIndex == x
+          measureIndex === currentMeasure && beatIndex === x
             ? beat === 0
               ? [note]
               : beat.includes(note) && beat.length > 1
-              ? beat.filter((z) => z != note)
+              ? beat.filter((z) => z !== note)
               : beat.includes(note) && beat.length === 1
               ? 0
               : [...beat, note]
@@ -74,7 +70,7 @@ function MelodyGrid(props) {
       : clearEvents(props.module.id);
   };
 
-  const getScaleFromSequenceNotes = () => {
+  /*  const getScaleFromSequenceNotes = () => {
     let notes = [];
     melodyArray.map((msre) =>
       msre.map((beat) =>
@@ -91,7 +87,7 @@ function MelodyGrid(props) {
       return 0;
     });
     setGridScale(notes);
-  };
+  }; */
 
   const playNote = (note, time) =>
     instrument.triggerAttackRelease(
@@ -207,7 +203,7 @@ function MelodyGrid(props) {
                     isNaN(drumsound) ? drumsound : parseInt(drumsound)
                   )
                 }
-                cursor={currentBeat == column}
+                cursor={currentBeat === column}
                 color={colors[props.module.color]}
                 x={column}
                 y={row}

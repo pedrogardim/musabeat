@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment, useEffect } from "react";
+import React, { useState, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
 import {

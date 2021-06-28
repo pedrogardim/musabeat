@@ -1,24 +1,14 @@
-import React, { useEffect, useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
 
-import * as Tone from "tone";
-
-import {
-  Select,
-  InputLabel,
-  BottomNavigation,
-  BottomNavigationAction,
-  Divider,
-} from "@material-ui/core";
+import { Divider } from "@material-ui/core";
 
 import "./ModuleEffects.css";
 
-import { colors } from "../../utils/materialPalette";
 import { loadEffect } from "../../assets/musicutils";
 
 import Effect from "./Effect";
 
 function ModuleEffects(props) {
-  let mainContent = "No Settings";
   const [currentEffect, setCurrentEffect] = useState(null);
 
   const createEffect = (type, index) => {

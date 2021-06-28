@@ -1,11 +1,9 @@
-import React, { useState, useEffect, Fragment } from "react";
-import * as Tone from "tone";
+import React, { useState, useEffect } from "react";
 
 import {
   Paper,
   Typography,
   CircularProgress,
-  TextField,
   Icon,
   IconButton,
   Avatar,
@@ -21,7 +19,6 @@ import { colors } from "../../../utils/materialPalette";
 function SessionGalleryItem(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
-  const [sessionLikes, setSessionLikes] = useState(false);
 
   const handleClick = (event) => {
     !event.target.classList.contains("MuiButtonBase-root") &&

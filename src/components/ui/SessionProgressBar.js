@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import * as Tone from "tone";
 
 import "./SessionProgressBar.css";

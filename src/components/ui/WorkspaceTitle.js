@@ -1,8 +1,5 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
-import * as Tone from "tone";
+import React, { useState, useEffect, Fragment } from "react";
 import firebase from "firebase";
-
-import { useParams } from "react-router-dom";
 
 import {
   Icon,

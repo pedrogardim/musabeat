@@ -1,7 +1,4 @@
-import React, { useEffect, useState, Fragment } from "react";
-import { labels } from "../../assets/drumkits";
-
-import * as Tone from "tone";
+import React, { useEffect, useState } from "react";
 
 import SavePatch from "../../components/ui/Dialogs/SavePatch";
 
@@ -12,12 +9,10 @@ import firebase from "firebase";
 import {
   List,
   ListItem,
-  ListItemText,
   IconButton,
   Icon,
   Paper,
   Divider,
-  ListItemSecondaryAction,
   CircularProgress,
   Tooltip,
   Typography,
@@ -38,7 +33,6 @@ function PatchExplorer(props) {
 
   const [patchesList, setPatchesList] = useState(null);
   const [patchesCreatorList, setPatchesCreatorList] = useState([]);
-  const [open, setOpen] = useState(false);
   const [selectedPatch, setSelectedPatch] = useState(<CircularProgress />);
   const [savePatchDialog, setSavePatchDialog] = useState(false);
 
@@ -204,7 +198,6 @@ function PatchExplorer(props) {
   }, [props.module]);
 
   useEffect(() => {
-    //user && fetchUserPatches();
     fetchPatches("all");
   }, []);
 

@@ -31,8 +31,8 @@ export const scheduleDrumSequence = (
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
   for (let x = 0; x < loopTimes; x++) {
-    sequence.map((measure, measureIndex) => {
-      measure.map((beat, beatIndex) => {
+    sequence.forEach((measure, measureIndex) => {
+      measure.forEach((beat, beatIndex) => {
         let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
         let beatscheduletime =
           beattimevalue * beatIndex +
@@ -73,8 +73,8 @@ export const scheduleMelodyGrid = (
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
   for (let x = 0; x < loopTimes; x++) {
-    sequence.map((measure, measureIndex) => {
-      measure.map((beat, beatIndex) => {
+    sequence.forEach((measure, measureIndex) => {
+      measure.forEach((beat, beatIndex) => {
         let beattimevalue = Tone.Time("1m").toSeconds() / measure.length;
         let beatscheduletime =
           beattimevalue * beatIndex +
@@ -117,14 +117,14 @@ export const scheduleChordProgression = (
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
   for (let x = 0; x < loopTimes; x++) {
-    chords.map((chord, chordIndex) => {
+    chords.forEach((chord, chordIndex) => {
       let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
       let chordtimetostart =
         Tone.Time("1m").toSeconds() * chord.time +
         Tone.Time("1m").toSeconds() * x * moduleLength;
       let rhythmduration = chordduration / chord.rhythm.length;
 
-      chord.rhythm.map((rhythm, rhythmIndex) => {
+      chord.rhythm.forEach((rhythm, rhythmIndex) => {
         let rhythmscheduletime =
           rhythmduration * rhythmIndex + chordtimetostart;
         let thisevent = transport.schedule((time) => {
@@ -139,6 +139,8 @@ export const scheduleChordProgression = (
                 time
               );
               //console.log(chord.notes);
+              break;
+            default:
               break;
           }
 
@@ -166,7 +168,7 @@ export const scheduleSamples = (
 
   let scheduledSounds = [];
 
-  score.map((event, eventIndex) => {
+  score.forEach((event, eventIndex) => {
     let isCursorinBetween =
       cursorTime > event.time && cursorTime < event.time + event.duration;
 
@@ -204,7 +206,7 @@ export const schedulePianoRoll = (
   let loopTimes = parseInt(sessionSize) / moduleSize;
 
   for (let x = 0; x < loopTimes; x++) {
-    score.map((e, i) => {
+    score.forEach((e, i) => {
       let event = transport.schedule((time) => {
         instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
       }, e.time + Tone.Time("1m").toSeconds() * moduleSize * x);

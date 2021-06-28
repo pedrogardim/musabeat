@@ -1,13 +1,9 @@
 import React, { useState, useRef } from "react";
 
 import {
-  Paper,
-  Typography,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
   TextField,

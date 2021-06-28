@@ -310,6 +310,8 @@ function Module(props) {
         />
       );
       break;
+    default:
+      break;
   }
 
   useEffect(() => {
@@ -346,10 +348,6 @@ function Module(props) {
         : props.instrument.releaseAll();
     }
   }, [Tone.Transport.state]);
-  /* 
-  useEffect(() => {
-    console.log(moduleZoom);
-  }, [moduleZoom]); */
 
   return (
     <Fragment>
@@ -497,7 +495,6 @@ function Module(props) {
                 setInstrument={setInstrument}
                 setInstrumentsLoaded={props.setInstrumentsLoaded}
                 setInstrumentLoaded={setInstrumentLoaded}
-                setModules={props.setModules}
                 setModulePage={setModulePage}
                 index={props.index}
               />

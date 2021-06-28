@@ -1,6 +1,3 @@
-import React, { useState, useEffect } from "react";
-import * as Tone from "tone";
-
 import "./Mixer.css";
 import ChannelStrip from "./ChannelStrip";
 

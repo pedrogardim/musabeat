@@ -9,14 +9,11 @@ import PlayerOptions from "./PlayerOptions";
 
 import Draggable from "react-draggable";
 import { FileDrop } from "react-file-drop";
-import { CircularProgress, Typography } from "@material-ui/core";
 
 import { scheduleSamples, clearEvents } from "../../../utils/TransportSchedule";
+import { colors } from "../../../utils/materialPalette";
 
 import "./Player.css";
-
-import { colors } from "../../../utils/materialPalette";
-import { ContactSupportOutlined } from "@material-ui/icons";
 
 function Player(props) {
   const playerWrapper = useRef(null);

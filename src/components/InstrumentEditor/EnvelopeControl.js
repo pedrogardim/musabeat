@@ -1,12 +1,6 @@
-import React, { useState, Fragment, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-import {
-  Select,
-  Typography,
-  Slider,
-  Icon,
-  IconButton,
-} from "@material-ui/core";
+import { Typography, Slider, Icon, IconButton } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 
@@ -34,7 +28,7 @@ function EnvelopeControl(props) {
 
   useEffect(() => {
     setEnvelope(props.instrument.get()[props.envelopeType]);
-  }, [props.instrument]);
+  }, [props.instrument, props.envelopeType]);
 
   return (
     <div className="instrument-editor-envelope-container">

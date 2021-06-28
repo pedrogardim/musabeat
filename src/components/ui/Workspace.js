@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
@@ -8,16 +8,10 @@ import {
   Fab,
   Icon,
   IconButton,
-  Button,
   Typography,
   Tooltip,
   Snackbar,
-  Avatar,
 } from "@material-ui/core";
-
-import { instruments } from "../../assets/instrumentpatches";
-
-import { starterSession } from "../../assets/starterSession";
 
 import "./Workspace.css";
 
@@ -40,11 +34,6 @@ import {
 } from "../../assets/musicutils";
 
 import { clearEvents } from "../../utils/TransportSchedule";
-import { createNewSession } from "../../utils/sessionUtils";
-import { getDefaultNormalizer } from "@testing-library/react";
-
-Tone.Transport.loop = true;
-Tone.Transport.loopStart = 0;
 
 function Workspace(props) {
   const [modules, setModules] = useState(null);
@@ -72,7 +61,7 @@ function Workspace(props) {
 
   //a copy of the instruments, to be able to use them on export function
   //to undo and redo
-  const [sessionHistory, setSessionHistory] = useState([]);
+  //const [sessionHistory, setSessionHistory] = useState([]);
 
   const handleSessionCopy = () => {
     DBSessionRef.get().then((r) => props.createNewSession(r.val()));
@@ -182,7 +171,6 @@ function Workspace(props) {
         let editors = sessionData.editors;
         //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
-        let name = sessionData.name;
       });
     } /* else if (typeof sessionKey === "object") {
       setModules(sessionKey.modules);
@@ -206,7 +194,7 @@ function Workspace(props) {
     //console.log("session instr loading");
 
     let moduleInstruments = [];
-    sessionModules.map((module, moduleIndex) => {
+    sessionModules.forEach((module, moduleIndex) => {
       //console.log(instrument)
       //sequencer
       if (module.type === 0) {
@@ -384,7 +372,7 @@ function Workspace(props) {
       });
     }
 
-    instruments.map((e, i) => {
+    instruments.forEach((e, i) => {
       if (!!e) {
         e.volume.value = modules[i].volume;
         e._volume.mute = modules[i].muted;
@@ -528,6 +516,8 @@ function Workspace(props) {
         case 86:
           handlePaste();
           break;
+        default:
+          break;
       }
     }
     switch (e.keyCode) {
@@ -539,10 +529,14 @@ function Workspace(props) {
       case 8:
         handleBackspace();
         break;
+      default:
+        break;
     }
   };
 
   useEffect(() => {
+    Tone.Transport.loop = true;
+    Tone.Transport.loopStart = 0;
     instruments.forEach((e) => e.dispose());
     clearEvents("all");
     console.log("transport cleared");
@@ -595,10 +589,12 @@ function Workspace(props) {
     };
   }, []);
 
+  /* 
   useEffect(() => {
-    //console.log("editMode", editMode);
+    console.log("editMode", editMode);
     !props.hidden && props.setSessionEditMode(editMode);
   }, [editMode]);
+ */
 
   //useEffect(() => {}, [instruments]);
 
@@ -640,7 +636,7 @@ function Workspace(props) {
                 editMode={editMode}
                 setFocusedModule={setFocusedModule}
               />
-              {moduleIndex % 3 == 1 && <div className="break" />}
+              {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>
           ))
         ) : !modules ? (

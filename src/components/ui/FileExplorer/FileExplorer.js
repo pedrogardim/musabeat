@@ -10,7 +10,6 @@ import {
   TableHead,
   TableRow,
   CircularProgress,
-  Typography,
   Icon,
   IconButton,
   Divider,
@@ -29,8 +28,8 @@ function FileExplorer(props) {
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
 
-  const [userOption, setUserOption] = useState(false);
-  const [sideMenu, setSideMenu] = useState(false);
+  //const [userOption, setUserOption] = useState(false);
+  //const [sideMenu, setSideMenu] = useState(false);
 
   const handleFileSelect = (e, index) => {
     props.compact &&
@@ -57,7 +56,7 @@ function FileExplorer(props) {
     setFiledata(filesMetadata);
   };
 
-  const handleDownload = (index) => {
+  /*   const handleDownload = (index) => {
     refList[index]
       .getDownloadURL()
       .then(function (url) {
@@ -74,7 +73,7 @@ function FileExplorer(props) {
       .catch(function (error) {
         console.log(error);
       });
-  };
+  }; */
 
   const playSound = (index) => {
     if (players[index] !== undefined) {
@@ -188,7 +187,9 @@ function FileExplorer(props) {
                           {row.contentType.replace("audio/", "")}
                         </TableCell>
                         <TableCell align="right">
-                          <IconButton onClick={() => handleDownload(index)}>
+                          {/* <IconButton onClick={() => handleDownload(index)}> */}
+
+                          <IconButton>
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell>

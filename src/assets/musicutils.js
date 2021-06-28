@@ -5,8 +5,6 @@
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { instruments } from "./instrumentpatches";
-import { kits, labels } from "./drumkits";
 import { PitchDetector } from "pitchy";
 
 export const musicalNotes = [

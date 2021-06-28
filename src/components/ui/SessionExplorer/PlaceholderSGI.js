@@ -1,32 +1,12 @@
-import React, { useState, useEffect, Fragment } from "react";
-import * as Tone from "tone";
-
-import {
-  Paper,
-  Typography,
-  CircularProgress,
-  TextField,
-  Icon,
-  IconButton,
-  Avatar,
-  Tooltip,
-} from "@material-ui/core";
+import { Paper } from "@material-ui/core";
 
 import "./SessionGalleryItem.css";
 
 import { Skeleton } from "@material-ui/lab";
 
 function PlaceholderSGI(props) {
-  const [creatorInfo, setCreatorInfo] = useState({});
-  const [hovered, setHovered] = useState(false);
-  const [sessionLikes, setSessionLikes] = useState(false);
-
   return (
-    <Paper
-      className={`session-gallery-item ${
-        hovered && "session-gallery-item-hovered"
-      }`}
-    >
+    <Paper className={"session-gallery-item"}>
       <div className="session-gallery-item-title-cont">
         <Skeleton width="128px" height="32px" />
       </div>

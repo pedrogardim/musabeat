@@ -1,9 +1,6 @@
 import React, { useEffect, useState, Fragment } from "react";
-import * as Tone from "tone";
 
 import {
-  Select,
-  InputLabel,
   IconButton,
   Icon,
   Tooltip,
@@ -13,13 +10,13 @@ import {
   Slider,
 } from "@material-ui/core";
 
-import { Knob, Pointer, Value, Arc } from "rc-knob";
+//import { Knob, Pointer, Value, Arc } from "rc-knob";
 
-import { Donut, Basic } from "react-dial-knob";
+//import { Donut, Basic } from "react-dial-knob";
 
 import "./ModuleEffects.css";
 
-import { colors } from "../../utils/materialPalette";
+//import { colors } from "../../utils/materialPalette";
 import { effectTypes, fxParametersRange } from "../../assets/musicutils";
 
 function Effect(props) {

@@ -1,7 +1,3 @@
-import React, { useState } from "react";
-
-//import { Paper, Icon, Card, Button } from '@material-ui/core';
-
 import "./Sequencer.css";
 
 function SequencerTile(props) {
@@ -13,11 +9,9 @@ function SequencerTile(props) {
 
   const thisColor = props.color;
 
-
   return (
     <div
-      className={
-        "sequencer-tile"}
+      className={"sequencer-tile"}
       onClick={clickedTile}
       style={{
         backgroundColor: active
@@ -25,10 +19,8 @@ function SequencerTile(props) {
           : props.cursor
           ? thisColor[400]
           : thisColor[500],
-        borderBottom: "solid 1px "+ thisColor[800],
-        borderRight: "solid 1px "+ thisColor[800],
-
-
+        borderBottom: "solid 1px " + thisColor[800],
+        borderRight: "solid 1px " + thisColor[800],
       }}
     ></div>
   );

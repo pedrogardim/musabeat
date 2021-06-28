@@ -1,6 +1,3 @@
-import React, { useState, useEffect, Fragment } from "react";
-import * as Tone from "tone";
-
 import {
   Drawer,
   List,

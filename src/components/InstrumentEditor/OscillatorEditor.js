@@ -1,8 +1,4 @@
-import React, { useState, useEffect, useRef, Fragment } from "react";
-
-import * as Tone from "tone";
-
-import { mapLogScale } from "../../assets/musicutils";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   Typography,
@@ -10,7 +6,6 @@ import {
   InputLabel,
   FormControl,
   Slider,
-  Card,
 } from "@material-ui/core";
 
 import "./OscillatorEditor.css";
@@ -21,11 +16,7 @@ const oscTypes = ["basic", "fm", "am", "fat", "pwm", "pulse"];
 function OscillatorEditor(props) {
   const waveSvg = useRef(null);
 
-  const [waveForm, setWaveForm] = useState("");
-
-  const [oscillatorWaveForm, setOscillatorWaveForm] = useState(
-    drawWave(waveForm)
-  );
+  const [oscillatorWaveForm, setOscillatorWaveForm] = useState("");
 
   const [oscWave, setOscWave] = useState("");
   const [oscType, setOscType] = useState("");
@@ -86,14 +77,13 @@ function OscillatorEditor(props) {
       .then((r) => setOscillatorWaveForm(drawWave(r)));
   };
 
-  useEffect(() => {
-    drawOscWave();
-    console.log(oscWave, oscType, oscPartials);
-  }, [oscWave, oscType, oscPartials]);
+  useEffect(
+    drawOscWave,
+    //console.log(oscWave, oscType, oscPartials);
+    [oscWave, oscType, oscPartials, props.instrument._dummyVoice.oscillator]
+  );
 
-  useEffect(() => {
-    getOscillatorData();
-  }, [props.instrument]);
+  useEffect(getOscillatorData, [props.instrument]);
 
   return (
     <div className="oscillator-editor">

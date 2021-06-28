@@ -1,18 +1,9 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, Fragment, useRef } from "react";
 
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import {
-  Select,
-  Typography,
-  Slider,
-  List,
-  Divider,
-  InputLabel,
-  FormControl,
-  CircularProgress,
-} from "@material-ui/core";
+import { List, Divider } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
@@ -20,13 +11,7 @@ import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
 import PatchExplorer from "./PatchExplorer";
 
-import { instruments } from "../../assets/instrumentpatches";
-import { kits } from "../../assets/drumkits";
-import {
-  patchLoader,
-  loadDrumPatch,
-  detectPitch,
-} from "../../assets/musicutils";
+import { detectPitch } from "../../assets/musicutils";
 
 import { FileDrop } from "react-file-drop";
 
@@ -164,8 +149,6 @@ function InstrumentEditor(props) {
   };
 
   let mainContent = "Nothing Here";
-
-  let list = [];
 
   if (props.instrument) {
     if (props.module.type === 0) {
