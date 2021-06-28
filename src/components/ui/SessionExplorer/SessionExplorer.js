@@ -9,6 +9,10 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  TextField,
+  InputAdornment,
+  Icon,
+  OutlinedInput,
 } from "@material-ui/core";
 
 import SessionGalleryItem from "./SessionGalleryItem";
@@ -29,7 +33,7 @@ function SessionExplorer(props) {
   const [playingSession, setPlayingSession] = useState(null);
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
-  const getSessionList = async () => {
+  const getSessionList = async (value) => {
     //console.log(props.props.isUser ? "fetching user sessions" : "fetching explore");
 
     let dbRef = props.isUser
@@ -38,24 +42,13 @@ function SessionExplorer(props) {
           .ref("sessions")
           .orderByChild("creator")
           .equalTo(props.user.uid)
-      : //? firebase.database().ref("users").child(props.user.uid).child("sessions")
-        firebase.database().ref("sessions");
+      : value
+      ? firebase.database().ref("sessions").orderByChild("name").equalTo(value)
+      : firebase.database().ref("sessions");
     const sessionKeys = (await dbRef.get()).val();
-    //console.log(sessionKeys);
-    //setSessionKeys(sessionKeys)
+
     setSessionKeys(Object.keys(sessionKeys));
     setSessions(Object.values(sessionKeys));
-
-    /* props.isUser &&
-      !!sessionKeys &&
-      (await Promise.all(
-        sessionKeys.map(async (e, i) => {
-          let sessionRef = firebase.database().ref("sessions").child(e);
-          let session = (await sessionRef.get()).val();
-          //console.log(session);
-          setSessions((prev) => [...prev, session]);
-        })
-      )); */
   };
 
   const handleUserLike = (index) => {
@@ -159,9 +152,9 @@ function SessionExplorer(props) {
     props.history.push(`/session/${sessionKeys[index].substring(1)}`);
   };
 
-  useEffect(() => {
-    return () => {};
-  }, []);
+  const handleSearch = (e) => {
+    e.key === "Enter" && getSessionList(e.target.value);
+  };
 
   useEffect(() => {
     //console.log(playingSession);
@@ -183,6 +176,18 @@ function SessionExplorer(props) {
     <div className="session-explorer">
       {!!sessions.length ? (
         <Fragment>
+          {!props.isUser && (
+            <OutlinedInput
+              style={{ fontSize: 24 }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Icon>search</Icon>
+                </InputAdornment>
+              }
+              onKeyPress={handleSearch}
+            />
+          )}
+          <div className="break" />
           {sessions.map((session, sessionIndex) => (
             <Fragment>
               <SessionGalleryItem
