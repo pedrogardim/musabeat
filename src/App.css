@@ -78,6 +78,13 @@ body *::-webkit-scrollbar-thumb {
   color: white !important;
 }
 
+.beta-text {
+  text-decoration: wavy;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: #3f51b5;
+}
+
 @keyframes flashing-alert-icon {
   0% {
     color: rgba(0, 0, 0, 0.137);

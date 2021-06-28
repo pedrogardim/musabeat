@@ -36,7 +36,7 @@ function PatchExplorer(props) {
   const categories = !isDrum ? instrumentsCategories : drumCategories;
   const user = firebase.auth().currentUser;
 
-  const [patchesList, setPatchesList] = useState([]);
+  const [patchesList, setPatchesList] = useState(null);
   const [patchesCreatorList, setPatchesCreatorList] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedPatch, setSelectedPatch] = useState(<CircularProgress />);
@@ -66,7 +66,7 @@ function PatchExplorer(props) {
 
     patchesRef.once("value").then((snapshot) => {
       if (!snapshot.val()) {
-        setPatchesList([]);
+        setPatchesList(null);
         return;
       }
       let array = Object.keys(snapshot.val()).map((e, i, a) => {
@@ -89,7 +89,7 @@ function PatchExplorer(props) {
       .once("value")
       .then((snapshot) => {
         if (snapshot.val() === null) {
-          setPatchesList([]);
+          setPatchesList(null);
           return;
         }
         let array = Object.keys(snapshot.val()).map((e, i, a) => {
@@ -135,7 +135,8 @@ function PatchExplorer(props) {
       })
     );
     setSelectedPatch(patch.name);
-    props.setPatchExplorer(false);
+    //props.setPatchExplorer(false);
+    props.setModulePage(null);
   };
 
   const saveUserPatch = (name, category) => {
@@ -203,11 +204,12 @@ function PatchExplorer(props) {
   }, [props.module]);
 
   useEffect(() => {
-    user && fetchUserPatches();
+    //user && fetchUserPatches();
+    fetchPatches("all");
   }, []);
 
   useEffect(() => {
-    patchesList.length && loadPatchCreatorInfo();
+    patchesList && patchesList.length && loadPatchCreatorInfo();
   }, [patchesList]);
 
   return !props.patchExplorer ? (
@@ -234,19 +236,6 @@ function PatchExplorer(props) {
   ) : (
     <div className="patch-explorer">
       <List className="patch-explorer-column">
-        {!!user && (
-          <ListItem
-            dense
-            button
-            divider
-            onClick={fetchUserPatches}
-            className="patch-explorer-first-column-item"
-          >
-            User Patches
-            <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
-          </ListItem>
-        )}
-        <Divider />
         <ListItem
           key={"allcateg"}
           dense
@@ -255,7 +244,7 @@ function PatchExplorer(props) {
           onClick={() => fetchPatches("all")}
           className="patch-explorer-first-column-item"
         >
-          All
+          All Categories
           <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
         </ListItem>
         {categories.map((e, i) => (
@@ -271,10 +260,35 @@ function PatchExplorer(props) {
             <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
           </ListItem>
         ))}
+        <Divider />
+        <ListItem
+          dense
+          button
+          divider
+          onClick={() => props.setPatchExplorer(false)}
+          className="patch-explorer-first-column-item"
+        >
+          Instrument Editor <span className="beta-text">beta</span>
+          <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
+        </ListItem>
+        {!!user && (
+          <ListItem
+            dense
+            button
+            divider
+            onClick={fetchUserPatches}
+            className="patch-explorer-first-column-item"
+          >
+            User Patches
+            <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
+          </ListItem>
+        )}
       </List>
       <Divider variant="vertical" />
       <List className="patch-explorer-column">
-        {!!patchesList.length ? (
+        {patchesList === null ? (
+          <CircularProgress />
+        ) : !!patchesList.length ? (
           patchesList.map((e, i) => (
             <ListItem
               key={`liipe${i}`}

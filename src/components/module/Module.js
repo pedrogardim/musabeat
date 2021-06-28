@@ -498,6 +498,7 @@ function Module(props) {
                 setInstrumentsLoaded={props.setInstrumentsLoaded}
                 setInstrumentLoaded={setInstrumentLoaded}
                 setModules={props.setModules}
+                setModulePage={setModulePage}
                 index={props.index}
               />
             )}

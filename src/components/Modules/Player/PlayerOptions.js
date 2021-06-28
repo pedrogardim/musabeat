@@ -32,7 +32,7 @@ function PlayerOptions(props) {
     if (!e.altKey) {
       setPlaybackRate(v);
     } else {
-      setPlaybackRate(0);
+      setPlaybackRate(1);
     }
   };
 

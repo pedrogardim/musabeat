@@ -35,7 +35,7 @@ import { colors } from "../../utils/materialPalette";
 
 function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchExplorer, setPatchExplorer] = useState(false);
+  const [patchExplorer, setPatchExplorer] = useState(true);
 
   const ieWrapper = useRef(null);
   /* 
@@ -282,6 +282,7 @@ function InstrumentEditor(props) {
         patchExplorer={patchExplorer}
         index={props.index}
         setModules={props.setModules}
+        setModulePage={props.setModulePage}
         setPatchExplorer={setPatchExplorer}
         instrument={props.instrument}
         setInstruments={props.setInstruments}
