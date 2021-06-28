@@ -8,7 +8,10 @@ import {
   Tooltip,
   Avatar,
   Chip,
+  Button,
 } from "@material-ui/core";
+
+import TagInput from "../ui/Dialogs/TagInput";
 
 import "./Workspace.css";
 
@@ -16,6 +19,7 @@ function WorkspaceTitle(props) {
   const [creationDateString, setCreationDateString] = useState(null);
   const [editorProfiles, setEditorProfiles] = useState([]);
   const [expanded, setExpanded] = useState(false);
+  const [tagDialog, setTagDialog] = useState(false);
 
   const getSessionTitleInfo = async () => {
     if (typeof props.sessionData.createdOn === "number") {
@@ -40,10 +44,31 @@ function WorkspaceTitle(props) {
       });
   };
 
+  const handleTagClick = () => {};
+
+  const handleTagDelete = (index) => {
+    console.log("deleting" + index);
+    const sessionTagsRef = firebase
+      .database()
+      .ref(`sessions/${props.sessionKey}/tags`);
+    const newTags = props.sessionData.tags.filter((e, i) => i !== index);
+    sessionTagsRef.set(newTags);
+  };
+
+  const handleTagAdd = (tags) => {
+    const sessionTagsRef = firebase
+      .database()
+      .ref(`sessions/${props.sessionKey}/tags`);
+    const newTags = props.sessionData.tags
+      ? [...props.sessionData.tags, ...tags]
+      : [...tags];
+    sessionTagsRef.set(newTags);
+  };
+
   useEffect(() => {
     props.sessionData && getSessionTitleInfo();
     setExpanded(false);
-  }, [props.sessionData]);
+  }, [props.sessionKey]);
 
   /*  useEffect(() => {
     console.log(editorProfiles);
@@ -92,10 +117,27 @@ function WorkspaceTitle(props) {
         <Fragment>
           <Typography>{props.sessionData.description}</Typography>
           <div className="break" />
-          {props.sessionData.tags &&
-            props.sessionData.tags.map((e) => (
-              <Chip key={props.index + e} label={e} variant="outlined" />
-            ))}
+          {props.sessionData.tags && props.sessionData.tags.length ? (
+            <Fragment>
+              {props.sessionData.tags.map((e, i) => (
+                <Chip
+                  key={props.index + e}
+                  label={e}
+                  variant="outlined"
+                  onClick={handleTagClick}
+                  onDelete={() => handleTagDelete(i)}
+                />
+              ))}
+              <IconButton
+                onClick={() => setTagDialog(true)}
+                style={{ height: 24, width: 24, margin: 4 }}
+              >
+                <Icon style={{ fontSize: 24 }}>add</Icon>
+              </IconButton>
+            </Fragment>
+          ) : (
+            <Button onClick={() => setTagDialog(true)}>ADD TAG</Button>
+          )}
 
           <div className="break" />
           {creationDateString && (
@@ -104,6 +146,12 @@ function WorkspaceTitle(props) {
             </Typography>
           )}
         </Fragment>
+      )}
+      {tagDialog && (
+        <TagInput
+          handleTagAdd={handleTagAdd}
+          onClose={() => setTagDialog(false)}
+        />
       )}
     </div>
   );

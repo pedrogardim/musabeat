@@ -614,6 +614,7 @@ function Workspace(props) {
 
       <WorkspaceTitle
         sessionData={sessionData}
+        sessionKey={sessionKey}
         editMode={editMode}
         user={props.user}
       />

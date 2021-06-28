@@ -43,9 +43,10 @@ function PlayerOptions(props) {
   };
 
   useEffect(() => {
-    props.instrument.set({ detune: pitch, playbackRate: playbackRate });
+    props.instrument &&
+      props.instrument.set({ detune: pitch, playbackRate: playbackRate });
     //console.log({ detune: pitch, playbackRate: playbackRate });
-  }, [pitch, playbackRate]);
+  }, [pitch, playbackRate, props.instrument]);
 
   return (
     <Fragment>
