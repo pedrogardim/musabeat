@@ -31,8 +31,8 @@ body *::-webkit-scrollbar-thumb {
 
 .app-title {
   margin-left: 16px !important;
-  position: absolute;
-  top: 24px;
+  position: relative;
+  margin-top: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,6 +44,10 @@ body *::-webkit-scrollbar-thumb {
   font-size: 28px !important;
   margin-left: 16px;
   animation: flashing-alert-icon 4s ease 0s infinite alternate both !important;
+}
+
+.app-title > * {
+  margin-bottom: 8px;
 }
 
 .app-logo {

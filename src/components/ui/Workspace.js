@@ -561,7 +561,7 @@ function Workspace(props) {
 
     loadSession();
     //!props.session.length && Tone.Transport.start()
-  }, [props.user, props.session]);
+  }, [props.user, props.session, sessionKey]);
 
   useEffect(() => {
     adaptSessionSize();
@@ -622,49 +622,52 @@ function Workspace(props) {
         user={props.user}
       />
 
-      {modules !== null ? (
-        modules.map((module, moduleIndex) => (
+      <div className="workspace-module-cont">
+        {modules !== null ? (
+          modules.map((module, moduleIndex) => (
+            <Fragment>
+              <Module
+                tabIndex={-1}
+                key={module.id}
+                index={moduleIndex}
+                module={module}
+                instrument={instruments[moduleIndex]}
+                setInstruments={setInstruments}
+                loaded={instrumentsLoaded[moduleIndex]}
+                setInstrumentsLoaded={setInstrumentsLoaded}
+                sessionSize={sessionSize}
+                setModules={setModules}
+                editMode={editMode}
+                setFocusedModule={setFocusedModule}
+              />
+              {moduleIndex % 3 == 1 && <div className="break" />}
+            </Fragment>
+          ))
+        ) : !modules ? (
+          [1, 1, 1, 1].map(() => <PlaceholderModule />)
+        ) : !modules.length && !instrumentsLoaded.length ? (
           <Fragment>
-            <Module
-              tabIndex={-1}
-              key={module.id}
-              index={moduleIndex}
-              module={module}
-              instrument={instruments[moduleIndex]}
-              setInstruments={setInstruments}
-              loaded={instrumentsLoaded[moduleIndex]}
-              setInstrumentsLoaded={setInstrumentsLoaded}
-              sessionSize={sessionSize}
-              setModules={setModules}
-              editMode={editMode}
-              setFocusedModule={setFocusedModule}
-            />
-            {moduleIndex % 3 == 1 && <div className="break" />}
+            <Typography variant="h1">:v</Typography>
+            <div className="break" />
+            <p>No Modules!</p>
           </Fragment>
-        ))
-      ) : !modules ? (
-        [1, 1, 1, 1].map(() => <PlaceholderModule />)
-      ) : !modules.length && !instrumentsLoaded.length ? (
-        <Fragment>
-          <Typography variant="h1">:v</Typography>
-          <div className="break" />
-          <p>No Modules!</p>
-        </Fragment>
-      ) : (
-        ""
-      )}
-      <div className="break" />
-      {editMode && (
-        <Tooltip title="Add new module">
-          <IconButton
-            color="primary"
-            style={{ marginTop: 48 }}
-            onClick={() => setModulePicker(true)}
-          >
-            <Icon style={{ fontSize: 40 }}>add</Icon>
-          </IconButton>
-        </Tooltip>
-      )}
+        ) : (
+          ""
+        )}
+
+        <div className="break" />
+        {editMode && (
+          <Tooltip title="Add new module">
+            <IconButton
+              color="primary"
+              style={{ marginTop: 48 }}
+              onClick={() => setModulePicker(true)}
+            >
+              <Icon style={{ fontSize: 40 }}>add</Icon>
+            </IconButton>
+          </Tooltip>
+        )}
+      </div>
 
       {modulePicker && (
         <ModulePicker

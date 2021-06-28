@@ -1,9 +1,21 @@
 .workspace {
-  background-color: #282c34;
-  position: relative;
+  position: absolute;
   /* background: radial-gradient(#ffffff, #fafaed); */
   background: white;
   min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.workspace-module-cont {
+  position: relative;
+  /* background: radial-gradient(#ffffff, #fafaed); */
+  background: white;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -11,7 +23,7 @@
   align-items: center;
   align-content: flex-start;
   justify-content: center;
-  padding: 128px 0 96px 0;
+  padding: 0px 0 96px 0;
 }
 
 .ws-fab-cont {

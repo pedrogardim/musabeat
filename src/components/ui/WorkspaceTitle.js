@@ -5,14 +5,12 @@ import firebase from "firebase";
 import { useParams } from "react-router-dom";
 
 import {
-  Fab,
   Icon,
   IconButton,
-  Button,
   Typography,
   Tooltip,
-  Snackbar,
   Avatar,
+  Chip,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -20,6 +18,7 @@ import "./Workspace.css";
 function WorkspaceTitle(props) {
   const [creationDateString, setCreationDateString] = useState(null);
   const [editorProfiles, setEditorProfiles] = useState([]);
+  const [expanded, setExpanded] = useState(false);
 
   const getSessionTitleInfo = async () => {
     if (typeof props.sessionData.createdOn === "number") {
@@ -38,13 +37,15 @@ function WorkspaceTitle(props) {
       );
     };
 
-    getEditorProfiles().then((data) => {
-      setEditorProfiles(data.map((e) => e.val()));
-    });
+    props.sessionData.editors &&
+      getEditorProfiles().then((data) => {
+        setEditorProfiles(data.map((e) => e.val()));
+      });
   };
 
   useEffect(() => {
     props.sessionData && getSessionTitleInfo();
+    setExpanded(false);
   }, [props.sessionData]);
 
   /*  useEffect(() => {
@@ -56,6 +57,19 @@ function WorkspaceTitle(props) {
       <Typography variant="h4">
         {props.sessionData && props.sessionData.name}
       </Typography>
+      {!(props.editMode && !props.user) && (
+        <IconButton onClick={() => setExpanded((prev) => !prev)}>
+          <Icon
+            style={{
+              transition: "0.2s",
+              transform: expanded ? "rotate(180deg)" : "",
+            }}
+          >
+            expand_more
+          </Icon>
+        </IconButton>
+      )}
+
       {!props.editMode && (
         <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
           <Icon className="app-title-alert">visibility</Icon>
@@ -68,16 +82,31 @@ function WorkspaceTitle(props) {
       )}
       <div className="break" />
 
-      {editorProfiles.map((e) => (
-        <Tooltip title={e.displayName}>
-          <Avatar src={e.photoURL} />
-        </Tooltip>
-      ))}
+      {!(props.editMode && !props.user) &&
+        editorProfiles.map((e) => (
+          <Tooltip title={e.displayName}>
+            <Avatar src={e.photoURL} />
+          </Tooltip>
+        ))}
 
       <div className="break" />
 
-      {creationDateString && (
-        <Typography variant="overline">{creationDateString}</Typography>
+      {expanded && (
+        <Fragment>
+          <Typography>{props.sessionData.description}</Typography>
+          <div className="break" />
+          {props.sessionData.tags &&
+            props.sessionData.tags.map((e) => (
+              <Chip key={props.index + e} label={e} variant="outlined" />
+            ))}
+
+          <div className="break" />
+          {creationDateString && (
+            <Typography variant="overline" style={{ fontSize: 10 }}>
+              {creationDateString}
+            </Typography>
+          )}
+        </Fragment>
       )}
     </div>
   );
