@@ -50,12 +50,9 @@ function SessionExplorer(props) {
       : firebase.firestore().collection("sessions");
 
     dbRef.get().then((snapshot) => {
-      let data = [];
-      snapshot.forEach((e) => data.push(e.data()));
-      console.log(data);
-
-      setSessionKeys(Object.keys(data));
-      setSessions(Object.values(data));
+      console.log(snapshot.docs.map((e) => [e.id, e.data()]));
+      setSessionKeys(snapshot.docs.map((e) => e.id));
+      setSessions(snapshot.docs.map((e) => e.data()));
     });
   };
 
@@ -132,8 +129,8 @@ function SessionExplorer(props) {
       .collection("sessions")
       .where("likedBy", "array-contains", props.user.uid);
     dbLikesRef.get().then((snapshot) => {
-      let data = [];
-      snapshot.forEach((e) => data.push(snapshot.data()));
+      let data = snapshot.docs.map((e) => e.data());
+
       setUserLikes(data);
     });
   };
@@ -141,7 +138,7 @@ function SessionExplorer(props) {
   const handleSessionSelect = (index) => {
     //props.setOpenedSession(sessionKeys[index]);
     //props.setCurrentPage(null);
-    props.history.push(`/session/${sessionKeys[index].substring(1)}`);
+    props.history.push(`/session/${sessionKeys[index]}`);
   };
 
   const handleSearch = (e) => {
