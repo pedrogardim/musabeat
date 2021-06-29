@@ -352,17 +352,17 @@ function Workspace(props) {
   };
 
   const updateFromDatabase = (modulesData) => {
-    //if (!compareObjectsArray(modules, modulesData)) {
-    //console.log("ITS DIFFERENT!!!")
-    //console.log("moduled loaded from server:" + modulesData);
-    let data = { ...modulesData };
-    delete data.modules;
-    setSessionData(data);
-    setModules(modulesData.modules);
-    //console.log("UPDATED");
-    //} else {
-    //console.log("ITS THE SAME!!!");
-    //}
+    if (JSON.stringify(modules) === JSON.stringify(modulesData)) {
+      //console.log("ITS DIFFERENT!!!")
+      //console.log("moduled loaded from server:" + modulesData);
+      let data = { ...modulesData };
+      delete data.modules;
+      setSessionData(data);
+      setModules(modulesData.modules);
+      //console.log("UPDATED");
+    } else {
+      console.log("ITS THE SAME!!!");
+    }
   };
 
   const onSessionReady = () => {
@@ -761,7 +761,7 @@ function Workspace(props) {
 
 export default Workspace;
 
-/* const compareObjectsArray = (arr1, arr2) => {
+const compareObjectsArray = (arr1, arr2) => {
   if (!arr1 || !arr2) return false;
 
   const parseArr = (parsingArray) =>
@@ -785,4 +785,3 @@ export default Workspace;
 
   return parseArr(arr1) === parseArr(arr2);
 };
- */
