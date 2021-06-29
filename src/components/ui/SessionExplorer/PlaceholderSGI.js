@@ -23,7 +23,7 @@ function PlaceholderSGI(props) {
         <Skeleton height="100%" width="100%" variant="rect" />
       </div>
       <div className="session-gallery-item-footer">
-        {[1, 1, 1].map((i) => (
+        {[1, 1, 1].map((e, i) => (
           <Skeleton
             key={`sgiphi${i}`}
             height="24px"

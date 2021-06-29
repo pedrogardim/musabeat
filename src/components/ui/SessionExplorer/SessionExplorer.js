@@ -27,7 +27,7 @@ import firebase from "firebase";
 function SessionExplorer(props) {
   const [sessions, setSessions] = useState([]);
   const [sessionKeys, setSessionKeys] = useState([]);
-  const [userLikes, setUserLikes] = useState("");
+  const [userLikes, setUserLikes] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState(null);
   const [renameDialog, setRenameDialog] = useState(null);
   const [playingSession, setPlayingSession] = useState(null);
@@ -67,34 +67,35 @@ function SessionExplorer(props) {
 
       setUserLikes(newUserLikes);
 
+      setSessions((prev) => {
+        let newSessions = [...prev];
+        newSessions[index].likes = isLiked
+          ? newSessions[index].likes - 1
+          : newSessions[index].likes + 1;
+        return newSessions;
+      });
+
       //add session to user "likes" array
 
-      let userLikesRef = firebase
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(props.user.uid)
+        .update({
+          likes: isLiked
+            ? firebase.firestore.FieldValue.arrayRemove(sessionKeys[index])
+            : firebase.firestore.FieldValue.arrayUnion(sessionKeys[index]),
+        });
+
+      firebase
         .firestore()
         .collection("sessions")
         .doc(sessionKeys[index])
         .update({
           likes: isLiked
-            ? firebase.firestore.FieldValue.arrayRemove(props.user.uid)
-            : firebase.firestore.FieldValue.arrayUnion(props.user.uid),
+            ? firebase.firestore.FieldValue.increment(-1)
+            : firebase.firestore.FieldValue.increment(1),
         });
-      userLikesRef.set(newUserLikes);
-
-      //add user to session "likedBy" array and increment like number on session
-
-      let sessionRef = firebase
-        .firestore()
-        .collection("sessions")
-        .doc(sessionKeys[index]);
-
-      sessionRef.get().then((snapshot) => {
-        let session = snapshot.data();
-        setSessions((prev) => {
-          let newSessions = [...prev];
-          newSessions[index] = session;
-          return newSessions;
-        });
-      });
     }
   };
 
@@ -126,10 +127,11 @@ function SessionExplorer(props) {
   const getUserLikes = () => {
     let dbLikesRef = firebase
       .firestore()
-      .collection("sessions")
-      .where("likedBy", "array-contains", props.user.uid);
+      .collection("users")
+      .doc(props.user.uid);
+
     dbLikesRef.get().then((snapshot) => {
-      let data = snapshot.docs.map((e) => e.data());
+      let data = snapshot.data().likes;
 
       setUserLikes(data);
     });
@@ -149,7 +151,7 @@ function SessionExplorer(props) {
     //console.log(playingSession);
     //Tone.Transport.seconds = 0;
     //Tone.Transport.clear();
-    if (playingSession === null) {
+    if (playingSession !== null) {
       Tone.Transport.pause();
       console.log("stop");
     }
@@ -195,7 +197,9 @@ function SessionExplorer(props) {
                 index={sessionIndex}
                 session={session}
                 isUser={props.isUser}
-                likedByUser={userLikes.includes(sessionKeys[sessionIndex])}
+                likedByUser={
+                  userLikes && userLikes.includes(sessionKeys[sessionIndex])
+                }
                 createNewSession={props.createNewSession}
               />
               {/* sessionIndex % 4 === 3 && <div className="break" /> */}

@@ -114,7 +114,7 @@ function SessionGalleryItem(props) {
         )}
         <Tooltip title={props.session.likes}>
           <IconButton onClick={props.handleUserLike}>
-            <Icon color={props.likedByUser ? "secondary" : "none"}>
+            <Icon color={props.likedByUser ? "secondary" : "inherit"}>
               favorite
             </Icon>
           </IconButton>

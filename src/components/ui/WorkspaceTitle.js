@@ -22,8 +22,8 @@ function WorkspaceTitle(props) {
   const [infoDialog, setInfoDialog] = useState(false);
 
   const getSessionTitleInfo = async () => {
-    if (typeof props.sessionData.createdOn === "number") {
-      let date = new Date(props.sessionData.createdOn);
+    if (typeof props.sessionData.createdOn.seconds === "number") {
+      let date = new Date(props.sessionData.createdOn.seconds * 1000);
       let creationDate = `Created on ${date.getDate()}/${
         date.getMonth() + 1
       }/${date.getFullYear()}`;
@@ -121,7 +121,7 @@ function WorkspaceTitle(props) {
         <Fragment>
           <Typography variant="body2">{`"${props.sessionData.description}"`}</Typography>
           <div className="break" />
-          {props.sessionData.tags && props.sessionData.tags.length && (
+          {props.sessionData.tags && !!props.sessionData.tags.length && (
             <Fragment>
               {props.sessionData.tags.map((e, i) => (
                 <Chip

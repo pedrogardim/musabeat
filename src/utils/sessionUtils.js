@@ -9,7 +9,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
 
   let sessionTemplate = {
     description: "No description",
-    tags: ["musa"],
+    tags: [],
     bpm: 120,
     modules: [
       {
@@ -45,7 +45,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     creator: userId,
     editors: [userId],
     likes: 0,
-    likedBy: ["a"],
     createdOn: firebase.firestore.FieldValue.serverTimestamp(),
   };
 
