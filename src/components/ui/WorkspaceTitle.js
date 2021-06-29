@@ -32,15 +32,15 @@ function WorkspaceTitle(props) {
 
     const getEditorProfiles = async () => {
       return Promise.all(
-        props.sessionData.editors.map((item) =>
-          firebase.database().ref(`users/${item}/profile`).get()
+        props.sessionData.editors.map((user) =>
+          firebase.firestore().collection("users").doc(user).get()
         )
       );
     };
 
     props.sessionData.editors &&
       getEditorProfiles().then((data) => {
-        setEditorProfiles(data.map((e) => e.val()));
+        setEditorProfiles(data.map((e) => e.data().profile));
       });
   };
 
