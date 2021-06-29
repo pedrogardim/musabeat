@@ -36,36 +36,42 @@ import {
 import { clearEvents } from "../../utils/TransportSchedule";
 
 function Workspace(props) {
+  /* 
+  There are 2 savingModes for the workspace:
+    -Simple: changes are saved in the db between X minutes, and changes are not detected
+    -Collaborative: all changes you make are stored in realtime, and changes in th db will be stored in real time. It's more resource expensive, meant to cowork 
+ */
+  const [savingMode, setSavingMode] = useState("simple");
+  const [autosaver, setAutosaver] = useState(null);
+  const [areUnsavedChanges, setAreUnsavedChanges] = useState(false);
+
+  const [DBSessionRef, setDBSessionRef] = useState(null);
+
   const [modules, setModules] = useState(null);
   const [sessionData, setSessionData] = useState(null);
+  const [sessionSize, setSessionSize] = useState(0);
 
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
-  const [sessionSize, setSessionSize] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
-
-  const sessionKey = useParams().key;
-
-  //to avoid running startup scripts for each new instrument
-  const [initialLoad, setInitialLoad] = useState(false);
-
-  const [DBSessionRef, setDBSessionRef] = useState(null);
-  //used at the time only for passing session name to Exporter
-
-  //a copy of the instruments, to be able to use them on export function
-  //to undo and redo
   const [sessionHistory, setSessionHistory] = useState({
     past: [],
     present: null, // (?) How do we initialize the present?
     future: [],
   });
+
+  const sessionKey = useParams().key;
+  const autoSaverTime = 60 * 1000; //1min
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -205,7 +211,7 @@ function Workspace(props) {
         sessionKey !== null &&
         firebase.firestore().collection("sessions").doc(sessionKey);
       setDBSessionRef(!sessionRef ? null : sessionRef);
-      //Check for editmode and get title
+      //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
         let sessionData = snapshot.data();
         //console.log(snapshot.val().modules + "-----");
@@ -392,7 +398,10 @@ function Workspace(props) {
   };
 
   const saveToDatabase = (input, type) => {
-    if (DBSessionRef !== null && initialLoad) {
+    if (DBSessionRef !== null && isLoaded) {
+      console.log(savingMode);
+      savingMode === "simple" && setSnackbarMessage("Changes Saved");
+
       //console.log(
       //  "saving to db",
       //  input.length !== undefined ? "modules" : "sessionData"
@@ -459,7 +468,27 @@ function Workspace(props) {
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     console.log("session ready!");
-    setInitialLoad(true);
+    updateMode("simple");
+    setIsLoaded(true);
+  };
+
+  const updateMode = (input) => {
+    if (input === "simple") {
+      const changeChecker = () => {
+        setAreUnsavedChanges((prev) => {
+          if (prev) {
+            saveToDatabase("int");
+            return false;
+          } else {
+            console.log("No changes detected...");
+            return prev;
+          }
+        });
+      };
+      clearInterval(autosaver);
+      //console.log("autosaver initialized");
+      setAutosaver(setInterval(changeChecker, autoSaverTime));
+    }
   };
 
   const unfocusModules = (e) => {
@@ -636,10 +665,16 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log("Modules", modules);
-    !props.hidden && saveToDatabase(modules, 0);
 
-    modules && initialLoad && handleUndo();
+    savingMode === "simple" && setAreUnsavedChanges(true);
+    savingMode === "collaborative" && saveToDatabase(modules);
+
+    modules && isLoaded && handleUndo();
   }, [modules]);
+
+  useEffect(() => {
+    isLoaded && updateMode(savingMode);
+  }, [savingMode]);
 
   /*  useEffect(() => {
     console.log("sessiondata triggered", sessionData);
@@ -659,7 +694,7 @@ function Workspace(props) {
       instruments.every((val) => typeof val === "object") &&
       instrumentsLoaded.every((val) => val === true) &&
       sessionSize > 0 &&
-      !initialLoad
+      !isLoaded
     ) {
       onSessionReady();
     }
@@ -675,6 +710,9 @@ function Workspace(props) {
     };
   }, []);
 
+  /* useEffect(() => {
+    console.log(areUnsavedChanges);
+  }, [areUnsavedChanges]); */
   /* 
   useEffect(() => {
     console.log("editMode", editMode);
@@ -796,14 +834,36 @@ function Workspace(props) {
         </Fab>
 
         {editMode && (
-          <Fab
-            tabIndex={-1}
-            className="ws-fab ws-fab-mix"
-            color="primary"
-            onClick={() => setMixerOpened((prev) => (prev ? false : true))}
-          >
-            <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-          </Fab>
+          <Fragment>
+            <Fab
+              tabIndex={-1}
+              className="ws-fab ws-fab-mix"
+              color="primary"
+              onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+            >
+              <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+            </Fab>
+            <Tooltip
+              title={
+                !areUnsavedChanges
+                  ? "All the changes are saved"
+                  : "Save changes"
+              }
+            >
+              <Fab
+                disabled={!areUnsavedChanges || !props.user}
+                tabIndex={-1}
+                className="ws-fab ws-fab-save"
+                color="primary"
+                onClick={() => {
+                  saveToDatabase(modules);
+                  setAreUnsavedChanges(false);
+                }}
+              >
+                <Icon>save</Icon>
+              </Fab>
+            </Tooltip>
+          </Fragment>
         )}
 
         {!props.hidden && (
@@ -828,7 +888,8 @@ function Workspace(props) {
           vertical: "bottom",
           horizontal: "left",
         }}
-        autoHideDuration={4000}
+        style={{ marginBottom: 96 }}
+        autoHideDuration={3000}
         onClose={handleSnackbarClose}
         action={
           <IconButton

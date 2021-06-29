@@ -60,3 +60,7 @@
 .ws-fab-settings {
   grid-area: 1/15;
 }
+
+.ws-fab-save {
+  grid-area: 1/2;
+}
