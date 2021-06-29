@@ -480,7 +480,7 @@ function Workspace(props) {
             saveToDatabase("int");
             return false;
           } else {
-            console.log("No changes detected...");
+            //console.log("No changes detected...");
             return prev;
           }
         });
