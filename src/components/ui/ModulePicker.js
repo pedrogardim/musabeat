@@ -72,7 +72,7 @@ function ModulePicker(props) {
       type: selectedType,
       score:
         selectedType === 0 || selectedType === 1
-          ? [new Array(selectedSteps).fill(0)]
+          ? [{ ...Array(selectedSteps).fill(0) }]
           : selectedType === 2
           ? new Array(selectedSize).fill().map((e, i) => {
               let chord = {
@@ -88,12 +88,12 @@ function ModulePicker(props) {
       muted: false,
       instrument:
         selectedType === 0
-          ? "-McEPecUtSOmHmpiuVOU"
+          ? "FSnt2y846yp8Q0RfM7V9"
           : selectedType === 3
           ? {
               url: "",
             }
-          : "-MbBygzylMiMRWrAv1kh",
+          : "jSjo9Rzv3eg1vTkkEj1s",
       color: Math.floor(Math.random() * 14.99),
     };
 

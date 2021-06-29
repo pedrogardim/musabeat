@@ -35,9 +35,10 @@ function SessionGalleryItem(props) {
 
   const fetchCreatorDisplayName = () => {
     const dbRef = firebase
-      .database()
-      .ref(`users/${props.session.creator}/profile`);
-    dbRef.get().then((snapshot) => setCreatorInfo(snapshot.val()));
+      .firestore()
+      .collection("users")
+      .doc(props.session.creator);
+    dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
   };
 
   useEffect(() => {

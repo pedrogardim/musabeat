@@ -36,37 +36,36 @@ function PatchExplorer(props) {
   const [selectedPatch, setSelectedPatch] = useState(<CircularProgress />);
   const [savePatchDialog, setSavePatchDialog] = useState(false);
 
-  const fetchPatchName = async (patchKey) => {
-    let nameRef = firebase
-      .database()
-      .ref(`${!isDrum ? "patches" : "drumpatches"}/${patchKey}/name`)
-      .get();
-    let name = (await nameRef).val();
-    setSelectedPatch(name);
+  const fetchPatchName = (patchKey) => {
+    firebase
+      .firestore()
+      .collection(!isDrum ? "patches" : "drumpatches")
+      .doc(patchKey)
+      .get()
+      .then((r) => setSelectedPatch(r.data().name));
   };
 
   const fetchPatches = (category) => {
     let patchesRef =
       category === "all"
         ? firebase
-            .database()
-            .ref(!isDrum ? "patches" : "drumpatches")
-            .limitToFirst(50)
+            .firestore()
+            .collection(!isDrum ? "patches" : "drumpatches")
+            .limit(50)
         : firebase
-            .database()
-            .ref(!isDrum ? "patches" : "drumpatches")
-            .orderByChild("categ")
-            .equalTo(category);
+            .firestore()
+            .collection(!isDrum ? "patches" : "drumpatches")
+            .where("categ", "==", category);
 
-    patchesRef.once("value").then((snapshot) => {
-      if (!snapshot.val()) {
+    patchesRef.get().then((snapshot) => {
+      if (snapshot.empty) {
         setPatchesList(null);
         return;
       }
-      let array = Object.keys(snapshot.val()).map((e, i, a) => {
+      let array = snapshot.docs.map((e) => {
         return {
-          key: e,
-          patch: snapshot.val()[e],
+          key: e.id,
+          patch: e.data(),
         };
       });
       //console.log(array);
@@ -76,20 +75,19 @@ function PatchExplorer(props) {
 
   const fetchUserPatches = () => {
     firebase
-      .database()
-      .ref(isDrum ? "drumpatches" : "patches")
-      .orderByChild("creator")
-      .equalTo(user.uid)
-      .once("value")
+      .firestore()
+      .collection(isDrum ? "drumpatches" : "patches")
+      .where("creator", "==", user.uid)
+      .get()
       .then((snapshot) => {
-        if (snapshot.val() === null) {
+        if (snapshot.empty) {
           setPatchesList(null);
           return;
         }
-        let array = Object.keys(snapshot.val()).map((e, i, a) => {
+        let array = snapshot.docs.map((e) => {
           return {
-            key: e,
-            patch: snapshot.val()[e],
+            key: e.id,
+            patch: e.data(),
           };
         });
         //console.log(array);
@@ -100,19 +98,10 @@ function PatchExplorer(props) {
   const handlePatchSelect = (patchKey, patch) => {
     isDrum
       ? loadDrumPatch(patchKey, props.setInstrumentsLoaded, props.index).then(
-          (r) =>
-            props.setInstruments((prev) => {
-              let a = [...prev];
-              a[props.index] = r;
-              return a;
-            })
+          (r) => props.setInstrument(r)
         )
       : patchLoader(patchKey, "", props.setInstrumentsLoaded).then((r) =>
-          props.setInstruments((prev) => {
-            let a = [...prev];
-            a[props.index] = r;
-            return a;
-          })
+          props.setInstrument(r)
         );
 
     props.setModules((previous) =>
@@ -156,37 +145,39 @@ function PatchExplorer(props) {
 
     if (typeof category === "number") patch.categ = parseInt(category);
 
-    const sessionsRef = firebase
-      .database()
-      .ref(!isDrum ? "patches" : "drumpatches");
-    const newSessionRef = sessionsRef.push();
-    newSessionRef.set(patch);
-
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module };
-          newModule.instrument = newSessionRef.key;
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+    const newPatchRef = firebase
+      .firestore()
+      .collection(!isDrum ? "patches" : "drumpatches");
+    newPatchRef.add(patch).then((r) => {
+      props.setModules((previous) =>
+        previous.map((module, i) => {
+          if (i === props.index) {
+            let newModule = { ...module };
+            newModule.instrument = r.id;
+            return newModule;
+          } else {
+            return module;
+          }
+        })
+      );
+    });
     setSelectedPatch(patch.name);
     props.setPatchExplorer(false);
   };
 
-  const loadPatchCreatorInfo = async (creatorKey) => {
+  const loadPatchCreatorInfo = async () => {
     setPatchesCreatorList([]);
     await Promise.all(
       patchesList.map(async (e, i) => {
-        let userProfileRef = firebase
-          .database()
-          .ref(`users/${e.patch.creator}/profile`);
-        let userProfile = (await userProfileRef.get()).val();
-        //console.log(session);
-        setPatchesCreatorList((prev) => [...prev, userProfile]);
+        if (e.patch.creator) {
+          let userProfileRef = firebase
+            .firestore()
+            .collection("users")
+            .doc(e.patch.creator);
+          let userProfile = (await userProfileRef.get()).data().profile;
+          //console.log(session);
+          setPatchesCreatorList((prev) => [...prev, userProfile]);
+        }
       })
     );
   };
@@ -292,7 +283,7 @@ function PatchExplorer(props) {
               onClick={() => handlePatchSelect(e.key, e.patch)}
             >
               {e.patch.name}
-              {e.patch.creator !== undefined && (
+              {e.patch.creator && (
                 <Tooltip
                   title={
                     patchesCreatorList[i] && patchesCreatorList[i].displayName

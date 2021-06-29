@@ -149,11 +149,12 @@ function Module(props) {
     if (props.module.type === 0) {
       if (typeof props.module.instrument === "string") {
         firebase
-          .database()
-          .ref(`drumpatches/${props.module.instrument}/urls`)
+          .firestore()
+          .collection("drumpatches")
+          .doc(props.module.instrument)
           .get()
           .then((urls) => {
-            let urlsObj = urls.val();
+            let urlsObj = urls.data().urls;
             !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
             props.setModules((prev) => {
               let newModules = [...prev];

@@ -20,20 +20,19 @@ function AuthDialog(props) {
 
   const checkForFistTimeLogin = (user) => {
     const userProfileRef = firebase
-      .database()
-      .ref("users")
-      .child(user.uid)
-      .child("profile");
+      .firestore()
+      .collection("users")
+      .doc(user.uid);
+
     const userProfile = {
       displayName: user.displayName,
       email: user.email,
       photoURL: user.photoURL,
     };
 
-    console.log(userProfile);
-
-    user.metadata.creationTime === user.metadata.lastSignInTime &&
-      userProfileRef.set(userProfile);
+    if (user.metadata.creationTime === user.metadata.lastSignInTime) {
+      userProfileRef.set({ profile: userProfile });
+    }
   };
 
   return (

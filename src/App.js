@@ -23,6 +23,7 @@ import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/AuthDialog";
+import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 import { createNewSession } from "./utils/sessionUtils";
 
@@ -151,6 +152,11 @@ function App() {
               user={user}
               createNewSession={handleCreateNewSession}
             />
+          </Route>
+          <Route exact path="/admin">
+            {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && (
+              <AdminDashboard />
+            )}
           </Route>
         </Switch>
       </div>

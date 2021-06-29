@@ -16,8 +16,19 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
         id: 0,
         name: "Sequencer",
         color: 2,
-        score: [[[0], [3], [2, 0], [3], [0], [3], [2, 0], [3]]],
-        instrument: "-McEPecUtSOmHmpiuVOU",
+        score: [
+          {
+            0: [0],
+            1: [3],
+            2: [2, 0],
+            3: [3],
+            4: [0],
+            5: [3],
+            6: [2, 0],
+            7: [3],
+          },
+        ],
+        instrument: "FSnt2y846yp8Q0RfM7V9",
         type: 0,
         volume: 0,
         muted: false,
@@ -35,7 +46,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     editors: [userId],
     likes: 0,
     likedBy: ["a"],
-    createdOn: firebase.database.ServerValue.TIMESTAMP,
+    createdOn: firebase.firestore.FieldValue.serverTimestamp(),
   };
 
   let newSession = Object.assign(
@@ -55,20 +66,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     return;
   }
 
-  const sessionsRef = firebase.database().ref("sessions");
-  const newSessionRef = sessionsRef.push();
-  newSessionRef.set(
-    newSession,
-    handlePageNav(`session/${newSessionRef.key.substring(1)}`)
-  );
-
-  const userSessionsRef = firebase
-    .database()
-    .ref("users")
-    .child(userId)
-    .child("sessions");
-  userSessionsRef.get().then((snapshot) => {
-    let prev = snapshot.val() === null ? [] : snapshot.val();
-    userSessionsRef.set([...prev, newSessionRef.key]);
-  });
+  const sessionsRef = firebase.firestore().collection("sessions");
+  sessionsRef.add(newSession).then((ref) => handlePageNav(`session/${ref.id}`));
 };
