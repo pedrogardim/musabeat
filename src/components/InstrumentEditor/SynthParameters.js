@@ -61,12 +61,15 @@ function SynthParameters(props) {
     //console.log(props.instrument.get());
   }, [props.instrument]);
 
-  mainContent = (
+  return (
     <Fragment>
       {Object.keys(instrumentParamenters).map((parameter, index) =>
         parameter === "harmonicity" || parameter === "modulationIndex" ? (
           <Fragment>
+            <div className="break" />
+
             <Typography variant="overline">{parameter}</Typography>
+            <div className="break" />
             <Slider
               value={instrumentParamenters[parameter]}
               min={1}
@@ -76,6 +79,7 @@ function SynthParameters(props) {
               onChange={(e, v) => handleChange(parameter, v)}
               valueLabelDisplay="auto"
             />
+            <div className="break" />
           </Fragment>
         ) : parameter === "modulation" ? (
           <FormControl>
@@ -106,8 +110,6 @@ function SynthParameters(props) {
       )}
     </Fragment>
   );
-
-  return mainContent;
 }
 
 export default SynthParameters;

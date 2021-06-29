@@ -17,7 +17,6 @@ function OscillatorEditor(props) {
   const waveSvg = useRef(null);
 
   const [oscillatorWaveForm, setOscillatorWaveForm] = useState("");
-
   const [oscWave, setOscWave] = useState("");
   const [oscType, setOscType] = useState("");
   const [oscPartials, setOscPartials] = useState("");
@@ -88,6 +87,7 @@ function OscillatorEditor(props) {
   return (
     <div className="oscillator-editor">
       <Typography variant="overline">Oscillator</Typography>
+      <div className="break" />
       <svg
         width="128px"
         height="64px"
@@ -96,6 +96,7 @@ function OscillatorEditor(props) {
       >
         <path d={oscillatorWaveForm} stroke="#05386b" fill="none" />
       </svg>
+      <div className="break" />
 
       <FormControl>
         <InputLabel>Type</InputLabel>
@@ -122,21 +123,21 @@ function OscillatorEditor(props) {
           ))}
         </Select>
       </FormControl>
-      {
-        <Slider
-          style={{ width: "70%" }}
-          disabled={oscType === "pwm" || oscType === "pulse"}
-          valueLabelDisplay="auto"
-          value={oscPartials}
-          onChange={handleOscPartialsSelect}
-          onChangeCommitted={() => {
-            props.onInstrumentMod();
-          }}
-          min={0}
-          max={24}
-          valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
-        />
-      }
+      <div className="break" />
+
+      <Slider
+        style={{ width: "70%" }}
+        disabled={oscType === "pwm" || oscType === "pulse"}
+        valueLabelDisplay="auto"
+        value={oscPartials}
+        onChange={handleOscPartialsSelect}
+        onChangeCommitted={() => {
+          props.onInstrumentMod();
+        }}
+        min={0}
+        max={24}
+        valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
+      />
 
       {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
             console.log(e)

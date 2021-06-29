@@ -53,9 +53,12 @@
   height: calc(100% - 30px);
   flex-grow: 1;
   align-items: center;
+  align-content: center;
+  justify-content: center;
 }
 
 .instrument-editor-vertical-slider {
+  max-height: 200px;
   height: 100% !important ;
   padding: 0 10% !important;
   width: 2px !important;

@@ -144,6 +144,11 @@ function Workspace(props) {
       ) {
         setEditMode(true);
       }
+
+      let array = Array(props.session.modules.length).fill(false);
+      console.log(array);
+      setInstrumentsLoaded(array);
+
       loadSessionInstruments(props.session.modules);
     }
     //
@@ -161,7 +166,6 @@ function Workspace(props) {
         setSessionData(data);
 
         if (sessionData.hasOwnProperty("modules")) {
-          setInstrumentsLoaded(Array(sessionData.modules.length).fill(false));
           loadSessionInstruments(sessionData.modules);
           setModules(sessionData.modules);
         }
@@ -189,9 +193,10 @@ function Workspace(props) {
   };
 
   const loadSessionInstruments = (sessionModules) => {
-    setInstruments(Array(sessionModules.length).fill(false));
-
     //console.log("session instr loading");
+    let array = Array(sessionModules.length).fill(false);
+
+    setInstruments(array);
 
     let moduleInstruments = [];
     sessionModules.forEach((module, moduleIndex) => {
@@ -338,11 +343,15 @@ function Workspace(props) {
     });
   };
 
-  const saveToDatabase = (input) => {
-    if (DBSessionRef !== null) {
+  const saveToDatabase = (input, type) => {
+    if (DBSessionRef !== null && initialLoad) {
+      console.log(
+        "saving to db",
+        input.length !== undefined ? "modules" : "sessionData"
+      );
       input.length !== undefined
         ? DBSessionRef.update({ modules: modules })
-        : DBSessionRef.update({ ...sessionData, modules: modules });
+        : DBSessionRef.update({ ...sessionData });
     }
     /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
@@ -352,31 +361,35 @@ function Workspace(props) {
   };
 
   const updateFromDatabase = (modulesData) => {
-    if (JSON.stringify(modules) === JSON.stringify(modulesData)) {
-      //console.log("ITS DIFFERENT!!!")
-      //console.log("moduled loaded from server:" + modulesData);
-      let data = { ...modulesData };
-      delete data.modules;
-      setSessionData(data);
+    if (JSON.stringify(modules) !== JSON.stringify(modulesData.modules)) {
+      console.log("modules loaded from server:", modulesData.modules);
+
       setModules(modulesData.modules);
+
       //console.log("UPDATED");
     } else {
       console.log("ITS THE SAME!!!");
     }
+    /* 
+    let data = { ...modulesData };
+    delete data.modules;
+
+    if (JSON.stringify(data) !== JSON.stringify(sessionData)) {
+      console.log(
+        "SESSION DATA UPDATED",
+        JSON.stringify(modulesData.modules),
+        JSON.stringify(modules)
+      );
+      setSessionData(data);
+    } */
   };
 
   const onSessionReady = () => {
-    if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.onSnapshot((snapshot) => {
-        updateFromDatabase(snapshot.data());
-      });
-    }
-
     instruments.forEach((e, i) => {
-      if (!!e) {
-        e.volume.value = modules[i].volume;
-        e._volume.mute = modules[i].muted;
-      }
+      //console.log(modules[i].name, 1, e.volume.value);
+      e.volume.value = modules[i].volume;
+      e._volume.mute = modules[i].muted;
+      //console.log(modules[i].name, 2, e.volume.value);
     });
 
     props.hidden &&
@@ -387,6 +400,13 @@ function Workspace(props) {
             100
         )
       );
+
+    //TODO, realtime collaborative editing. Must activate only when multiple editors are in the same session
+    /* if (!props.hidden && DBSessionRef !== null) {
+      DBSessionRef.onSnapshot((snapshot) => {
+        updateFromDatabase(snapshot.data());
+      });
+    } */
 
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
@@ -561,22 +581,27 @@ function Workspace(props) {
     adaptSessionSize();
     //registerSession();
     console.log("Modules", modules);
-    !props.hidden && saveToDatabase(modules);
+    !props.hidden && saveToDatabase(modules, 0);
   }, [modules]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
+    console.log("sessiondata triggered", sessionData);
     if (sessionData) {
-      !props.hidden && saveToDatabase(sessionData);
+      !props.hidden && saveToDatabase(sessionData, 1);
     }
-  }, [sessionData]);
+  }, [sessionData]); */
 
   useEffect(() => {
-    //console.log(instrumentsLoaded);
-    instrumentsLoaded &&
-      !instrumentsLoaded.includes(false) &&
+    if (
+      modules &&
+      instrumentsLoaded &&
+      instruments.every((val) => typeof val === "object") &&
+      instrumentsLoaded.every((val) => val === true) &&
       sessionSize > 0 &&
-      !initialLoad &&
+      !initialLoad
+    ) {
       onSessionReady();
+    }
     //temp
   }, [instrumentsLoaded]);
 

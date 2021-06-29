@@ -1,11 +1,10 @@
 .oscillator-editor {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  justify-content: center;
   flex-wrap: wrap;
-  align-content: flex-start;
-  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
   height: 100%;
 }
 

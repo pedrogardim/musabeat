@@ -22,6 +22,7 @@ function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(true);
 
+  const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
   /* 
   const lookForPatch = () => {
@@ -203,10 +204,11 @@ function InstrumentEditor(props) {
     } else {
       mainContent = (
         <Fragment>
-          <div className="instrument-editor-column" key={0}>
+          <div ref={oscColumn} className="instrument-editor-column" key={0}>
             <OscillatorEditor
               onInstrumentMod={props.onInstrumentMod}
               instrument={props.instrument}
+              columnRef={oscColumn}
             />
           </div>
           <div className="instrument-editor-column" key={1}>

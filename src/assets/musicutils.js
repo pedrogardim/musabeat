@@ -638,12 +638,15 @@ export const patchLoader = async (
   setInstrumentsLoaded,
   moduleIndex
 ) => {
-  let instrumentLoaded = (isLoaded) =>
+  let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
       a[moduleIndex] = isLoaded;
       return a;
     });
+  };
+
+  instrumentLoaded(false);
 
   let instr;
   let patchRef = firebase.firestore().collection("patches").doc(input);
@@ -683,6 +686,8 @@ export const patchLoader = async (
     instr.set(patch);
     //console.log(instr);
   }
+
+  if (patch.base !== "Sampler") instrumentLoaded(true);
 
   "gain" in patch
     ? (instr.volume.value = patch.gain)
@@ -724,6 +729,7 @@ export const patchLoader = async (
   } else {
     instr.toDestination();
   }
+  //console.log("instr", instr);
   return instr;
 };
 
