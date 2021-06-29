@@ -639,9 +639,9 @@ export const patchLoader = async (
   moduleIndex
 ) => {
   let instr;
-  let patchRef = firebase.database().ref("/patches/" + input);
+  let patchRef = firebase.database().collection("patches").doc(input);
 
-  let patch = (await patchRef.get()).val();
+  let patch = (await patchRef.get()).data();
   //console.log(patch)
 
   let options = patch.options;
