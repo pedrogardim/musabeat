@@ -790,7 +790,7 @@ function Workspace(props) {
           tabIndex={-1}
           color="primary"
           className="ws-fab ws-fab-play"
-          onClick={props.togglePlaying}
+          onClick={togglePlaying}
         >
           <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
         </Fab>
@@ -846,30 +846,5 @@ function Workspace(props) {
 }
 
 export default Workspace;
-
-const compareObjectsArray = (arr1, arr2) => {
-  if (!arr1 || !arr2) return false;
-
-  const parseArr = (parsingArray) =>
-    JSON.stringify(
-      parsingArray.map((parsingObj) =>
-        Object.keys(parsingObj)
-          .sort()
-          .reduce((obj, key) => {
-            obj[key] = parsingObj[key];
-            return obj;
-          }, {})
-      )
-    );
-
-  //console.log(
-  //  parseArr(arr1),
-  //  "><===><",
-  //  parseArr(arr2),
-  //  parseArr(arr1) === parseArr(arr2) ? "equal" : "different"
-  //);
-
-  return parseArr(arr1) === parseArr(arr2);
-};
 
 const deepCopy = (a) => JSON.parse(JSON.stringify(a));
