@@ -638,8 +638,15 @@ export const patchLoader = async (
   setInstrumentsLoaded,
   moduleIndex
 ) => {
+  let instrumentLoaded = (isLoaded) =>
+    setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[moduleIndex] = isLoaded;
+      return a;
+    });
+
   let instr;
-  let patchRef = firebase.database().collection("patches").doc(input);
+  let patchRef = firebase.firestore().collection("patches").doc(input);
 
   let patch = (await patchRef.get()).data();
   //console.log(patch)
@@ -648,30 +655,16 @@ export const patchLoader = async (
   let instrfx = [];
 
   if (patch.base === "Sampler") {
-    setInstrumentsLoaded((prev) => {
-      let a = [...prev];
-      a[moduleIndex] = false;
-      return a;
-    });
+    instrumentLoaded(false);
     instr = new Tone.Sampler(
       patch.urls,
-      () =>
-        setInstrumentsLoaded((prev) => {
-          //console.log("======LOADED=======")
-          let a = [...prev];
-          a[moduleIndex] = true;
-          return a;
-        }),
+      () => instrumentLoaded(true),
       options.baseUrl
     ).toDestination();
 
     instr.set(options);
   } else {
-    setInstrumentsLoaded((prev) => {
-      let a = [...prev];
-      a[moduleIndex] = true;
-      return a;
-    });
+    instrumentLoaded(true);
   }
   if (patch.base === "FM" || type === "FMSynth") {
     instr = new Tone.PolySynth(Tone.FMSynth, options);
@@ -754,9 +747,9 @@ export const loadDrumPatch = async (
   moduleIndex
 ) => {
   //drum patch with stardard configuration
-  let patchRef = firebase.database().ref(`/drumpatches/${input}`);
+  let patchRef = firebase.firestore().collection("drumpatches").doc(input);
 
-  let patch = (await patchRef.get()).val();
+  let patch = (await patchRef.get()).data();
 
   setInstrumentsLoaded((prev) => {
     //console.log("======LOADED=======")

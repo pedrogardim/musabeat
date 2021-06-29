@@ -269,6 +269,7 @@ function InstrumentEditor(props) {
         setPatchExplorer={setPatchExplorer}
         instrument={props.instrument}
         setInstruments={props.setInstruments}
+        setInstrument={props.setInstrument}
         setInstrumentsLoaded={props.setInstrumentsLoaded}
         module={props.module}
       />

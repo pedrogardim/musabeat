@@ -30,10 +30,10 @@ function PatchEditor(props) {
   };
 
   const patchesMigration = () => {
-    const newDBref = firebase.firestore().collection("patches");
+    const newDBref = firebase.firestore().collection("users");
     const oldDBref = firebase
       .database()
-      .ref("patches")
+      .ref("users")
       .get()
       .then((r) => {
         let values = Object.values(r.val());
@@ -43,7 +43,7 @@ function PatchEditor(props) {
           delete newPatch.fx;
           return newPatch;
         });
-        values.forEach((e) => newDBref.add(e));
+        values.forEach((e, i) => newDBref.doc(Object.keys(r.val())[i]).set(e));
       });
   };
 
@@ -53,6 +53,7 @@ function PatchEditor(props) {
 
   useEffect(() => {
     loadAllPatches();
+    //patchesMigration();
   }, []);
 
   return (
