@@ -400,7 +400,7 @@ function Workspace(props) {
   const saveToDatabase = (input, type) => {
     if (DBSessionRef !== null && isLoaded) {
       console.log(savingMode);
-      savingMode === "simple" && setSnackbarMessage("Changes Saved");
+      savingMode === "simple" && setSnackbarMessage("Changes saved");
 
       //console.log(
       //  "saving to db",
@@ -506,7 +506,7 @@ function Workspace(props) {
 
     let copiedData =
       module.type === 0 || module.type === 1
-        ? [...module.score[currentMeasure]]
+        ? { ...module.score[currentMeasure] }
         : null;
     setClipboard([module.type, copiedData]);
     setSnackbarMessage(
@@ -541,16 +541,23 @@ function Workspace(props) {
       let newModules = [...prev];
 
       if (
-        clipboard.length !==
-        newModules[focusedModule].score[currentMeasure].length
+        Object.keys(clipboard).length !==
+        Object.keys(newModules[focusedModule].score[currentMeasure]).length
       ) {
         newModules[focusedModule].score = newModules[focusedModule].score.map(
-          (e) => adaptSequencetoSubdiv(e, clipboard.length)
+          (e) =>
+            Object.assign(
+              {},
+              adaptSequencetoSubdiv(
+                Object.values(e),
+                Object.keys(clipboard).length
+              )
+            )
         );
         subdivisionChanged = true;
       }
 
-      newModules[focusedModule].score[currentMeasure] = [...clipboard];
+      newModules[focusedModule].score[currentMeasure] = { ...clipboard[1] };
 
       return newModules;
     });

@@ -111,7 +111,7 @@ function Sequencer(props) {
 
   useEffect(() => {
     setSequence(props.module.score);
-  }, [props.module]);
+  }, [props.module.score]);
 
   useEffect(() => {
     scheduleNotes();
