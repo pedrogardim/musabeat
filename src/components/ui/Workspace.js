@@ -61,7 +61,55 @@ function Workspace(props) {
 
   //a copy of the instruments, to be able to use them on export function
   //to undo and redo
-  //const [sessionHistory, setSessionHistory] = useState([]);
+  const [sessionHistory, setSessionHistory] = useState({
+    past: [],
+    present: null, // (?) How do we initialize the present?
+    future: [],
+  });
+
+  const handleUndo = (action) => {
+    let currentModules = deepCopy(modules);
+
+    setSessionHistory((prev) => {
+      let { past, present, future } = { ...prev };
+
+      switch (action) {
+        case "UNDO":
+          if (past.length < 2) return prev;
+          let previous = past[past.length - 1];
+          let newPast = past.slice(0, past.length - 1);
+          setModules(deepCopy(previous));
+          return {
+            past: newPast,
+            present: previous,
+            future: [present, ...future],
+          };
+
+        case "REDO":
+          if (future.length < 1) return prev;
+          let next = future[0];
+          let newFuture = future.slice(1);
+          setModules(deepCopy(next));
+          return {
+            past: [...past, present],
+            present: next,
+            future: newFuture,
+          };
+        default:
+          let areDifferent =
+            JSON.stringify(present) !== JSON.stringify(currentModules);
+          //console.log(areDifferent);
+          return areDifferent
+            ? {
+                past: [...past, present],
+                present: deepCopy(currentModules),
+                future: [],
+              }
+            : prev;
+      }
+    });
+    //newObject && setSessionHistory(newObject);
+  };
 
   const handleSessionCopy = () => {
     DBSessionRef.get().then((r) => props.createNewSession(r.data()));
@@ -146,7 +194,7 @@ function Workspace(props) {
       }
 
       let array = Array(props.session.modules.length).fill(false);
-      console.log(array);
+      //console.log(array);
       setInstrumentsLoaded(array);
 
       loadSessionInstruments(props.session.modules);
@@ -345,10 +393,10 @@ function Workspace(props) {
 
   const saveToDatabase = (input, type) => {
     if (DBSessionRef !== null && initialLoad) {
-      console.log(
-        "saving to db",
-        input.length !== undefined ? "modules" : "sessionData"
-      );
+      //console.log(
+      //  "saving to db",
+      //  input.length !== undefined ? "modules" : "sessionData"
+      //);
       input.length !== undefined
         ? DBSessionRef.update({ modules: modules })
         : DBSessionRef.update({ ...sessionData });
@@ -362,13 +410,13 @@ function Workspace(props) {
 
   const updateFromDatabase = (modulesData) => {
     if (JSON.stringify(modules) !== JSON.stringify(modulesData.modules)) {
-      console.log("modules loaded from server:", modulesData.modules);
+      //console.log("modules loaded from server:", modulesData.modules);
 
       setModules(modulesData.modules);
 
       //console.log("UPDATED");
     } else {
-      console.log("ITS THE SAME!!!");
+      //console.log("ITS THE SAME!!!");
     }
     /* 
     let data = { ...modulesData };
@@ -491,15 +539,18 @@ function Workspace(props) {
     if (focusedModule == null) return;
     let currentMeasure = Tone.Transport.position.split(":")[0];
     let module = modules[focusedModule];
-    let measureLength = modules[focusedModule].score[currentMeasure].length;
+    let measureLength = Object.keys(
+      modules[focusedModule].score[currentMeasure]
+    ).length;
 
     if (module.type !== 0 && module.type !== 1) return;
 
     setModules((prev) => {
       let newModules = [...prev];
-      newModules[focusedModule].score[currentMeasure] = new Array(
-        measureLength
-      ).fill(0);
+      newModules[focusedModule].score[currentMeasure] = Object.assign(
+        {},
+        Array(measureLength).fill(0)
+      );
 
       return newModules;
     });
@@ -536,6 +587,10 @@ function Workspace(props) {
         case 86:
           handlePaste();
           break;
+        case 90:
+          !e.shiftKey ? handleUndo("UNDO") : handleUndo("REDO");
+          break;
+
         default:
           break;
       }
@@ -582,6 +637,8 @@ function Workspace(props) {
     //registerSession();
     console.log("Modules", modules);
     !props.hidden && saveToDatabase(modules, 0);
+
+    modules && initialLoad && handleUndo();
   }, [modules]);
 
   /*  useEffect(() => {
@@ -590,6 +647,10 @@ function Workspace(props) {
       !props.hidden && saveToDatabase(sessionData, 1);
     }
   }, [sessionData]); */
+
+  /*   useEffect(() => {
+    console.log(sessionHistory);
+  }, [sessionHistory]); */
 
   useEffect(() => {
     if (
@@ -810,3 +871,5 @@ const compareObjectsArray = (arr1, arr2) => {
 
   return parseArr(arr1) === parseArr(arr2);
 };
+
+const deepCopy = (a) => JSON.parse(JSON.stringify(a));
