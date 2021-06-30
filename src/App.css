@@ -52,7 +52,20 @@ body *::-webkit-scrollbar-thumb {
 
 .app-logo {
   margin-left: 16px;
-  height: 30px;
+  height: 100%;
+  width: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.app-log-beta-mark {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  font-size: 10px !important;
+  line-height: 10px !important;
 }
 
 .app-wrapper {

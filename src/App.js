@@ -12,6 +12,7 @@ import {
   MenuItem,
   Toolbar,
   AppBar,
+  Typography,
 } from "@material-ui/core";
 
 import firebase from "firebase";
@@ -73,12 +74,12 @@ function App() {
           >
             <Icon>menu</Icon>
           </IconButton>
-          <img
-            className="app-logo"
-            alt={"musa"}
-            style={{ height: 30 }}
-            src={logo}
-          />
+          <div className="app-logo">
+            <Typography variant="overline" className="app-log-beta-mark">
+              BETA
+            </Typography>
+            <img alt={"musa"} style={{ height: 30 }} src={logo} />
+          </div>
           <IconButton className="main-avatar">
             <Avatar
               onClick={handleAvatarClick}
