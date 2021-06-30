@@ -14,6 +14,14 @@ export const TRANSLATIONS_ES = {
   workspace: {
     empty: "¡Vaya, no hay módulos!",
     addBtn: "Añadir Módulo",
+    actions: {
+      copyPasteIncompatible:
+        "El contenido que intentas pegar pertenece a otro tipo de módulo",
+      copyPasteEmptyClipboard: "Nada que pegar",
+      copySuccess: "Copiado del módulo",
+      pasteSuccess: "Compás copiado pegado en el módulo",
+      stepsChange: "Pasos en el módulo final cambiado a",
+    },
   },
   WSTitle: {
     viewMode:
@@ -80,7 +88,10 @@ export const TRANSLATIONS_ES = {
   dialogs: {
     cancel: "Cancelar",
     submit: "Enviar",
+    delete: "Eliminar",
     loginWithGoogle: "Iniciar sesión con Google",
+    areYouSure: "¿Estás seguro?",
+    irreversibleAction: "Esta medida no se puede deshacer",
     insertName: "Insertar nombre",
     sessionInfo: "Información de la sessión",
     patchName: "Nombre del Patch",

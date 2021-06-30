@@ -26,6 +26,8 @@ import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 import ModuleEffects from "./ModuleEffects";
 
+import DeleteConfirm from "../ui/Dialogs/DeleteConfirm";
+
 import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
 import { colors } from "../../utils/materialPalette";
@@ -42,6 +44,7 @@ function Module(props) {
   const [fullScreen, setFullScreen] = useState(false);
 
   const [moduleZoom, setModuleZoom] = useState(1);
+  const [deleteDialog, setDeleteDialog] = useState(false);
 
   let moduleContent = <span>Nothing Here</span>;
 
@@ -92,20 +95,6 @@ function Module(props) {
       let newModules = [...prevModules];
       newModules = newModules.filter((e, i) => i !== props.index);
       return newModules;
-    });
-
-    props.setInstruments((prevInstruments) => {
-      //prevModules.forEach(e=>clearEvents(e.id));
-      let newInstruments = [...prevInstruments];
-      newInstruments = newInstruments.filter((e, i) => i !== props.index);
-      return newInstruments;
-    });
-
-    props.setInstrumentsLoaded((prevLoaded) => {
-      //prevModules.forEach(e=>clearEvents(e.id));
-      let newLoaded = [...prevLoaded];
-      newLoaded = newLoaded.filter((e, i) => i !== props.index);
-      return newLoaded;
     });
   };
 
@@ -479,7 +468,7 @@ function Module(props) {
             </MenuItem>
             <MenuItem
               className="module-menu-option"
-              onClick={removeModule}
+              onClick={() => setDeleteDialog(true)}
               tabIndex={-1}
             >
               <Icon>delete</Icon>
@@ -534,6 +523,11 @@ function Module(props) {
           />
         )}
       </div>
+      <DeleteConfirm
+        open={deleteDialog}
+        onClose={() => setDeleteDialog(null)}
+        action={removeModule}
+      />
     </Fragment>
   );
 }

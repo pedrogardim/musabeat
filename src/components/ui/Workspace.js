@@ -80,12 +80,18 @@ function Workspace(props) {
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
 
+    let cleanHistory = {
+      past: [],
+      present: currentModules, // (?) How do we initialize the present?
+      future: [],
+    };
+
     setSessionHistory((prev) => {
       let { past, present, future } = { ...prev };
 
       switch (action) {
         case "UNDO":
-          if (past.length < 2) return prev;
+          if (past.length < 1) return prev;
           let previous = past[past.length - 1];
           let newPast = past.slice(0, past.length - 1);
           setModules(deepCopy(previous));
@@ -108,8 +114,13 @@ function Workspace(props) {
         default:
           let areDifferent =
             JSON.stringify(present) !== JSON.stringify(currentModules);
-          //console.log(areDifferent);
-          return areDifferent
+
+          //TEMP Solution: (currentModules.length < past[past.length - 1].length) ===> Reset undo to prevent bringing back deleted modules
+
+          return past[past.length - 1] &&
+            currentModules.length < past[past.length - 1].length
+            ? cleanHistory
+            : areDifferent
             ? {
                 past: [...past, present],
                 present: deepCopy(currentModules),
@@ -404,7 +415,7 @@ function Workspace(props) {
   const saveToDatabase = (input, type) => {
     if (DBSessionRef !== null && isLoaded) {
       console.log(savingMode);
-      savingMode === "simple" && setSnackbarMessage("Changes saved");
+      savingMode === "simple" && setSnackbarMessage(t("misc.saveChanges"));
 
       //console.log(
       //  "saving to db",
@@ -514,7 +525,9 @@ function Workspace(props) {
         : null;
     setClipboard([module.type, copiedData]);
     setSnackbarMessage(
-      `Measure copied from module ${focusedModule + 1} "${module.name}"`
+      `${t("workspace.action.copySuccess")} ${focusedModule + 1} "${
+        module.name
+      }"`
     );
 
     //console.log("copied", copiedData);
@@ -523,7 +536,7 @@ function Workspace(props) {
   const handlePaste = () => {
     if (focusedModule == null) return;
     if (!clipboard) {
-      setSnackbarMessage("Nothing to paste");
+      setSnackbarMessage(t("workspace.action.copyPasteEmptyClipboard"));
       return;
     }
 
@@ -531,9 +544,7 @@ function Workspace(props) {
     let module = modules[focusedModule];
 
     if (clipboard[0] !== module.type) {
-      setSnackbarMessage(
-        "The content you are trying to paste belongs to a different type of module"
-      );
+      setSnackbarMessage(t("workspace.action.copyPasteIncompatible"));
       return;
     }
 
@@ -566,9 +577,11 @@ function Workspace(props) {
       return newModules;
     });
     setSnackbarMessage(
-      `Copied measure pasted on module ${focusedModule + 1} "${module.name}" ${
+      `${t("workspace.action.pasteSuccess")} ${focusedModule + 1} "${
+        module.name
+      }" ${
         subdivisionChanged
-          ? "Steps on target was changed to " + clipboard.length
+          ? `${t("workspace.action.stepsChange")} ${clipboard.length}`
           : ""
       }`
     );
@@ -675,7 +688,8 @@ function Workspace(props) {
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
-    console.log("Modules", modules);
+    //console.log("Modules", modules);
+    //console.log(modules, instruments, instrumentsLoaded);
 
     savingMode === "simple" && setAreUnsavedChanges(true);
     savingMode === "collaborative" && saveToDatabase(modules);

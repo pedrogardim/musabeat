@@ -18,6 +18,8 @@ import {
 import SessionGalleryItem from "./SessionGalleryItem";
 import PlaceholderSGI from "./PlaceholderSGI";
 import NameInput from "../Dialogs/NameInput";
+import DeleteConfirm from "../Dialogs/DeleteConfirm";
+
 import Workspace from "../Workspace";
 
 import "./SessionExplorer.css";
@@ -223,7 +225,12 @@ function SessionExplorer(props) {
       ) : (
         ""
       )}
-      {deleteDialog !== null && (
+      <DeleteConfirm
+        open={deleteDialog !== null}
+        onClose={() => setDeleteDialog(null)}
+        action={handleSessionDelete}
+      />
+      {/* {deleteDialog !== null && (
         <Dialog open="true" onClose={() => setDeleteDialog(null)}>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogContent>
@@ -238,7 +245,7 @@ function SessionExplorer(props) {
             </Button>
           </DialogActions>
         </Dialog>
-      )}
+      )} */}
       {renameDialog !== null && (
         <NameInput
           onSubmit={handleSessionRename}

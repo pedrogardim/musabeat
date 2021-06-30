@@ -14,6 +14,14 @@ export const TRANSLATIONS_EN = {
   workspace: {
     empty: "No Modules!",
     addBtn: "Add New Module",
+    actions: {
+      copyPasteIncompatible:
+        "The content you are trying to paste belongs to a different type of module",
+      copyPasteEmptyClipboard: "Nothing to paste",
+      copySuccess: "Copied from module",
+      pasteSuccess: "Copied measure pasted on module",
+      stepsChange: "Steps on target were changed to",
+    },
   },
   WSTitle: {
     viewMode:
@@ -80,7 +88,10 @@ export const TRANSLATIONS_EN = {
   dialogs: {
     cancel: "Cancel",
     submit: "Submit",
+    delete: "Delete",
     loginWithGoogle: "Log In with Google",
+    areYouSure: "Are you sure?",
+    irreversibleAction: "This is an action that can't be undone",
     insertName: "Insert name",
     sessionInfo: "Session Info",
     patchName: "Patch Name",
