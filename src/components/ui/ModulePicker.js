@@ -1,6 +1,7 @@
 import "./ModulePicker.css";
 
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import {
   IconButton,
@@ -51,6 +52,8 @@ const stepValues = [4, 8, 12, 16, 24, 32];
 const lengthValues = [1, 2, 4, 8, 16];
 
 function ModulePicker(props) {
+  const { t } = useTranslation();
+
   const [selectedType, setSelectedType] = useState(0);
   const [selectedSize, setSelectedSize] = useState(1);
   const [selectedSteps, setSelectedSteps] = useState(8);
@@ -68,7 +71,7 @@ function ModulePicker(props) {
         !props.modules || !props.modules.length
           ? 0
           : Math.max(...props.modules.map((e) => e.id)) + 1,
-      name: moduletypes[selectedType].name,
+      name: t(`modulePicker.types.${selectedType}.name`),
       type: selectedType,
       score:
         selectedType === 0 || selectedType === 1
@@ -132,7 +135,7 @@ function ModulePicker(props) {
       onClose={props.onClose}
       PaperProps={{ className: "module-picker" }}
     >
-      <Typography variant="overline"> Create a new module</Typography>
+      <Typography variant="overline"> {t(`modulePicker.create`)}</Typography>
       <BottomNavigation
         value={selectedType}
         onChange={(event, newValue) => {
@@ -140,21 +143,23 @@ function ModulePicker(props) {
         }}
         showLabels
       >
-        {moduletypes.map((e) => (
+        {moduletypes.map((e, i) => (
           <BottomNavigationAction
-            label={e.name}
+            label={t(`modulePicker.types.${i}.name`)}
             key={e.name}
             icon={<Icon>{e.icon}</Icon>}
           />
         ))}
       </BottomNavigation>
 
-      <p variant="overline"> {moduletypes[selectedType].description}</p>
+      <p variant="overline">
+        {t(`modulePicker.types.${selectedType}.description`)}
+      </p>
 
       <div className="module-picker-select-cont">
         {
           <FormControl>
-            <InputLabel>Length, in measures</InputLabel>
+            <InputLabel>{t("module.settings.length")}</InputLabel>
             <Select native value={selectedSize} onChange={handleSizeSelect}>
               {lengthValues.map((e) => (
                 <option key={`mpl${e}`} value={e}>
@@ -166,7 +171,7 @@ function ModulePicker(props) {
         }
         {(selectedType === 0 || selectedType === 1) && (
           <FormControl>
-            <InputLabel>Steps</InputLabel>
+            <InputLabel>{t("module.settings.steps")}</InputLabel>
             <Select native value={selectedSteps} onChange={handleStepSelect}>
               {stepValues.map((e) => (
                 <option key={`mps${e}`} value={e}>
@@ -178,7 +183,7 @@ function ModulePicker(props) {
         )}
       </div>
 
-      <Button onClick={addModule}>ADD MODULE</Button>
+      <Button onClick={addModule}>{t("modulePicker.submit")}</Button>
 
       <IconButton
         onClick={() => props.setModulePicker(false)}

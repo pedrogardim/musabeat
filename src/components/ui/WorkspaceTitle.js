@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import {
   Icon,
@@ -16,6 +17,8 @@ import SessionInfo from "./Dialogs/SessionInfo";
 import "./Workspace.css";
 
 function WorkspaceTitle(props) {
+  const { t } = useTranslation();
+
   const [creationDateString, setCreationDateString] = useState(null);
   const [editorProfiles, setEditorProfiles] = useState([]);
   const [expanded, setExpanded] = useState(false);
@@ -24,7 +27,7 @@ function WorkspaceTitle(props) {
   const getSessionTitleInfo = async () => {
     if (typeof props.sessionData.createdOn.seconds === "number") {
       let date = new Date(props.sessionData.createdOn.seconds * 1000);
-      let creationDate = `Created on ${date.getDate()}/${
+      let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
         date.getMonth() + 1
       }/${date.getFullYear()}`;
       setCreationDateString(creationDate);
@@ -87,12 +90,12 @@ function WorkspaceTitle(props) {
       </Typography>
 
       {!props.editMode && (
-        <Tooltip title="View Mode: You don't have the permission to edit this session! To be able to edit it create a copy">
+        <Tooltip title={t("WSTitle.viewMode")}>
           <Icon className="app-title-alert">visibility</Icon>
         </Tooltip>
       )}
       {props.editMode && !props.user && (
-        <Tooltip title="You are not logged in! Changes will not be saved">
+        <Tooltip title={t("WSTitle.unloggedEditor")}>
           <Icon className="app-title-alert">no_accounts</Icon>
         </Tooltip>
       )}

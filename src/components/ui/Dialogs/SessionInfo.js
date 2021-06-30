@@ -12,9 +12,13 @@ import {
   InputLabel,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 import "./SessionInfo.css";
 
 function SessionInfo(props) {
+  const { t } = useTranslation();
+
   const [sessionName, setSessionName] = useState(props.sessionData.name);
   const [description, setDescription] = useState(props.sessionData.description);
 
@@ -35,10 +39,10 @@ function SessionInfo(props) {
 
   return (
     <Dialog open="true" onClose={props.onClose}>
-      <DialogTitle>Session Info</DialogTitle>
+      <DialogTitle>{t("dialogs.sessionInfo")}</DialogTitle>
       <DialogContent className="session-info-dialog">
         <FormControl>
-          <InputLabel labelFor="si1">Session Name</InputLabel>
+          <InputLabel labelFor="si1">{t("info.name")}</InputLabel>
           <Input
             value={sessionName}
             onChange={(e) => setSessionName(e.target.value)}
@@ -47,7 +51,7 @@ function SessionInfo(props) {
         </FormControl>
         <div className="break" />
         <FormControl>
-          <InputLabel labelFor="si2">Description</InputLabel>
+          <InputLabel labelFor="si2">{t("info.description")}</InputLabel>
           <Input
             value={description}
             rows={2}
@@ -59,7 +63,7 @@ function SessionInfo(props) {
         </FormControl>
         <div className="break" />
         <FormControl>
-          <InputLabel labelFor="si3">Tags</InputLabel>
+          <InputLabel labelFor="si3">{t("info.tags")}</InputLabel>
           <Input
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -71,9 +75,9 @@ function SessionInfo(props) {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={props.onClose}>Cancel</Button>
+        <Button onClick={props.onClose}> {t("dialogs.cancel")}</Button>
         <Button color="primary" onClick={handleSubmit}>
-          Submit
+          {t("dialogs.submit")}
         </Button>
       </DialogActions>
     </Dialog>

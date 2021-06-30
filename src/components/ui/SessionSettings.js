@@ -55,7 +55,7 @@ function SessionSettings(props) {
               marginBottom: 16,
             }}
           >
-            <Typography> BPM</Typography>
+            <Typography>BPM</Typography>
             <Slider
               min={50}
               max={300}

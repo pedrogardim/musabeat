@@ -12,11 +12,14 @@ import {
 import "./ModuleSettings.css";
 
 import { colors } from "../../utils/materialPalette";
+import { useTranslation } from "react-i18next";
 
 const subdivisionValues = [4, 8, 12, 16, 24, 32];
 const lengthValues = [1, 2, 4, 8, 16];
 
 function ModuleSettings(props) {
+  const { t } = useTranslation();
+
   let mainContent = "No Settings";
 
   const handleColorSelect = (event) => {
@@ -155,7 +158,9 @@ function ModuleSettings(props) {
     <Fragment>
       {(props.module.type === 0 || props.module.type === 1) && (
         <FormControl>
-          <InputLabel id="subdivision-select-label">Steps</InputLabel>
+          <InputLabel id="subdivision-select-label">
+            {t("module.settings.steps")}
+          </InputLabel>
           <Select
             native
             labelId="subdivision"
@@ -174,7 +179,9 @@ function ModuleSettings(props) {
         props.module.type === 1 ||
         props.module.type === 4) && (
         <FormControl>
-          <InputLabel id="length-select-label">Length (In measures)</InputLabel>
+          <InputLabel id="length-select-label">
+            {t("module.settings.length")}
+          </InputLabel>
           <Select
             native
             labelId="length-select-label"
@@ -196,7 +203,7 @@ function ModuleSettings(props) {
 
       {(props.module.type === 1 || props.module.type === 2) && (
         <FormControl>
-          <InputLabel id="root-select-label">Root</InputLabel>
+          <InputLabel id="root-select-label">{t("music.root")}</InputLabel>
           <Select
             native
             labelId="root-select-label"
@@ -213,7 +220,7 @@ function ModuleSettings(props) {
       )}
       {(props.module.type === 1 || props.module.type === 2) && (
         <FormControl>
-          <InputLabel id="scale-select-label">Scales</InputLabel>
+          <InputLabel id="scale-select-label">{t("music.scale")}</InputLabel>
           <Select
             native
             labelId="scale-select-label"
@@ -222,7 +229,7 @@ function ModuleSettings(props) {
           >
             {scales.map((scale, scaleIndex) => (
               <option key={scaleIndex} value={scaleIndex}>
-                {scale[1]}
+                {t(`music.scales[${scaleIndex}]`)}
               </option>
             ))}
           </Select>
@@ -243,14 +250,16 @@ function ModuleSettings(props) {
       )}
       {props.module.type === 2 && (
         <FormControl>
-          <InputLabel id="complexity-select-label">Extentions</InputLabel>
+          <InputLabel id="complexity-select-label">
+            {t("music.complexity")}
+          </InputLabel>
           <Select
             native
             labelId="complexity-select-label"
             value={props.module.complexity}
             onChange={handleComplexityChange}
           >
-            <option value={3}>None</option>
+            <option value={3}>{t("misc.none")}</option>
             <option value={4}>7ths</option>
             <option value={5}>7ths + 9ths</option>
           </Select>

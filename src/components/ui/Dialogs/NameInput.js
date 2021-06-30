@@ -9,8 +9,11 @@ import {
   TextField,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 function NameInput(props) {
   const inputRef = useRef(null);
+  const { t } = useTranslation();
 
   const handleSubmit = () => {
     let value = inputRef.current.children[0].children[0].value;
@@ -20,14 +23,14 @@ function NameInput(props) {
 
   return (
     <Dialog open="true" onClose={props.onClose}>
-      <DialogTitle>Insert new name</DialogTitle>
+      <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
         <TextField ref={inputRef}></TextField>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>Cancel</Button>
+        <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>
         <Button color="primary" onClick={handleSubmit}>
-          Change Name
+          {t("dialogs.submit")}
         </Button>
       </DialogActions>
     </Dialog>

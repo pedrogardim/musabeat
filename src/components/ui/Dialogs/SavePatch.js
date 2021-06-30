@@ -10,12 +10,16 @@ import {
   Select,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 import {
   instrumentsCategories,
   drumCategories,
 } from "../../../assets/musicutils";
 
 function SavePatch(props) {
+  const { t } = useTranslation();
+
   const inputRef = useRef(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -30,29 +34,32 @@ function SavePatch(props) {
 
   return (
     <Dialog open="true" onClose={props.onClose}>
-      <DialogTitle>Insert patch name</DialogTitle>
+      <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
-        <TextField helperText={"Patch Name"} ref={inputRef}></TextField>
+        <TextField
+          helperText={t("dialogs.patchName")}
+          ref={inputRef}
+        ></TextField>
         <div className="break" style={{ height: 16 }} />
         <Select native onChange={handleChange} value={selectedCategory}>
-          <option value={null}>No Category</option>
+          <option value={null}>{t("misc.noCategory")}</option>
           {props.isDrum
             ? drumCategories.map((e, i) => (
                 <option key={"spd" + e} value={i}>
-                  {e}
+                  {t(`music.drumCategories.${i}`)}
                 </option>
               ))
             : instrumentsCategories.map((e, i) => (
                 <option key={"spd" + e} value={i}>
-                  {e}
+                  {t(`music.instrumentsCategories.${i}`)}
                 </option>
               ))}
         </Select>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>Cancel</Button>
+        <Button onClick={props.onClose}>{t("dialogs.canvel")}</Button>
         <Button color="primary" onClick={handleSubmit}>
-          Save patch
+          {t("dialogs.submit")}
         </Button>
       </DialogActions>
     </Dialog>

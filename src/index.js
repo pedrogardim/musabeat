@@ -1,14 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import "./translations/i18n";
+
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import firebase from "firebase";
+
 import { Dialog, DialogTitle } from "@material-ui/core";
-
 import { BrowserRouter } from "react-router-dom";
-
 import { ErrorBoundary } from "react-error-boundary";
 
 const firebaseConfig = {

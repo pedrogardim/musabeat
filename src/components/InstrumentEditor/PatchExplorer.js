@@ -5,6 +5,7 @@ import SavePatch from "../../components/ui/Dialogs/SavePatch";
 import "./PatchExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import {
   List,
@@ -27,6 +28,8 @@ import {
 } from "../../assets/musicutils";
 
 function PatchExplorer(props) {
+  const { t } = useTranslation();
+
   const isDrum = props.module.type === 0;
   const categories = !isDrum ? instrumentsCategories : drumCategories;
   const user = firebase.auth().currentUser;
@@ -228,7 +231,7 @@ function PatchExplorer(props) {
           onClick={() => fetchPatches("all")}
           className="patch-explorer-first-column-item"
         >
-          All Categories
+          {t("misc.allCategories")}
           <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
         </ListItem>
         {categories.map((e, i) => (
@@ -240,7 +243,10 @@ function PatchExplorer(props) {
             onClick={() => fetchPatches(i)}
             className="patch-explorer-first-column-item"
           >
-            {e}
+            {isDrum
+              ? t(`music.drumCategories.${i}`)
+              : t(`music.instrumentsCategories.${i}`)}
+
             <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
           </ListItem>
         ))}
@@ -252,7 +258,10 @@ function PatchExplorer(props) {
           onClick={() => props.setPatchExplorer(false)}
           className="patch-explorer-first-column-item"
         >
-          Instrument Editor <span className="beta-text">beta</span>
+          <div>
+            {t("patchExplorer.instrumentEditor")}
+            <span className="beta-text">beta</span>
+          </div>
           <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
         </ListItem>
         {!!user && (
@@ -263,7 +272,7 @@ function PatchExplorer(props) {
             onClick={fetchUserPatches}
             className="patch-explorer-first-column-item"
           >
-            User Patches
+            {t("patchExplorer.userPatches")}
             <Icon style={{ fontSize: 20 }}>chevron_right</Icon>
           </ListItem>
         )}
@@ -318,7 +327,7 @@ function PatchExplorer(props) {
           <div className="empty-wrapper">
             <Typography variant="h3">;-;</Typography>
             <div className="break" />
-            <span>No patches here..</span>
+            <span>{t("patchExplorer.empty")}</span>
           </div>
         )}
       </List>

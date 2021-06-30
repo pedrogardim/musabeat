@@ -1,10 +1,13 @@
 import { Dialog, Button } from "@material-ui/core";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import "./AuthDialog.css";
 
 function AuthDialog(props) {
+  const { t } = useTranslation();
+
   const handleGoogleLogin = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase
@@ -41,7 +44,9 @@ function AuthDialog(props) {
       open={props.authDialog}
       onClose={() => props.setAuthDialog(false)}
     >
-      <Button onClick={handleGoogleLogin}>Log In with Google</Button>
+      <Button onClick={handleGoogleLogin}>
+        {t("dialogs.loginWithGoogle")}
+      </Button>
     </Dialog>
   );
 }

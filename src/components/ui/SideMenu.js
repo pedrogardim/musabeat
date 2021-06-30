@@ -9,19 +9,22 @@ import {
   Divider,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 import "./SideMenu.css";
 
 function SideMenu(props) {
+  const { t } = useTranslation();
   const handleClose = () => props.setSideMenu(false);
 
   const handleClick = (opt) => {
-    opt === "New Session"
+    opt === "newSession"
       ? props.createNewSession(
           undefined,
           props.handlePageNav,
           props.setOpenedSession
         )
-      : opt === "Explore"
+      : opt === "explore"
       ? props.handlePageNav("explore")
       : props.setSideMenu(false);
     props.setSideMenu(false);
@@ -37,7 +40,7 @@ function SideMenu(props) {
       </Typography>
       <Divider />
       <List className="side-menu-list">
-        {["New Session", "Explore", "Sample Bank"].map((text, index) => (
+        {["newSession", "explore"].map((text, index) => (
           <ListItem
             button
             onClick={() => {
@@ -50,7 +53,7 @@ function SideMenu(props) {
                 {index === 0 ? "add" : index === 1 ? "explore" : "equalizer"}
               </Icon>
             </ListItemIcon>
-            <ListItemText primary={text} />
+            <ListItemText primary={t(`sidemenu.${text}`)} />
           </ListItem>
         ))}
       </List>

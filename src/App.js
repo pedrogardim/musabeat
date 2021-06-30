@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import logo from "./assets/img/logo.svg";
 
@@ -29,13 +30,14 @@ import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import { createNewSession } from "./utils/sessionUtils";
 
 function App() {
+  const { t } = useTranslation();
+  const history = useHistory();
+
   const [user, setUser] = useState(null);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [sideMenu, setSideMenu] = useState(false);
   const [openedSession, setOpenedSession] = useState(null);
-
-  const history = useHistory();
 
   const handlePageNav = (route, additional) => history.push(`/${route}`);
 
@@ -105,15 +107,19 @@ function App() {
           open={Boolean(userOption)}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={() => setUserOption(false)}>Profile</MenuItem>
-          <MenuItem onClick={() => handlePageNav("sessions")}>
-            My Sessions
-          </MenuItem>
-          <MenuItem onClick={() => handlePageNav("files")}>My Samples</MenuItem>
           <MenuItem onClick={() => setUserOption(false)}>
-            My Synth Patches
+            {t("avatar.profile")}
           </MenuItem>
-          <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+          <MenuItem onClick={() => handlePageNav("sessions")}>
+            {t("avatar.userSessions")}
+          </MenuItem>
+          <MenuItem onClick={() => handlePageNav("files")}>
+            {t("avatar.userSamples")}
+          </MenuItem>
+          <MenuItem onClick={() => setUserOption(false)}>
+            {t("avatar.userPatches")}
+          </MenuItem>
+          <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
         </Menu>
 
         <SideMenu

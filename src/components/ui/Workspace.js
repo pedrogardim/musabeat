@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router-dom";
 
@@ -36,11 +37,14 @@ import {
 import { clearEvents } from "../../utils/TransportSchedule";
 
 function Workspace(props) {
+  const { t } = useTranslation();
+
   /* 
   There are 2 savingModes for the workspace:
     -Simple: changes are saved in the db between X minutes, and changes are not detected
     -Collaborative: all changes you make are stored in realtime, and changes in th db will be stored in real time. It's more resource expensive, meant to cowork 
  */
+
   const [savingMode, setSavingMode] = useState("simple");
   const [autosaver, setAutosaver] = useState(null);
   const [areUnsavedChanges, setAreUnsavedChanges] = useState(false);
@@ -850,13 +854,7 @@ function Workspace(props) {
             >
               <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
             </Fab>
-            <Tooltip
-              title={
-                !areUnsavedChanges
-                  ? "All the changes are saved"
-                  : "Save changes"
-              }
-            >
+            <Tooltip title={t("misc.saveChanges")}>
               <Fab
                 disabled={!areUnsavedChanges || !props.user}
                 tabIndex={-1}

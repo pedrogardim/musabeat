@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Fragment } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import {
   IconButton,
@@ -32,6 +33,8 @@ import { colors } from "../../utils/materialPalette";
 import "./Module.css";
 
 function Module(props) {
+  const { t } = useTranslation();
+
   const [modulePage, setModulePage] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [renameDialog, setRenameDialog] = useState(false);
@@ -422,12 +425,12 @@ function Module(props) {
             tabIndex={-1}
           >
             <MenuItem
-              className=""
+              className="module-menu-option"
               onClick={() => setFullScreen((prev) => !prev)}
               tabIndex={-1}
             >
               <Icon>fullscreen</Icon>
-              Fullscreen
+              {t("module.options.fullscreen")}
             </MenuItem>
             {/* (props.module.type === 0 || props.module.type === 1) && (
             <MenuItem
@@ -445,7 +448,7 @@ function Module(props) {
                 tabIndex={-1}
               >
                 <Icon>graphic_eq</Icon>
-                Load audio file
+                {t("module.options.loadFile")}
               </MenuItem>
             ) : (
               <MenuItem
@@ -454,7 +457,7 @@ function Module(props) {
                 tabIndex={-1}
               >
                 <Icon>piano</Icon>
-                Instrument
+                {t("module.options.instrument")}
               </MenuItem>
             )}
 
@@ -464,7 +467,7 @@ function Module(props) {
               tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">settings</Icon>
-              Settings
+              {t("module.options.settings")}
             </MenuItem>
             <MenuItem
               onClick={handleEffectButtonMode}
@@ -472,7 +475,7 @@ function Module(props) {
               tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">blur_on</Icon>
-              Effects
+              {t("module.options.effects")}
             </MenuItem>
             <MenuItem
               className="module-menu-option"
@@ -480,7 +483,7 @@ function Module(props) {
               tabIndex={-1}
             >
               <Icon>delete</Icon>
-              Remove
+              {t("module.options.remove")}
             </MenuItem>
           </Menu>
         </div>
