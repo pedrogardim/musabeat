@@ -784,7 +784,7 @@ function Workspace(props) {
           <Fragment>
             <Typography variant="h1">:v</Typography>
             <div className="break" />
-            <p>No Modules!</p>
+            <p>{t("workspace.empty")}</p>
           </Fragment>
         ) : (
           ""
@@ -792,7 +792,7 @@ function Workspace(props) {
 
         <div className="break" />
         {editMode && (
-          <Tooltip title="Add new module">
+          <Tooltip title={t("workspace.addBtn")}>
             <IconButton
               color="primary"
               style={{ marginTop: 48 }}

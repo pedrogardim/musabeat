@@ -11,6 +11,10 @@ export const TRANSLATIONS_ES = {
     userPatches: "Mis Patches",
     logOut: "Desconectar",
   },
+  workspace: {
+    empty: "¡Vaya, no hay módulos!",
+    addBtn: "Añadir Módulo",
+  },
   WSTitle: {
     viewMode:
       "Modo Vista: ¡No tienes el permiso para editar esta sesión! To be able to edit it create a copy",

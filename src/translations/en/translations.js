@@ -11,6 +11,10 @@ export const TRANSLATIONS_EN = {
     userPatches: "My Patches",
     logOut: "Log Out",
   },
+  workspace: {
+    empty: "No Modules!",
+    addBtn: "Add New Module",
+  },
   WSTitle: {
     viewMode:
       "View Mode: You don't have the permission to edit this session! To be able to edit it create a copy",
@@ -60,6 +64,7 @@ export const TRANSLATIONS_EN = {
       },
     },
   },
+
   patchExplorer: {
     userPatches: "User Patches",
     instrumentEditor: "Instrument Editor",

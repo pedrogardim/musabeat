@@ -30,12 +30,14 @@ import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 import { createNewSession } from "./utils/sessionUtils";
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const history = useHistory();
 
   const [user, setUser] = useState(null);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
+  const [languagePicker, setLanguagePicker] = useState(false);
+
   const [sideMenu, setSideMenu] = useState(false);
   const [openedSession, setOpenedSession] = useState(null);
 
@@ -47,6 +49,11 @@ function App() {
 
   const handleAvatarClick = (e) => {
     !user ? setAuthDialog(true) : setUserOption(e.currentTarget);
+  };
+
+  const handleLanguageChange = (lang) => {
+    i18n.changeLanguage(lang);
+    setLanguagePicker(false);
   };
 
   const handleLogOut = () => {
@@ -82,6 +89,12 @@ function App() {
             </Typography>
             <img alt={"musa"} style={{ height: 30 }} src={logo} />
           </div>
+          <IconButton
+            style={{ position: "absolute", right: 80 }}
+            onClick={(e) => setLanguagePicker(e.currentTarget)}
+          >
+            <Icon style={{ color: "white" }}>language</Icon>
+          </IconButton>
           <IconButton className="main-avatar">
             <Avatar
               onClick={handleAvatarClick}
@@ -104,7 +117,7 @@ function App() {
           style={{ marginTop: 48 }}
           anchorEl={userOption}
           keepMounted
-          open={Boolean(userOption)}
+          open={!!userOption}
           onClose={() => setUserOption(false)}
         >
           <MenuItem onClick={() => setUserOption(false)}>
@@ -120,6 +133,21 @@ function App() {
             {t("avatar.userPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
+        </Menu>
+
+        <Menu
+          style={{ marginTop: 48 }}
+          anchorEl={languagePicker}
+          keepMounted
+          open={!!languagePicker}
+          onClose={() => setLanguagePicker(false)}
+        >
+          <MenuItem onClick={() => handleLanguageChange("en")}>
+            English
+          </MenuItem>
+          <MenuItem onClick={() => handleLanguageChange("es")}>
+            Español
+          </MenuItem>
         </Menu>
 
         <SideMenu
