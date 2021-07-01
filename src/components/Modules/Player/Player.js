@@ -184,17 +184,20 @@ function Player(props) {
     });
   }, [props.loaded]); */
 
+  //todo fix
+
   useEffect(() => {
-    if (props.module.score !== score) setScore(props.module.score);
+    if (JSON.stringify(props.module.score) !== JSON.stringify(score))
+      setScore(props.module.score);
   }, [props.module.score]);
-  /* 
+
   useEffect(() => {
     props.setModules((prev) => {
       let newModules = [...prev];
       newModules[props.index].score = [...score];
       return newModules;
     });
-  }, [score]); */
+  }, [score]);
 
   useEffect(() => {
     //TEMP: function on "module" component to make score adapts to audio file

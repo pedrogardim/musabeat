@@ -39,7 +39,7 @@ function AudioClip(props) {
 
     props.setScore((prev) => {
       let newScore = [...prev];
-      newScore[props.index].time = newTime;
+      newScore[props.index].time = parseFloat(newTime.toFixed(2));
       return newScore;
     });
   };
