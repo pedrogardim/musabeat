@@ -80,14 +80,14 @@ function Workspace(props) {
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
 
-    let cleanHistory = {
-      past: [],
-      present: currentModules, // (?) How do we initialize the present?
-      future: [],
-    };
-
     setSessionHistory((prev) => {
       let { past, present, future } = { ...prev };
+
+      let cleanHistory = {
+        past: [],
+        present: currentModules, // (?) How do we initialize the present?
+        future: [],
+      };
 
       switch (action) {
         case "UNDO":
@@ -111,6 +111,8 @@ function Workspace(props) {
             present: next,
             future: newFuture,
           };
+        case "RESET":
+          return cleanHistory;
         default:
           let areDifferent =
             JSON.stringify(present) !== JSON.stringify(currentModules);
@@ -688,7 +690,7 @@ function Workspace(props) {
   useEffect(() => {
     adaptSessionSize();
     //registerSession();
-    //console.log("Modules", modules);
+    console.log(modules);
     //console.log(modules, instruments, instrumentsLoaded);
 
     savingMode === "simple" && setAreUnsavedChanges(true);
@@ -788,6 +790,7 @@ function Workspace(props) {
                 setModules={setModules}
                 editMode={editMode}
                 setFocusedModule={setFocusedModule}
+                resetUndoHistory={() => handleUndo("RESET")}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

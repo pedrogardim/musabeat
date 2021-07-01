@@ -116,16 +116,14 @@ function Module(props) {
 
   const handleZoom = () => {
     setModuleZoom((prev) => (prev <= props.sessionSize ? prev * 2 : 1));
-    console.log(props.sessionSize, moduleZoom);
-
-    console.log(moduleZoom * 100 + "%");
+    //console.log(props.sessionSize, moduleZoom);
+    //console.log(moduleZoom * 100 + "%");
   };
 
   //Only used for players
 
   const updateOnAudioFileLoaded = () => {
-    setInstrumentLoaded(true);
-    //console.log(props.instrument);
+    console.log(props.instrument);
     props.setModules((previousModules) => {
       let newmodules = [...previousModules];
       newmodules[props.index].score[0].duration = parseFloat(
@@ -133,6 +131,7 @@ function Module(props) {
       );
       return newmodules;
     });
+    props.resetUndoHistory();
   };
 
   const onInstrumentMod = (url, name, isRemoving) => {
@@ -180,6 +179,7 @@ function Module(props) {
         return newModules;
       });
     }
+    props.resetUndoHistory();
   };
 
   const handleFileClick = (fileUrl, audiobuffer) => {
@@ -188,7 +188,7 @@ function Module(props) {
       props.instrument.dispose();
       let newPlayer = new Tone.GrainPlayer(
         audiobuffer ? audiobuffer : fileUrl,
-        updateOnAudioFileLoaded
+        () => setInstrumentLoaded(true)
       ).toDestination();
 
       setInstrument(newPlayer);

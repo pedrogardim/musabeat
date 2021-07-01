@@ -186,20 +186,20 @@ function Player(props) {
 
   useEffect(() => {
     if (props.module.score !== score) setScore(props.module.score);
-  }, [props.module]);
-
+  }, [props.module.score]);
+  /* 
   useEffect(() => {
     props.setModules((prev) => {
       let newModules = [...prev];
-      newModules[props.index].score = score;
+      newModules[props.index].score = [...score];
       return newModules;
     });
-  }, [score]);
+  }, [score]); */
 
   useEffect(() => {
     //TEMP: function on "module" component to make score adapts to audio file
     //console.log("IS LOADED?", props.instrument.loaded);
-    //props.updateOnAudioFileLoaded();
+    props.updateOnAudioFileLoaded();
   }, [props.instrument.loaded]);
 
   useEffect(() => {
