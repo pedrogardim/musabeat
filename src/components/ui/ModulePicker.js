@@ -86,7 +86,9 @@ function ModulePicker(props) {
               };
               return chord;
             })
-          : [{ time: 0, duration: 0 }],
+          : selectedType === 3
+          ? [{ time: 0, duration: 0 }]
+          : [],
       volume: 0,
       muted: false,
       instrument:
