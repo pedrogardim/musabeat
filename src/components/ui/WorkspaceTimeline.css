@@ -1,0 +1,38 @@
+.ws-timeline {
+  width: 60%;
+  position: relative;
+  /* background-color: black;
+     height: 16px; */
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4px;
+}
+
+.ws-timeline-module {
+  height: 4px;
+  left: 0;
+  margin: 2px 0px;
+  border-radius: 10px;
+}
+
+.ws-timeline-cursor {
+  position: absolute;
+  background-color: black;
+  height: 100%;
+  width: 2px;
+  top: 0px;
+  transition: width 0.3s;
+}
+
+.ws-timeline-cursor:hover {
+  width: 4px;
+  margin-left: -1px;
+  cursor: grab;
+}
+
+.ws-timeline-cursor:hover {
+  cursor: grabbing;
+}

@@ -12,16 +12,17 @@ function AudioClip(props) {
   const [clipPosition, setClipPosition] = useState(0);
 
   const updateClipPosition = () => {
-    if (props.parentRef.current === null) return;
+    if (!props.sessionSize || props.parentRef.current === null) return;
     let timePerPixel =
       props.parentRef.current.offsetWidth /
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      (Tone.Time("1m").toSeconds() * props.sessionSize);
     setClipPosition(props.score.time * timePerPixel);
     setClipWidth(
       (props.score.duration * timePerPixel) /
         (props.score.playbackRate ? props.score.playbackRate : 1)
     );
     setClipHeight(props.parentRef.current.offsetHeight);
+    console.log(timePerPixel, props.parentRef.current.offsetWidth);
   };
 
   const handleDrag = (event, element) => {

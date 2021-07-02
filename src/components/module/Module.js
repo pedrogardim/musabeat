@@ -123,12 +123,13 @@ function Module(props) {
   //Only used for players
 
   const updateOnAudioFileLoaded = () => {
-    console.log(props.instrument);
+    //console.log(props.instrument);
     props.setModules((previousModules) => {
       let newmodules = [...previousModules];
-      newmodules[props.index].score[0].duration = parseFloat(
-        props.instrument.buffer.duration.toFixed(2)
-      );
+      if (props.instrument.buffer)
+        newmodules[props.index].score[0].duration = parseFloat(
+          props.instrument.buffer.duration.toFixed(2)
+        );
       return newmodules;
     });
     props.resetUndoHistory();
