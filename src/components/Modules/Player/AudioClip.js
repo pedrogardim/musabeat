@@ -22,7 +22,7 @@ function AudioClip(props) {
         (props.score.playbackRate ? props.score.playbackRate : 1)
     );
     setClipHeight(props.parentRef.current.offsetHeight);
-    console.log(timePerPixel, props.parentRef.current.offsetWidth);
+    //console.log(timePerPixel, props.parentRef.current.offsetWidth);
   };
 
   const handleDrag = (event, element) => {

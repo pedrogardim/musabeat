@@ -38,6 +38,8 @@ import {
 
 import { clearEvents } from "../../utils/TransportSchedule";
 
+let autosaverModules;
+
 function Workspace(props) {
   const { t } = useTranslation();
 
@@ -66,6 +68,7 @@ function Workspace(props) {
 
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
+  //const [timelineMode, setTimelineMode] = useState(false);
 
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
@@ -77,7 +80,7 @@ function Workspace(props) {
   });
 
   const sessionKey = useParams().key;
-  const autoSaverTime = 10 * 1000; //1min
+  const autoSaverTime = 5 * 60 * 1000; //5min
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -169,6 +172,8 @@ function Workspace(props) {
     );
     let longestModule = Math.max(...lengths);
     let newSessionSize = 2 << (31 - Math.clz32(longestModule - 1));
+
+    if (newSessionSize === 0) newSessionSize = 1;
 
     if (newSessionSize !== sessionSize) {
       setSessionSize(newSessionSize);
@@ -410,11 +415,15 @@ function Workspace(props) {
   const saveToDatabase = (mod, data) => {
     //console.log(DBSessionRef, isLoaded);
     if (DBSessionRef !== null) {
-      console.log("saved", mod, data);
-      savingMode === "simple" && setSnackbarMessage(t("misc.saveChanges"));
+      //console.log("saved", modules, sessionData);
+
+      savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
 
       !data || !mod
-        ? DBSessionRef.update({ ...sessionData, modules: modules })
+        ? DBSessionRef.update({
+            ...sessionData,
+            modules: modules,
+          })
         : DBSessionRef.update({ ...data, modules: mod });
     }
     /* DBSessionRef.get().then((snapshot) => {
@@ -475,31 +484,26 @@ function Workspace(props) {
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     console.log("session ready!");
-    //updateMode("simple");
-
+    updateMode("simple");
     setIsLoaded(true);
+  };
+
+  const changeChecker = (mod, data) => {
+    setAreUnsavedChanges((prev) => {
+      prev && saveToDatabase(mod, data);
+      return prev ? false : prev;
+    });
   };
 
   const updateMode = (input) => {
     if (input === "simple") {
-      const changeChecker = (mod, data) => {
-        setAreUnsavedChanges((prev) => {
-          prev && saveToDatabase(mod, data);
-          return prev ? false : prev;
-        });
-      };
-
       clearInterval(autosaver);
       //console.log("autosaver initialized");
 
       let intervalId = setInterval(
-        changeChecker,
-        autoSaverTime,
-        modules,
-        sessionData
+        () => setAreUnsavedChanges((prev) => (prev ? false : prev)),
+        autoSaverTime
       );
-
-      console.log(intervalId);
 
       setAutosaver(intervalId);
     }
@@ -691,13 +695,14 @@ function Workspace(props) {
     //console.log(modules, instruments, instrumentsLoaded);
 
     savingMode === "simple" && setAreUnsavedChanges(true);
+
     savingMode === "collaborative" && saveToDatabase(modules, sessionData);
 
     modules && isLoaded && handleUndo();
   }, [modules]);
 
   useEffect(() => {
-    //isLoaded && updateMode(savingMode);
+    isLoaded && updateMode(savingMode);
   }, [savingMode]);
 
   /*  useEffect(() => {
@@ -744,7 +749,10 @@ function Workspace(props) {
   }, [editMode]);
  */
 
-  //useEffect(() => {}, [instruments]);
+  useEffect(() => {
+    //console.log(areUnsavedChanges);
+    if (isLoaded && !areUnsavedChanges) saveToDatabase();
+  }, [areUnsavedChanges]);
 
   /**/
 
@@ -767,10 +775,10 @@ function Workspace(props) {
           user={props.user}
         />
       )}
-
+      {/* 
       {modules && (
         <WorkspaceTimeline modules={modules} sessionSize={sessionSize} />
-      )}
+      )} */}
 
       <div className="workspace-module-cont">
         {modules !== null ? (

@@ -81,6 +81,7 @@ export const TRANSLATIONS_ES = {
   misc: {
     createdOn: "Creado en",
     saveChanges: "Guardar cambios",
+    changesSaved: "Cambios guardados",
     allCategories: "Todas las Categorías",
     noCategory: "Sín Categoría",
     none: "Ninguno",
