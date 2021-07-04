@@ -57,7 +57,7 @@ function Workspace(props) {
 
   const [modules, setModules] = useState(null);
   const [sessionData, setSessionData] = useState(null);
-  const [sessionSize, setSessionSize] = useState(1);
+  const [sessionSize, setSessionSize] = useState(0);
 
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
@@ -884,10 +884,7 @@ function Workspace(props) {
                 tabIndex={-1}
                 className="ws-fab ws-fab-save"
                 color="primary"
-                onClick={() => {
-                  saveToDatabase();
-                  setAreUnsavedChanges(false);
-                }}
+                onClick={() => setAreUnsavedChanges(false)}
               >
                 <Icon>save</Icon>
               </Fab>
