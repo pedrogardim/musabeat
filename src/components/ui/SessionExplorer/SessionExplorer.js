@@ -36,8 +36,6 @@ function SessionExplorer(props) {
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
   const getSessionList = (value) => {
-    //console.log(props.props.isUser ? "fetching user sessions" : "fetching explore");
-
     const dbRef = props.isUser
       ? firebase
           .firestore()
@@ -53,8 +51,13 @@ function SessionExplorer(props) {
 
     dbRef.get().then((snapshot) => {
       //console.log(snapshot.docs.map((e) => [e.id, e.data()]));
-      setSessionKeys(snapshot.docs.map((e) => e.id));
-      setSessions(snapshot.docs.map((e) => e.data()));
+      if (snapshot.empty) {
+        setSessionKeys(null);
+        setSessions(null);
+      } else {
+        setSessionKeys(snapshot.docs.map((e) => e.id));
+        setSessions(snapshot.docs.map((e) => e.data()));
+      }
     });
   };
 
@@ -161,26 +164,41 @@ function SessionExplorer(props) {
 
   useEffect(() => {
     setSessions([]);
-    getSessionList();
-    props.user && getUserLikes();
+    if (props.user) {
+      getSessionList();
+      getUserLikes();
+    }
   }, [props.isUser, props.user]);
 
   return (
     <div className="session-explorer">
-      {!!sessions.length ? (
+      {!props.isUser && (
+        <OutlinedInput
+          style={{ fontSize: 24 }}
+          startAdornment={
+            <InputAdornment position="start">
+              <Icon>search</Icon>
+            </InputAdornment>
+          }
+          onKeyPress={handleSearch}
+        />
+      )}
+      <div className="break" />
+
+      {!sessions || !sessionKeys ? (
         <Fragment>
-          {!props.isUser && (
-            <OutlinedInput
-              style={{ fontSize: 24 }}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Icon>search</Icon>
-                </InputAdornment>
-              }
-              onKeyPress={handleSearch}
-            />
-          )}
+          <Typography variant="h1">:p</Typography>
           <div className="break" />
+          <p>No sessions here...</p>
+          <div className="break" />
+          {props.isUser && (
+            <Button onClick={props.createNewSession} color="primary">
+              Create New Session!
+            </Button>
+          )}
+        </Fragment>
+      ) : !!sessions.length ? (
+        <Fragment>
           {sessions.map((session, sessionIndex) => (
             <Fragment>
               <SessionGalleryItem
@@ -207,16 +225,6 @@ function SessionExplorer(props) {
               {/* sessionIndex % 4 === 3 && <div className="break" /> */}
             </Fragment>
           ))}
-        </Fragment>
-      ) : props.isUser && !sessionKeys ? (
-        <Fragment>
-          <Typography variant="h1">:p</Typography>
-          <div className="break" />
-          <p>No sessions here...</p>
-          <div className="break" />
-          <Button onClick={props.createNewSession} color="primary">
-            Create New Session!
-          </Button>
         </Fragment>
       ) : !sessions.length ? (
         Array(props.isUser ? 3 : 15)
