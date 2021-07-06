@@ -88,7 +88,19 @@ function SessionGalleryItem(props) {
               className="session-gallery-item-module"
               style={{ backgroundColor: colors[e.color][500], borderRadius: 0 }}
             >
-              {e.name}
+              <Tooltip title={`"${e.name}"`}>
+                <Icon>
+                  {e.type === 0
+                    ? "grid_on"
+                    : e.type === 1
+                    ? "music_note"
+                    : e.type === 2
+                    ? "font_download"
+                    : e.type === 3
+                    ? "graphic_eq"
+                    : "piano"}
+                </Icon>
+              </Tooltip>
             </Paper>
           ))
         ) : (

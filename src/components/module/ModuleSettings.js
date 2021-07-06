@@ -229,7 +229,7 @@ function ModuleSettings(props) {
           >
             {scales.map((scale, scaleIndex) => (
               <option key={scaleIndex} value={scaleIndex}>
-                {t(`music.scales[${scaleIndex}]`)}
+                {t(`music.scales.${scaleIndex}`)}
               </option>
             ))}
           </Select>

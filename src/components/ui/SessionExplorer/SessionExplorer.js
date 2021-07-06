@@ -36,6 +36,7 @@ function SessionExplorer(props) {
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
   const getSessionList = (value) => {
+    console.log(value);
     const dbRef = props.isUser
       ? firebase
           .firestore()
@@ -164,10 +165,8 @@ function SessionExplorer(props) {
 
   useEffect(() => {
     setSessions([]);
-    if (props.user) {
-      getSessionList();
-      getUserLikes();
-    }
+    getSessionList();
+    props.user && getUserLikes();
   }, [props.isUser, props.user]);
 
   return (

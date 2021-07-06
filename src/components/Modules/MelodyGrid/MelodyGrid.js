@@ -178,7 +178,7 @@ function MelodyGrid(props) {
 
   useEffect(() => {
     setMelodyArray(props.module.score);
-  }, [props.module.score]);
+  }, [props.module]);
 
   useEffect(() => {
     instrument && scheduleNotes();

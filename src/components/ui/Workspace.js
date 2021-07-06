@@ -488,14 +488,15 @@ function Workspace(props) {
     setIsLoaded(true);
   };
 
-  const changeChecker = (mod, data) => {
+  /*   const changeChecker = (mod, data) => {
     setAreUnsavedChanges((prev) => {
       prev && saveToDatabase(mod, data);
       return prev ? false : prev;
     });
-  };
+  }; */
 
   const updateMode = (input) => {
+    if (props.user === null || !editMode) return;
     if (input === "simple") {
       clearInterval(autosaver);
       //console.log("autosaver initialized");
@@ -751,7 +752,7 @@ function Workspace(props) {
 
   useEffect(() => {
     //console.log(areUnsavedChanges);
-    if (isLoaded && !areUnsavedChanges) saveToDatabase();
+    if (!props.hidden && isLoaded && !areUnsavedChanges) saveToDatabase();
   }, [areUnsavedChanges]);
 
   /**/
