@@ -740,6 +740,18 @@ function Workspace(props) {
     };
   }, []);
 
+  useEffect(() => {
+    instruments.forEach((e, i) => {
+      if (modules && modules[i] && e) {
+        e.volume.value = modules[i].volume;
+        e._volume.mute = modules[i].muted;
+      }
+      //console.log(modules[i].name, 1, e.volume.value);
+
+      //console.log(modules[i].name, 2, e.volume.value);
+    });
+  }, [instruments]);
+
   /* useEffect(() => {
     console.log(areUnsavedChanges);
   }, [areUnsavedChanges]); */
