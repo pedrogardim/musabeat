@@ -113,7 +113,7 @@ function WorkspaceTitle(props) {
           (e) =>
             e !== null && (
               <Tooltip title={e.displayName}>
-                <Avatar src={e.photoURL} />
+                <Avatar src={e.photoURL} alt={e.displayName} />
               </Tooltip>
             )
         )}

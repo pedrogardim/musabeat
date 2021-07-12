@@ -6,7 +6,7 @@ import {
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
-import { loadSynthFromGetObject } from "../assets/musicutils";
+import { loadSynthFromGetObject, loadEffect } from "../assets/musicutils";
 import * as Tone from "tone";
 
 export const bounceSessionExport = async (
@@ -31,18 +31,21 @@ export const bounceSessionExport = async (
 
   Tone.Offline(({ transport }) => {
     //console.log(transport);
-    //let offlineLimiter = new Tone.Limiter(-3).toDestination();
+    let offlineLimiter = new Tone.Limiter(0).toDestination();
 
     transport.bpm.value = sessionData.bpm;
 
     modules.map((module, moduleIndex) => {
       let originalInstrument = instruments[moduleIndex];
       let thisinstrument;
+      let effects = module.fx.map((e) =>
+        !!e ? loadEffect(e.type, e.options) : false
+      );
 
       if (!module.muted) {
         switch (module.type) {
           case 0:
-            thisinstrument = new Tone.Players().toDestination();
+            thisinstrument = new Tone.Players();
             thisinstrument._buffers = instrumentBuffers[moduleIndex];
             thisinstrument.volume.value = module.volume;
 
@@ -87,12 +90,16 @@ export const bounceSessionExport = async (
           case 3:
             thisinstrument = new Tone.GrainPlayer(
               instrumentBuffers[moduleIndex]
-            ).toDestination();
+            );
             thisinstrument.volume.value = module.volume;
 
             scheduleSamples(module.score, thisinstrument, 0, transport, "");
             break;
         }
+        thisinstrument.chain(
+          ...effects.filter((e) => e !== false),
+          offlineLimiter
+        );
       }
     });
 
