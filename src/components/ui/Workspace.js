@@ -68,7 +68,7 @@ function Workspace(props) {
 
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
-  //const [timelineMode, setTimelineMode] = useState(false);
+  const [timelineMode, setTimelineMode] = useState(false);
 
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);

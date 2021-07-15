@@ -214,7 +214,7 @@ function PatchExplorer(props) {
       </div>
       {savePatchDialog && (
         <SavePatch
-          isDrum
+          isDrum={isDrum}
           onClose={() => setSavePatchDialog(false)}
           onSubmit={saveUserPatch}
         />

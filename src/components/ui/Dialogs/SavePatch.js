@@ -26,6 +26,7 @@ function SavePatch(props) {
   const handleSubmit = () => {
     let value = inputRef.current.children[0].children[0].value;
     props.onSubmit(value, parseInt(selectedCategory));
+    props.onClose();
   };
 
   const handleChange = (e) => {
@@ -57,7 +58,7 @@ function SavePatch(props) {
         </Select>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>{t("dialogs.canvel")}</Button>
+        <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>
         <Button color="primary" onClick={handleSubmit}>
           {t("dialogs.submit")}
         </Button>
