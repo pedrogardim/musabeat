@@ -68,8 +68,9 @@ function Workspace(props) {
 
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
-  const [timelineMode, setTimelineMode] = useState(false);
 
+  //true: timeline ; false: loopmode
+  const [timelineMode, setTimelineMode] = useState(false);
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
@@ -488,6 +489,12 @@ function Workspace(props) {
     setIsLoaded(true);
   };
 
+  const setTimeline = (newTimeline) => {
+    setSessionData((prev) => {
+      return { ...prev, timeline: newTimeline };
+    });
+  };
+
   /*   const changeChecker = (mod, data) => {
     setAreUnsavedChanges((prev) => {
       prev && saveToDatabase(mod, data);
@@ -788,10 +795,16 @@ function Workspace(props) {
           user={props.user}
         />
       )}
-      {/* 
-      {modules && (
-        <WorkspaceTimeline modules={modules} sessionSize={sessionSize} />
-      )} */}
+      {modules && sessionSize && sessionData.timeline && (
+        <WorkspaceTimeline
+          setTimelineMode={setTimelineMode}
+          timelineMode={timelineMode}
+          timeline={sessionData.timeline}
+          setTimeline={setTimeline}
+          modules={modules}
+          sessionSize={sessionSize}
+        />
+      )}
 
       <div className="workspace-module-cont">
         {modules !== null ? (

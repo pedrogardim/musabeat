@@ -41,7 +41,8 @@ function WorkspaceTitle(props) {
       );
     };
 
-    props.sessionData.editors &&
+    props.user &&
+      props.sessionData.editors &&
       getEditorProfiles().then((data) => {
         setEditorProfiles(data.map((e) => e.data().profile));
       });
@@ -60,7 +61,7 @@ function WorkspaceTitle(props) {
   useEffect(() => {
     getSessionTitleInfo();
     setExpanded(false);
-  }, [props.sessionKey]);
+  }, [props.sessionKey, props.user]);
 
   /*  useEffect(() => {
     console.log(editorProfiles);

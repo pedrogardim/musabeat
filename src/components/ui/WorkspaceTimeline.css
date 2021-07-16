@@ -8,23 +8,49 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 4px;
+  padding: 2px;
+  margin: 8px;
+}
+
+.ws-timeline-loop {
+  outline: solid 1px rgba(0, 0, 0, 0.342);
+  min-height: 24px;
 }
 
 .ws-timeline-module {
-  height: 4px;
-  left: 0;
-  margin: 2px 0px;
-  border-radius: 10px;
+  height: 32px;
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 4px;
+}
+
+.ws-timeline-module-compact {
+  height: 8px;
+  flex-grow: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 0px;
+}
+
+.ws-timeline-module-tile {
+  height: 100%;
+  flex-grow: 1;
+}
+
+.ws-timeline-module-tile-active {
 }
 
 .ws-timeline-cursor {
   position: absolute;
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.404);
   height: 100%;
   width: 2px;
   top: 0px;
   transition: width 0.3s;
+  border-radius: 99px;
 }
 
 .ws-timeline-cursor:hover {
