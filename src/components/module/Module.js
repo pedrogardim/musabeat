@@ -232,6 +232,8 @@ function Module(props) {
           module={props.module}
           kit={0}
           updateModules={props.setModules}
+          timeline={props.timeline}
+          timelineMode={props.timelineMode}
         />
       );
       break;
@@ -246,6 +248,8 @@ function Module(props) {
           index={props.index}
           module={props.module}
           updateModules={props.setModules}
+          timeline={props.timeline}
+          timelineMode={props.timelineMode}
         />
       );
       break;
@@ -261,6 +265,8 @@ function Module(props) {
           index={props.index}
           module={props.module}
           updateModules={props.setModules}
+          timeline={props.timeline}
+          timelineMode={props.timelineMode}
         />
       );
       break;
@@ -283,6 +289,8 @@ function Module(props) {
           moduleZoom={moduleZoom}
           updateOnAudioFileLoaded={updateOnAudioFileLoaded}
           fullScreen={fullScreen}
+          timeline={props.timeline}
+          timelineMode={props.timelineMode}
         />
       );
       break;
@@ -301,6 +309,9 @@ function Module(props) {
           setModules={props.setModules}
           moduleZoom={moduleZoom}
           fullScreen={fullScreen}
+          //temp
+          timeline={props.timeline}
+          timelineMode={props.timelineMode}
         />
       );
       break;

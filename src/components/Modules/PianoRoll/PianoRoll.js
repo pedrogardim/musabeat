@@ -34,7 +34,9 @@ function PianoRoll(props) {
           Tone.Transport,
           props.module.id,
           props.module.size,
-          props.sessionSize
+          props.sessionSize,
+          props.timeline,
+          props.timelineMode
         )
       : clearEvents(props.module.id);
   };
@@ -141,7 +143,7 @@ function PianoRoll(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [props.loaded, props.instrument]);
+  }, [props.loaded, props.instrument, props.timeline]);
 
   return (
     <div

@@ -73,7 +73,9 @@ function Sequencer(props) {
           setCurrentBeat,
           setCurrentMeasure,
           props.module.id,
-          props.sessionSize
+          props.sessionSize,
+          props.timeline,
+          props.timelineMode
         )
       : clearEvents(props.module.id);
   };
@@ -122,7 +124,7 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-  }, [props.sessionSize]);
+  }, [props.sessionSize, props.timeline]);
 
   return (
     <div

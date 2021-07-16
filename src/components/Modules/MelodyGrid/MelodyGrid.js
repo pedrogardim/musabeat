@@ -83,7 +83,9 @@ function MelodyGrid(props) {
           setCurrentBeat,
           setCurrentMeasure,
           props.module.id,
-          props.sessionSize
+          props.sessionSize,
+          props.timeline,
+          props.timelineMode
         )
       : clearEvents(props.module.id);
   };
@@ -182,7 +184,7 @@ function MelodyGrid(props) {
 
   useEffect(() => {
     instrument && scheduleNotes();
-  }, [props.sessionSize]);
+  }, [props.sessionSize, props.timeline]);
 
   useEffect(() => {
     updateGridRows();

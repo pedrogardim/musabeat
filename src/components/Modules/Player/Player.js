@@ -68,7 +68,9 @@ function Player(props) {
           props.instrument,
           atRestart ? 0 : Tone.Transport.seconds,
           Tone.Transport,
-          props.module.id
+          props.module.id,
+          props.timeline,
+          props.timelineMode
         )
       : clearEvents(props.module.id);
   };
@@ -171,7 +173,7 @@ function Player(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [score, props.instrument]);
+  }, [score, props.instrument, props.timeline]);
 
   /* useEffect(() => {
     //console.log(props.instrument.buffer);

@@ -697,7 +697,7 @@ function Workspace(props) {
   }, [props.user, props.session, sessionKey]);
 
   useEffect(() => {
-    adaptSessionSize();
+    !timelineMode && adaptSessionSize();
     //registerSession();
     console.log(modules);
     //console.log(modules, instruments, instrumentsLoaded);
@@ -712,6 +712,10 @@ function Workspace(props) {
   useEffect(() => {
     isLoaded && updateMode(savingMode);
   }, [savingMode]);
+
+  useEffect(() => {
+    isLoaded && !timelineMode && adaptSessionSize();
+  }, [timelineMode]);
 
   /*  useEffect(() => {
     console.log("sessiondata triggered", sessionData);
@@ -824,6 +828,8 @@ function Workspace(props) {
                 editMode={editMode}
                 setFocusedModule={setFocusedModule}
                 resetUndoHistory={() => handleUndo("RESET")}
+                timeline={sessionData.timeline}
+                timelineMode={timelineMode}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

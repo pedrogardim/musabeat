@@ -33,7 +33,9 @@ function ChordProgression(props) {
           setActiveChord,
           setActiveRhythm,
           props.module.id,
-          props.sessionSize
+          props.sessionSize,
+          props.timeline,
+          props.timelineMode
         )
       : clearEvents(props.module.id);
   };
@@ -111,7 +113,7 @@ function ChordProgression(props) {
 
   useEffect(() => {
     instrument && scheduleChords();
-  }, [instrument, props.sessionSize]);
+  }, [instrument, props.sessionSize, props.timeline]);
 
   useEffect(() => {
     setInstrument(props.instrument);

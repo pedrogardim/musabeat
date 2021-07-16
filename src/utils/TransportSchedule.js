@@ -21,7 +21,9 @@ export const scheduleDrumSequence = (
   updateBeat,
   updateMeasure,
   moduleId,
-  sessionSize
+  sessionSize,
+  timeline,
+  timelineMode
 ) => {
   moduleId !== undefined && clearEvents(moduleId);
 
@@ -29,27 +31,52 @@ export const scheduleDrumSequence = (
 
   let moduleLength = sequence.length;
   let loopTimes = parseInt(sessionSize) / moduleLength;
+  if (!timelineMode) {
+    for (let x = 0; x < loopTimes; x++) {
+      sequence.forEach((measure, measureIndex) => {
+        Object.values(measure).forEach((beat, beatIndex) => {
+          let beattimevalue =
+            Tone.Time("1m").toSeconds() / Object.keys(measure).length;
+          let beatscheduletime =
+            beattimevalue * beatIndex +
+            Tone.Time("1m").toSeconds() * measureIndex +
+            Tone.Time("1m").toSeconds() * x * moduleLength;
 
-  for (let x = 0; x < loopTimes; x++) {
-    sequence.forEach((measure, measureIndex) => {
-      Object.values(measure).forEach((beat, beatIndex) => {
-        let beattimevalue =
-          Tone.Time("1m").toSeconds() / Object.keys(measure).length;
-        let beatscheduletime =
-          beattimevalue * beatIndex +
-          Tone.Time("1m").toSeconds() * measureIndex +
-          Tone.Time("1m").toSeconds() * x * moduleLength;
+          let thisevent = transport.schedule((time) => {
+            beat !== 0 &&
+              beat.forEach(
+                (note) =>
+                  instrument.has(note) && instrument.player(note).start(time)
+              );
+            updateBeat(beatIndex);
+            updateMeasure(measureIndex);
+          }, beatscheduletime);
+          scheduledNotes.push(thisevent);
+        });
+      });
+    }
+  } else {
+    timeline[moduleId].forEach((tlmeasure, index) => {
+      sequence.forEach((measure, measureIndex) => {
+        Object.values(measure).forEach((beat, beatIndex) => {
+          let beattimevalue =
+            Tone.Time("1m").toSeconds() / Object.keys(measure).length;
+          let beatscheduletime =
+            beattimevalue * beatIndex +
+            Tone.Time("1m").toSeconds() * measureIndex +
+            Tone.Time("1m").toSeconds() * tlmeasure;
 
-        let thisevent = transport.schedule((time) => {
-          beat !== 0 &&
-            beat.forEach(
-              (note) =>
-                instrument.has(note) && instrument.player(note).start(time)
-            );
-          updateBeat(beatIndex);
-          updateMeasure(measureIndex);
-        }, beatscheduletime);
-        scheduledNotes.push(thisevent);
+          let thisevent = transport.schedule((time) => {
+            beat !== 0 &&
+              beat.forEach(
+                (note) =>
+                  instrument.has(note) && instrument.player(note).start(time)
+              );
+            updateBeat(beatIndex);
+            updateMeasure(measureIndex);
+          }, beatscheduletime);
+          scheduledNotes.push(thisevent);
+        });
       });
     });
   }
@@ -64,7 +91,9 @@ export const scheduleMelodyGrid = (
   updateBeat,
   updateMeasure,
   moduleId,
-  sessionSize
+  sessionSize,
+  timeline,
+  timelineMode
 ) => {
   moduleId !== undefined && clearEvents(moduleId);
 
@@ -73,29 +102,58 @@ export const scheduleMelodyGrid = (
   let moduleLength = sequence.length;
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
-  for (let x = 0; x < loopTimes; x++) {
-    sequence.forEach((measure, measureIndex) => {
-      Object.values(measure).forEach((beat, beatIndex) => {
-        let beattimevalue =
-          Tone.Time("1m").toSeconds() / Object.keys(measure).length;
-        let beatscheduletime =
-          beattimevalue * beatIndex +
-          Tone.Time("1m").toSeconds() * measureIndex +
-          Tone.Time("1m").toSeconds() * x * moduleLength;
+  if (!timelineMode) {
+    for (let x = 0; x < loopTimes; x++) {
+      sequence.forEach((measure, measureIndex) => {
+        Object.values(measure).forEach((beat, beatIndex) => {
+          let beattimevalue =
+            Tone.Time("1m").toSeconds() / Object.keys(measure).length;
+          let beatscheduletime =
+            beattimevalue * beatIndex +
+            Tone.Time("1m").toSeconds() * measureIndex +
+            Tone.Time("1m").toSeconds() * x * moduleLength;
 
-        let thisevent = transport.schedule((time) => {
-          beat !== 0 &&
-            beat.forEach((note) =>
-              instrument.triggerAttackRelease(
-                note,
-                Tone.Time("1m").toSeconds() / Object.keys(measure).length,
-                time
-              )
-            );
-          updateBeat(beatIndex);
-          updateMeasure(measureIndex);
-        }, beatscheduletime);
-        scheduledNotes.push(thisevent);
+          let thisevent = transport.schedule((time) => {
+            beat !== 0 &&
+              beat.forEach((note) =>
+                instrument.triggerAttackRelease(
+                  note,
+                  Tone.Time("1m").toSeconds() / Object.keys(measure).length,
+                  time
+                )
+              );
+            updateBeat(beatIndex);
+            updateMeasure(measureIndex);
+          }, beatscheduletime);
+          scheduledNotes.push(thisevent);
+        });
+      });
+    }
+  } else {
+    timeline[moduleId].forEach((tlmeasure, index) => {
+      sequence.forEach((measure, measureIndex) => {
+        Object.values(measure).forEach((beat, beatIndex) => {
+          let beattimevalue =
+            Tone.Time("1m").toSeconds() / Object.keys(measure).length;
+          let beatscheduletime =
+            beattimevalue * beatIndex +
+            Tone.Time("1m").toSeconds() * measureIndex +
+            Tone.Time("1m").toSeconds() * tlmeasure;
+
+          let thisevent = transport.schedule((time) => {
+            beat !== 0 &&
+              beat.forEach((note) =>
+                instrument.triggerAttackRelease(
+                  note,
+                  Tone.Time("1m").toSeconds() / Object.keys(measure).length,
+                  time
+                )
+              );
+            updateBeat(beatIndex);
+            updateMeasure(measureIndex);
+          }, beatscheduletime);
+          scheduledNotes.push(thisevent);
+        });
       });
     });
   }
@@ -109,7 +167,9 @@ export const scheduleChordProgression = (
   updateChord,
   updateRhythm,
   moduleId,
-  sessionSize
+  sessionSize,
+  timeline,
+  timelineMode
 ) => {
   moduleId !== undefined && clearEvents(moduleId);
 
@@ -118,39 +178,78 @@ export const scheduleChordProgression = (
   let moduleLength = Math.ceil(chords[chords.length - 1].time + 0.01);
   let loopTimes = parseInt(sessionSize) / moduleLength;
 
-  for (let x = 0; x < loopTimes; x++) {
-    chords.forEach((chord, chordIndex) => {
-      let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
-      let chordtimetostart =
-        Tone.Time("1m").toSeconds() * chord.time +
-        Tone.Time("1m").toSeconds() * x * moduleLength;
-      let rhythmduration = chordduration / chord.rhythm.length;
+  if (!timelineMode) {
+    for (let x = 0; x < loopTimes; x++) {
+      chords.forEach((chord, chordIndex) => {
+        let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
+        let chordtimetostart =
+          Tone.Time("1m").toSeconds() * chord.time +
+          Tone.Time("1m").toSeconds() * x * moduleLength;
+        let rhythmduration = chordduration / chord.rhythm.length;
 
-      chord.rhythm.forEach((rhythm, rhythmIndex) => {
-        let rhythmscheduletime =
-          rhythmduration * rhythmIndex + chordtimetostart;
-        let thisevent = transport.schedule((time) => {
-          switch (rhythm) {
-            case 0:
-              instrument.releaseAll(time);
-              break;
-            case 1:
-              instrument.triggerAttackRelease(
-                chord.notes !== 0 ? chord.notes : [],
-                rhythmduration,
-                time
-              );
-              //console.log(chord.notes);
-              break;
-            default:
-              break;
-          }
+        chord.rhythm.forEach((rhythm, rhythmIndex) => {
+          let rhythmscheduletime =
+            rhythmduration * rhythmIndex + chordtimetostart;
+          let thisevent = transport.schedule((time) => {
+            switch (rhythm) {
+              case 0:
+                instrument.releaseAll(time);
+                break;
+              case 1:
+                instrument.triggerAttackRelease(
+                  chord.notes !== 0 ? chord.notes : [],
+                  rhythmduration,
+                  time
+                );
+                //console.log(chord.notes);
+                break;
+              default:
+                break;
+            }
 
-          //console.log(chord.notes);
-          updateChord(chordIndex);
-          updateRhythm(rhythmIndex);
-        }, rhythmscheduletime);
-        scheduledChords.push(thisevent);
+            //console.log(chord.notes);
+            updateChord(chordIndex);
+            updateRhythm(rhythmIndex);
+          }, rhythmscheduletime);
+          scheduledChords.push(thisevent);
+        });
+      });
+    }
+  } else {
+    timeline[moduleId].forEach((measure, index) => {
+      chords.forEach((chord, chordIndex) => {
+        let chordduration = Tone.Time("1m").toSeconds() * chord.duration;
+        let chordtimetostart =
+          Tone.Time("1m").toSeconds() * chord.time +
+          Tone.Time("1m").toSeconds() * measure;
+        let rhythmduration = chordduration / chord.rhythm.length;
+
+        chord.rhythm.forEach((rhythm, rhythmIndex) => {
+          let rhythmscheduletime =
+            rhythmduration * rhythmIndex + chordtimetostart;
+          let thisevent = transport.schedule((time) => {
+            switch (rhythm) {
+              case 0:
+                instrument.releaseAll(time);
+                break;
+              case 1:
+                instrument.triggerAttackRelease(
+                  chord.notes !== 0 ? chord.notes : [],
+                  rhythmduration,
+                  time
+                );
+                //console.log(chord.notes);
+                break;
+              default:
+                break;
+            }
+
+            //console.log(chord.notes);
+            updateChord(chordIndex);
+            updateRhythm(rhythmIndex);
+          }, rhythmscheduletime);
+          scheduledChords.push(thisevent);
+        });
       });
     });
   }
@@ -164,7 +263,9 @@ export const scheduleSamples = (
   instrument,
   cursorTime,
   transport,
-  moduleId
+  moduleId,
+  timeline,
+  timelineMode
 ) => {
   moduleId !== undefined && clearEvents(moduleId);
 
@@ -198,7 +299,9 @@ export const schedulePianoRoll = (
   transport,
   moduleId,
   moduleSize,
-  sessionSize
+  sessionSize,
+  timeline,
+  timelineMode
 ) => {
   //console.log("PR Scheduled");
   moduleId !== undefined && clearEvents(moduleId);
@@ -207,12 +310,23 @@ export const schedulePianoRoll = (
 
   let loopTimes = parseInt(sessionSize) / moduleSize;
 
-  for (let x = 0; x < loopTimes; x++) {
-    score.forEach((e, i) => {
-      let event = transport.schedule((time) => {
-        instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
-      }, e.time + Tone.Time("1m").toSeconds() * moduleSize * x);
-      scheduledNotes.push(event);
+  if (!timelineMode) {
+    for (let x = 0; x < loopTimes; x++) {
+      score.forEach((e, i) => {
+        let event = transport.schedule((time) => {
+          instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
+        }, e.time + Tone.Time("1m").toSeconds() * moduleSize * x);
+        scheduledNotes.push(event);
+      });
+    }
+  } else {
+    timeline[moduleId].forEach((measure, index) => {
+      score.forEach((e, i) => {
+        let event = transport.schedule((time) => {
+          instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
+        }, e.time + Tone.Time("1m").toSeconds() * measure);
+        scheduledNotes.push(event);
+      });
     });
   }
 
