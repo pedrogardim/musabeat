@@ -178,7 +178,6 @@ function Workspace(props) {
 
     if (newSessionSize !== sessionSize) {
       setSessionSize(newSessionSize);
-      Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * newSessionSize;
       console.log("Session size updated: " + newSessionSize);
     }
   };
@@ -763,9 +762,9 @@ function Workspace(props) {
     });
   }, [instruments]);
 
-  /* useEffect(() => {
-    console.log(areUnsavedChanges);
-  }, [areUnsavedChanges]); */
+  useEffect(() => {
+    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
+  }, [sessionSize]);
   /* 
   useEffect(() => {
     console.log("editMode", editMode);
@@ -807,6 +806,7 @@ function Workspace(props) {
           setTimeline={setTimeline}
           modules={modules}
           sessionSize={sessionSize}
+          setSessionSize={setSessionSize}
         />
       )}
 

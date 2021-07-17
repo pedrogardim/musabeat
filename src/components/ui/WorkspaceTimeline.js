@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
 import "./WorkspaceTimeline.css";
@@ -7,7 +7,7 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../utils/materialPalette";
 
-import { IconButton, Icon, Tooltip } from "@material-ui/core";
+import { IconButton, Icon, Tooltip, TextField } from "@material-ui/core";
 import { PermPhoneMsgTwoTone } from "@material-ui/icons";
 
 function WorkspaceTimeline(props) {
@@ -62,6 +62,7 @@ function WorkspaceTimeline(props) {
   };
 
   const handleTimelineTileClick = (moduleId, moduleSize, tile) => {
+    if (compact) return;
     let newTimeline = { ...props.timeline };
     let tlModule = newTimeline[moduleId];
     let timeToEdit = tile * moduleSize;
@@ -69,6 +70,18 @@ function WorkspaceTimeline(props) {
       ? tlModule.filter((e) => e !== timeToEdit)
       : [...tlModule, timeToEdit];
     props.setTimeline(newTimeline);
+  };
+
+  const handleSessionSizeChange = (e) => {
+    let newValue = e.target.value;
+
+    if (newValue <= 1) {
+      props.setSessionSize(1);
+    } else if (newValue >= 128) {
+      props.setSessionSize(128);
+    } else if (newValue > 1 && newValue < 128) {
+      props.setSessionSize(newValue);
+    }
   };
 
   useEffect(() => {
@@ -109,13 +122,29 @@ function WorkspaceTimeline(props) {
         </IconButton>
       </Tooltip>
       {props.timelineMode && (
-        <IconButton
-          className="ws-timeline-btn"
-          onClick={() => setCompact((prev) => !prev)}
-          style={{ position: "absolute", right: -64 }}
-        >
-          <Icon>expand</Icon>
-        </IconButton>
+        <div style={{ position: "absolute", right: -256 }}>
+          <IconButton
+            className="ws-timeline-btn"
+            onClick={() => setCompact((prev) => !prev)}
+          >
+            <Icon>expand</Icon>
+          </IconButton>
+          <TextField
+            label="Session Size"
+            type="number"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={props.sessionSize}
+            onChange={handleSessionSizeChange}
+          />
+          <span>{`${Math.floor(
+            (Tone.Time("1m").toSeconds() * props.sessionSize) / 60
+          )}:${(
+            "0" +
+            Math.floor((Tone.Time("1m").toSeconds() * props.sessionSize) % 60)
+          ).slice(-2)} s`}</span>
+        </div>
       )}
       {props.timelineMode &&
         props.modules.map((module, moduleIndex) => {
