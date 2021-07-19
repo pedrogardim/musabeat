@@ -830,6 +830,7 @@ function Workspace(props) {
                 resetUndoHistory={() => handleUndo("RESET")}
                 timeline={sessionData.timeline}
                 timelineMode={timelineMode}
+                setTimeline={setTimeline}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>
@@ -869,6 +870,9 @@ function Workspace(props) {
           setModules={setModules}
           loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}
+          sessionSize={sessionSize}
+          timeline={sessionData.timeline}
+          setTimeline={setTimeline}
         />
       )}
 

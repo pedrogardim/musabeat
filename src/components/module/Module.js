@@ -96,6 +96,10 @@ function Module(props) {
       newModules = newModules.filter((e, i) => i !== props.index);
       return newModules;
     });
+
+    let newTimeline = { ...props.timeline };
+    delete newTimeline[props.module.id];
+    props.setTimeline(newTimeline);
   };
 
   const handleModuleRename = (name) => {

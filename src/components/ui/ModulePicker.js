@@ -119,6 +119,11 @@ function ModulePicker(props) {
         prevModules === null ? [newModule] : [...prevModules, newModule];
       return newModules;
     });
+
+    let newTimeline = { ...props.timeline };
+    newTimeline[newModule.id] = [...Array(props.sessionSize).keys()];
+    props.setTimeline(newTimeline);
+
     props.setModulePicker(false);
     props.loadNewModuleInstrument(newModule, newModules.length - 1);
   };
