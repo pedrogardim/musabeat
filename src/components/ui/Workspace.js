@@ -189,11 +189,9 @@ function Workspace(props) {
     //TODO: optimize this, avoid call from server for each session load
     console.log("loading session: ", sessionKey);
     if (props.hidden) {
-      firebase
-        .firestore()
-        .collection("sessions")
-        .doc(sessionKey)
-        .update({ played: firebase.firestore.FieldValue.increment(1) });
+      let thisSessionData = { ...props.session };
+      delete thisSessionData.modules;
+      setSessionData(thisSessionData);
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
       setEditMode(true);
@@ -764,6 +762,7 @@ function Workspace(props) {
   useEffect(() => {
     if (
       modules &&
+      sessionData &&
       instrumentsLoaded &&
       instruments.every((val) => typeof val === "object") &&
       instrumentsLoaded.every((val) => val === true) &&
@@ -773,7 +772,7 @@ function Workspace(props) {
       onSessionReady();
     }
     //temp
-  }, [instrumentsLoaded]);
+  }, [instrumentsLoaded, sessionData]);
 
   useEffect(() => {
     //TODO: Completely clear Tone instance, disposing context
