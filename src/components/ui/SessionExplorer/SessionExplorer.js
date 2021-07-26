@@ -160,6 +160,11 @@ function SessionExplorer(props) {
     if (playingSession !== null) {
       Tone.Transport.pause();
       console.log("stop");
+      let sessionRef = firebase
+        .firestore()
+        .collection("sessions")
+        .doc(sessionKeys[playingSession]);
+      sessionRef.update({ played: firebase.firestore.FieldValue.increment(1) });
     }
   }, [playingSession]);
 
