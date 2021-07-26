@@ -8,7 +8,6 @@ import Draggable from "react-draggable";
 import { colors } from "../../utils/materialPalette";
 
 import { IconButton, Icon, Tooltip, TextField } from "@material-ui/core";
-import { PermPhoneMsgTwoTone } from "@material-ui/icons";
 
 function WorkspaceTimeline(props) {
   const TLWrapper = useRef(null);
@@ -16,6 +15,10 @@ function WorkspaceTimeline(props) {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [compact, setCompact] = useState(true);
+  const [draggingSelect, setDraggingSelect] = useState(false);
+  const [TLinputSessionSize, setTLinputSessionSize] = useState(
+    props.sessionSize
+  );
 
   const toggleCursor = (state) => {
     clearInterval(cursorAnimator);
@@ -51,13 +54,18 @@ function WorkspaceTimeline(props) {
 
   const handleMouseDown = (event) => {
     if (
-      (!props.timelineMode || compact) &&
-      event.target.className.includes("ws-timeline")
+      (compact && event.target.className === "ws-timeline-module-tile") ||
+      !props.timelineMode
     ) {
       Tone.Transport.seconds =
         ((event.pageX - TLWrapper.current.offsetLeft) /
           TLWrapper.current.offsetWidth) *
         Tone.Transport.loopEnd;
+    } else if (
+      props.timelineMode &&
+      event.target.className === "ws-timeline-module-tile"
+    ) {
+      setDraggingSelect(true);
     }
   };
 
@@ -74,7 +82,7 @@ function WorkspaceTimeline(props) {
 
   const handleSessionSizeChange = (e) => {
     let newValue = e.target.value;
-
+    if (props.sessionSize === e.target.value) return;
     if (newValue <= 1) {
       props.setSessionSize(1);
     } else if (newValue >= 128) {
@@ -82,14 +90,21 @@ function WorkspaceTimeline(props) {
     } else if (newValue > 1 && newValue < 128) {
       props.setSessionSize(newValue);
     }
+
+    cleanTimeline(newValue);
+  };
+
+  const cleanTimeline = (newSize) => {
+    let newTimeline = { ...props.timeline };
+    Object.keys(newTimeline).forEach((id) => {
+      newTimeline[id] = newTimeline[id].filter((e) => e < newSize);
+    });
+    props.setTimeline(newTimeline);
   };
 
   useEffect(() => {
-    return () => {
-      //console.log("cleared");
-      clearInterval(cursorAnimator);
-    };
-  }, []);
+    setTLinputSessionSize(props.sessionSize);
+  }, [props.sessionSize]);
 
   useEffect(() => {
     //toggleCursor(Tone.Transport.state);
@@ -102,8 +117,13 @@ function WorkspaceTimeline(props) {
               Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
               TLWrapper.current.offsetWidth
           );
-      }, 32)
+      }, 16)
     );
+
+    return () => {
+      //console.log("cleared");
+      clearInterval(cursorAnimator);
+    };
   }, []);
 
   return (
@@ -111,6 +131,8 @@ function WorkspaceTimeline(props) {
       className={`ws-timeline ${!props.timelineMode && "ws-timeline-loop"}`}
       ref={TLWrapper}
       onMouseDown={handleMouseDown}
+      onMouseUp={() => setDraggingSelect(false)}
+      onMouseLeave={() => setDraggingSelect(false)}
     >
       <Tooltip title={props.timelineMode ? "Loop Mode" : "Timeline Mode"}>
         <IconButton
@@ -122,7 +144,7 @@ function WorkspaceTimeline(props) {
         </IconButton>
       </Tooltip>
       {props.timelineMode && (
-        <div style={{ position: "absolute", right: -256 }}>
+        <div style={{ position: "absolute", right: -128 }}>
           <IconButton
             className="ws-timeline-btn"
             onClick={() => setCompact((prev) => !prev)}
@@ -135,15 +157,14 @@ function WorkspaceTimeline(props) {
             InputLabelProps={{
               shrink: true,
             }}
-            value={props.sessionSize}
-            onChange={handleSessionSizeChange}
+            inputProps={{ min: 1, max: 128 }}
+            defaultValue={props.sessionSize}
+            onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
+            onBlur={(e) => handleSessionSizeChange(e)}
+            onMouseUp={(e) => handleSessionSizeChange(e)}
+            value={TLinputSessionSize}
+            onChange={(e) => setTLinputSessionSize(e.target.value)}
           />
-          <span>{`${Math.floor(
-            (Tone.Time("1m").toSeconds() * props.sessionSize) / 60
-          )}:${(
-            "0" +
-            Math.floor((Tone.Time("1m").toSeconds() * props.sessionSize) % 60)
-          ).slice(-2)} s`}</span>
         </div>
       )}
       {props.timelineMode &&
@@ -184,7 +205,11 @@ function WorkspaceTimeline(props) {
                         outline: "solid 1px " + colors[module.color][800],
                         width: (moduleSize / props.sessionSize) * 100 + "%",
                       }}
-                      onClick={() =>
+                      onMouseEnter={() =>
+                        draggingSelect &&
+                        handleTimelineTileClick(module.id, moduleSize, i)
+                      }
+                      onMouseDown={() =>
                         handleTimelineTileClick(module.id, moduleSize, i)
                       }
                     />

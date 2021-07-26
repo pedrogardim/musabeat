@@ -518,6 +518,8 @@ function Module(props) {
                 setModules={props.setModules}
                 setSettingsMode={() => setModulePage(null)}
                 index={props.index}
+                timeline={props.timeline}
+                setTimeline={props.setTimeline}
               />
             )}
             {modulePage === "effects" && (

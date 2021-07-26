@@ -144,33 +144,36 @@ function Workspace(props) {
     DBSessionRef.get().then((r) => props.createNewSession(r.data()));
   };
 
+  const getModuleSize = (module, index) => {
+    let thisModule = module ? module : modules[index];
+    return thisModule.type === 2
+      ? Math.ceil(
+          thisModule.score[thisModule.score.length - 1].time +
+            thisModule.score[thisModule.score.length - 1].duration
+        )
+      : thisModule.type === 3
+      ? Math.ceil(
+          (thisModule.score[0].duration +
+            thisModule.score[0].time +
+            Tone.Time("1m").toSeconds() * 0.5) /
+            Tone.Time("1m").toSeconds()
+        )
+      : thisModule.type === 4
+      ? thisModule.size
+      : /* Math.ceil(
+              Math.max(
+                ...module.score
+                  .sort((a, b) => a.time + a.duration - (b.time + b.duration))
+                  .map((e) => e.time + e.duration)
+              )
+            ) */
+        thisModule.score.length;
+  };
+
   const adaptSessionSize = () => {
     //console.log("checked");
     if (modules === null) return;
-    let lengths = modules.map((module) =>
-      module.type === 2
-        ? Math.ceil(
-            module.score[module.score.length - 1].time +
-              module.score[module.score.length - 1].duration
-          )
-        : module.type === 3
-        ? Math.ceil(
-            (module.score[0].duration +
-              module.score[0].time +
-              Tone.Time("1m").toSeconds() * 0.5) /
-              Tone.Time("1m").toSeconds()
-          )
-        : module.type === 4
-        ? module.size
-        : /* Math.ceil(
-            Math.max(
-              ...module.score
-                .sort((a, b) => a.time + a.duration - (b.time + b.duration))
-                .map((e) => e.time + e.duration)
-            )
-          ) */
-          module.score.length
-    );
+    let lengths = modules.map((module) => getModuleSize(module));
     let longestModule = Math.max(...lengths);
     let newSessionSize = 2 << (31 - Math.clz32(longestModule - 1));
 
@@ -494,6 +497,21 @@ function Workspace(props) {
     });
   };
 
+  const getSessionSizeFromTimeline = () => {
+    let moduleTimes = Object.values(sessionData.timeline).map(
+      (e, i) =>
+        Math.max(...e) +
+        getModuleSize(
+          modules.find(
+            (module) =>
+              module.id === parseInt(Object.keys(sessionData.timeline)[i])
+          )
+        )
+    );
+    console.log("session size changed", Math.max(...moduleTimes));
+    setSessionSize(Math.max(...moduleTimes));
+  };
+
   /*   const changeChecker = (mod, data) => {
     setAreUnsavedChanges((prev) => {
       prev && saveToDatabase(mod, data);
@@ -716,6 +734,11 @@ function Workspace(props) {
     isLoaded && !timelineMode && adaptSessionSize();
   }, [timelineMode]);
 
+  useEffect(() => {
+    sessionData && console.log(sessionData.timeline);
+    savingMode === "simple" && setAreUnsavedChanges(true);
+  }, [sessionData]);
+
   /*  useEffect(() => {
     console.log("sessiondata triggered", sessionData);
     if (sessionData) {
@@ -765,6 +788,10 @@ function Workspace(props) {
   useEffect(() => {
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
   }, [sessionSize]);
+
+  useEffect(() => {
+    timelineMode && getSessionSizeFromTimeline();
+  }, [timelineMode]);
   /* 
   useEffect(() => {
     console.log("editMode", editMode);
@@ -796,6 +823,7 @@ function Workspace(props) {
           sessionKey={sessionKey}
           editMode={editMode}
           user={props.user}
+          sessionSize={sessionSize}
         />
       )}
       {modules && sessionSize && sessionData.timeline && (

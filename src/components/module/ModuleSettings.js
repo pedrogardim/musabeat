@@ -66,6 +66,7 @@ function ModuleSettings(props) {
   const handleLengthSelect = (event) => {
     Tone.Transport.pause();
     let newLength = parseInt(event.target.value);
+
     props.setModules((previous) =>
       previous.map((module, i) => {
         if (i === props.index) {
@@ -88,6 +89,14 @@ function ModuleSettings(props) {
         }
       })
     );
+
+    let newTimeline = { ...props.timeline };
+    newTimeline[props.module.id] = newTimeline[props.module.id].filter(
+      (e) => e % newLength === 0
+    );
+
+    props.setTimeline(newTimeline);
+
     props.setSettingsMode(false);
   };
 

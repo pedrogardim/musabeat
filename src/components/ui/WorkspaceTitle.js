@@ -2,6 +2,8 @@ import React, { useState, useEffect, Fragment } from "react";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
 
+import * as Tone from "tone";
+
 import {
   Icon,
   IconButton,
@@ -102,9 +104,15 @@ function WorkspaceTitle(props) {
       )}
 
       <div className="break" style={{ margin: 0 }} />
+
       {creationDateString && (
         <Typography variant="overline" style={{ fontSize: 10 }}>
-          {`${props.sessionData.bpm} BPM - ${creationDateString}`}
+          {`${props.sessionData.bpm} BPM - ${Math.floor(
+            (Tone.Time("1m").toSeconds() * props.sessionSize) / 60
+          )}:${(
+            "0" +
+            Math.floor((Tone.Time("1m").toSeconds() * props.sessionSize) % 60)
+          ).slice(-2)} s - ${creationDateString}`}
         </Typography>
       )}
       <div className="break" />

@@ -24,6 +24,7 @@
   display: flex;
   flex-direction: row;
   margin-bottom: 4px;
+  flex-wrap: nowrap;
 }
 
 .ws-timeline-module-compact {
@@ -37,7 +38,7 @@
 
 .ws-timeline-module-tile {
   height: 100%;
-  flex-grow: 1;
+  flex-grow: 0;
 }
 
 .ws-timeline-module-tile-active {
