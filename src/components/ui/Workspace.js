@@ -189,6 +189,11 @@ function Workspace(props) {
     //TODO: optimize this, avoid call from server for each session load
     console.log("loading session: ", sessionKey);
     if (props.hidden) {
+      firebase
+        .firestore()
+        .collection("sessions")
+        .doc(sessionKey)
+        .update({ played: firebase.firestore.FieldValue.increment(1) });
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
       setEditMode(true);
@@ -228,6 +233,12 @@ function Workspace(props) {
       let sessionRef =
         sessionKey !== null &&
         firebase.firestore().collection("sessions").doc(sessionKey);
+
+      sessionRef.update({
+        opened: firebase.firestore.FieldValue.increment(1),
+        played: firebase.firestore.FieldValue.increment(1),
+      });
+
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
@@ -839,7 +850,7 @@ function Workspace(props) {
       )}
 
       <div className="workspace-module-cont">
-        {modules !== null ? (
+        {modules !== null && sessionData ? (
           modules.map((module, moduleIndex) => (
             <Fragment>
               <Module
