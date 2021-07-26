@@ -27,8 +27,8 @@ function WorkspaceTitle(props) {
   const [infoDialog, setInfoDialog] = useState(false);
 
   const getSessionTitleInfo = async () => {
-    if (typeof props.sessionData.createdOn.seconds === "number") {
-      let date = new Date(props.sessionData.createdOn.seconds * 1000);
+    if (typeof props.sessionData.createdOn === "number") {
+      let date = new Date(props.sessionData.createdOn * 1000);
       let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
         date.getMonth() + 1
       }/${date.getFullYear()}`;

@@ -45,7 +45,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     creator: userId,
     editors: [userId],
     likes: 0,
-    createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+    createdOn: firebase.firestore.FieldValue.serverTimestamp().seconds,
     timeline: { 0: [1] },
   };
 
