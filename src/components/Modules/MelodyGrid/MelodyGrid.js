@@ -35,6 +35,7 @@ function MelodyGrid(props) {
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const [draggingSelect, setDraggingSelect] = useState(false);
 
   const inputNote = (x, y) => {
     let note = gridScale[y];
@@ -201,7 +202,12 @@ function MelodyGrid(props) {
       className="module-innerwrapper"
       style={props.style}
       onMouseOver={handleMouseOver}
-      onMouseOut={() => setHovered(false)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setDraggingSelect(false);
+      }}
+      onMouseDown={() => setDraggingSelect(true)}
+      onMouseUp={() => setDraggingSelect(false)}
     >
       <div className="melody-grid" ref={parentRef}>
         {gridScale.map((drumsound, row) => (
@@ -229,6 +235,7 @@ function MelodyGrid(props) {
                 color={colors[props.module.color]}
                 x={column}
                 y={row}
+                draggingSelect={draggingSelect}
               />
             ))}
           </div>

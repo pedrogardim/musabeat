@@ -26,6 +26,7 @@ function Sequencer(props) {
   const [currentMeasure, setCurrentMeasure] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [soundsMap, setSoundsMap] = useState([]);
+  const [draggingSelect, setDraggingSelect] = useState(false);
 
   const inputNote = (x, y) => {
     /*  setSequence((previousSequence) =>
@@ -131,7 +132,12 @@ function Sequencer(props) {
       className="module-innerwrapper"
       style={props.style}
       onMouseOver={handleMouseOver}
-      onMouseOut={() => setHovered(false)}
+      onMouseLeave={() => {
+        setHovered(false);
+        setDraggingSelect(false);
+      }}
+      onMouseDown={() => setDraggingSelect(true)}
+      onMouseUp={() => setDraggingSelect(false)}
     >
       <div className="sequencer" ref={parentRef}>
         {soundsMap.map((drumsound, row) => (
@@ -160,6 +166,7 @@ function Sequencer(props) {
                   color={colors[props.module.color]}
                   x={column}
                   y={isNaN(drumsound) ? drumsound : parseInt(drumsound)}
+                  draggingSelect={draggingSelect}
                 />
               )
             )}

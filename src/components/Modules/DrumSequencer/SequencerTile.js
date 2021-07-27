@@ -12,7 +12,8 @@ function SequencerTile(props) {
   return (
     <div
       className={"sequencer-tile"}
-      onClick={clickedTile}
+      onMouseDown={clickedTile}
+      onMouseEnter={() => props.draggingSelect && clickedTile()}
       style={{
         backgroundColor: active
           ? thisColor[900]
