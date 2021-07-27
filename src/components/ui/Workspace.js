@@ -194,6 +194,7 @@ function Workspace(props) {
       setSessionData(thisSessionData);
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
+      setTimelineMode(thisSessionData.tl);
       setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
@@ -232,11 +233,6 @@ function Workspace(props) {
         sessionKey !== null &&
         firebase.firestore().collection("sessions").doc(sessionKey);
 
-      sessionRef.update({
-        opened: firebase.firestore.FieldValue.increment(1),
-        played: firebase.firestore.FieldValue.increment(1),
-      });
-
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
@@ -251,11 +247,18 @@ function Workspace(props) {
           setModules(sessionData.modules);
         }
 
+        setTimelineMode(sessionData.tl);
+
         Tone.Transport.bpm.value = sessionData.bpm;
 
         let editors = sessionData.editors;
         //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
+      });
+
+      sessionRef.update({
+        opened: firebase.firestore.FieldValue.increment(1),
+        played: firebase.firestore.FieldValue.increment(1),
       });
     } /* else if (typeof sessionKey === "object") {
       setModules(sessionKey.modules);
@@ -431,12 +434,22 @@ function Workspace(props) {
 
       savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
 
+      let newSessionData = !data || !mod ? { ...sessionData } : { ...data };
+
+      //temp fix: delete properties to avoid overwrites
+      delete newSessionData.createdOn;
+      delete newSessionData.creator;
+      delete newSessionData.opened;
+      delete newSessionData.played;
+      delete newSessionData.copied;
+      delete newSessionData.likes;
+
       !data || !mod
         ? DBSessionRef.update({
-            ...sessionData,
+            ...newSessionData,
             modules: modules,
           })
-        : DBSessionRef.update({ ...data, modules: mod });
+        : DBSessionRef.update({ ...newSessionData, modules: mod });
     }
     /* DBSessionRef.get().then((snapshot) => {
         snapshot !== modules
@@ -741,6 +754,11 @@ function Workspace(props) {
 
   useEffect(() => {
     isLoaded && !timelineMode && adaptSessionSize();
+    sessionData &&
+      timelineMode !== sessionData.tl &&
+      setSessionData((prev) => {
+        return { ...prev, tl: timelineMode };
+      });
   }, [timelineMode]);
 
   useEffect(() => {

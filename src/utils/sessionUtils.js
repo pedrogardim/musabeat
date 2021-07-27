@@ -11,6 +11,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     description: "No description",
     tags: [],
     bpm: 120,
+    tl: false,
     modules: [
       {
         id: 0,
