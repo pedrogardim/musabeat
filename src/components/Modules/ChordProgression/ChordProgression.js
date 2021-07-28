@@ -104,6 +104,18 @@ function ChordProgression(props) {
       newModules[props.index].score = chords;
       return newModules;
     });
+    //update timeline on module size modified
+
+    let newSize = Math.ceil(
+      chords[chords.length - 1].time + chords[chords.length - 1].duration
+    );
+
+    let newTimeline = { ...props.timeline };
+    newTimeline[props.module.id] = newTimeline[props.module.id].filter(
+      (e) => e % newSize === 0
+    );
+
+    props.setTimeline(newTimeline);
   };
 
   useEffect(() => {

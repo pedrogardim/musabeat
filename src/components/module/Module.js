@@ -299,6 +299,7 @@ function Module(props) {
           updateModules={props.setModules}
           timeline={props.timeline}
           timelineMode={props.timelineMode}
+          setTimeline={props.setTimeline}
         />
       );
       break;
