@@ -194,7 +194,7 @@ function Workspace(props) {
       setSessionData(thisSessionData);
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
-      setTimelineMode(thisSessionData.tl);
+      setTimelineMode(thisSessionData.timeline.on);
       setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
@@ -247,7 +247,7 @@ function Workspace(props) {
           setModules(sessionData.modules);
         }
 
-        setTimelineMode(sessionData.tl);
+        setTimelineMode(sessionData.timeline.on);
 
         Tone.Transport.bpm.value = sessionData.bpm;
 
@@ -520,18 +520,7 @@ function Workspace(props) {
   };
 
   const getSessionSizeFromTimeline = () => {
-    let moduleTimes = Object.values(sessionData.timeline).map(
-      (e, i) =>
-        Math.max(...e) +
-        getModuleSize(
-          modules.find(
-            (module) =>
-              module.id === parseInt(Object.keys(sessionData.timeline)[i])
-          )
-        )
-    );
-    console.log("session size changed", Math.max(...moduleTimes));
-    setSessionSize(Math.max(...moduleTimes));
+    setSessionSize(sessionData.timeline.size);
   };
 
   /*   const changeChecker = (mod, data) => {
@@ -755,9 +744,9 @@ function Workspace(props) {
   useEffect(() => {
     isLoaded && !timelineMode && adaptSessionSize();
     sessionData &&
-      timelineMode !== sessionData.tl &&
+      timelineMode !== sessionData.timeline.on &&
       setSessionData((prev) => {
-        return { ...prev, tl: timelineMode };
+        return { ...prev, timeline: { ...prev.timeline, on: timelineMode } };
       });
   }, [timelineMode]);
 
@@ -885,7 +874,7 @@ function Workspace(props) {
                 setFocusedModule={setFocusedModule}
                 resetUndoHistory={() => handleUndo("RESET")}
                 timeline={sessionData.timeline}
-                timelineMode={timelineMode}
+                timelineMode={sessionData.timeline.on}
                 setTimeline={setTimeline}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}

@@ -42,6 +42,9 @@ function Module(props) {
   const [renameDialog, setRenameDialog] = useState(false);
   const [effects, setEffects] = useState(new Array(4).fill(false));
   const [fullScreen, setFullScreen] = useState(false);
+  //module is disabled in the timeline
+  const [TLVisibility, setTLVisibility] = useState(true);
+  const [TLVisibilityAnimator, setTLVisibilityAnimator] = useState(null);
 
   const [moduleZoom, setModuleZoom] = useState(1);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -122,6 +125,31 @@ function Module(props) {
     setModuleZoom((prev) => (prev <= props.sessionSize ? prev * 2 : 1));
     //console.log(props.sessionSize, moduleZoom);
     //console.log(moduleZoom * 100 + "%");
+  };
+
+  const scheduleTLVisibility = () => {
+    clearInterval(TLVisibilityAnimator);
+    if (props.timelineMode) {
+      let event = setInterval(() => {
+        let currentMeasure = parseInt(Tone.Transport.position.split(":")[0]);
+
+        let moduleState = Object.values(props.timeline[props.module.id])
+          .sort((a, b) => a - b)
+          .map(
+            (e) =>
+              currentMeasure >= e &&
+              currentMeasure <= e + (getModuleSize(props.module) - 1)
+          );
+
+        let moduleVisiblity = moduleState.includes(true);
+        //console.log(moduleVisiblity, TLVisibility);
+
+        setTLVisibility((prev) =>
+          moduleVisiblity !== prev ? moduleVisiblity : prev
+        );
+      }, 100);
+      setTLVisibilityAnimator(event);
+    }
   };
 
   //Only used for players
@@ -327,6 +355,7 @@ function Module(props) {
     loadModuleEffects();
     return () => {
       clearEvents(props.module.id);
+      clearInterval(TLVisibilityAnimator);
       effects.map((e) => !!e && e.dispose());
     };
   }, []);
@@ -358,6 +387,14 @@ function Module(props) {
     }
   }, [Tone.Transport.state]);
 
+  useEffect(() => {
+    scheduleTLVisibility();
+  }, [props.timeline]);
+
+  /*  useEffect(() => {
+    console.log(props.module.id, TLVisibility);
+  }, [TLVisibility]); */
+
   return (
     <Fragment>
       {fullScreen && (
@@ -372,11 +409,9 @@ function Module(props) {
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
-        className={
-          "module " +
-          (props.module.muted && " module-muted ") +
-          (fullScreen && " module-fullscreen")
-        }
+        className={`module ${props.module.muted && " module-muted "} ${
+          fullScreen && " module-fullscreen"
+        } ${!TLVisibility && props.timelineMode && " module-tloff"}`}
       >
         <div className="module-header">
           {modulePage !== null && (
@@ -551,3 +586,29 @@ function Module(props) {
 }
 
 export default Module;
+
+const getModuleSize = (module, index) => {
+  let thisModule = module;
+  return thisModule.type === 2
+    ? Math.ceil(
+        thisModule.score[thisModule.score.length - 1].time +
+          thisModule.score[thisModule.score.length - 1].duration
+      )
+    : thisModule.type === 3
+    ? Math.ceil(
+        (thisModule.score[0].duration +
+          thisModule.score[0].time +
+          Tone.Time("1m").toSeconds() * 0.5) /
+          Tone.Time("1m").toSeconds()
+      )
+    : thisModule.type === 4
+    ? thisModule.size
+    : /* Math.ceil(
+            Math.max(
+              ...module.score
+                .sort((a, b) => a.time + a.duration - (b.time + b.duration))
+                .map((e) => e.time + e.duration)
+            )
+          ) */
+      thisModule.score.length;
+};

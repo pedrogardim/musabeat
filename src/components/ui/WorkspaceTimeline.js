@@ -82,23 +82,25 @@ function WorkspaceTimeline(props) {
 
   const handleSessionSizeChange = (e) => {
     let newValue = e.target.value;
+    let newSize;
     if (props.sessionSize === e.target.value) return;
     if (newValue <= 1) {
-      props.setSessionSize(1);
+      newSize = 1;
     } else if (newValue >= 128) {
-      props.setSessionSize(128);
+      newSize = 128;
     } else if (newValue > 1 && newValue < 128) {
-      props.setSessionSize(newValue);
+      newSize = newValue;
     }
+    props.setSessionSize(parseInt(newSize));
 
-    cleanTimeline(newValue);
-  };
+    let newTimeline = { ...props.timeline, size: parseInt(newSize) };
 
-  const cleanTimeline = (newSize) => {
-    let newTimeline = { ...props.timeline };
-    Object.keys(newTimeline).forEach((id) => {
-      newTimeline[id] = newTimeline[id].filter((e) => e < newSize);
-    });
+    //filter modules greater than new value
+    Object.keys(newTimeline)
+      .filter((e) => !isNaN(e))
+      .forEach((id) => {
+        newTimeline[id] = newTimeline[id].filter((e) => e < newSize);
+      });
     props.setTimeline(newTimeline);
   };
 
