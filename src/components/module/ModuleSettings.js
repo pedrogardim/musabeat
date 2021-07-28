@@ -71,7 +71,7 @@ function ModuleSettings(props) {
       previous.map((module, i) => {
         if (i === props.index) {
           let newModule = { ...module };
-          if (props.module.type === 4) {
+          if (props.module.type === 3 || props.module.type === 4) {
             newModule.size = newLength;
           } else {
             let oldLength = module.score.length;
@@ -186,7 +186,8 @@ function ModuleSettings(props) {
       )}
       {(props.module.type === 0 ||
         props.module.type === 1 ||
-        props.module.type === 4) && (
+        props.module.type === 4 ||
+        props.module.type === 3) && (
         <FormControl>
           <InputLabel id="length-select-label">
             {t("module.settings.length")}
@@ -195,7 +196,7 @@ function ModuleSettings(props) {
             native
             labelId="length-select-label"
             value={
-              props.module.type === 4
+              props.module.type === 3 || props.module.type === 4
                 ? props.module.size
                 : props.module.score.length
             }

@@ -12,10 +12,10 @@ function AudioClip(props) {
   const [clipPosition, setClipPosition] = useState(0);
 
   const updateClipPosition = () => {
-    if (!props.sessionSize || props.parentRef.current === null) return;
+    if (!props.moduleSize || props.parentRef.current === null) return;
     let timePerPixel =
       props.parentRef.current.offsetWidth /
-      (Tone.Time("1m").toSeconds() * props.sessionSize);
+      (Tone.Time("1m").toSeconds() * props.moduleSize);
     setClipPosition(props.score.time * timePerPixel);
     setClipWidth(
       (props.score.duration * timePerPixel) /
@@ -49,7 +49,7 @@ function AudioClip(props) {
   const handleResizeStop = (e, handle, target, delta) => {
     if (handle === "right") {
       let newDuration =
-        (target.offsetWidth * props.sessionSize * Tone.Time("1m").toSeconds()) /
+        (target.offsetWidth * props.moduleSize * Tone.Time("1m").toSeconds()) /
         props.parentRef.current.offsetWidth;
 
       let maxDuration = props.instrument.buffer.duration;
@@ -58,7 +58,7 @@ function AudioClip(props) {
         newDuration <= maxDuration
           ? target.offsetWidth
           : (maxDuration * props.parentRef.current.offsetWidth) /
-              (props.sessionSize * Tone.Time("1m").toSeconds())
+              (props.moduleSize * Tone.Time("1m").toSeconds())
       );
 
       props.setScore((prev) => {
@@ -79,7 +79,7 @@ function AudioClip(props) {
   useEffect(() => {
     updateClipPosition();
   }, [
-    props.sessionSize,
+    props.moduleSize,
     props.score,
     props.instrument,
     props.instrument.loaded,

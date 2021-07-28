@@ -108,7 +108,7 @@ function ModulePicker(props) {
       newModule.range = selectedRange;
     }
 
-    if (selectedType === 4) {
+    if (selectedType === 3 || selectedType === 4) {
       newModule.size = 1;
     }
 

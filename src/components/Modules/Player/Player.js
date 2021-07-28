@@ -42,8 +42,9 @@ function Player(props) {
             playerWrapper.current !== null &&
               Tone.Transport.state === "started" &&
               setCursorPosition(
-                (Tone.Transport.seconds /
-                  Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
+                ((Tone.Transport.seconds %
+                  (Tone.Time("1m").toSeconds() * props.module.size)) /
+                  (Tone.Time("1m").toSeconds() * props.module.size)) *
                   playerWrapper.current.offsetWidth
               );
           }, 32)
@@ -69,6 +70,8 @@ function Player(props) {
           atRestart ? 0 : Tone.Transport.seconds,
           Tone.Transport,
           props.module.id,
+          props.module.size,
+          props.sessionSize,
           props.timeline,
           props.timelineMode
         )
@@ -78,7 +81,8 @@ function Player(props) {
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
       (element.x / playerWrapper.current.offsetWidth) *
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      Tone.Time("1m").toSeconds() *
+      props.module.size;
 
     setCursorPosition(element.x);
   };
@@ -213,9 +217,9 @@ function Player(props) {
       //console.log("should schedule");
       scheduleEvents(true);
       props.instrument.stop(time);
-    }, Tone.Transport.loopEnd - 0.02);
+    }, Tone.Time("1m").toSeconds() * props.module.size - 0.02);
     setRescheduleEvent(event);
-  }, [props.sessionSize, score]);
+  }, [props.module.size, score]);
 
   return (
     <div
@@ -237,7 +241,7 @@ function Player(props) {
         }}
       >
         <BackgroundGrid
-          sessionSize={props.sessionSize}
+          moduleSize={props.module.size}
           color={colors[props.module.color]}
         />
         {draggingOver && (
@@ -258,7 +262,7 @@ function Player(props) {
         {!!props.instrument && props.loaded && score[0].duration > 0 && (
           <AudioClip
             index={0}
-            sessionSize={props.sessionSize}
+            moduleSize={props.module.size}
             parentRef={playerWrapper}
             color={colors[props.module.color]}
             instrument={props.instrument}

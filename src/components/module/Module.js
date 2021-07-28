@@ -595,14 +595,7 @@ const getModuleSize = (module, index) => {
         thisModule.score[thisModule.score.length - 1].time +
           thisModule.score[thisModule.score.length - 1].duration
       )
-    : thisModule.type === 3
-    ? Math.ceil(
-        (thisModule.score[0].duration +
-          thisModule.score[0].time +
-          Tone.Time("1m").toSeconds() * 0.5) /
-          Tone.Time("1m").toSeconds()
-      )
-    : thisModule.type === 4
+    : thisModule.type === 3 || thisModule.type === 4
     ? thisModule.size
     : /* Math.ceil(
             Math.max(

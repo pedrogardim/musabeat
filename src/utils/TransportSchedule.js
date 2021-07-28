@@ -264,6 +264,8 @@ export const scheduleSamples = (
   cursorTime,
   transport,
   moduleId,
+  moduleSize,
+  sessionSize,
   timeline,
   timelineMode
 ) => {
@@ -271,24 +273,59 @@ export const scheduleSamples = (
 
   let scheduledSounds = [];
 
-  score.forEach((event, eventIndex) => {
-    let isCursorinBetween =
-      cursorTime > event.time && cursorTime < event.time + event.duration;
+  let loopTimes = parseInt(sessionSize) / moduleSize;
 
-    let eventOffset = parseFloat(
-      (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
-    );
-    let eventTime = parseFloat(
-      (isCursorinBetween ? cursorTime : event.time).toFixed(3)
-    );
+  if (!timelineMode) {
+    for (let x = 0; x < loopTimes; x++) {
+      score.forEach((event, eventIndex) => {
+        let isCursorinBetween =
+          cursorTime > event.time && cursorTime < event.time + event.duration;
 
-    //console.log(eventTime, eventOffset);
+        let eventOffset = parseFloat(
+          (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
+        );
+        let eventTime = parseFloat(
+          (isCursorinBetween ? cursorTime : event.time).toFixed(3)
+        );
 
-    let thisevent = transport.schedule((time) => {
-      instrument.start(time, eventOffset, event.duration);
-    }, eventTime);
-    scheduledSounds.push(thisevent);
-  });
+        //console.log(eventTime, eventOffset);
+
+        let thisevent = transport.schedule((time) => {
+          instrument.start(
+            time + Tone.Time("1m").toSeconds() * x,
+            eventOffset,
+            event.duration
+          );
+        }, eventTime);
+        scheduledSounds.push(thisevent);
+      });
+    }
+  } else {
+    timeline[moduleId].forEach((measure, index) => {
+      score.forEach((event, eventIndex) => {
+        let isCursorinBetween =
+          cursorTime > event.time && cursorTime < event.time + event.duration;
+
+        let eventOffset = parseFloat(
+          (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
+        );
+        let eventTime = parseFloat(
+          (isCursorinBetween ? cursorTime : event.time).toFixed(3)
+        );
+
+        //console.log(eventTime, eventOffset);
+
+        let thisevent = transport.schedule((time) => {
+          instrument.start(
+            time + Tone.Time("1m").toSeconds() * measure,
+            eventOffset,
+            event.duration
+          );
+        }, eventTime);
+        scheduledSounds.push(thisevent);
+      });
+    });
+  }
 
   scheduledEvents[moduleId] = scheduledSounds;
 };

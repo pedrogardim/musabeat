@@ -177,9 +177,7 @@ function WorkspaceTimeline(props) {
                   module.score[module.score.length - 1].time +
                     module.score[module.score.length - 1].duration
                 )
-              : module.type === 3
-              ? props.sessionSize
-              : module.type === 4
+              : module.type === 3 || module.type === 4
               ? module.size
               : module.score.length;
           //console.log(moduleSize, props.sessionSize);

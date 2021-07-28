@@ -5,7 +5,8 @@ function BackgroundGrid(props) {
 
   let grid = [];
 
-  for (let x = 0; x < props.sessionSize * 8; x++) {
+  //for (let x = 0; x < props.sessionSize * 8; x++) {
+  for (let x = 0; x < props.moduleSize * 8; x++) {
     grid.push(
       <div
         style={{
