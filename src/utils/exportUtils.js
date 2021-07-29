@@ -3,6 +3,7 @@ import {
   scheduleChordProgression,
   scheduleMelodyGrid,
   scheduleSamples,
+  schedulePianoRoll,
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
@@ -14,7 +15,9 @@ export const bounceSessionExport = async (
   instruments,
   sessionData,
   setIsReady,
-  sessionSize
+  sessionSize,
+  timeline,
+  timelineMode
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
   let exportDuration = Tone.Transport.loopEnd;
@@ -55,8 +58,10 @@ export const bounceSessionExport = async (
               transport,
               () => {},
               () => {},
-              "",
-              sessionSize
+              module.id,
+              sessionSize,
+              timeline,
+              timelineMode
             );
             break;
           case 1:
@@ -69,8 +74,10 @@ export const bounceSessionExport = async (
               transport,
               () => {},
               () => {},
-              "",
-              sessionSize
+              module.id,
+              sessionSize,
+              timeline,
+              timelineMode
             );
             break;
           case 2:
@@ -83,8 +90,10 @@ export const bounceSessionExport = async (
               transport,
               () => {},
               () => {},
-              "",
-              sessionSize
+              module.id,
+              sessionSize,
+              timeline,
+              timelineMode
             );
             break;
           case 3:
@@ -93,7 +102,29 @@ export const bounceSessionExport = async (
             );
             thisinstrument.volume.value = module.volume;
 
-            scheduleSamples(module.score, thisinstrument, 0, transport, "");
+            scheduleSamples(
+              module.score,
+              thisinstrument,
+              0,
+              transport,
+              module.id
+            );
+            break;
+          case 4:
+            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+
+            thisinstrument.volume.value = module.volume;
+
+            schedulePianoRoll(
+              module.score,
+              thisinstrument,
+              transport,
+              module.id,
+              module.size,
+              sessionSize,
+              timeline,
+              timelineMode
+            );
             break;
         }
         thisinstrument.chain(

@@ -17,7 +17,9 @@ function Exporter(props) {
       props.modulesInstruments,
       sessionData,
       setIsReady,
-      props.sessionSize
+      props.sessionSize,
+      props.timeline,
+      props.timelineMode
     );
   };
 

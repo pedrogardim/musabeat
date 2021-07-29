@@ -971,12 +971,14 @@ function Workspace(props) {
           </Fragment>
         )}
 
-        {!props.hidden && (
+        {!props.hidden && sessionData && (
           <Exporter
             sessionSize={sessionSize}
             sessionData={sessionData}
             modules={modules}
             modulesInstruments={instruments}
+            timeline={sessionData.timeline}
+            timelineMode={timelineMode}
           />
         )}
 
