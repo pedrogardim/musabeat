@@ -73,11 +73,14 @@ function PianoRollNote(props) {
     //console.log(noteY, noteX, noteHeight, noteWidth);
   };
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
     if (props.parentRef.current) {
       updateNotePosition();
     }
   }, [
+    props.parentWidth,
     props.parentRef.current,
     props.fullScreen,
     props.moduleZoom,

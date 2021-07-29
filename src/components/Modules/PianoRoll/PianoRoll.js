@@ -23,7 +23,8 @@ function PianoRoll(props) {
   const [notes, setNotes] = useState(
     props.module.score ? props.module.score : []
   );
-
+  //TEMP: used only for detect window resizing on note component
+  const [parentWidth, setParentWidth] = useState(0);
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
 
   const scheduleEvents = () => {
@@ -128,6 +129,12 @@ function PianoRoll(props) {
   };
 
   useEffect(() => {
+    window.addEventListener("resize", () =>
+      setParentWidth(PRWrapper.current.offsetWidth)
+    );
+  }, []);
+
+  useEffect(() => {
     toggleCursor(Tone.Transport.state);
     //scheduleEvents();
   }, [Tone.Transport.state]);
@@ -224,6 +231,7 @@ function PianoRoll(props) {
             changeNote={changeNote}
             sessionSize={props.sessionSize}
             size={props.module.size}
+            parentWidth={parentWidth}
           />
         ))}
         <Draggable
