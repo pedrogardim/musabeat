@@ -1,6 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import * as Tone from "tone";
 
+import { useParams } from "react-router-dom";
+
 import {
   Typography,
   Dialog,
@@ -35,19 +37,26 @@ function SessionExplorer(props) {
   const [playingSession, setPlayingSession] = useState(null);
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
-  const getSessionList = (value) => {
-    console.log(value);
+  const tag = useParams().key;
+
+  const getSessionList = (name) => {
+    //console.log(keyword);
     const dbRef = props.isUser
       ? firebase
           .firestore()
           .collection("sessions")
           .where("creator", "==", props.user.uid)
-      : value
+      : props.isTag
       ? firebase
           .firestore()
           .collection("sessions")
-          .where("name", ">=", value)
-          .where("name", "<=", value + "\uf8ff")
+          .where("tags", "array-contains", tag.toLowerCase())
+      : name
+      ? firebase
+          .firestore()
+          .collection("sessions")
+          .where("name", ">=", name)
+          .where("name", "<=", name + "\uf8ff")
       : firebase.firestore().collection("sessions");
 
     dbRef.get().then((snapshot) => {
@@ -176,7 +185,8 @@ function SessionExplorer(props) {
 
   return (
     <div className="session-explorer">
-      {!props.isUser && (
+      {props.isTag && <Typography variant="h3">{`Tag: "${tag}"`}</Typography>}
+      {!props.isTag && !props.isUser && (
         <OutlinedInput
           style={{ fontSize: 24 }}
           startAdornment={

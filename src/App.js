@@ -188,6 +188,14 @@ function App() {
               createNewSession={handleCreateNewSession}
             />
           </Route>
+          <Route exact path="/tag/:key">
+            <SessionExplorer
+              isTag
+              createNewSession={handleCreateNewSession}
+              history={history}
+              user={user}
+            />
+          </Route>
           <Route exact path="/admin">
             {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && (
               <AdminDashboard />

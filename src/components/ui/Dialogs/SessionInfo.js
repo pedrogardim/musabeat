@@ -23,7 +23,9 @@ function SessionInfo(props) {
   const [description, setDescription] = useState(props.sessionData.description);
 
   const [tags, setTags] = useState(
-    props.sessionData.tags ? props.sessionData.tags.join(" ") : ""
+    props.sessionData.tags
+      ? props.sessionData.tags.join(" ").map((e) => e.toLowerCase())
+      : ""
   );
 
   const handleSubmit = () => {

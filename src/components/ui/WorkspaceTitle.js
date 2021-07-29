@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
 
 import * as Tone from "tone";
 
@@ -26,6 +27,8 @@ function WorkspaceTitle(props) {
   const [expanded, setExpanded] = useState(false);
   const [infoDialog, setInfoDialog] = useState(false);
 
+  const history = useHistory();
+
   const getSessionTitleInfo = async () => {
     if (typeof props.sessionData.createdOn === "number") {
       let date = new Date(props.sessionData.createdOn * 1000);
@@ -50,7 +53,9 @@ function WorkspaceTitle(props) {
       });
   };
 
-  const handleTagClick = () => {};
+  const handleTagClick = (tag) => {
+    history.push(`/tag/${tag}`);
+  };
 
   const handleTagDelete = (index) => {
     props.setSessionData((prev) => {
@@ -141,7 +146,7 @@ function WorkspaceTitle(props) {
                   key={props.index + e}
                   label={e}
                   variant="outlined"
-                  onClick={handleTagClick}
+                  onClick={() => handleTagClick(e)}
                   onDelete={() => handleTagDelete(i)}
                 />
               ))}

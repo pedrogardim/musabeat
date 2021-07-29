@@ -38,8 +38,6 @@ import {
 
 import { clearEvents } from "../../utils/TransportSchedule";
 
-let autosaverModules;
-
 function Workspace(props) {
   const { t } = useTranslation();
 
