@@ -15,11 +15,15 @@ export const bounceSessionExport = async (
   instruments,
   sessionData,
   setIsReady,
+  setExportProgress,
   sessionSize,
   timeline,
   timelineMode
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
+
+  setIsReady(false);
+
   let exportDuration = Tone.Transport.loopEnd;
 
   let instrumentBuffers = modules.map((module, i) =>
@@ -65,7 +69,13 @@ export const bounceSessionExport = async (
             );
             break;
           case 1:
-            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            if (originalInstrument.name === "Sampler") {
+              thisinstrument = new Tone.Sampler();
+              thisinstrument.set(originalInstrument.get());
+              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+            } else {
+              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            }
             thisinstrument.volume.value = module.volume;
 
             scheduleMelodyGrid(
@@ -81,7 +91,13 @@ export const bounceSessionExport = async (
             );
             break;
           case 2:
-            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            if (originalInstrument.name === "Sampler") {
+              thisinstrument = new Tone.Sampler();
+              thisinstrument.set(originalInstrument.get());
+              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+            } else {
+              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            }
             thisinstrument.volume.value = module.volume;
 
             scheduleChordProgression(
@@ -111,8 +127,13 @@ export const bounceSessionExport = async (
             );
             break;
           case 4:
-            thisinstrument = loadSynthFromGetObject(originalInstrument.get());
-
+            if (originalInstrument.name === "Sampler") {
+              thisinstrument = new Tone.Sampler();
+              thisinstrument.set(originalInstrument.get());
+              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+            } else {
+              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+            }
             thisinstrument.volume.value = module.volume;
 
             schedulePianoRoll(
@@ -134,10 +155,15 @@ export const bounceSessionExport = async (
       }
     });
 
+    transport.scheduleRepeat(() => {
+      setExportProgress(
+        (transport.seconds / (Tone.Time("1m").toSeconds() * sessionSize)) * 100
+      );
+    }, "1m");
     transport.start();
   }, exportDuration).then((e) => {
     let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
-    //console.log(blob);
+    console.log(blob);
 
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);

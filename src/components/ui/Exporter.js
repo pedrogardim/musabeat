@@ -1,27 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-import { Fab, Icon } from "@material-ui/core";
+import { Fab, Icon, CircularProgress } from "@material-ui/core";
 
 import { bounceSessionExport } from "../../utils/exportUtils";
 
 function Exporter(props) {
-  const [isReady, setIsReady] = useState(false);
+  const [isReady, setIsReady] = useState(true);
+  const [exportProgress, setExportProgress] = useState(0);
 
   const modules = props.modules;
   const sessionData = props.sessionData;
 
   const handleButtonClick = () => {
-    setIsReady(false);
-    bounceSessionExport(
-      modules,
-      props.modulesInstruments,
-      sessionData,
-      setIsReady,
-      props.sessionSize,
-      props.timeline,
-      props.timelineMode
-    );
+    if (isReady)
+      bounceSessionExport(
+        modules,
+        props.modulesInstruments,
+        sessionData,
+        setIsReady,
+        setExportProgress,
+        props.sessionSize,
+        props.timeline,
+        props.timelineMode
+      );
   };
+
+  useEffect(() => {
+    console.log(exportProgress);
+  }, [exportProgress]);
 
   return (
     <Fab
@@ -30,7 +36,15 @@ function Exporter(props) {
       tabIndex={-1}
       onClick={handleButtonClick}
     >
-      <Icon>file_download</Icon>
+      {isReady ? (
+        <Icon>file_download</Icon>
+      ) : (
+        <CircularProgress
+          color={"secondary"}
+          variant="determinate"
+          value={exportProgress}
+        />
+      )}
     </Fab>
   );
 }
