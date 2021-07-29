@@ -150,7 +150,7 @@ function PianoRoll(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [props.loaded, props.instrument, props.timeline]);
+  }, [props.loaded, props.instrument, props.timeline, props.module.muted]);
 
   return (
     <div

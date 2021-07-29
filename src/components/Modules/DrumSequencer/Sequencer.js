@@ -125,7 +125,7 @@ function Sequencer(props) {
 
   useEffect(() => {
     scheduleNotes();
-  }, [props.sessionSize, props.timeline]);
+  }, [props.sessionSize, props.timeline, props.module.muted]);
 
   return (
     <div

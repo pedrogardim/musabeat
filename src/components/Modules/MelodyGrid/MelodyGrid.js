@@ -186,7 +186,7 @@ function MelodyGrid(props) {
   useEffect(() => {
     instrument && scheduleNotes();
     //console.log(props.timeline);
-  }, [props.sessionSize, props.timeline]);
+  }, [props.sessionSize, props.timeline, props.module.muted]);
 
   useEffect(() => {
     updateGridRows();

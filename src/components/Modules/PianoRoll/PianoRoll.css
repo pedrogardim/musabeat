@@ -29,6 +29,7 @@
   width: calc(100% - 8px);
   transition: 0.2s;
   left: 4px;
+  user-select: none;
 }
 
 .piano-roll-row-tile {

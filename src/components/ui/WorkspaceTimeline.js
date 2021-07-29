@@ -57,10 +57,17 @@ function WorkspaceTimeline(props) {
       (compact && event.target.className === "ws-timeline-module-tile") ||
       !props.timelineMode
     ) {
-      Tone.Transport.seconds =
+      let newTime =
         ((event.pageX - TLWrapper.current.offsetLeft) /
           TLWrapper.current.offsetWidth) *
         Tone.Transport.loopEnd;
+
+      Tone.Transport.seconds =
+        newTime < 0
+          ? 0
+          : newTime > Tone.Transport.loopEnd
+          ? Tone.Transport.loopEnd
+          : newTime;
     } else if (
       props.timelineMode &&
       event.target.className === "ws-timeline-module-tile"

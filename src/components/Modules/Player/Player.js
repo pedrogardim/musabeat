@@ -177,7 +177,7 @@ function Player(props) {
 
   useEffect(() => {
     scheduleEvents();
-  }, [score, props.instrument, props.timeline]);
+  }, [score, props.instrument, props.timeline, props.module.muted]);
 
   /* useEffect(() => {
     //console.log(props.instrument.buffer);

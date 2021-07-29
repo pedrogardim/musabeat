@@ -149,7 +149,7 @@ function ChordProgression(props) {
 
   useEffect(() => {
     scheduleChords();
-  }, [props.index]);
+  }, [props.index, props.module.muted]);
 
   useEffect(() => {
     props.module.score !== chords && setChords(props.module.score);

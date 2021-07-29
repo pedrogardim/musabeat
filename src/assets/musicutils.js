@@ -284,7 +284,7 @@ export const fxParametersRange = [
   //units
   {
     attack: [0, 2, 0.1],
-    ratio: [1, 30, 1],
+    ratio: [1, 20, 1],
     knee: [0, 40, 1],
     threshold: [-100, 0, 1],
     release: [0, 2, 0.1],
