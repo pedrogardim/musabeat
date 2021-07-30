@@ -78,6 +78,8 @@ function Workspace(props) {
     future: [],
   });
 
+  const [selection, setSelection] = useState([]);
+
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
 
@@ -251,7 +253,6 @@ function Workspace(props) {
         let editors = data.editors;
         //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
-        setAreUnsavedChanges(false);
       });
 
       sessionRef.update({
@@ -509,6 +510,7 @@ function Workspace(props) {
     console.log("session ready!");
     updateMode("simple");
     setIsLoaded(true);
+    setAreUnsavedChanges(true);
   };
 
   const setTimeline = (newTimeline) => {
@@ -635,26 +637,36 @@ function Workspace(props) {
     if (focusedModule == null) return;
     let currentMeasure = Tone.Transport.position.split(":")[0];
     let module = modules[focusedModule];
-    let measureLength = Object.keys(
-      modules[focusedModule].score[currentMeasure]
-    ).length;
 
-    if (module.type !== 0 && module.type !== 1) return;
+    if (module.type === 0 && module.type === 1) {
+      let measureLength = Object.keys(
+        modules[focusedModule].score[currentMeasure]
+      ).length;
+      setModules((prev) => {
+        let newModules = [...prev];
+        newModules[focusedModule].score[currentMeasure] = Object.assign(
+          {},
+          Array(measureLength).fill(0)
+        );
 
-    setModules((prev) => {
-      let newModules = [...prev];
-      newModules[focusedModule].score[currentMeasure] = Object.assign(
-        {},
-        Array(measureLength).fill(0)
+        return newModules;
+      });
+      setSnackbarMessage(
+        `Measure ${currentMeasure + 1} cleared, from module ${
+          focusedModule + 1
+        } "${module.name}"`
       );
-
-      return newModules;
-    });
-    setSnackbarMessage(
-      `Measure ${currentMeasure + 1} cleared, from module ${
-        focusedModule + 1
-      } "${module.name}"`
-    );
+    }
+    if (module.type === 4) {
+      setModules((prev) => {
+        let newModules = [...prev];
+        newModules[focusedModule].score = newModules[
+          focusedModule
+        ].score.filter((e, i) => selection.indexOf(i) === -1);
+        return newModules;
+      });
+      setSelection([]);
+    }
   };
 
   const handleSnackbarClose = () => {
@@ -887,6 +899,8 @@ function Workspace(props) {
                 timeline={sessionData.timeline}
                 timelineMode={sessionData.timeline.on}
                 setTimeline={setTimeline}
+                selection={selection}
+                setSelection={setSelection}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

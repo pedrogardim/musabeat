@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import PianoRollNote from "./PianoRollNote";
+//import SelectBox from "../../ui/SelectBox";
+
 import * as Tone from "tone";
 
 import { Typography } from "@material-ui/core";
@@ -25,6 +27,8 @@ function PianoRoll(props) {
   );
   //TEMP: used only for detect window resizing on note component
   const [parentWidth, setParentWidth] = useState(0);
+  const [selecting, setSelecting] = useState(false);
+
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
 
   const scheduleEvents = () => {
@@ -120,6 +124,18 @@ function PianoRoll(props) {
     });
   };
 
+  const handleKeyPress = (e) => {
+    console.log(e.keyName);
+  };
+
+  const handleMouseDown = (e) => {
+    if (e.target.className === "piano-roll-row-tile") {
+      //console.log("notes cleared!");
+      props.setSelection([]);
+    }
+    setSelecting([e.pageX, e.pageY]);
+  };
+
   const handleMouseOver = (event) => {
     let hoverX =
       (event.nativeEvent.pageX -
@@ -128,10 +144,25 @@ function PianoRoll(props) {
     setHovered(hoverX < 0.5 ? "left" : "right");
   };
 
+  const handleMouseOut = (event) => {
+    setHovered(false);
+    setSelecting(false);
+  };
+
+  const handleMouseUp = (event) => {
+    setSelecting(false);
+  };
+
   useEffect(() => {
     window.addEventListener("resize", () =>
       setParentWidth(PRWrapper.current.offsetWidth)
     );
+
+    return () => {
+      window.removeEventListener("resize", () =>
+        setParentWidth(PRWrapper.current.offsetWidth)
+      );
+    };
   }, []);
 
   useEffect(() => {
@@ -149,8 +180,17 @@ function PianoRoll(props) {
   }, [notes]);
 
   useEffect(() => {
+    setNotes(props.module.score);
+    //console.log(props.module.score);
+  }, [props.module.score]);
+
+  useEffect(() => {
     scheduleEvents();
   }, [props.loaded, props.instrument, props.timeline, props.module.muted]);
+
+  /*  useEffect(() => {
+    console.log(props.selection);
+  }, [props.selection]); */
 
   return (
     <div
@@ -169,8 +209,11 @@ function PianoRoll(props) {
         style={{
           width: props.moduleZoom * 100 + "%",
         }}
+        onKeyDown={handleKeyPress}
+        onMouseDown={handleMouseDown}
         onMouseOver={handleMouseOver}
-        onMouseOut={() => setHovered(false)}
+        onMouseOut={handleMouseOut}
+        onMouseUp={handleMouseUp}
       >
         {Array(12 * 7)
           .fill(0)
@@ -232,6 +275,8 @@ function PianoRoll(props) {
             sessionSize={props.sessionSize}
             size={props.module.size}
             parentWidth={parentWidth}
+            selected={props.selection.includes(i)}
+            setSelection={props.setSelection}
           />
         ))}
         <Draggable

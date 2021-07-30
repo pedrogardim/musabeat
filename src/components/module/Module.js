@@ -348,9 +348,10 @@ function Module(props) {
           setModules={props.setModules}
           moduleZoom={moduleZoom}
           fullScreen={fullScreen}
-          //temp
           timeline={props.timeline}
           timelineMode={props.timelineMode}
+          selection={props.selection}
+          setSelection={props.setSelection}
         />
       );
       break;

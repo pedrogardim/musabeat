@@ -22,9 +22,19 @@ function PianoRollNote(props) {
     alignItems: "center",
     justifyContent: "center",
     border: `solid 1px ${props.color[100]}`,
-    background: props.color[500],
-    color: props.color[100],
+    background: props.selected ? props.color[500] : props.color[300],
+    color: props.selected ? props.color[100] : props.color[800],
     borderRadius: 3,
+  };
+
+  const handleMouseDown = (e) => {
+    props.setSelection((prev) =>
+      e.shiftKey
+        ? prev.includes(props.index)
+          ? prev.filter((e) => e !== props.index)
+          : [...prev, props.index]
+        : [props.index]
+    );
   };
 
   const handleDrag = (event, data) => {
@@ -80,6 +90,8 @@ function PianoRollNote(props) {
       updateNotePosition();
     }
   }, [
+    props.note,
+    props.index,
     props.parentWidth,
     props.parentRef.current,
     props.fullScreen,
@@ -110,10 +122,11 @@ function PianoRollNote(props) {
       onDragStop={handleDragStop}
       onResize={handleResize}
       onResizeStop={handleResizeStop}
+      onMouseDown={handleMouseDown}
       position={notePosition}
       size={{ height: noteHeight, width: noteWidth }}
       bounds={".piano-roll"}
-      dragGrid={[1, noteHeight]}
+      dragGrid={[3, noteHeight]}
       default={{
         x: notePosition.x,
         y: notePosition.y,
