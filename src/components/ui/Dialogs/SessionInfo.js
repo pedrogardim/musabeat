@@ -24,7 +24,7 @@ function SessionInfo(props) {
 
   const [tags, setTags] = useState(
     props.sessionData.tags
-      ? props.sessionData.tags.join(" ").map((e) => e.toLowerCase())
+      ? props.sessionData.tags.map((e) => e.toLowerCase()).join(" ")
       : ""
   );
 

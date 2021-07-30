@@ -100,6 +100,12 @@ function Module(props) {
       return newModules;
     });
 
+    props.instrument.dispose();
+    props.setInstruments((prev) => prev.filter((e, i) => i !== props.index));
+    props.setInstrumentsLoaded((prev) =>
+      prev.filter((e, i) => i !== props.index)
+    );
+
     let newTimeline = { ...props.timeline };
     delete newTimeline[props.module.id];
     props.setTimeline(newTimeline);
