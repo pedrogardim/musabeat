@@ -21,13 +21,12 @@ function Exporter(props) {
         setExportProgress,
         props.sessionSize,
         props.timeline,
-        props.timelineMode
+        props.timelineMode,
+        props.forceReschedule
       );
   };
 
-  useEffect(() => {
-    console.log(exportProgress);
-  }, [exportProgress]);
+  //it's necessary to trigger rescheduling after export
 
   return (
     <Fab

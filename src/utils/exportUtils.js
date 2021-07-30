@@ -18,7 +18,8 @@ export const bounceSessionExport = async (
   setExportProgress,
   sessionSize,
   timeline,
-  timelineMode
+  timelineMode,
+  forceReschedule
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
 
@@ -163,11 +164,12 @@ export const bounceSessionExport = async (
     transport.start();
   }, exportDuration).then((e) => {
     let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
-    console.log(blob);
+    //console.log(blob);
 
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
     downloadURI(url, `${sessionData.name}.wav`);
+    forceReschedule();
     setIsReady(true);
 
     //});

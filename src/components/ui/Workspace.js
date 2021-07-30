@@ -179,7 +179,6 @@ function Workspace(props) {
 
     if (newSessionSize !== sessionSize) {
       setSessionSize(newSessionSize);
-      console.log("Session size updated: " + newSessionSize);
     }
   };
 
@@ -234,22 +233,22 @@ function Workspace(props) {
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
-        let sessionData = snapshot.data();
+        let data = snapshot.data();
         //console.log(snapshot.val().modules + "-----");
-        let data = { ...sessionData };
-        delete data.modules;
-        setSessionData(data);
+        let sessionInfo = { ...data };
+        delete sessionInfo.modules;
+        setSessionData(sessionInfo);
 
-        if (sessionData.hasOwnProperty("modules")) {
-          loadSessionInstruments(sessionData.modules);
-          setModules(sessionData.modules);
+        if (data.hasOwnProperty("modules")) {
+          loadSessionInstruments(data.modules);
+          setModules(data.modules);
         }
 
-        setTimelineMode(sessionData.timeline.on);
+        setTimelineMode(data.timeline.on);
 
-        Tone.Transport.bpm.value = sessionData.bpm;
+        Tone.Transport.bpm.value = data.bpm;
 
-        let editors = sessionData.editors;
+        let editors = data.editors;
         //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
       });
@@ -519,6 +518,12 @@ function Workspace(props) {
 
   const getSessionSizeFromTimeline = () => {
     setSessionSize(sessionData.timeline.size);
+  };
+
+  const forceReschedule = () => {
+    console.log("forceReschedule");
+    setSessionSize(0);
+    timelineMode ? getSessionSizeFromTimeline() : adaptSessionSize();
   };
 
   /*   const changeChecker = (mod, data) => {
@@ -802,6 +807,7 @@ function Workspace(props) {
 
   useEffect(() => {
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
+    console.log("sessionSize", sessionSize);
   }, [sessionSize]);
 
   useEffect(() => {
@@ -971,7 +977,7 @@ function Workspace(props) {
           </Fragment>
         )}
 
-        {!props.hidden && sessionData && (
+        {!props.hidden && isLoaded && sessionData && (
           <Exporter
             sessionSize={sessionSize}
             sessionData={sessionData}
@@ -979,6 +985,7 @@ function Workspace(props) {
             modulesInstruments={instruments}
             timeline={sessionData.timeline}
             timelineMode={timelineMode}
+            forceReschedule={forceReschedule}
           />
         )}
 
