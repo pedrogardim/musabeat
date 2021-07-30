@@ -227,7 +227,8 @@ function PianoRoll(props) {
                   Tone.Frequency(i + 24, "midi")
                     .toNote()
                     .includes("#") && "rgba(0,0,0,0.1)",
-                minHeight: props.fullScreen ? 32 : 16,
+                //minHeight: props.fullScreen ? 32 : 16,
+                minHeight: 16,
               }}
             >
               {hovered && (
