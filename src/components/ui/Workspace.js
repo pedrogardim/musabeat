@@ -894,6 +894,7 @@ function Workspace(props) {
                 sessionSize={sessionSize}
                 setModules={setModules}
                 editMode={editMode}
+                isFocused={focusedModule === moduleIndex}
                 setFocusedModule={setFocusedModule}
                 resetUndoHistory={() => handleUndo("RESET")}
                 timeline={sessionData.timeline}

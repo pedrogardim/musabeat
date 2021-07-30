@@ -106,6 +106,8 @@ function Module(props) {
       prev.filter((e, i) => i !== props.index)
     );
 
+    props.setFocusedModule((prev) => (prev === props.index ? null : prev));
+
     let newTimeline = { ...props.timeline };
     delete newTimeline[props.module.id];
     props.setTimeline(newTimeline);
@@ -414,6 +416,9 @@ function Module(props) {
       <div
         style={{
           backgroundColor: colors[props.module.color][700],
+          boxShadow: props.isFocused
+            ? "0px 2px 6px -1px rgb(0 0 0 / 30%), 0px 1px 6px 0px rgb(0 0 0 / 20%), 0px 1px 5px 0px rgb(0 0 0 / 15%)"
+            : "0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)",
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
