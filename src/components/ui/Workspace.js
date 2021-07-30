@@ -557,6 +557,21 @@ function Workspace(props) {
       setFocusedModule(null);
   };
 
+  const handleSnackbarClose = () => {
+    setSnackbarMessage(null);
+  };
+
+  const togglePlaying = (e) => {
+    e.preventDefault();
+    if (Tone.Transport.state !== "started") {
+      Tone.Transport.start();
+      setIsPlaying(true);
+    } else {
+      Tone.Transport.pause();
+      setIsPlaying(false);
+    }
+  };
+
   const handleCopy = () => {
     if (focusedModule == null) return;
     let currentMeasure = Tone.Transport.position.split(":")[0];
@@ -669,18 +684,41 @@ function Workspace(props) {
     }
   };
 
-  const handleSnackbarClose = () => {
-    setSnackbarMessage(null);
-  };
+  const handleArrowKey = (event) => {
+    event.preventDefault();
+    if (typeof focusedModule === "number") {
+      if (modules[focusedModule].type === 4) {
+        if (event.keyCode === 38) {
+          setModules((prev) => {
+            let newModules = [...prev];
+            selection.forEach(
+              (e, i) =>
+                (newModules[focusedModule].score[e].note = Tone.Frequency(
+                  newModules[focusedModule].score[e].note
+                )
+                  .transpose(event.shiftKey ? 12 : 1)
+                  .toNote())
+            );
 
-  const togglePlaying = (e) => {
-    e.preventDefault();
-    if (Tone.Transport.state !== "started") {
-      Tone.Transport.start();
-      setIsPlaying(true);
-    } else {
-      Tone.Transport.pause();
-      setIsPlaying(false);
+            return newModules;
+          });
+        }
+        if (event.keyCode === 40) {
+          setModules((prev) => {
+            let newModules = [...prev];
+            selection.forEach(
+              (e, i) =>
+                (newModules[focusedModule].score[e].note = Tone.Frequency(
+                  newModules[focusedModule].score[e].note
+                )
+                  .transpose(event.shiftKey ? -12 : -1)
+                  .toNote())
+            );
+
+            return newModules;
+          });
+        }
+      }
     }
   };
 
@@ -711,6 +749,13 @@ function Workspace(props) {
         break;
       case 8:
         handleBackspace();
+        break;
+      case 37:
+      case 38:
+      case 39:
+      case 40:
+        handleArrowKey(e);
+
         break;
       default:
         break;

@@ -91,6 +91,7 @@ function PianoRollNote(props) {
     }
   }, [
     props.note,
+    props.note.note,
     props.index,
     props.parentWidth,
     props.parentRef.current,
