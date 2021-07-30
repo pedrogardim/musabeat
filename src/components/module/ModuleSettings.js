@@ -77,7 +77,7 @@ function ModuleSettings(props) {
             let oldLength = module.score.length;
             let newScore = [];
             for (let x = 0; x < newLength; x++) {
-              newScore[x] = module.score[x % oldLength];
+              newScore[x] = { ...module.score[x % oldLength] };
             }
 
             newModule.score = newScore;
