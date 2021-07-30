@@ -96,6 +96,7 @@ export const TRANSLATIONS_EN = {
     insertName: "Insert name",
     sessionInfo: "Session Info",
     patchName: "Patch Name",
+    unsavedChanges: "Are you sure? Any unsaved changes will not be saved",
   },
   info: {
     name: "Name",

@@ -251,6 +251,7 @@ function Workspace(props) {
         let editors = data.editors;
         //console.log(editors);
         props.user && editors.includes(props.user.uid) && setEditMode(true);
+        setAreUnsavedChanges(false);
       });
 
       sessionRef.update({
@@ -807,7 +808,7 @@ function Workspace(props) {
 
   useEffect(() => {
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
-    console.log("sessionSize", sessionSize);
+    //console.log("sessionSize", sessionSize);
   }, [sessionSize]);
 
   useEffect(() => {
@@ -822,6 +823,12 @@ function Workspace(props) {
 
   useEffect(() => {
     //console.log(areUnsavedChanges);
+    window.onbeforeunload = function (e) {
+      if (!areUnsavedChanges) return;
+      var dialogText = "Dialog text here";
+      e.returnValue = dialogText;
+      return dialogText;
+    };
     if (!props.hidden && isLoaded && !areUnsavedChanges) saveToDatabase();
   }, [areUnsavedChanges]);
 

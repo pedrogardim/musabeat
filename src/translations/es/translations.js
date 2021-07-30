@@ -1,5 +1,5 @@
 export const TRANSLATIONS_ES = {
-  welcome: "Welcome to the tutorial",
+  welcome: "Bienvenido al tutorial",
   sidemenu: {
     newSession: "Crear sesion",
     explore: "Explorar",
@@ -96,6 +96,7 @@ export const TRANSLATIONS_ES = {
     insertName: "Insertar nombre",
     sessionInfo: "Información de la sessión",
     patchName: "Nombre del Patch",
+    unsavedChanges: "¿Estás seguro? Los cambios no guardados se perderán",
   },
   info: {
     name: "Nombre",
