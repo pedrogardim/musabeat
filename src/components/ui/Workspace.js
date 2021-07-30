@@ -689,6 +689,12 @@ function Workspace(props) {
     if (typeof focusedModule === "number") {
       if (modules[focusedModule].type === 4) {
         if (event.keyCode === 38) {
+          for (let x = 0; x < selection.length; x++) {
+            let midiNote = Tone.Frequency(
+              modules[focusedModule].score[x].note
+            ).toMidi();
+            if (midiNote >= 107) return;
+          }
           setModules((prev) => {
             let newModules = [...prev];
             selection.forEach(
@@ -704,6 +710,12 @@ function Workspace(props) {
           });
         }
         if (event.keyCode === 40) {
+          for (let x = 0; x < selection.length; x++) {
+            let midiNote = Tone.Frequency(
+              modules[focusedModule].score[x].note
+            ).toMidi();
+            if (midiNote <= 24) return;
+          }
           setModules((prev) => {
             let newModules = [...prev];
             selection.forEach(
