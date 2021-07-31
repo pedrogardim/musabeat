@@ -121,6 +121,11 @@ function Module(props) {
     });
   };
 
+  //method moved to Workspace
+  /* const handleModuleDuplicate = () => {
+    props.setModules((prev) => [...prev, { ...prev[props.index] }]);
+  }; */
+
   const openMenu = (e) => {
     setMenuAnchorEl(e.currentTarget);
   };
@@ -416,15 +421,14 @@ function Module(props) {
       <div
         style={{
           backgroundColor: colors[props.module.color][700],
-          boxShadow: props.isFocused
-            ? "0px 2px 6px -1px rgb(0 0 0 / 30%), 0px 1px 6px 0px rgb(0 0 0 / 20%), 0px 1px 5px 0px rgb(0 0 0 / 15%)"
-            : "0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)",
           pointerEvents: props.editMode ? "auto" : "none",
         }}
         onClick={() => props.setFocusedModule(props.index)}
-        className={`module ${props.module.muted && " module-muted "} ${
-          fullScreen && " module-fullscreen"
-        } ${!TLVisibility && props.timelineMode && " module-tloff"}`}
+        className={`module ${props.module.muted && "module-muted"} ${
+          fullScreen && "module-fullscreen"
+        } ${!TLVisibility && props.timelineMode && "module-tloff"} ${
+          props.isFocused && "module-focused"
+        }`}
       >
         <div className="module-header">
           {modulePage !== null && (
@@ -529,6 +533,14 @@ function Module(props) {
             >
               <Icon className="module-menu-option-icon">blur_on</Icon>
               {t("module.options.effects")}
+            </MenuItem>
+            <MenuItem
+              onClick={() => props.duplicateModule(props.index)}
+              className="module-menu-option"
+              tabIndex="-1"
+            >
+              <Icon className="module-menu-option-icon">content_copy</Icon>
+              {t("module.options.duplicate")}
             </MenuItem>
             <MenuItem
               className="module-menu-option"

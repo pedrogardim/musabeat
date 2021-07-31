@@ -36,6 +36,7 @@ export const TRANSLATIONS_ES = {
       instrument: "Instrumento",
       settings: "Ajustes",
       effects: "Efectos",
+      duplicate: "Duplicar",
       remove: "Eliminar módulo",
     },
     settings: {

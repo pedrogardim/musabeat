@@ -64,6 +64,11 @@
   display: none;
 }
 
+.module-focused {
+  box-shadow: 0px 2px 6px -1px rgb(0 0 0 / 30%),
+    0px 1px 6px 0px rgb(0 0 0 / 20%), 0px 1px 5px 0px rgb(0 0 0 / 15%);
+}
+
 .module-header {
   height: 30px;
   width: 100%;
@@ -112,10 +117,6 @@
 
 .module-menu-remove-option * {
   color: rgba(255, 9, 9, 0.733) !important;
-}
-
-.hidden {
-  display: none;
 }
 
 .module-innerwrapper {

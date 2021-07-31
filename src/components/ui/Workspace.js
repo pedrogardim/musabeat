@@ -557,6 +557,24 @@ function Workspace(props) {
       setFocusedModule(null);
   };
 
+  const duplicateModule = (index) => {
+    let newModuleId = parseInt(Math.max(...modules.map((e) => e.id))) + 1;
+    setTimeline({
+      ...sessionData.timeline,
+      [newModuleId]: [...sessionData.timeline[index]],
+    });
+    setInstrumentsLoaded((prev) => [...prev, false]);
+    loadNewModuleInstrument(modules[modules.length - 1], modules.length);
+    setModules((prev) => [
+      ...prev,
+      {
+        ...prev[index],
+        id: newModuleId,
+      },
+    ]);
+    handleUndo("RESET");
+  };
+
   const handleSnackbarClose = () => {
     setSnackbarMessage(null);
   };
@@ -959,6 +977,7 @@ function Workspace(props) {
                 setTimeline={setTimeline}
                 selection={selection}
                 setSelection={setSelection}
+                duplicateModule={duplicateModule}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>
