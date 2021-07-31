@@ -119,6 +119,7 @@ function Sequencer(props) {
   useEffect(() => {
     scheduleNotes();
     props.instrument &&
+      props.instrument._buffers &&
       props.loaded &&
       setSoundsMap(Array.from(props.instrument._buffers._buffers.keys()));
   }, [props.instrument, props.loaded]);

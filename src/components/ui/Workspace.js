@@ -361,11 +361,19 @@ function Workspace(props) {
     setInstruments(moduleInstruments);
   };
 
-  const loadNewModuleInstrument = (module, index) => {
+  const loadNewModuleInstrument = (module, index, buffers) => {
     let instrument;
     //console.log("inserting new instrument on" + index);
     if (module.type === 0) {
-      if (typeof module.instrument === "string") {
+      if (buffers) {
+        instrument = new Tone.Players(
+          {},
+          setInstrumentsLoaded((prev) =>
+            prev.map((e, i) => (i === index ? true : e))
+          )
+        ).toDestination();
+        instrument._buffers = buffers;
+      } else if (typeof module.instrument === "string") {
         loadDrumPatch(module.instrument, setInstrumentsLoaded, index).then(
           (r) =>
             setInstruments((prev) => {
@@ -559,12 +567,18 @@ function Workspace(props) {
 
   const duplicateModule = (index) => {
     let newModuleId = parseInt(Math.max(...modules.map((e) => e.id))) + 1;
+    let moduleToCopy = modules[modules.length - 1];
     setTimeline({
       ...sessionData.timeline,
       [newModuleId]: [...sessionData.timeline[index]],
     });
     setInstrumentsLoaded((prev) => [...prev, false]);
-    loadNewModuleInstrument(modules[modules.length - 1], modules.length);
+    let instrumentBuffers = moduleToCopy.type === 0 && moduleToCopy._buffers;
+    loadNewModuleInstrument(
+      modules[modules.length - 1],
+      modules.length,
+      instrumentBuffers
+    );
     setModules((prev) => [
       ...prev,
       {
