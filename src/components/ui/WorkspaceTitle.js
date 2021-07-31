@@ -30,13 +30,11 @@ function WorkspaceTitle(props) {
   const history = useHistory();
 
   const getSessionTitleInfo = async () => {
-    if (typeof props.sessionData.createdOn === "number") {
-      let date = new Date(props.sessionData.createdOn * 1000);
-      let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
-        date.getMonth() + 1
-      }/${date.getFullYear()}`;
-      setCreationDateString(creationDate);
-    }
+    let date = new Date(props.sessionData.createdOn.seconds * 1000);
+    let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
+      date.getMonth() + 1
+    }/${date.getFullYear()}`;
+    setCreationDateString(creationDate);
 
     const getEditorProfiles = async () => {
       return Promise.all(
