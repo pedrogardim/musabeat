@@ -313,6 +313,8 @@ function Module(props) {
           timeline={props.timeline}
           timelineMode={props.timelineMode}
           setTimeline={props.setTimeline}
+          selection={props.selection}
+          setSelection={props.setSelection}
         />
       );
       break;

@@ -595,26 +595,27 @@ function Workspace(props) {
     let currentMeasure = Tone.Transport.position.split(":")[0];
     let module = modules[focusedModule];
 
-    if (module.type !== 0 && module.type !== 1) return;
-
-    let copiedData =
-      module.type === 0 || module.type === 1
-        ? { ...module.score[currentMeasure] }
-        : null;
-    setClipboard([module.type, copiedData]);
-    setSnackbarMessage(
-      `${t("workspace.action.copySuccess")} ${focusedModule + 1} "${
-        module.name
-      }"`
-    );
-
+    if (module.type === 0 || module.type === 1 || module.type === 2) {
+      let copiedData =
+        module.type === 0 || module.type === 1
+          ? { ...module.score[currentMeasure] }
+          : module.type === 2
+          ? { ...module.score[selection] }
+          : null;
+      setClipboard([module.type, copiedData]);
+      setSnackbarMessage(
+        `${t("workspace.actions.copySuccess")} ${focusedModule + 1} "${
+          module.name
+        }"`
+      );
+    }
     //console.log("copied", copiedData);
   };
 
   const handlePaste = () => {
     if (focusedModule == null) return;
     if (!clipboard) {
-      setSnackbarMessage(t("workspace.action.copyPasteEmptyClipboard"));
+      setSnackbarMessage(t("workspace.actions.copyPasteEmptyClipboard"));
       return;
     }
 
@@ -622,47 +623,63 @@ function Workspace(props) {
     let module = modules[focusedModule];
 
     if (clipboard[0] !== module.type) {
-      setSnackbarMessage(t("workspace.action.copyPasteIncompatible"));
+      setSnackbarMessage(t("workspace.actions.copyPasteIncompatible"));
       return;
     }
 
-    if (module.type !== 0 && module.type !== 1) return;
+    if (module.type === 0 || module.type === 1) {
+      let subdivisionChanged = false;
 
-    let subdivisionChanged = false;
+      setModules((prev) => {
+        let newModules = [...prev];
 
-    setModules((prev) => {
-      let newModules = [...prev];
-
-      if (
-        Object.keys(clipboard).length !==
-        Object.keys(newModules[focusedModule].score[currentMeasure]).length
-      ) {
-        newModules[focusedModule].score = newModules[focusedModule].score.map(
-          (e) =>
-            Object.assign(
-              {},
-              adaptSequencetoSubdiv(
-                Object.values(e),
-                Object.keys(clipboard).length
+        if (
+          Object.keys(clipboard).length !==
+          Object.keys(newModules[focusedModule].score[currentMeasure]).length
+        ) {
+          newModules[focusedModule].score = newModules[focusedModule].score.map(
+            (e) =>
+              Object.assign(
+                {},
+                adaptSequencetoSubdiv(
+                  Object.values(e),
+                  Object.keys(clipboard).length
+                )
               )
-            )
-        );
-        subdivisionChanged = true;
-      }
+          );
+          subdivisionChanged = true;
+        }
 
-      newModules[focusedModule].score[currentMeasure] = { ...clipboard[1] };
+        newModules[focusedModule].score[currentMeasure] = { ...clipboard[1] };
 
-      return newModules;
-    });
-    setSnackbarMessage(
-      `${t("workspace.action.pasteSuccess")} ${focusedModule + 1} "${
-        module.name
-      }" ${
-        subdivisionChanged
-          ? `${t("workspace.action.stepsChange")} ${clipboard.length}`
-          : ""
-      }`
-    );
+        return newModules;
+      });
+      setSnackbarMessage(
+        `${t("workspace.actions.pasteSuccessMeasure")} ${focusedModule + 1} "${
+          module.name
+        }" ${
+          subdivisionChanged
+            ? `${t("workspace.actions.stepsChange")} ${clipboard.length}`
+            : ""
+        }`
+      );
+    } else if (module.type === 2) {
+      setModules((prev) => {
+        let newModules = [...prev];
+        newModules[focusedModule].score[selection].notes = [
+          ...clipboard[1].notes,
+        ];
+        newModules[focusedModule].score[selection].rhythm = [
+          ...clipboard[1].rhythm,
+        ];
+        return newModules;
+      });
+      setSnackbarMessage(
+        `${t("workspace.actions.pasteSuccessChord")} ${focusedModule + 1} "${
+          module.name
+        }"`
+      );
+    }
     //console.log("paste", [...clipboard]);
   };
 
@@ -785,7 +802,6 @@ function Workspace(props) {
       case 39:
       case 40:
         handleArrowKey(e);
-
         break;
       default:
         break;

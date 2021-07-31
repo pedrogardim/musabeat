@@ -143,6 +143,7 @@ function ChordProgression(props) {
 
   useEffect(() => {
     setActiveChord(selectedChord);
+    props.setSelection(selectedChord);
   }, [selectedChord]);
 
   //temp fix for unwanted unscheduling
