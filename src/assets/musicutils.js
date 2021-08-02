@@ -757,6 +757,18 @@ export const loadDrumPatch = async (
 
   let patch = (await patchRef.get()).data();
 
+  let urlArray = await Promise.all(
+    Object.keys(patch.urls).map(
+      async (e, i) =>
+        await firebase.storage().ref(patch.urls[e]).getDownloadURL()
+    )
+  );
+
+  let urls = Object.keys(patch.urls).reduce(
+    (acc, curr) => ((acc[curr] = urlArray[curr]), acc),
+    {}
+  );
+
   setInstrumentsLoaded((prev) => {
     //console.log("======LOADED=======")
     let a = [...prev];
@@ -764,7 +776,7 @@ export const loadDrumPatch = async (
     return a;
   });
 
-  let drumPlayers = new Tone.Players(patch.urls, () =>
+  let drumPlayers = new Tone.Players(urls, () =>
     setInstrumentsLoaded((prev) => {
       //console.log("======LOADED=======")
       let a = [...prev];

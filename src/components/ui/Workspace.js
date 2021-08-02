@@ -1008,6 +1008,7 @@ function Workspace(props) {
                 selection={selection}
                 setSelection={setSelection}
                 duplicateModule={duplicateModule}
+                setSnackbarMessage={setSnackbarMessage}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

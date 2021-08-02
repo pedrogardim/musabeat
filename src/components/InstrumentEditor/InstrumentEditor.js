@@ -10,10 +10,11 @@ import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
 import PatchExplorer from "./PatchExplorer";
-
-import { detectPitch } from "../../assets/musicutils";
+import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 
 import { FileDrop } from "react-file-drop";
+
+import { detectPitch } from "../../assets/musicutils";
 
 import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
@@ -21,6 +22,8 @@ import { colors } from "../../utils/materialPalette";
 function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(true);
+
+  const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
@@ -36,71 +39,9 @@ function InstrumentEditor(props) {
   const handleFileDrop = (files, event) => {
     event.preventDefault();
     Tone.Transport.pause();
-    let file = files[0];
-
+    //let file = files[0];
     setDraggingOver(false);
-
-    props.setInstrumentLoaded(false);
-
-    file.arrayBuffer().then((arraybuffer) => {
-      props.instrument.context.rawContext.decodeAudioData(
-        arraybuffer,
-        (audiobuffer) => {
-          if (audiobuffer.duration > 5) {
-            alert("Try importing a smaller audio file");
-            return;
-          }
-
-          let fileName =
-            props.instrument.name === "Sampler"
-              ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
-              : file.name.split(".")[0];
-
-          props.instrument.name === "Players"
-            ? props.instrument.add(
-                fileName,
-                audiobuffer,
-                props.setInstrumentLoaded(true)
-              )
-            : props.intrument.add(
-                Tone.Frequency(detectPitch(audiobuffer)[0]).toNote(),
-                audiobuffer,
-                props.setInstrumentLoaded(true)
-              );
-
-          const user = firebase.auth().currentUser;
-
-          if (user) {
-            const storageRef = firebase
-              .storage()
-              .ref(`/${user.uid}/${file.name.split(".")[0]}`);
-            const task = storageRef.put(file);
-
-            task.on(
-              "state_changed",
-              (snapshot) => {
-                console.log(
-                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                );
-              },
-              (error) => {
-                console.log(error);
-              },
-              () => {
-                storageRef.getDownloadURL().then((r) => {
-                  props.onInstrumentMod(r, fileName);
-                });
-              }
-            );
-          }
-        },
-        (e) => {
-          alert(
-            "Upps.. there was an error decoding your audio file, try to convert it to other format"
-          );
-        }
-      );
-    });
+    setUploadingFiles(files);
   };
 
   const handlePlayersFileDelete = (fileName) => {
@@ -293,6 +234,15 @@ function InstrumentEditor(props) {
           Drop your files here!
         </FileDrop>
       )}
+
+      <FileUploader
+        open={uploadingFiles.length > 0}
+        files={uploadingFiles}
+        setFiles={setUploadingFiles}
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        setInstrumentLoaded={props.setInstrumentLoaded}
+      />
     </div>
   );
 }

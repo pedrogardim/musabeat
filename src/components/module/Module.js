@@ -568,6 +568,7 @@ function Module(props) {
                 setInstrumentLoaded={setInstrumentLoaded}
                 setModulePage={setModulePage}
                 index={props.index}
+                setSnackbarMessage={props.setSnackbarMessage}
               />
             )}
             {modulePage === "fileExplorer" && (
