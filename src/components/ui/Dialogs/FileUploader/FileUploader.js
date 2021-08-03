@@ -23,7 +23,7 @@ function FileUploader(props) {
   const [uploadState, setUploadState] = useState([]);
 
   const onClose = () => {
-    //props.setUploadingFiles([]);
+    props.setUploadingFiles([]);
   };
 
   const uploadFiles = () => {
@@ -51,22 +51,24 @@ function FileUploader(props) {
               //break;
             }
 
-            //add buffer directly to instrument
-            let nameOnInstrument =
+            //set sound label on instrument
+            let labelOnInstrument =
               props.instrument.name === "Sampler"
                 ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
                 : file.name.split(".")[0];
 
-            console.log(nameOnInstrument);
+            console.log(labelOnInstrument);
+
+            //add buffer directly to instrument
 
             props.instrument.name === "Players"
               ? props.instrument.add(
-                  nameOnInstrument,
+                  labelOnInstrument,
                   audiobuffer,
                   () => isLastFile && props.setInstrumentLoaded(true)
                 )
               : props.intrument.add(
-                  nameOnInstrument,
+                  labelOnInstrument,
                   audiobuffer,
                   () => isLastFile && props.setInstrumentLoaded(true)
                 );
@@ -118,7 +120,7 @@ function FileUploader(props) {
                     //update instrument on "modules"
 
                     Boolean(props.onInstrumentMod) &&
-                      props.onInstrumentMod(ref.id, nameOnInstrument);
+                      props.onInstrumentMod(ref.id, labelOnInstrument);
 
                     //add file id to user in db
 
@@ -151,7 +153,7 @@ function FileUploader(props) {
     console.log(props.files);
     if (props.files.length > 0) {
       uploadFiles();
-      setUploadState();
+      setUploadState([]);
     }
   }, [props.files]);
 
@@ -171,7 +173,7 @@ function FileUploader(props) {
         </List>
       </DialogContent>
       <DialogActions>
-        <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>
+        <Button onClick={onClose}>{t("dialogs.cancel")}</Button>
         {/* <Button color="secondary" onClick={handleConfirm}>
           {t("dialogs.delete")}
         </Button> */}

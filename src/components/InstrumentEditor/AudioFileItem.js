@@ -18,8 +18,8 @@ function AudioFileItem(props) {
 
   const handleClick = () => {
     props.instrument.name === "Sampler"
-      ? props.instrument.triggerAttackRelease(props.fileName, "8n")
-      : props.instrument.player(props.fileName).start(0);
+      ? props.instrument.triggerAttackRelease(props.fileLabel, "8n")
+      : props.instrument.player(props.fileLabel).start(0);
   };
 
   useEffect(
@@ -39,9 +39,11 @@ function AudioFileItem(props) {
       </svg>
 
       <ListItemText variant="overline">
-        {isNaN(props.fileName)
-          ? props.fileName
-          : labels[parseInt(props.fileName)]}
+        {(isNaN(props.fileLabel)
+          ? props.fileLabel
+          : labels[parseInt(props.fileLabel)]) +
+          " " +
+          props.fileName}
       </ListItemText>
 
       <ListItemSecondaryAction>
@@ -49,8 +51,8 @@ function AudioFileItem(props) {
           onClick={() =>
             props.handleFileDelete(
               props.instrument.name === "Sampler"
-                ? Tone.Frequency(props.fileName).toMidi()
-                : props.fileName
+                ? Tone.Frequency(props.fileLabel).toMidi()
+                : props.fileLabel
             )
           }
           edge="end"

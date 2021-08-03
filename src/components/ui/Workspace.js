@@ -286,31 +286,20 @@ function Workspace(props) {
       //console.log(instrument)
       //sequencer
       if (module.type === 0) {
-        if (typeof module.instrument === "string") {
-          //console.log(`loading drums: ${module.instrument}`);
-          loadDrumPatch(
-            module.instrument,
-            setInstrumentsLoaded,
-            moduleIndex
-          ).then((r) =>
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[moduleIndex] = r;
-              return a;
-            })
-          );
-        } else {
-          moduleInstruments[moduleIndex] = new Tone.Players(
-            module.instrument.urls,
-            () =>
-              setInstrumentsLoaded((prev) => {
-                let a = [...prev];
-                a[moduleIndex] = true;
-                return a;
-              })
-          ).toDestination();
-        }
+        //console.log(`loading drums: ${module.instrument}`);
+        loadDrumPatch(
+          module.instrument,
+          setInstrumentsLoaded,
+          moduleIndex
+        ).then((r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = r;
+            return a;
+          })
+        );
       }
+
       //player
       else if (module.type === 3) {
         moduleInstruments[moduleIndex] = !!module.instrument.url
@@ -373,7 +362,7 @@ function Workspace(props) {
           )
         ).toDestination();
         instrument._buffers = buffers;
-      } else if (typeof module.instrument === "string") {
+      } else {
         loadDrumPatch(module.instrument, setInstrumentsLoaded, index).then(
           (r) =>
             setInstruments((prev) => {
@@ -382,12 +371,6 @@ function Workspace(props) {
               return a;
             })
         );
-      } else {
-        instrument = new Tone.Players(module.instrument.urls, () =>
-          setInstrumentsLoaded((prev) =>
-            prev.map((e, i) => (i === index ? true : e))
-          )
-        ).toDestination();
       }
     }
     //player

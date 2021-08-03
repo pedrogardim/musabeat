@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useRef } from "react";
+import React, { useState, Fragment, useRef, useEffect } from "react";
 
 import * as Tone from "tone";
 import firebase from "firebase";
@@ -23,6 +23,7 @@ function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(true);
 
+  const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const oscColumn = useRef(null);
@@ -90,6 +91,39 @@ function InstrumentEditor(props) {
     );
   };
 
+  const getFilesName = () => {
+    const getFilesNameFromId = (ids) => {
+      Promise.all(
+        ids.map(async (e, i) => {
+          let filedata = (
+            await firebase.firestore().collection("files").doc(e).get()
+          ).data();
+          return (
+            filedata.name +
+            "." +
+            (filedata.type.replace("audio/", "") === "mpeg" ? "mp3" : "wav")
+          );
+        })
+      ).then((values) => {
+        setFilesName(values);
+        console.log(values);
+      });
+    };
+
+    if (typeof props.module.instrument === "string") {
+      firebase
+        .firestore()
+        .collection(props.module.type === 0 ? "drumpatches" : "patches")
+        .doc(props.module.instrument)
+        .get()
+        .then((r) => {
+          getFilesNameFromId(Object.values(r.get("urls")));
+        });
+    } else {
+      getFilesNameFromId(Object.values(props.module.instrument.urls));
+    }
+  };
+
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
@@ -110,7 +144,8 @@ function InstrumentEditor(props) {
                   instrument={props.instrument}
                   handleFileDelete={handlePlayersFileDelete}
                   buffer={e[0]}
-                  fileName={e[1]}
+                  fileLabel={e[1]}
+                  fileName={filesName[i]}
                 />
                 <Divider />
               </Fragment>
@@ -178,14 +213,10 @@ function InstrumentEditor(props) {
       );
     }
   }
-  /* 
+
   useEffect(() => {
-    setInstrument(props.instrument);
-  }, [props.instrument]); */
-  /* 
-  useEffect(() => {
-    console.log(patchesList);
-  }, [selectedPatch]); */
+    getFilesName();
+  }, []);
 
   return (
     <div
@@ -238,10 +269,11 @@ function InstrumentEditor(props) {
       <FileUploader
         open={uploadingFiles.length > 0}
         files={uploadingFiles}
-        setFiles={setUploadingFiles}
+        setUploadingFiles={setUploadingFiles}
         onInstrumentMod={props.onInstrumentMod}
         instrument={props.instrument}
         setInstrumentLoaded={props.setInstrumentLoaded}
+        setFilesName={setFilesName}
       />
     </div>
   );

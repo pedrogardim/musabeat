@@ -755,7 +755,9 @@ export const loadDrumPatch = async (
   //drum patch with stardard configuration
   let patchRef = firebase.firestore().collection("drumpatches").doc(input);
 
-  let patch = (await patchRef.get()).data();
+  let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
+
+  //console.log(patch);
 
   let urlArray = await Promise.all(
     Object.keys(patch.urls).map(
@@ -764,10 +766,13 @@ export const loadDrumPatch = async (
     )
   );
 
-  let urls = Object.keys(patch.urls).reduce(
-    (acc, curr) => ((acc[curr] = urlArray[curr]), acc),
-    {}
+  //console.log(urlArray);
+
+  let urls = Object.fromEntries(
+    urlArray.map((e, i) => [Object.keys(patch.urls)[i], e])
   );
+
+  //console.log(urls);
 
   setInstrumentsLoaded((prev) => {
     //console.log("======LOADED=======")
