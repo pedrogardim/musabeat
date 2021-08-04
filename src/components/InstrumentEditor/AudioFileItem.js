@@ -40,9 +40,13 @@ function AudioFileItem(props) {
       </svg>
 
       <ListItemText variant="overline">
-        {isNaN(props.fileLabel)
-          ? props.fileLabel
-          : labels[parseInt(props.fileLabel)]}
+        <Typography variant="body2">
+          {isNaN(props.fileLabel)
+            ? props.fileLabel
+            : labels[parseInt(props.fileLabel)]}
+        </Typography>
+        <br />
+
         <Typography variant="overline">{props.fileName}</Typography>
       </ListItemText>
 

@@ -765,6 +765,20 @@ export const loadDrumPatch = async (
 
   //console.log(patch);
 
+  //handle empty urls obj
+
+  if (JSON.stringify(patch.urls) === "{}") {
+    setInstrumentsLoaded((prev) => {
+      //console.log("======LOADED=======")
+      let a = [...prev];
+      a[moduleIndex] = true;
+      return a;
+    });
+    return new Tone.Players();
+  }
+
+  //get urls from file ids
+
   let urlArray = await Promise.all(
     Object.keys(patch.urls).map(
       async (e, i) =>
