@@ -337,6 +337,9 @@ export const instrumentsCategories = ["Keys", "Synth", "Bass", "Pad"];
 
 export const drumCategories = ["Electronic", "Acoustic", "FX", "Ethnic"];
 
+export const fileTypes = ["audio/wav", "audio/mpeg"];
+export const fileExtentions = ["wav", "mp3"];
+
 ////////////////////////////////////////////////////////////////
 //Functions
 ////////////////////////////////////////////////////////////////
@@ -753,7 +756,10 @@ export const loadDrumPatch = async (
   moduleIndex
 ) => {
   //drum patch with stardard configuration
-  let patchRef = firebase.firestore().collection("drumpatches").doc(input);
+  let patchRef =
+    typeof input === "string"
+      ? firebase.firestore().collection("drumpatches").doc(input)
+      : "";
 
   let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
 

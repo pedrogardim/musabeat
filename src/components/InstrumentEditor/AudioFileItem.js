@@ -11,6 +11,7 @@ import {
   IconButton,
   Icon,
   ListItemSecondaryAction,
+  Typography,
 } from "@material-ui/core";
 
 function AudioFileItem(props) {
@@ -39,11 +40,10 @@ function AudioFileItem(props) {
       </svg>
 
       <ListItemText variant="overline">
-        {(isNaN(props.fileLabel)
+        {isNaN(props.fileLabel)
           ? props.fileLabel
-          : labels[parseInt(props.fileLabel)]) +
-          " " +
-          props.fileName}
+          : labels[parseInt(props.fileLabel)]}
+        <Typography variant="overline">{props.fileName}</Typography>
       </ListItemText>
 
       <ListItemSecondaryAction>

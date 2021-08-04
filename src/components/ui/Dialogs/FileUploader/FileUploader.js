@@ -10,13 +10,17 @@ import {
   List,
   ListItem,
   ListItemText,
+  ListItemSecondaryAction,
+  Tooltip,
+  Icon,
+  CircularProgress,
 } from "@material-ui/core";
 
 import * as Tone from "tone";
 import firebase from "firebase";
 
 import { useTranslation } from "react-i18next";
-import { detectPitch } from "../../../../assets/musicutils";
+import { detectPitch, fileTypes } from "../../../../assets/musicutils";
 
 function FileUploader(props) {
   const { t } = useTranslation();
@@ -45,10 +49,15 @@ function FileUploader(props) {
 
             //skip if audio is too large
             if (audiobuffer.duration > 10) {
-              alert(
+              /* alert(
                 `Error on file: "${file.name}" - Try importing a smaller audio file`
-              );
-              //break;
+              ); */
+              setUploadState((prev) => {
+                let newState = [...prev];
+                newState[i] = "importSmallerFile";
+                return newState;
+              });
+              return;
             }
 
             //set sound label on instrument
@@ -58,6 +67,16 @@ function FileUploader(props) {
                 : file.name.split(".")[0];
 
             console.log(labelOnInstrument);
+
+            let labelVersion = 2;
+
+            while (
+              props.instrument.name === "Players" &&
+              props.instrument._buffers._buffers.has(labelOnInstrument)
+            ) {
+              labelOnInstrument = labelOnInstrument + " " + labelVersion;
+              labelVersion++;
+            }
 
             //add buffer directly to instrument
 
@@ -82,66 +101,119 @@ function FileUploader(props) {
               let fileInfo = {
                 name: file.name.split(".")[0],
                 size: file.size,
-                dur: audiobuffer.duration,
+                dur: parseFloat(audiobuffer.duration.toFixed(3)),
                 loaded: 1,
                 user: user.uid,
                 categ: [0, 0, 0],
                 ch: audiobuffer.numberOfChannels,
-                type: file.type,
+                type: fileTypes.indexOf(file.type),
               };
 
               console.log(fileInfo);
 
-              //add file info in database
+              //Prevent duplicated files: check for existing file
+
               const filesRef = firebase.firestore().collection("files");
-              filesRef.add(fileInfo).then((ref) => {
-                //upload file to storage
-                const storageRef = firebase.storage().ref(ref.id);
-                const task = storageRef.put(file);
 
-                task.on(
-                  "state_changed",
-                  (snapshot) => {
-                    setUploadState((prev) => {
-                      let newState = [...prev];
-                      newState[i] =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                      return newState;
-                    });
-                  },
-                  (error) => {
-                    console.log(error);
-                    filesRef.doc(ref.id).remove();
-                    //break;
-                  },
-                  () => {
-                    /////IF UPLOAD SUCCEDS
+              filesRef
+                .where("dur", "==", fileInfo.dur)
+                .where("user", "==", user.uid)
+                .where("size", "==", file.size)
+                .get()
+                .then((result) => {
+                  //no matches to uploaded file, then upload it
+                  if (result.empty) {
+                    filesRef.add(fileInfo).then((ref) => {
+                      //upload file to storage
+                      const storageRef = firebase.storage().ref(ref.id);
+                      const task = storageRef.put(file);
 
-                    //update instrument on "modules"
+                      task.on(
+                        "state_changed",
+                        (snapshot) => {
+                          setUploadState((prev) => {
+                            let newState = [...prev];
+                            newState[i] =
+                              (snapshot.bytesTransferred /
+                                snapshot.totalBytes) *
+                              100;
+                            return newState;
+                          });
+                        },
+                        (error) => {
+                          console.log(error);
+                          filesRef.doc(ref.id).remove();
 
-                    Boolean(props.onInstrumentMod) &&
-                      props.onInstrumentMod(ref.id, labelOnInstrument);
+                          setUploadState((prev) => {
+                            let newState = [...prev];
+                            newState[i] = "uploadError";
+                            return newState;
+                          });
 
-                    //add file id to user in db
+                          return;
+                        },
+                        () => {
+                          /////IF UPLOAD SUCCEDS
 
-                    const userRef = firebase
-                      .firestore()
-                      .collection("users")
-                      .doc(user.uid);
+                          //update instrument on "modules"
 
-                    userRef.update({
-                      files: firebase.firestore.FieldValue.arrayUnion(ref.id),
+                          Boolean(props.onInstrumentMod) &&
+                            props.onInstrumentMod(ref.id, labelOnInstrument);
+
+                          //add file id to user in db
+
+                          const userRef = firebase
+                            .firestore()
+                            .collection("users")
+                            .doc(user.uid);
+
+                          userRef.update({
+                            files: firebase.firestore.FieldValue.arrayUnion(
+                              ref.id
+                            ),
+                          });
+                        }
+                      );
                     });
                   }
-                );
-              });
+                  //the file is already uploaded to server, get its id
+                  else {
+                    let fileid = result.docs[0].id;
+
+                    console.log(result.docs, fileid);
+
+                    firebase
+                      .firestore()
+                      .collection("files")
+                      .doc(fileid)
+                      .update({
+                        loaded: firebase.firestore.FieldValue.increment(1),
+                      });
+
+                    Boolean(props.onInstrumentMod) &&
+                      props.onInstrumentMod(fileid, labelOnInstrument);
+
+                    setUploadState((prev) => {
+                      let newState = [...prev];
+                      newState[i] = "duplicatedFound";
+                      return newState;
+                    });
+                  }
+                });
+
+              //add file info in database
             }
           },
           (e) => {
-            alert(
+            /* alert(
               `Error on file "${file.name}" - There was an error decoding your audio file, try to convert it to other format`
-            );
-            //break;
+            ); */
+            setUploadState((prev) => {
+              let newState = [...prev];
+              newState[i] = "decodingError";
+              return newState;
+            });
+            return;
           }
         );
       });
@@ -157,9 +229,13 @@ function FileUploader(props) {
     }
   }, [props.files]);
 
+  useEffect(() => {
+    console.log(uploadState);
+  }, [uploadState]);
+
   return (
     <Dialog open={props.open} onClose={onClose}>
-      <DialogTitle>{t("dialogs.areYouSure")}</DialogTitle>
+      <DialogTitle>Uploading:</DialogTitle>
       <DialogContent>
         <List>
           {Array(props.files.length)
@@ -167,7 +243,33 @@ function FileUploader(props) {
             .map((e, i) => (
               <ListItem divider>
                 <ListItemText primary={props.files[i].name} />
-                {}
+                <ListItemSecondaryAction>
+                  <Tooltip title={uploadState}>
+                    {typeof uploadState[i] === "number" ||
+                    uploadState[i] !== 100 ? (
+                      <CircularProgress
+                        variant={
+                          uploadState[i] === 0 ? "indeterminate" : "determinate"
+                        }
+                        value={uploadState}
+                      />
+                    ) : (
+                      <Icon>
+                        {uploadState[i] === 100
+                          ? "done"
+                          : uploadState[i] === "uploadError"
+                          ? "error"
+                          : uploadState[i] === "duplicatedFound"
+                          ? "done_all"
+                          : uploadState[i] === "importSmallerFile"
+                          ? "warning"
+                          : uploadState[i] === "decodingError"
+                          ? "warning"
+                          : uploadState[i]}
+                      </Icon>
+                    )}
+                  </Tooltip>
+                </ListItemSecondaryAction>
               </ListItem>
             ))}
         </List>

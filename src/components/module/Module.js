@@ -387,6 +387,8 @@ function Module(props) {
         ...effects.filter((e) => e !== false),
         Tone.Destination
       );
+
+    //console.log(props.instrument);
   }, [props.instrument, effects]);
 
   useEffect(() => {

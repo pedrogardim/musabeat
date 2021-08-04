@@ -14,7 +14,11 @@ import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 
 import { FileDrop } from "react-file-drop";
 
-import { detectPitch } from "../../assets/musicutils";
+import {
+  detectPitch,
+  fileTypes,
+  fileExtentions,
+} from "../../assets/musicutils";
 
 import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
@@ -93,20 +97,18 @@ function InstrumentEditor(props) {
 
   const getFilesName = () => {
     const getFilesNameFromId = (ids) => {
+      let labelsWithFilename = { ...ids };
       Promise.all(
-        ids.map(async (e, i) => {
+        Object.keys(ids).map(async (e, i) => {
           let filedata = (
-            await firebase.firestore().collection("files").doc(e).get()
+            await firebase.firestore().collection("files").doc(ids[e]).get()
           ).data();
-          return (
-            filedata.name +
-            "." +
-            (filedata.type.replace("audio/", "") === "mpeg" ? "mp3" : "wav")
-          );
+          labelsWithFilename[e] = filedata.name + "." + filedata.type;
+          return filedata.name + "." + fileExtentions[parseInt(filedata.type)];
         })
       ).then((values) => {
-        setFilesName(values);
-        console.log(values);
+        setFilesName(labelsWithFilename);
+        //console.log(labelsWithFilename);
       });
     };
 
@@ -117,10 +119,10 @@ function InstrumentEditor(props) {
         .doc(props.module.instrument)
         .get()
         .then((r) => {
-          getFilesNameFromId(Object.values(r.get("urls")));
+          getFilesNameFromId(r.get("urls"));
         });
     } else {
-      getFilesNameFromId(Object.values(props.module.instrument.urls));
+      getFilesNameFromId(props.module.instrument.urls);
     }
   };
 
@@ -145,7 +147,7 @@ function InstrumentEditor(props) {
                   handleFileDelete={handlePlayersFileDelete}
                   buffer={e[0]}
                   fileLabel={e[1]}
-                  fileName={filesName[i]}
+                  fileName={filesName[e[1]]}
                 />
                 <Divider />
               </Fragment>
