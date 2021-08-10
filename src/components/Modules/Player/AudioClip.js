@@ -74,6 +74,9 @@ function AudioClip(props) {
     //watch to window resize to update clips position
 
     window.addEventListener("resize", updateClipPosition);
+    return () => {
+      window.removeEventListener("resize", updateClipPosition);
+    };
   }, []);
 
   useEffect(() => {

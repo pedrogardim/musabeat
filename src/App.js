@@ -23,6 +23,8 @@ import logo from "./assets/img/logo.svg";
 import Workspace from "./components/ui/Workspace";
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
+import FilePage from "./components/ui/FileExplorer/FilePage";
+
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/AuthDialog";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
@@ -179,6 +181,9 @@ function App() {
           </Route>
           <Route exact path="/files">
             <FileExplorer />
+          </Route>
+          <Route exact path="/file/:key">
+            <FilePage />
           </Route>
           <Route exact path="/session/:key">
             <Workspace

@@ -281,6 +281,7 @@ function Player(props) {
           onStart={handleCursorDragStart}
           onStop={handleCursorDragStop}
           position={{ x: cursorPosition, y: 0 }}
+          bounds=".sampler"
         >
           <div
             className="sampler-cursor"

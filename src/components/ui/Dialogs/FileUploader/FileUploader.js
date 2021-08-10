@@ -105,6 +105,7 @@ function FileUploader(props) {
                 size: file.size,
                 dur: parseFloat(audiobuffer.duration.toFixed(3)),
                 loaded: 1,
+                downloaded: 0,
                 user: user.uid,
                 categ: [0, 0, 0],
                 ch: audiobuffer.numberOfChannels,
