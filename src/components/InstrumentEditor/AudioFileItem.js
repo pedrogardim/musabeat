@@ -17,7 +17,12 @@ import {
 function AudioFileItem(props) {
   const [wavePath, setWavePath] = useState("");
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    if (
+      e.target.className.indexOf("label") !== -1 ||
+      e.target.className.indexOf("filename") !== -1
+    )
+      return;
     props.instrument.name === "Sampler"
       ? props.instrument.triggerAttackRelease(props.fileLabel, "8n")
       : props.instrument.player(props.fileLabel).start(0);
@@ -40,14 +45,19 @@ function AudioFileItem(props) {
       </svg>
 
       <ListItemText variant="overline">
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          className="audio-file-item-label"
+          onClick={() => props.setRenamingLabel(props.fileLabel)}
+        >
           {isNaN(props.fileLabel)
             ? props.fileLabel
             : labels[parseInt(props.fileLabel)]}
         </Typography>
         <br />
-
-        <Typography variant="overline">{props.fileName}</Typography>
+        <Typography className="audio-file-item-filename" variant="overline">
+          {props.fileName}
+        </Typography>
       </ListItemText>
 
       <ListItemSecondaryAction>

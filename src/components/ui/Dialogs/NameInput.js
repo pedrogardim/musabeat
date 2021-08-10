@@ -9,6 +9,8 @@ import {
   TextField,
 } from "@material-ui/core";
 
+import { labels } from "../../../assets/drumkits";
+
 import { useTranslation } from "react-i18next";
 
 function NameInput(props) {
@@ -25,7 +27,7 @@ function NameInput(props) {
     <Dialog open="true" onClose={props.onClose}>
       <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
-        <TextField ref={inputRef}></TextField>
+        <TextField ref={inputRef} />
       </DialogContent>
       <DialogActions>
         <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>

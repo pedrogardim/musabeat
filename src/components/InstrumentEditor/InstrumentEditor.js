@@ -11,6 +11,7 @@ import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
 import PatchExplorer from "./PatchExplorer";
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
+import NameInput from "../ui/Dialogs/NameInput";
 
 import { FileDrop } from "react-file-drop";
 
@@ -29,6 +30,8 @@ function InstrumentEditor(props) {
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
+
+  const [renamingLabel, setRenamingLabel] = useState(null);
 
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
@@ -103,7 +106,8 @@ function InstrumentEditor(props) {
           let filedata = (
             await firebase.firestore().collection("files").doc(ids[e]).get()
           ).data();
-          labelsWithFilename[e] = filedata.name + "." + filedata.type;
+          labelsWithFilename[e] =
+            filedata.name + "." + fileExtentions[parseInt(filedata.type)];
           return filedata.name + "." + fileExtentions[parseInt(filedata.type)];
         })
       ).then((values) => {
@@ -124,6 +128,88 @@ function InstrumentEditor(props) {
     } else {
       getFilesNameFromId(props.module.instrument.urls);
     }
+  };
+
+  const renamePlayersLabel = (input, newName) => {
+    let labelName = !isNaN(input) ? parseInt(input) : input;
+    console.log(labelName, newName);
+
+    let drumMap = props.instrument._buffers._buffers;
+    if (drumMap.has(newName)) return;
+    drumMap.set(newName, drumMap.get(input));
+    drumMap.delete(input);
+    if (typeof props.module.instrument === "string") {
+      firebase
+        .firestore()
+        .collection("drumpatches")
+        .doc(props.module.instrument)
+        .get()
+        .then((urls) => {
+          setFilesName((prev) => {
+            let newFileNames = { ...prev };
+            newFileNames[newName] = newFileNames[labelName];
+            delete newFileNames[labelName];
+            return newFileNames;
+          });
+
+          let urlsObj = urls.data().urls;
+          urlsObj[newName] = urlsObj[labelName];
+          delete urlsObj[labelName];
+
+          props.setModules((prev) => {
+            let newModules = [...prev];
+            newModules[props.index].instrument = { urls: urlsObj };
+
+            newModules[props.index].score.forEach((measure, msreIndex) => {
+              Object.keys(measure).forEach((key) => {
+                if (measure[key] !== 0) {
+                  newModules[props.index].score[msreIndex][key] = measure[
+                    key
+                  ].map((e) => (e === labelName ? newName : e));
+                }
+              });
+            });
+
+            return newModules;
+          });
+        });
+    } else {
+      setFilesName((prev) => {
+        let newFileNames = { ...prev };
+        newFileNames[newName] = newFileNames[labelName];
+        delete newFileNames[labelName];
+        return newFileNames;
+      });
+
+      let urlsObj = { ...props.module.instrument.urls };
+      urlsObj[newName] = urlsObj[labelName];
+      delete urlsObj[labelName];
+
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].instrument = { urls: urlsObj };
+        newModules[props.index].score.forEach((measure, msreIndex) => {
+          console.log(measure);
+          Object.keys(measure).forEach((key) => {
+            console.log(
+              measure[key],
+              labelName,
+              measure[key].includes(labelName)
+            );
+            if (measure[key] !== 0 && measure[key].includes(labelName)) {
+              newModules[props.index].score[msreIndex][key] = measure[key].map(
+                (e) => {
+                  console.log(e, labelName, newName);
+                  return e == labelName ? newName : e;
+                }
+              );
+            }
+          });
+        });
+        return newModules;
+      });
+    }
+    setRenamingLabel(null);
   };
 
   let mainContent = "Nothing Here";
@@ -148,6 +234,7 @@ function InstrumentEditor(props) {
                   buffer={e[0]}
                   fileLabel={e[1]}
                   fileName={filesName[e[1]]}
+                  setRenamingLabel={setRenamingLabel}
                 />
                 <Divider />
               </Fragment>
@@ -276,7 +363,17 @@ function InstrumentEditor(props) {
         instrument={props.instrument}
         setInstrumentLoaded={props.setInstrumentLoaded}
         setFilesName={setFilesName}
+        renamePlayersLabel={renamePlayersLabel}
       />
+
+      {renamingLabel !== null && (
+        <NameInput
+          select
+          open={renamingLabel !== null}
+          onClose={() => setRenamingLabel(null)}
+          onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}
+        />
+      )}
     </div>
   );
 }

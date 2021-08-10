@@ -93,7 +93,7 @@ function ModulePicker(props) {
       muted: false,
       instrument:
         selectedType === 0
-          ? "FSnt2y846yp8Q0RfM7V9"
+          ? "8fsbChTqV7aaWNyI1hTC"
           : selectedType === 3
           ? {
               url: "",

@@ -5,3 +5,13 @@
 .audio-file-item-waveform {
   margin: 0px 8px;
 }
+
+.audio-file-item-label:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.audio-file-item-filename:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
