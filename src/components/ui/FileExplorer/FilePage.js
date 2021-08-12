@@ -39,7 +39,8 @@ function FilePage(props) {
 
   const [player, setPlayer] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+  const [creatorInfo, setCreatorInfo] = useState(null);
+  const [isFileLiked, setIsFileLiked] = useState(null);
 
   const [downloadUrl, setDownloadUrl] = useState(null);
 
@@ -54,6 +55,10 @@ function FilePage(props) {
   const [currentPlaying, setCurrentPlaying] = useState(null);
 
   const fileKey = useParams().key;
+
+  const usersRef = firebase.firestore().collection("users");
+  const fileInfoRef = firebase.firestore().collection("files").doc(fileKey);
+  const user = firebase.auth().currentUser;
 
   const updateClipPosition = () => {
     //if (!fileInfo || waveformWrapper.current === null) return;
@@ -108,7 +113,7 @@ function FilePage(props) {
   };
 
   const togglePlaying = () => {
-    console.log(Tone.Transport.state);
+    //console.log(Tone.Transport.state);
 
     if (Tone.Transport.state !== "started") {
       Tone.Transport.start();
@@ -119,9 +124,6 @@ function FilePage(props) {
   };
 
   const getFileInfo = () => {
-    const usersRef = firebase.firestore().collection("users");
-    const fileInfoRef = firebase.firestore().collection("files").doc(fileKey);
-
     fileInfoRef.get().then((r) => {
       setFileInfo(r.data());
       Tone.Transport.loop = false;
@@ -136,7 +138,7 @@ function FilePage(props) {
         .doc(r.get("user"))
         .get()
         .then((user) => {
-          setUserInfo(user.data());
+          setCreatorInfo(user.data());
         });
     });
 
@@ -153,6 +155,14 @@ function FilePage(props) {
           drawFileWave(player.buffer, clipHeight, clipWidth); */
         setPlayer(newPlayer);
       });
+
+    //liked by user
+    if (user) {
+      usersRef
+        .doc(user.uid)
+        .get()
+        .then((r) => setIsFileLiked(r.data().likedFiles.includes(fileKey)));
+    }
   };
 
   const handleDownload = () => {
@@ -180,6 +190,9 @@ function FilePage(props) {
     };
     xhr.open("GET", downloadUrl);
     xhr.send();
+    fileInfoRef.update({
+      dl: firebase.firestore.FieldValue.increment(1),
+    });
 
     /* var xhr = new XMLHttpRequest();
     xhr.responseType = "blob";
@@ -189,6 +202,56 @@ function FilePage(props) {
     xhr.open("GET", downloadUrl);
     xhr.send(); */
   };
+
+  const handleUserLike = () => {
+    if (!isFileLiked) {
+      //file is not liked
+      setIsFileLiked(true);
+      setFileInfo((prev) => {
+        let newFileInfo = { ...prev };
+        newFileInfo.likes++;
+        return newFileInfo;
+      });
+      fileInfoRef.update({
+        likes: firebase.firestore.FieldValue.increment(1),
+      });
+      usersRef.doc(user.uid).update({
+        likedFiles: firebase.firestore.FieldValue.arrayUnion(fileKey),
+      });
+    } else {
+      setIsFileLiked(false);
+      setFileInfo((prev) => {
+        let newFileInfo = { ...prev };
+        newFileInfo.likes--;
+        return newFileInfo;
+      });
+      fileInfoRef.update({
+        likes: firebase.firestore.FieldValue.increment(-1),
+      });
+      usersRef.doc(user.uid).update({
+        likedFiles: firebase.firestore.FieldValue.arrayRemove(fileKey),
+      });
+    }
+  };
+
+  /* const huehue = () => {
+    firebase
+      .firestore()
+      .collection("files")
+      .get()
+      .then((r) =>
+        r.forEach((e) => {
+          r.forEach((e) => {
+            firebase
+              .firestore()
+              .collection("files")
+              .doc(e.id)
+              .update({ dl: 0 })
+              .then(console.log("done on file " + e.id));
+          });
+        })
+      );
+  }; */
 
   useEffect(() => {
     //console.log(player);
@@ -224,11 +287,11 @@ function FilePage(props) {
         {fileInfo ? `${fileInfo.name}.${fileExtentions[fileInfo.type]}` : "..."}
       </Typography>
       <div className="break" />
-      {userInfo && (
-        <Tooltip title={userInfo.profile.displayName}>
+      {creatorInfo && (
+        <Tooltip title={creatorInfo.profile.displayName}>
           <Avatar
-            alt={userInfo.profile.displayName}
-            src={userInfo.profile.photoURL}
+            alt={creatorInfo.profile.displayName}
+            src={creatorInfo.profile.photoURL}
           />
         </Tooltip>
       )}
@@ -270,6 +333,16 @@ function FilePage(props) {
         <IconButton onClick={handleDownload}>
           <Icon>download</Icon>
         </IconButton>
+
+        <Tooltip title={fileInfo && fileInfo.likes}>
+          <IconButton onClick={handleUserLike}>
+            <Icon color={isFileLiked ? "secondary" : "inherit"}>favorite</Icon>
+          </IconButton>
+        </Tooltip>
+
+        {/* <IconButton onClick={huehue}>
+          <Icon>manage_accounts</Icon>
+        </IconButton> */}
       </div>
       <div className="file-info"></div>
     </div>
