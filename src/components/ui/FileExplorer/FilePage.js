@@ -9,12 +9,8 @@ import { useParams } from "react-router-dom";
 
 import {
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Chip,
+  Grid,
   CircularProgress,
   Icon,
   IconButton,
@@ -28,19 +24,22 @@ import {
 
 import "./FilePage.css";
 
-import { fileExtentions } from "../../../assets/musicutils";
+import { fileExtentions, soundChannels } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
 import { get } from "jquery";
 const waveColor = colors[2];
 
 function FilePage(props) {
+  const { t } = useTranslation();
+
   const waveformWrapper = useRef(null);
 
   const [player, setPlayer] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
   const [creatorInfo, setCreatorInfo] = useState(null);
   const [isFileLiked, setIsFileLiked] = useState(null);
+  const [uploadDateString, setUploadDateString] = useState(null);
 
   const [downloadUrl, setDownloadUrl] = useState(null);
 
@@ -126,6 +125,11 @@ function FilePage(props) {
   const getFileInfo = () => {
     fileInfoRef.get().then((r) => {
       setFileInfo(r.data());
+      let date = new Date(r.data().upOn.seconds * 1000);
+      let creationDate = `${t("misc.uploadedOn")} ${date.getDate()}/${
+        date.getMonth() + 1
+      }/${date.getFullYear()}`;
+      setUploadDateString(creationDate);
       Tone.Transport.loop = false;
       Tone.Transport.setLoopPoints(0, r.data().dur);
       //console.log(0, r.data().dur);
@@ -234,27 +238,27 @@ function FilePage(props) {
     }
   };
 
-  /* const huehue = () => {
+  const huehue = () => {
     firebase
       .firestore()
       .collection("files")
       .get()
       .then((r) =>
         r.forEach((e) => {
-          r.forEach((e) => {
-            firebase
-              .firestore()
-              .collection("files")
-              .doc(e.id)
-              .update({ dl: 0 })
-              .then(console.log("done on file " + e.id));
-          });
+          firebase
+            .firestore()
+            .collection("files")
+            .doc(e.id)
+            .update({
+              upOn: firebase.firestore.FieldValue.serverTimestamp(),
+            })
+            .then(console.log("done on file " + e.id));
         })
       );
-  }; */
+  };
 
   useEffect(() => {
-    //console.log(player);
+    console.log(player);
     if (isLoaded) drawFileWave(player.buffer, clipHeight, clipWidth);
   }, [clipHeight, clipWidth, isLoaded]);
 
@@ -323,6 +327,17 @@ function FilePage(props) {
 
       <div className="break" />
 
+      {fileInfo &&
+        fileInfo.categ.map((e, i) => (
+          <Chip
+            style={{ margin: "0px 4px" }}
+            key={`pfcc${i}`}
+            label={e}
+            variant="outlined"
+          />
+        ))}
+      <div className="break" />
+
       <div className="player-controls">
         <IconButton onClick={togglePlaying}>
           <Icon>
@@ -344,7 +359,47 @@ function FilePage(props) {
           <Icon>manage_accounts</Icon>
         </IconButton> */}
       </div>
-      <div className="file-info"></div>
+      <div className="break" />
+
+      {fileInfo && (
+        <Grid
+          container
+          spacing={1}
+          style={{ width: "40%" }}
+          className="file-info"
+        >
+          {isLoaded && (
+            <Grid item xs={6} sm={3}>
+              <Paper className="file-info-card">
+                <Typography variant="overline">
+                  {soundChannels[player._buffer.numberOfChannels] ||
+                    player._buffer.numbesrOfChannels ||
+                    "Multichannel"}
+                  <br />
+                  {player._buffer.sampleRate + " Hz"}
+                </Typography>
+              </Paper>
+            </Grid>
+          )}
+          <Grid item xs={6} sm={3}>
+            <Paper className="file-info-card">
+              <Typography variant="overline">
+                {formatBytes(fileInfo.size)}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Paper className="file-info-card">
+              <Typography variant="overline">{fileInfo.dur + " s"}</Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6} sm={3}>
+            <Paper className="file-info-card">
+              <Typography variant="overline">{uploadDateString}</Typography>
+            </Paper>
+          </Grid>
+        </Grid>
+      )}
     </div>
   );
 }
@@ -375,3 +430,14 @@ const drawFileWave = (buffer, h, w) => {
 };
 
 export default FilePage;
+
+function formatBytes(a, b = 2) {
+  if (0 === a) return "0 Bytes";
+  const c = 0 > b ? 0 : b,
+    d = Math.floor(Math.log(a) / Math.log(1024));
+  return (
+    parseFloat((a / Math.pow(1024, d)).toFixed(c)) +
+    " " +
+    ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+  );
+}

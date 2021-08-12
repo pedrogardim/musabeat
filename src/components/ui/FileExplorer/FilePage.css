@@ -22,5 +22,24 @@
   overflow: hidden;
 
   height: 30%;
+  width: 40vw !important;
+}
+
+.file-info {
+  height: 64px;
+
   width: 40%;
+}
+
+/* .file-info > div {
+  
+} */
+
+.file-info-card {
+  height: 100% !important;
+  width: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }

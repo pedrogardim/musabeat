@@ -111,6 +111,7 @@ function FileUploader(props) {
                 categ: [0, 0, 0],
                 ch: audiobuffer.numberOfChannels,
                 type: fileTypes.indexOf(file.type),
+                upOn: firebase.firestore.FieldValue.serverTimestamp(),
               };
 
               console.log(fileInfo);

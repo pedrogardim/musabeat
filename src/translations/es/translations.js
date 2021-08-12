@@ -81,7 +81,8 @@ export const TRANSLATIONS_ES = {
     empty: "No hay Patches aquí..",
   },
   misc: {
-    createdOn: "Creado en",
+    createdOn: "Creado el",
+    uploadedOn: "Subido el",
     saveChanges: "Guardar cambios",
     changesSaved: "Cambios guardados",
     allCategories: "Todas las Categorías",

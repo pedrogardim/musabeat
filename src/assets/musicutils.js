@@ -339,6 +339,8 @@ export const drumCategories = ["Electronic", "Acoustic", "FX", "Ethnic"];
 
 export const fileTypes = ["audio/wav", "audio/mpeg"];
 export const fileExtentions = ["wav", "mp3"];
+export const soundChannels = { 0: "Mono", 1: "Mono", 2: "Stereo" };
+// 0:Mono => Solution for Tone.audiobuffer.numberOfChannels bug
 
 ////////////////////////////////////////////////////////////////
 //Functions
