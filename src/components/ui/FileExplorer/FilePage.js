@@ -41,12 +41,14 @@ function FilePage(props) {
   const [fileInfo, setFileInfo] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
-  const [donwloadUrl, setDownloadUrl] = useState(null);
+  const [downloadUrl, setDownloadUrl] = useState(null);
 
   const [clipHeight, setClipHeight] = useState(0);
   const [clipWidth, setClipWidth] = useState(0);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
+
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
@@ -54,24 +56,26 @@ function FilePage(props) {
   const fileKey = useParams().key;
 
   const updateClipPosition = () => {
-    if (!fileInfo || waveformWrapper.current === null) return;
+    //if (!fileInfo || waveformWrapper.current === null) return;
     setClipWidth(waveformWrapper.current.offsetWidth);
     setClipHeight(waveformWrapper.current.offsetHeight);
   };
 
   const toggleCursor = (state) => {
     clearInterval(cursorAnimator);
-    setCursorAnimator(
-      setInterval(() => {
-        //temp fix
-        fileInfo &&
-          waveformWrapper.current !== null &&
-          setCursorPosition(
-            (Tone.Transport.seconds / fileInfo.dur) *
-              waveformWrapper.current.offsetWidth
-          );
-      }, 32)
-    );
+    fileInfo &&
+      setCursorAnimator(
+        setInterval(() => {
+          //console.log(fileInfo, waveformWrapper.current);
+          //temp fix
+          fileInfo &&
+            waveformWrapper.current !== null &&
+            setCursorPosition(
+              (Tone.Transport.seconds / fileInfo.dur) *
+                waveformWrapper.current.offsetWidth
+            );
+        }, 32)
+      );
   };
 
   const scheduleEvents = (atRestart) => {
@@ -104,6 +108,8 @@ function FilePage(props) {
   };
 
   const togglePlaying = () => {
+    console.log(Tone.Transport.state);
+
     if (Tone.Transport.state !== "started") {
       Tone.Transport.start();
     } else {
@@ -120,7 +126,7 @@ function FilePage(props) {
       setFileInfo(r.data());
       Tone.Transport.loop = false;
       Tone.Transport.setLoopPoints(0, r.data().dur);
-      console.log(0, r.data().dur);
+      //console.log(0, r.data().dur);
 
       fileInfoRef.update({
         loaded: firebase.firestore.FieldValue.increment(1),
@@ -140,47 +146,67 @@ function FilePage(props) {
       .getDownloadURL()
       .then((r) => {
         setDownloadUrl(r);
-        let newPlayer = new Tone.Player(r).toDestination();
-        newPlayer.onload = () =>
-          drawFileWave(player.buffer, clipHeight, clipWidth);
+        let newPlayer = new Tone.Player(r, () =>
+          setIsLoaded(true)
+        ).toDestination();
+        /* newPlayer.onload = () =>
+          drawFileWave(player.buffer, clipHeight, clipWidth); */
         setPlayer(newPlayer);
       });
   };
 
-  /*   const handleDownload = (index) => {
-    refList[index]
-      .getDownloadURL()
-      .then(function (url) {
-        console.log(url);
+  const handleDownload = () => {
+    /* var link = document.createElement("a");
+    link.download = "test";
 
-        var xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = function (event) {
-          var blob = xhr.response;
-        };
-        xhr.open("GET", url);
-        xhr.send();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }; */
+    link.href = downloadUrl;
+    link.target = "_blank";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); */
+
+    //console.log(downloadUrl);
+
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "blob";
+    xhr.onload = function (event) {
+      var blob = xhr.response;
+      var a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = fileInfo.name;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+    };
+    xhr.open("GET", downloadUrl);
+    xhr.send();
+
+    /* var xhr = new XMLHttpRequest();
+    xhr.responseType = "blob";
+    xhr.onload = function (event) {
+      var blob = xhr.response;
+    };
+    xhr.open("GET", downloadUrl);
+    xhr.send(); */
+  };
 
   useEffect(() => {
     //console.log(player);
-    if (player) {
-      drawFileWave(player.buffer, clipHeight, clipWidth);
-    }
-  }, [player, clipHeight, clipWidth]);
+    if (isLoaded) drawFileWave(player.buffer, clipHeight, clipWidth);
+  }, [clipHeight, clipWidth, isLoaded]);
 
   useEffect(() => {
     fileInfo && player && scheduleEvents();
   }, [fileInfo, player, Tone.Transport.state]);
 
   useEffect(() => {
+    toggleCursor();
+  }, [fileInfo]);
+
+  useEffect(() => {
     updateClipPosition();
     getFileInfo();
-    toggleCursor(true);
+    toggleCursor();
     window.addEventListener("resize", updateClipPosition);
 
     return () => {
@@ -241,7 +267,7 @@ function FilePage(props) {
           </Icon>
         </IconButton>
 
-        <IconButton onClick={togglePlaying}>
+        <IconButton onClick={handleDownload}>
           <Icon>download</Icon>
         </IconButton>
       </div>
@@ -252,7 +278,7 @@ function FilePage(props) {
 
 const drawFileWave = (buffer, h, w) => {
   //TODO: FIX UNWANTED CLEARING
-  console.log("draw");
+  //console.log("draw");
   let clipHeight = h;
   let clipWidth = w;
 
