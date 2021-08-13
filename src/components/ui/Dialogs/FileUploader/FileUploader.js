@@ -211,6 +211,8 @@ function FileUploader(props) {
                           Boolean(props.onInstrumentMod) &&
                             props.onInstrumentMod(ref.id, labelOnInstrument);
 
+                          props.getFilesName();
+
                           //add file id to user in db
 
                           const userRef = firebase
@@ -256,6 +258,8 @@ function FileUploader(props) {
 
                     Boolean(props.onInstrumentMod) &&
                       props.onInstrumentMod(fileid, labelOnInstrument);
+
+                    props.getFilesName();
 
                     setUploadState((prev) => {
                       let newState = [...prev];

@@ -377,6 +377,8 @@ function InstrumentEditor(props) {
         instrument={props.instrument}
         setInstrumentLoaded={props.setInstrumentLoaded}
         setFilesName={setFilesName}
+        setFilesId={setFilesId}
+        getFilesName={getFilesName}
         renamePlayersLabel={renamePlayersLabel}
         setRenamingLabel={setRenamingLabel}
       />
