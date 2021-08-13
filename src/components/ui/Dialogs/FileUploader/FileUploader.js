@@ -13,7 +13,9 @@ import {
   ListItemSecondaryAction,
   Tooltip,
   Icon,
+  Chip,
   CircularProgress,
+  IconButton,
 } from "@material-ui/core";
 
 import * as Tone from "tone";
@@ -22,14 +24,30 @@ import firebase from "firebase";
 import NameInput from "../../Dialogs/NameInput";
 
 import { useTranslation } from "react-i18next";
-import { detectPitch, fileTypes } from "../../../../assets/musicutils";
+import {
+  fileTags,
+  detectPitch,
+  fileTypes,
+  fileExtentions,
+} from "../../../../assets/musicutils";
+
+import "./FileUploader.css";
 
 function FileUploader(props) {
   const { t } = useTranslation();
   const [uploadState, setUploadState] = useState([]);
+  const [uploadingFileIds, setUploadingFileIds] = useState([]);
+  const [duplicatedFilesInfo, setDuplicatedFilesInfo] = useState([]);
+  const [uploadingFileTags, setUploadingFileTags] = useState([]);
+  const [labelsOnInstrument, setLabelsOnInstrument] = useState([]);
 
   const onClose = () => {
     props.setUploadingFiles([]);
+    setUploadingFileTags([]);
+    setUploadingFileIds([]);
+    setDuplicatedFilesInfo([]);
+    setUploadState([]);
+    setLabelsOnInstrument([]);
   };
 
   const uploadFiles = () => {
@@ -68,7 +86,7 @@ function FileUploader(props) {
                 ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
                 : file.name.split(".")[0];
 
-            console.log(labelOnInstrument);
+            //console.log(labelOnInstrument);
 
             let labelVersion = 2;
 
@@ -76,9 +94,18 @@ function FileUploader(props) {
               props.instrument.name === "Players" &&
               props.instrument._buffers._buffers.has(labelOnInstrument)
             ) {
-              labelOnInstrument = labelOnInstrument + " " + labelVersion;
+              labelOnInstrument =
+                labelOnInstrument.replace(/[0-9]/g, "").replace(" ", "") +
+                " " +
+                labelVersion;
               labelVersion++;
             }
+
+            setLabelsOnInstrument((prev) => {
+              let newLbls = [...prev];
+              newLbls[i] = labelOnInstrument;
+              return newLbls;
+            });
 
             //add buffer directly to instrument
 
@@ -108,13 +135,19 @@ function FileUploader(props) {
                 liked: 0,
                 dl: 0,
                 user: user.uid,
-                categ: [0, 0, 0],
-                ch: audiobuffer.numberOfChannels,
+                categ: [],
                 type: fileTypes.indexOf(file.type),
                 upOn: firebase.firestore.FieldValue.serverTimestamp(),
               };
 
-              console.log(fileInfo);
+              if (props.module.type === 0) fileInfo.categ.push(0);
+              if (props.instrument.name === "Sampler") fileInfo.categ.push(1);
+
+              setUploadingFileTags((prev) => {
+                let newTags = [...prev];
+                newTags[i] = [...fileInfo.categ];
+                return newTags;
+              });
 
               //Prevent duplicated files: check for existing file
 
@@ -132,6 +165,12 @@ function FileUploader(props) {
                       //upload file to storage
                       const storageRef = firebase.storage().ref(ref.id);
                       const task = storageRef.put(file);
+
+                      setUploadingFileIds((prev) => {
+                        let newFileIds = [...prev];
+                        newFileIds[i] = ref.id;
+                        return newFileIds;
+                      });
 
                       task.on(
                         "state_changed",
@@ -185,15 +224,28 @@ function FileUploader(props) {
                   else {
                     let fileid = result.docs[0].id;
 
-                    console.log(result.docs, fileid);
-
-                    firebase
+                    const originalFileRef = firebase
                       .firestore()
                       .collection("files")
-                      .doc(fileid)
-                      .update({
-                        loaded: firebase.firestore.FieldValue.increment(1),
+                      .doc(fileid);
+
+                    setUploadingFileIds((prev) => {
+                      let newFileIds = [...prev];
+                      newFileIds[i] = fileid;
+                      return newFileIds;
+                    });
+
+                    originalFileRef.update({
+                      loaded: firebase.firestore.FieldValue.increment(1),
+                    });
+
+                    originalFileRef.get().then((result) => {
+                      setDuplicatedFilesInfo((prev) => {
+                        let newDPInfo = [...prev];
+                        newDPInfo[i] = result.data();
+                        return newDPInfo;
                       });
+                    });
 
                     Boolean(props.onInstrumentMod) &&
                       props.onInstrumentMod(fileid, labelOnInstrument);
@@ -226,6 +278,12 @@ function FileUploader(props) {
     props.setInstrumentLoaded(true);
   };
 
+  const openFilePage = (id) => {
+    //console.log(id);
+    const win = window.open("/file/" + id, "_blank");
+    win.focus();
+  };
+
   useEffect(() => {
     console.log(props.files);
     if (props.files.length > 0) {
@@ -239,18 +297,52 @@ function FileUploader(props) {
   }, [uploadState]);
 
   return (
-    <Dialog open={props.open} onClose={onClose}>
-      <DialogTitle>Uploading:</DialogTitle>
+    <Dialog open={props.open} onClose={onClose} fullWidth maxWidth={"md"}>
+      <DialogTitle>Uploading</DialogTitle>
       <DialogContent>
         <List>
           {Array(props.files.length)
             .fill(0)
             .map((e, i) => (
               <ListItem divider>
-                <ListItemText primary={props.files[i].name} />
+                <ListItemText
+                  primary={labelsOnInstrument[i]}
+                  primaryTypographyProps={{
+                    onClick: () =>
+                      props.setRenamingLabel(labelsOnInstrument[i]),
+                    className: "file-label",
+                  }}
+                  secondaryTypographyProps={{
+                    onClick: () =>
+                      uploadingFileIds[i] && openFilePage(uploadingFileIds[i]),
+                    variant: "overline",
+                    className: uploadingFileIds[i] && "clickable-filename",
+                  }}
+                  secondary={
+                    duplicatedFilesInfo[i]
+                      ? `(${duplicatedFilesInfo[i].name}.${
+                          fileExtentions[duplicatedFilesInfo[i].type]
+                        })`
+                      : props.files[i].name
+                  }
+                />
+                {duplicatedFilesInfo[i]
+                  ? duplicatedFilesInfo[i].categ.map((e) => (
+                      <Chip className={"file-tag-chip"} label={fileTags[e]} />
+                    ))
+                  : uploadingFileTags[i] &&
+                    [uploadingFileTags[i], 1, 1].map((e) => (
+                      <Chip
+                        clickable
+                        onClick={() => openFilePage}
+                        className={"file-tag-chip"}
+                        label={fileTags[e]}
+                      />
+                    ))}
+
                 <ListItemSecondaryAction>
-                  <Tooltip title={uploadState}>
-                    {typeof uploadState[i] === "number" ||
+                  <Tooltip title={uploadState[i]}>
+                    {typeof uploadState[i] === "number" &&
                     uploadState[i] !== 100 ? (
                       <CircularProgress
                         variant={
@@ -259,7 +351,7 @@ function FileUploader(props) {
                         value={uploadState}
                       />
                     ) : (
-                      <Icon>
+                      <Icon color="primary">
                         {uploadState[i] === 100
                           ? "done"
                           : uploadState[i] === "uploadError"
@@ -280,11 +372,14 @@ function FileUploader(props) {
         </List>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t("dialogs.cancel")}</Button>
+        <Button onClick={onClose}>{t("dialogs.submit")}</Button>
         {/* <Button color="secondary" onClick={handleConfirm}>
           {t("dialogs.delete")}
         </Button> */}
       </DialogActions>
+      <IconButton onClick={onClose} className="mp-closebtn" color="primary">
+        <Icon>close</Icon>
+      </IconButton>
     </Dialog>
   );
 }
