@@ -30,6 +30,7 @@ function InstrumentEditor(props) {
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
+  const [filesId, setFilesId] = useState([]);
 
   const [renamingLabel, setRenamingLabel] = useState(null);
 
@@ -112,6 +113,7 @@ function InstrumentEditor(props) {
         })
       ).then((values) => {
         setFilesName(labelsWithFilename);
+
         //console.log(labelsWithFilename);
       });
     };
@@ -124,9 +126,11 @@ function InstrumentEditor(props) {
         .get()
         .then((r) => {
           getFilesNameFromId(r.get("urls"));
+          setFilesId(Object.values(r.get("urls")));
         });
     } else {
       getFilesNameFromId(props.module.instrument.urls);
+      setFilesId(Object.values(props.module.instrument.urls));
     }
   };
 
@@ -212,15 +216,22 @@ function InstrumentEditor(props) {
     setRenamingLabel(null);
   };
 
+  const openFilePage = (id) => {
+    //console.log(id);
+    const win = window.open("/file/" + id, "_blank");
+    win.focus();
+  };
+
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
     if (props.module.type === 0) {
       //console.log(props.instrument);
       let bufferObjects = [];
-      props.instrument._buffers._buffers.forEach((e, i, a) =>
-        bufferObjects.push([e, i])
-      );
+      props.instrument._buffers._buffers.forEach((e, i, a) => {
+        bufferObjects.push([e, i]);
+      });
+      //bufferObjects.sort((a, b) => a[1] - b[1]);
       mainContent = (
         <Fragment>
           <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
@@ -235,6 +246,7 @@ function InstrumentEditor(props) {
                   fileLabel={e[1]}
                   fileName={filesName[e[1]]}
                   setRenamingLabel={setRenamingLabel}
+                  openFilePage={() => openFilePage(filesId[i])}
                 />
                 <Divider />
               </Fragment>
@@ -259,6 +271,7 @@ function InstrumentEditor(props) {
                   handleFileDelete={handleSamplerFileDelete}
                   buffer={e[0]}
                   fileName={Tone.Frequency(e[1], "midi").toNote()}
+                  openFilePage={() => openFilePage(filesId[i])}
                 />
                 <Divider />
               </Fragment>
@@ -360,10 +373,12 @@ function InstrumentEditor(props) {
         files={uploadingFiles}
         setUploadingFiles={setUploadingFiles}
         onInstrumentMod={props.onInstrumentMod}
+        module={props.module}
         instrument={props.instrument}
         setInstrumentLoaded={props.setInstrumentLoaded}
         setFilesName={setFilesName}
         renamePlayersLabel={renamePlayersLabel}
+        setRenamingLabel={setRenamingLabel}
       />
 
       {renamingLabel !== null && (

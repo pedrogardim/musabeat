@@ -24,7 +24,11 @@ import {
 
 import "./FilePage.css";
 
-import { fileExtentions, soundChannels } from "../../../assets/musicutils";
+import {
+  fileExtentions,
+  soundChannels,
+  fileTags,
+} from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
 import { get } from "jquery";
@@ -332,7 +336,7 @@ function FilePage(props) {
           <Chip
             style={{ margin: "0px 4px" }}
             key={`pfcc${i}`}
-            label={e}
+            label={fileTags[e]}
             variant="outlined"
           />
         ))}

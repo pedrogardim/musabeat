@@ -16,6 +16,8 @@ import {
   Chip,
   CircularProgress,
   IconButton,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 
 import * as Tone from "tone";
@@ -40,6 +42,11 @@ function FileUploader(props) {
   const [duplicatedFilesInfo, setDuplicatedFilesInfo] = useState([]);
   const [uploadingFileTags, setUploadingFileTags] = useState([]);
   const [labelsOnInstrument, setLabelsOnInstrument] = useState([]);
+
+  const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
+
+  const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
+  const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
 
   const onClose = () => {
     props.setUploadingFiles([]);
@@ -278,6 +285,33 @@ function FileUploader(props) {
     props.setInstrumentLoaded(true);
   };
 
+  const handleTagSelect = (tagName) => {
+    let tag = fileTags.indexOf(tagName);
+    let fileIndex = tagSelectionTarget[1];
+    let tagIndex = tagSelectionTarget[2];
+
+    let hasTag = uploadingFileTags[fileIndex][tagIndex] === tag;
+
+    //console.log(tag, fileIndex, tagIndex, hasTag);
+
+    if (!hasTag) {
+      let finalCateg;
+      setUploadingFileTags((prev) => {
+        let newUpTags = [...prev];
+        newUpTags[fileIndex][tagIndex] = tag;
+        finalCateg = newUpTags[fileIndex];
+        return newUpTags;
+      });
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(uploadingFileIds[fileIndex])
+        .update({ categ: finalCateg });
+    }
+
+    setTagSelectionTarget(null);
+  };
+
   const openFilePage = (id) => {
     //console.log(id);
     const win = window.open("/file/" + id, "_blank");
@@ -285,7 +319,7 @@ function FileUploader(props) {
   };
 
   useEffect(() => {
-    console.log(props.files);
+    //console.log(props.files);
     if (props.files.length > 0) {
       uploadFiles();
       setUploadState([]);
@@ -331,22 +365,31 @@ function FileUploader(props) {
                       <Chip className={"file-tag-chip"} label={fileTags[e]} />
                     ))
                   : uploadingFileTags[i] &&
-                    [uploadingFileTags[i], 1, 1].map((e) => (
+                    [
+                      uploadingFileTags[i][0],
+                      uploadingFileTags[i][1] ? uploadingFileTags[i][1] : "/",
+                      uploadingFileTags[i][2] ? uploadingFileTags[i][2] : "/",
+                    ].map((e, chipIndex) => (
                       <Chip
-                        clickable
-                        onClick={() => openFilePage}
+                        clickable={chipIndex !== 0}
+                        variant={chipIndex === 0 ? "outline" : "default"}
+                        onClick={(e) =>
+                          chipIndex !== 0 &&
+                          setTagSelectionTarget([e.target, i, chipIndex])
+                        }
                         className={"file-tag-chip"}
-                        label={fileTags[e]}
+                        label={e === "/" ? "..." : fileTags[e]}
                       />
                     ))}
 
                 <ListItemSecondaryAction>
                   <Tooltip title={uploadState[i]}>
-                    {typeof uploadState[i] === "number" &&
-                    uploadState[i] !== 100 ? (
+                    {uploadState[i] === undefined ||
+                    (typeof uploadState[i] === "number" &&
+                      uploadState[i] !== 100) ? (
                       <CircularProgress
                         variant={
-                          uploadState[i] === 0 ? "indeterminate" : "determinate"
+                          !uploadState[i] ? "indeterminate" : "determinate"
                         }
                         value={uploadState}
                       />
@@ -380,6 +423,27 @@ function FileUploader(props) {
       <IconButton onClick={onClose} className="mp-closebtn" color="primary">
         <Icon>close</Icon>
       </IconButton>
+      <Menu
+        anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
+        keepMounted
+        open={Boolean(tagSelectionTarget)}
+        onClose={() => setTagSelectionTarget(null)}
+      >
+        {tagSelectionTarget &&
+          (props.module.type === 0 ? (
+            tagSelectionTarget[2] === 1 ? (
+              fileTagDrumComponents.map((e, i) => (
+                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+              ))
+            ) : (
+              fileTagDrumGenres.map((e, i) => (
+                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+              ))
+            )
+          ) : (
+            <MenuItem>a</MenuItem>
+          ))}
+      </Menu>
     </Dialog>
   );
 }

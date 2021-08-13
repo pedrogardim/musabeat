@@ -1,0 +1,18 @@
+/* .file-uploader > div {
+  background-color: aquamarine;
+} */
+
+.clickable-filename:hover {
+  cursor: pointer;
+  text-decoration: underline;
+  user-select: none;
+}
+
+.file-tag-chip {
+  margin-left: 8px !important;
+}
+
+.file-label:hover {
+  text-decoration: underline;
+  user-select: none;
+}

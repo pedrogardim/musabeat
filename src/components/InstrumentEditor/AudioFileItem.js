@@ -55,7 +55,11 @@ function AudioFileItem(props) {
             : labels[parseInt(props.fileLabel)]}
         </Typography>
         <br />
-        <Typography className="audio-file-item-filename" variant="overline">
+        <Typography
+          className="audio-file-item-filename"
+          variant="overline"
+          onClick={props.openFilePage}
+        >
           {props.fileName}
         </Typography>
       </ListItemText>
