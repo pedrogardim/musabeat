@@ -7,7 +7,13 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../utils/materialPalette";
 
-import { IconButton, Icon, Tooltip, TextField } from "@material-ui/core";
+import {
+  IconButton,
+  Icon,
+  Tooltip,
+  TextField,
+  Slider,
+} from "@material-ui/core";
 
 function WorkspaceTimeline(props) {
   const TLWrapper = useRef(null);
@@ -152,88 +158,100 @@ function WorkspaceTimeline(props) {
           <Icon>{props.timelineMode ? "loop" : "linear_scale"}</Icon>
         </IconButton>
       </Tooltip>
-      {props.timelineMode && (
-        <div style={{ position: "absolute", right: -128 }}>
-          <IconButton
-            className="ws-timeline-btn"
-            onClick={() => setCompact((prev) => !prev)}
-          >
-            <Icon>expand</Icon>
-          </IconButton>
-          <TextField
-            label="Session Size"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputProps={{ min: 1, max: 128 }}
-            defaultValue={props.sessionSize}
-            onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
-            onBlur={(e) => handleSessionSizeChange(e)}
-            onMouseUp={(e) => handleSessionSizeChange(e)}
-            value={TLinputSessionSize}
-            onChange={(e) => setTLinputSessionSize(e.target.value)}
-          />
-        </div>
-      )}
-      {props.timelineMode &&
-        props.modules.map((module, moduleIndex) => {
-          let moduleSize =
-            module.type === 2
-              ? Math.ceil(
-                  module.score[module.score.length - 1].time +
-                    module.score[module.score.length - 1].duration
-                )
-              : module.type === 3 || module.type === 4
-              ? module.size
-              : module.score.length;
-          //console.log(moduleSize, props.sessionSize);
-          return (
-            <div
-              className={
-                !compact ? "ws-timeline-module" : "ws-timeline-module-compact"
-              }
-              style={{
-                background: colors[module.color][100],
-              }}
+      {props.timelineMode ? (
+        <Fragment>
+          <div style={{ position: "absolute", right: -128 }}>
+            <IconButton
+              className="ws-timeline-btn"
+              onClick={() => setCompact((prev) => !prev)}
             >
-              {props.sessionSize / moduleSize > 0 &&
-                Array(Math.floor(props.sessionSize / moduleSize))
-                  .fill(0)
-                  .map((e, i) => (
-                    <div
-                      className="ws-timeline-module-tile"
-                      style={{
-                        backgroundColor: props.timeline[module.id].includes(
-                          i * moduleSize
-                        )
-                          ? colors[module.color][200]
-                          : colors[module.color][50],
-                        outline: "solid 1px " + colors[module.color][800],
-                        width: (moduleSize / props.sessionSize) * 100 + "%",
-                      }}
-                      onMouseEnter={() =>
-                        draggingSelect &&
-                        handleTimelineTileClick(module.id, moduleSize, i)
-                      }
-                      onMouseDown={() =>
-                        handleTimelineTileClick(module.id, moduleSize, i)
-                      }
-                    />
-                  ))}
-            </div>
-          );
-        })}
-      <Draggable
-        axis="x"
-        onDrag={handleCursorDrag}
-        onStart={handleCursorDragStart}
-        onStop={handleCursorDragStop}
-        position={{ x: cursorPosition, y: 0 }}
-        bounds=".ws-timeline"
-      >
-        <div className="ws-timeline-cursor" />
-      </Draggable>
+              <Icon>expand</Icon>
+            </IconButton>
+            <TextField
+              label="Session Size"
+              type="number"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{ min: 1, max: 128 }}
+              defaultValue={props.sessionSize}
+              onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
+              onBlur={(e) => handleSessionSizeChange(e)}
+              onMouseUp={(e) => handleSessionSizeChange(e)}
+              value={TLinputSessionSize}
+              onChange={(e) => setTLinputSessionSize(e.target.value)}
+            />
+          </div>
+
+          {props.modules.map((module, moduleIndex) => {
+            let moduleSize =
+              module.type === 2
+                ? Math.ceil(
+                    module.score[module.score.length - 1].time +
+                      module.score[module.score.length - 1].duration
+                  )
+                : module.type === 3 || module.type === 4
+                ? module.size
+                : module.score.length;
+            //console.log(moduleSize, props.sessionSize);
+            return (
+              <div
+                className={
+                  !compact ? "ws-timeline-module" : "ws-timeline-module-compact"
+                }
+                style={{
+                  background: colors[module.color][100],
+                }}
+              >
+                {props.sessionSize / moduleSize > 0 &&
+                  Array(Math.floor(props.sessionSize / moduleSize))
+                    .fill(0)
+                    .map((e, i) => (
+                      <div
+                        className="ws-timeline-module-tile"
+                        style={{
+                          backgroundColor: props.timeline[module.id].includes(
+                            i * moduleSize
+                          )
+                            ? colors[module.color][200]
+                            : colors[module.color][50],
+                          outline: "solid 1px " + colors[module.color][800],
+                          width: (moduleSize / props.sessionSize) * 100 + "%",
+                        }}
+                        onMouseEnter={() =>
+                          draggingSelect &&
+                          handleTimelineTileClick(module.id, moduleSize, i)
+                        }
+                        onMouseDown={() =>
+                          handleTimelineTileClick(module.id, moduleSize, i)
+                        }
+                      />
+                    ))}
+              </div>
+            );
+          })}
+          <Draggable
+            axis="x"
+            onDrag={handleCursorDrag}
+            onStart={handleCursorDragStart}
+            onStop={handleCursorDragStop}
+            position={{ x: cursorPosition, y: 0 }}
+            bounds=".ws-timeline"
+          >
+            <div className="ws-timeline-cursor" />
+          </Draggable>
+        </Fragment>
+      ) : (
+        <Slider
+          min={0}
+          max={1}
+          step={0.01}
+          value={Tone.Transport.seconds / Tone.Transport.loopEnd}
+          onChange={(e, v) =>
+            (Tone.Transport.seconds = v * Tone.Transport.loopEnd)
+          }
+        />
+      )}
     </div>
   );
 }

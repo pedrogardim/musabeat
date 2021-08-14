@@ -39,6 +39,8 @@ import {
 
 import { clearEvents } from "../../utils/TransportSchedule";
 
+Tone.Transport.loopEnd = "1m";
+
 function Workspace(props) {
   const { t } = useTranslation();
 
@@ -363,7 +365,7 @@ function Workspace(props) {
       }
     });
 
-    console.log(moduleInstruments);
+    //console.log(moduleInstruments);
 
     setInstruments(moduleInstruments);
   };
