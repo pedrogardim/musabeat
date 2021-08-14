@@ -116,17 +116,11 @@ function FileUploader(props) {
 
             //add buffer directly to instrument
 
-            props.instrument.name === "Players"
-              ? props.instrument.add(
-                  labelOnInstrument,
-                  audiobuffer,
-                  () => isLastFile && props.setInstrumentLoaded(true)
-                )
-              : props.intrument.add(
-                  labelOnInstrument,
-                  audiobuffer,
-                  () => isLastFile && props.setInstrumentLoaded(true)
-                );
+            props.instrument.add(
+              labelOnInstrument,
+              audiobuffer,
+              () => isLastFile && props.setInstrumentLoaded(true)
+            );
 
             /////
             //UPLOAD FILE

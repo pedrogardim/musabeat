@@ -6,6 +6,7 @@ import * as Tone from "tone";
 import firebase from "firebase";
 
 import { PitchDetector } from "pitchy";
+import { EmojiObjectsRounded } from "@material-ui/icons";
 
 export const musicalNotes = [
   "C",
@@ -704,32 +705,11 @@ export const patchLoader = async (
   let instrfx = [];
 
   if (patch.base === "Sampler") {
-    instrumentLoaded(false);
-
-    //console.log("Sampler!");
-
-    let urlArray = await Promise.all(
-      Object.keys(patch.urls).map(
-        async (e, i) =>
-          await firebase.storage().ref(patch.urls[e]).getDownloadURL()
-      )
+    return await loadSamplerFromObject(
+      patch,
+      setInstrumentsLoaded,
+      moduleIndex
     );
-
-    //console.log(urlArray);
-
-    let urls = Object.fromEntries(
-      urlArray.map((e, i) => [Object.keys(patch.urls)[i], e])
-    );
-
-    //console.log(urls);
-
-    let sampler = new Tone.Sampler(urls, () =>
-      instrumentLoaded(true)
-    ).toDestination();
-
-    //sampler.set(options);
-
-    return sampler;
   } else {
     instrumentLoaded(true);
   }
@@ -794,6 +774,46 @@ export const patchLoader = async (
   } */
   //console.log("instr", instr);
   return instr;
+};
+
+export const loadSamplerFromObject = async (
+  obj,
+  setInstrumentsLoaded,
+  moduleIndex
+) => {
+  let instrumentLoaded = (isLoaded) => {
+    setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[moduleIndex] = isLoaded;
+      return a;
+    });
+  };
+
+  instrumentLoaded(false);
+
+  //console.log("Sampler!");
+
+  let urlArray = await Promise.all(
+    Object.keys(obj.urls).map(
+      async (e, i) => await firebase.storage().ref(obj.urls[e]).getDownloadURL()
+    )
+  );
+
+  //console.log(urlArray);
+
+  let urls = Object.fromEntries(
+    urlArray.map((e, i) => [Object.keys(obj.urls)[i], e])
+  );
+
+  //console.log(urls);
+
+  let sampler = new Tone.Sampler(urls, () =>
+    instrumentLoaded(true)
+  ).toDestination();
+
+  //sampler.set(options);
+
+  return sampler;
 };
 
 export const loadSynthFromGetObject = (obj) => {

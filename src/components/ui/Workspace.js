@@ -34,6 +34,7 @@ import {
   loadDrumPatch,
   loadSynthFromGetObject,
   adaptSequencetoSubdiv,
+  loadSamplerFromObject,
 } from "../../assets/musicutils";
 
 import { clearEvents } from "../../utils/TransportSchedule";
@@ -336,16 +337,33 @@ function Workspace(props) {
       } //load from obj
       else if (typeof module.instrument === "object") {
         //console.log(module.instrument);
-        moduleInstruments[moduleIndex] = loadSynthFromGetObject(
-          module.instrument
-        );
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[moduleIndex] = true;
-          return a;
-        });
+
+        if (module.instrument.hasOwnProperty("urls")) {
+          loadSamplerFromObject(
+            module.instrument,
+            setInstrumentsLoaded,
+            moduleIndex
+          ).then((r) =>
+            setInstruments((prev) => {
+              let a = [...prev];
+              a[moduleIndex] = r;
+              return a;
+            })
+          );
+        } else {
+          moduleInstruments[moduleIndex] = loadSynthFromGetObject(
+            module.instrument
+          );
+          setInstrumentsLoaded((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = true;
+            return a;
+          });
+        }
       }
     });
+
+    console.log(moduleInstruments);
 
     setInstruments(moduleInstruments);
   };
@@ -401,13 +419,27 @@ function Workspace(props) {
           })
       );
     } //load from obj
-    else if (
-      typeof module.instrument === "object" &&
-      module.instrument.name !== "Players" &&
-      module.instrument.name !== "GrainPlayer" &&
-      instruments[index] === null
-    ) {
-      instrument = loadSynthFromGetObject(module.instrument);
+    else if (typeof module.instrument === "object" && !instruments[index]) {
+      if (module.instrument.hasOwnProperty("urls")) {
+        loadSamplerFromObject(
+          module.instrument,
+          setInstrumentsLoaded,
+          index
+        ).then((r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[index] = r;
+            return a;
+          })
+        );
+      } else {
+        instrument = loadSynthFromGetObject(module.instrument);
+        setInstrumentsLoaded((prev) => {
+          let a = [...prev];
+          a[index] = true;
+          return a;
+        });
+      }
     }
 
     setInstruments((prev) => {
