@@ -15,6 +15,7 @@ import {
   Divider,
   List,
   ListItem,
+  Typography,
 } from "@material-ui/core";
 
 import "./FileExplorer.css";
@@ -35,18 +36,14 @@ function FileExplorer(props) {
   //const [sideMenu, setSideMenu] = useState(false);
 
   const handleFileSelect = (e, index) => {
-    props.compact &&
-      !e.target.classList.contains("MuiIcon-root") &&
-      firebase
-        .storage()
-        .ref(fileIdList[index])
-        .getDownloadURL()
-        .then((url) =>
-          props.onFileClick(
-            url,
-            players[index] !== undefined && players[index].buffer
-          )
-        );
+    if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
+      let url = filesUrl[index];
+
+      props.onFileClick(
+        url,
+        players[index] !== undefined && players[index].buffer
+      );
+    }
   };
 
   const getUserFilesList = async () => {
@@ -137,6 +134,12 @@ function FileExplorer(props) {
     setCurrentPlaying(null);
   };
 
+  const openFilePage = (id) => {
+    //console.log(id);
+    const win = window.open("/file/" + id, "_blank");
+    win.focus();
+  };
+
   useEffect(() => {
     getUserFilesList();
   }, []);
@@ -207,7 +210,13 @@ function FileExplorer(props) {
                       )}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {`${row.name}.${fileExtentions[row.type]}`}
+                      <Typography
+                        variant="overline"
+                        className="fe-filename"
+                        onClick={() => openFilePage(fileIdList[index])}
+                      >
+                        {`${row.name}.${fileExtentions[row.type]}`}
+                      </Typography>
                     </TableCell>
                     {!props.compact && (
                       <Fragment>
