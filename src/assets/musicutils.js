@@ -6,7 +6,6 @@ import * as Tone from "tone";
 import firebase from "firebase";
 
 import { PitchDetector } from "pitchy";
-import { EmojiObjectsRounded } from "@material-ui/icons";
 
 export const musicalNotes = [
   "C",

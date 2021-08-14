@@ -21,9 +21,12 @@ import "./FileExplorer.css";
 
 import firebase from "firebase";
 
+import { fileExtentions } from "../../../assets/musicutils";
+
 function FileExplorer(props) {
   const [filedata, setFiledata] = useState([]);
-  const [refList, setRefList] = useState([]);
+  const [fileIdList, setFileIdList] = useState([]);
+  const [filesUrl, setFilesUrl] = useState([]);
   const [players, setPlayers] = useState([]);
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
@@ -34,7 +37,9 @@ function FileExplorer(props) {
   const handleFileSelect = (e, index) => {
     props.compact &&
       !e.target.classList.contains("MuiIcon-root") &&
-      refList[index]
+      firebase
+        .storage()
+        .ref(fileIdList[index])
         .getDownloadURL()
         .then((url) =>
           props.onFileClick(
@@ -45,35 +50,62 @@ function FileExplorer(props) {
   };
 
   const getUserFilesList = async () => {
-    const user = firebase.auth().currentUser;
+    /* const user = firebase.auth().currentUser;
     const dbRef = firebase.storage().ref().child(user.uid);
-    const refList = (await dbRef.list()).items;
-    setRefList(refList);
+    const fileIdList = (await dbRef.list()).items;
+    setFileIdList(fileIdList);
 
     const filesMetadata = await Promise.all(
-      refList.map((e, i) => e.getMetadata())
+      fileIdList.map((e, i) => e.getMetadata())
     );
-    setFiledata(filesMetadata);
+    setFiledata(filesMetadata); */
+
+    const user = firebase.auth().currentUser;
+    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbFilesRef = firebase.firestore().collection("files");
+    const storageRef = firebase.storage();
+
+    const fileIdList = (await dbUserRef.get()).get("files");
+
+    //console.log(fileIdList);
+    setFileIdList(fileIdList);
+
+    const filesData = await Promise.all(
+      fileIdList.map(async (e, i) => {
+        return (await dbFilesRef.doc(e).get()).data();
+      })
+    );
+    //console.log(filesMetadata);
+
+    setFiledata(filesData);
+
+    const filesUrl = await Promise.all(
+      fileIdList.map(async (e, i) => {
+        return await storageRef.ref(e).getDownloadURL();
+      })
+    );
+
+    console.log(filesUrl);
+    setFilesUrl(filesUrl);
   };
 
-  /*   const handleDownload = (index) => {
-    refList[index]
-      .getDownloadURL()
-      .then(function (url) {
-        console.log(url);
-
-        var xhr = new XMLHttpRequest();
-        xhr.responseType = "blob";
-        xhr.onload = function (event) {
-          var blob = xhr.response;
-        };
-        xhr.open("GET", url);
-        xhr.send();
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }; */
+  const handleDownload = (index) => {
+    let url = filesUrl[index];
+    console.log(url);
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = "blob";
+    xhr.onload = function (event) {
+      var blob = xhr.response;
+      var a = document.createElement("a");
+      a.href = window.URL.createObjectURL(blob);
+      a.download = filedata[index].name;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+    };
+    xhr.open("GET", url);
+    xhr.send();
+  };
 
   const playSound = (index) => {
     if (players[index] !== undefined) {
@@ -81,21 +113,21 @@ function FileExplorer(props) {
       setCurrentPlaying(index);
     } else {
       setLoadingPlay(index);
-      refList[index].getDownloadURL().then((url) => {
-        let player = new Tone.Player(url, () => {
-          player.state !== "started" && player.start();
-          setCurrentPlaying(index);
-          setLoadingPlay(null);
-        }).toDestination();
-        player.onstop = () => {
-          setCurrentPlaying(null);
-        };
-        setPlayers((prev) => {
-          let newPlayers = [...prev];
+      let url = filesUrl[index];
 
-          newPlayers[index] = player;
-          return newPlayers;
-        });
+      let player = new Tone.Player(url, () => {
+        player.state !== "started" && player.start();
+        setCurrentPlaying(index);
+        setLoadingPlay(null);
+      }).toDestination();
+      player.onstop = () => {
+        setCurrentPlaying(null);
+      };
+      setPlayers((prev) => {
+        let newPlayers = [...prev];
+
+        newPlayers[index] = player;
+        return newPlayers;
       });
     }
   };
@@ -148,7 +180,6 @@ function FileExplorer(props) {
                     <TableCell>Name</TableCell>
                     <Fragment>
                       <TableCell align="right">Size</TableCell>
-                      <TableCell align="right">Type</TableCell>
                       <TableCell style={{ width: 50 }} align="right">
                         Download
                       </TableCell>
@@ -176,7 +207,7 @@ function FileExplorer(props) {
                       )}
                     </TableCell>
                     <TableCell component="th" scope="row">
-                      {row.name}
+                      {`${row.name}.${fileExtentions[row.type]}`}
                     </TableCell>
                     {!props.compact && (
                       <Fragment>
@@ -184,12 +215,7 @@ function FileExplorer(props) {
                           {formatBytes(row.size)}
                         </TableCell>
                         <TableCell align="right">
-                          {row.contentType.replace("audio/", "")}
-                        </TableCell>
-                        <TableCell align="right">
-                          {/* <IconButton onClick={() => handleDownload(index)}> */}
-
-                          <IconButton>
+                          <IconButton onClick={() => handleDownload(index)}>
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell>
