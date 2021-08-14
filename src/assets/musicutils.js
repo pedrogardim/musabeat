@@ -695,23 +695,41 @@ export const patchLoader = async (
   instrumentLoaded(false);
 
   let instr;
-  let patchRef = firebase.firestore().collection("patches").doc(input);
+  const patchRef = firebase.firestore().collection("patches").doc(input);
 
   let patch = (await patchRef.get()).data();
-  //console.log(patch)
+  console.log(patch);
 
   let options = patch.options;
   let instrfx = [];
 
   if (patch.base === "Sampler") {
     instrumentLoaded(false);
-    instr = new Tone.Sampler(
-      patch.urls,
-      () => instrumentLoaded(true),
-      options.baseUrl
+
+    //console.log("Sampler!");
+
+    let urlArray = await Promise.all(
+      Object.keys(patch.urls).map(
+        async (e, i) =>
+          await firebase.storage().ref(patch.urls[e]).getDownloadURL()
+      )
+    );
+
+    //console.log(urlArray);
+
+    let urls = Object.fromEntries(
+      urlArray.map((e, i) => [Object.keys(patch.urls)[i], e])
+    );
+
+    //console.log(urls);
+
+    let sampler = new Tone.Sampler(urls, () =>
+      instrumentLoaded(true)
     ).toDestination();
 
-    instr.set(options);
+    //sampler.set(options);
+
+    return sampler;
   } else {
     instrumentLoaded(true);
   }
@@ -739,8 +757,7 @@ export const patchLoader = async (
     ? (instr.volume.value = patch.gain)
     : (instr.volume.value = -18);
 
-  //if ("fx" in patch) {
-  if ("asdajsiod" in patch) {
+  /*  if ("fx" in patch) {
     patch.fx.forEach((e, i) => {
       if (e[0] === "vib") {
         instrfx[i] = new Tone.Vibrato(e[1], e[2]);
@@ -774,7 +791,7 @@ export const patchLoader = async (
     });
   } else {
     instr.toDestination();
-  }
+  } */
   //console.log("instr", instr);
   return instr;
 };

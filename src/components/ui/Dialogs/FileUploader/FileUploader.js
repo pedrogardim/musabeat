@@ -350,12 +350,6 @@ function FileUploader(props) {
                       props.setRenamingLabel(labelsOnInstrument[i]),
                     className: "file-label",
                   }}
-                  secondaryTypographyProps={{
-                    onClick: () =>
-                      uploadingFileIds[i] && openFilePage(uploadingFileIds[i]),
-                    variant: "overline",
-                    className: uploadingFileIds[i] && "clickable-filename",
-                  }}
                   secondary={
                     duplicatedFilesInfo[i]
                       ? `(${duplicatedFilesInfo[i].name}.${
@@ -363,6 +357,12 @@ function FileUploader(props) {
                         })`
                       : props.files[i].name
                   }
+                  secondaryTypographyProps={{
+                    onClick: () =>
+                      uploadingFileIds[i] && openFilePage(uploadingFileIds[i]),
+                    variant: "overline",
+                    className: uploadingFileIds[i] && "clickable-filename",
+                  }}
                 />
                 {duplicatedFilesInfo[i]
                   ? duplicatedFilesInfo[i].categ.map((e) => (

@@ -270,7 +270,8 @@ function InstrumentEditor(props) {
                   instrument={props.instrument}
                   handleFileDelete={handleSamplerFileDelete}
                   buffer={e[0]}
-                  fileName={Tone.Frequency(e[1], "midi").toNote()}
+                  fileLabel={Tone.Frequency(e[1], "midi").toNote()}
+                  fileName={filesName[e[1]]}
                   openFilePage={() => openFilePage(filesId[i])}
                 />
                 <Divider />
@@ -317,7 +318,9 @@ function InstrumentEditor(props) {
   }
 
   useEffect(() => {
-    getFilesName();
+    (props.instrument.name === "Players" ||
+      props.instrument.name === "Sampler") &&
+      getFilesName();
   }, []);
 
   return (

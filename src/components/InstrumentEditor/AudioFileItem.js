@@ -12,6 +12,7 @@ import {
   Icon,
   ListItemSecondaryAction,
   Typography,
+  Tooltip,
 } from "@material-ui/core";
 
 function AudioFileItem(props) {
@@ -44,39 +45,42 @@ function AudioFileItem(props) {
         <path d={wavePath} stroke="#05386b" fill="none" />
       </svg>
 
-      <ListItemText variant="overline">
-        <Typography
-          variant="body2"
-          className="audio-file-item-label"
-          onClick={() => props.setRenamingLabel(props.fileLabel)}
-        >
-          {isNaN(props.fileLabel)
+      <ListItemText
+        primary={
+          isNaN(props.fileLabel)
             ? props.fileLabel
-            : labels[parseInt(props.fileLabel)]}
-        </Typography>
-        <br />
-        <Typography
-          className="audio-file-item-filename"
-          variant="overline"
-          onClick={props.openFilePage}
-        >
-          {props.fileName}
-        </Typography>
-      </ListItemText>
+            : labels[parseInt(props.fileLabel)]
+        }
+        primaryTypographyProps={{
+          variant: "body2",
+          className: "audio-file-item-label",
+          onClick: () =>
+            props.instrument.name === "Players" &&
+            props.setRenamingLabel(props.fileLabel),
+        }}
+        secondary={props.fileName}
+        secondaryTypographyProps={{
+          className: "audio-file-item-filename",
+          variant: "overline",
+          onClick: props.openFilePage,
+        }}
+      />
 
       <ListItemSecondaryAction>
-        <IconButton
-          onClick={() =>
-            props.handleFileDelete(
-              props.instrument.name === "Sampler"
-                ? Tone.Frequency(props.fileLabel).toMidi()
-                : props.fileLabel
-            )
-          }
-          edge="end"
-        >
-          <Icon>delete</Icon>
-        </IconButton>
+        <Tooltip title="Remove file from instrument">
+          <IconButton
+            onClick={() =>
+              props.handleFileDelete(
+                props.instrument.name === "Sampler"
+                  ? Tone.Frequency(props.fileLabel).toMidi()
+                  : props.fileLabel
+              )
+            }
+            edge="end"
+          >
+            <Icon>remove</Icon>
+          </IconButton>
+        </Tooltip>
       </ListItemSecondaryAction>
     </ListItem>
   );
