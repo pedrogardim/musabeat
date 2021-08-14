@@ -16,13 +16,19 @@ import {
   List,
   ListItem,
   Typography,
+  Chip,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 
 import "./FileExplorer.css";
 
 import firebase from "firebase";
 
-import { fileExtentions } from "../../../assets/musicutils";
+import { fileExtentions, fileTags } from "../../../assets/musicutils";
+
+const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
+const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
 
 function FileExplorer(props) {
   const [filedata, setFiledata] = useState([]);
@@ -31,6 +37,8 @@ function FileExplorer(props) {
   const [players, setPlayers] = useState([]);
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
+
+  const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
@@ -140,6 +148,33 @@ function FileExplorer(props) {
     win.focus();
   };
 
+  const handleTagSelect = (tagName) => {
+    let tag = fileTags.indexOf(tagName);
+    let fileIndex = tagSelectionTarget[1];
+    let tagIndex = tagSelectionTarget[2];
+
+    let hasTag = filedata[fileIndex].categ[tagIndex] === tag;
+
+    //console.log(tag, fileIndex, tagIndex, hasTag);
+
+    if (!hasTag) {
+      let finalCateg;
+      setFiledata((prev) => {
+        let newUpTags = [...prev];
+        newUpTags[fileIndex].categ[tagIndex] = tag;
+        finalCateg = newUpTags[fileIndex].categ;
+        return newUpTags;
+      });
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(fileIdList[fileIndex])
+        .update({ categ: finalCateg });
+    }
+
+    setTagSelectionTarget(null);
+  };
+
   useEffect(() => {
     getUserFilesList();
   }, []);
@@ -218,6 +253,32 @@ function FileExplorer(props) {
                         {`${row.name}.${fileExtentions[row.type]}`}
                       </Typography>
                     </TableCell>
+                    <TableCell>
+                      {filedata &&
+                        [
+                          filedata[index].categ[0],
+                          filedata[index].categ[1]
+                            ? filedata[index].categ[1]
+                            : "/",
+                          filedata[index].categ[2]
+                            ? filedata[index].categ[2]
+                            : "/",
+                        ].map((chip, chipIndex) => (
+                          <Chip
+                            clickable={chipIndex !== 0}
+                            onClick={(e) =>
+                              chipIndex !== 0 &&
+                              setTagSelectionTarget([
+                                e.target,
+                                index,
+                                chipIndex,
+                              ])
+                            }
+                            className={"file-tag-chip"}
+                            label={chip === "/" ? "..." : fileTags[chip]}
+                          />
+                        ))}
+                    </TableCell>
                     {!props.compact && (
                       <Fragment>
                         <TableCell align="right">
@@ -237,6 +298,29 @@ function FileExplorer(props) {
           </TableContainer>
         ) : (
           <CircularProgress />
+        )}
+        {!props.compact && (
+          <Menu
+            anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
+            keepMounted
+            open={Boolean(tagSelectionTarget)}
+            onClose={() => setTagSelectionTarget(null)}
+          >
+            {tagSelectionTarget &&
+              (props.module.type === 0 ? (
+                tagSelectionTarget[2] === 1 ? (
+                  fileTagDrumComponents.map((e, i) => (
+                    <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                  ))
+                ) : (
+                  fileTagDrumGenres.map((e, i) => (
+                    <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                  ))
+                )
+              ) : (
+                <MenuItem>a</MenuItem>
+              ))}
+          </Menu>
         )}
       </div>
     </div>
