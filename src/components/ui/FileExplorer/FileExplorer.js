@@ -25,6 +25,8 @@ import "./FileExplorer.css";
 
 import firebase from "firebase";
 
+import DeleteConfirm from "../Dialogs/DeleteConfirm";
+
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
 
 const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
@@ -38,7 +40,11 @@ function FileExplorer(props) {
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
 
+  const [deletingFile, setDeletingFile] = useState(null);
+
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
+
+  const user = firebase.auth().currentUser;
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
@@ -90,7 +96,7 @@ function FileExplorer(props) {
       })
     );
 
-    console.log(filesUrl);
+    //console.log(filesUrl);
     setFilesUrl(filesUrl);
   };
 
@@ -175,9 +181,29 @@ function FileExplorer(props) {
     setTagSelectionTarget(null);
   };
 
+  const deleteFile = (index) => {
+    let fileId = fileIdList[index];
+
+    firebase.storage().ref(fileId).delete();
+
+    firebase.firestore().collection("files").doc(fileId).delete();
+
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(filedata[index].user)
+      .update({
+        files: firebase.firestore.FieldValue.arrayRemove(fileId),
+      });
+
+    setFiledata((prev) => prev.filter((e, i) => i !== index));
+    setFileIdList((prev) => prev.filter((e, i) => i !== index));
+    setFilesUrl((prev) => prev.filter((e, i) => i !== index));
+  };
+
   useEffect(() => {
-    getUserFilesList();
-  }, []);
+    user && getUserFilesList();
+  }, [user]);
 
   useEffect(() => {
     return () => {
@@ -217,9 +243,14 @@ function FileExplorer(props) {
                     <TableCell style={{ width: 50 }}></TableCell>
                     <TableCell>Name</TableCell>
                     <Fragment>
+                      <TableCell>Categories</TableCell>
+
                       <TableCell align="right">Size</TableCell>
                       <TableCell style={{ width: 50 }} align="right">
                         Download
+                      </TableCell>
+                      <TableCell style={{ width: 50 }} align="right">
+                        Delete
                       </TableCell>
                     </Fragment>
                   </TableRow>
@@ -289,6 +320,11 @@ function FileExplorer(props) {
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell>
+                        <TableCell align="right">
+                          <IconButton onClick={() => setDeletingFile(index)}>
+                            <Icon>delete</Icon>
+                          </IconButton>
+                        </TableCell>
                       </Fragment>
                     )}
                   </TableRow>
@@ -306,23 +342,22 @@ function FileExplorer(props) {
             open={Boolean(tagSelectionTarget)}
             onClose={() => setTagSelectionTarget(null)}
           >
-            {tagSelectionTarget &&
-              (props.module.type === 0 ? (
-                tagSelectionTarget[2] === 1 ? (
-                  fileTagDrumComponents.map((e, i) => (
-                    <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
-                  ))
-                ) : (
-                  fileTagDrumGenres.map((e, i) => (
-                    <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
-                  ))
-                )
-              ) : (
-                <MenuItem>a</MenuItem>
-              ))}
+            {tagSelectionTarget && tagSelectionTarget[2] === 1
+              ? fileTagDrumComponents.map((e, i) => (
+                  <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                ))
+              : fileTagDrumGenres.map((e, i) => (
+                  <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                ))}
           </Menu>
         )}
       </div>
+      <DeleteConfirm
+        fileExplore
+        open={deletingFile !== null}
+        action={() => deleteFile(deletingFile)}
+        onClose={() => setDeletingFile(null)}
+      />
     </div>
   );
 }
