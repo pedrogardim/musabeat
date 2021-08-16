@@ -19,6 +19,8 @@ import {
   Chip,
   Menu,
   MenuItem,
+  Tooltip,
+  Avatar,
 } from "@material-ui/core";
 
 import "./FileExplorer.css";
@@ -36,6 +38,8 @@ function FileExplorer(props) {
   const [filedata, setFiledata] = useState([]);
   const [fileIdList, setFileIdList] = useState([]);
   const [filesUrl, setFilesUrl] = useState([]);
+  const [filesUserData, setFilesUserData] = useState([]);
+
   const [players, setPlayers] = useState([]);
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
@@ -60,17 +64,38 @@ function FileExplorer(props) {
     }
   };
 
-  const getUserFilesList = async () => {
-    /* const user = firebase.auth().currentUser;
-    const dbRef = firebase.storage().ref().child(user.uid);
-    const fileIdList = (await dbRef.list()).items;
+  const getFilesList = async () => {
+    const user = firebase.auth().currentUser;
+    const dbFilesRef = firebase.firestore().collection("files");
+    const usersRef = firebase.firestore().collection("users");
+    const storageRef = firebase.storage();
+
+    let fileQuery = await dbFilesRef.orderBy("loaded").limit(10).get();
+
+    let filesData = fileQuery.docs.map((e) => e.data());
+    let fileIdList = fileQuery.docs.map((e) => e.id);
+
+    setFiledata(filesData);
     setFileIdList(fileIdList);
 
-    const filesMetadata = await Promise.all(
-      fileIdList.map((e, i) => e.getMetadata())
+    const filesUrl = await Promise.all(
+      fileIdList.map(async (e, i) => {
+        return await storageRef.ref(e).getDownloadURL();
+      })
     );
-    setFiledata(filesMetadata); */
 
+    setFilesUrl(filesUrl);
+
+    const usersData = await Promise.all(
+      filesData.map(async (e, i) => {
+        return (await usersRef.doc(e.user).get()).get("profile");
+      })
+    );
+
+    setFilesUserData(usersData);
+  };
+
+  const getUserFilesList = async () => {
     const user = firebase.auth().currentUser;
     const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
     const dbFilesRef = firebase.firestore().collection("files");
@@ -78,7 +103,6 @@ function FileExplorer(props) {
 
     const fileIdList = (await dbUserRef.get()).get("files");
 
-    //console.log(fileIdList);
     setFileIdList(fileIdList);
 
     const filesData = await Promise.all(
@@ -86,7 +110,6 @@ function FileExplorer(props) {
         return (await dbFilesRef.doc(e).get()).data();
       })
     );
-    //console.log(filesMetadata);
 
     setFiledata(filesData);
 
@@ -96,7 +119,6 @@ function FileExplorer(props) {
       })
     );
 
-    //console.log(filesUrl);
     setFilesUrl(filesUrl);
   };
 
@@ -202,8 +224,12 @@ function FileExplorer(props) {
   };
 
   useEffect(() => {
-    user && getUserFilesList();
-  }, [user]);
+    props.userFiles & user && getUserFilesList();
+  }, [props.userFiles, user]);
+
+  useEffect(() => {
+    props.explore && getFilesList();
+  }, [props.explore]);
 
   useEffect(() => {
     return () => {
@@ -212,8 +238,8 @@ function FileExplorer(props) {
   }, []);
 
   useEffect(() => {
-    //console.log(players);
-  }, [players]);
+    console.log(props.userFiles);
+  }, [props.userFiles]);
 
   return (
     <div className="file-explorer">
@@ -242,6 +268,9 @@ function FileExplorer(props) {
                   <TableRow>
                     <TableCell style={{ width: 50 }}></TableCell>
                     <TableCell>Name</TableCell>
+                    {props.explore && (
+                      <TableCell style={{ width: 50 }}> User</TableCell>
+                    )}
                     <Fragment>
                       <TableCell>Categories</TableCell>
 
@@ -249,9 +278,11 @@ function FileExplorer(props) {
                       <TableCell style={{ width: 50 }} align="right">
                         Download
                       </TableCell>
-                      <TableCell style={{ width: 50 }} align="right">
-                        Delete
-                      </TableCell>
+                      {props.userFiles && (
+                        <TableCell style={{ width: 50 }} align="right">
+                          Delete
+                        </TableCell>
+                      )}
                     </Fragment>
                   </TableRow>
                 </TableHead>
@@ -284,6 +315,16 @@ function FileExplorer(props) {
                         {`${row.name}.${fileExtentions[row.type]}`}
                       </Typography>
                     </TableCell>
+                    <TableCell style={{ width: 50 }}>
+                      {filesUserData[index] && (
+                        <Tooltip title={filesUserData[index].displayName}>
+                          <Avatar
+                            alt={filesUserData[index].displayName}
+                            src={filesUserData[index].photoURL}
+                          />
+                        </Tooltip>
+                      )}
+                    </TableCell>
                     <TableCell>
                       {filedata &&
                         [
@@ -296,9 +337,10 @@ function FileExplorer(props) {
                             : "/",
                         ].map((chip, chipIndex) => (
                           <Chip
-                            clickable={chipIndex !== 0}
+                            clickable={!!props.userFiles && chipIndex !== 0}
                             onClick={(e) =>
                               chipIndex !== 0 &&
+                              !!props.userFiles &&
                               setTagSelectionTarget([
                                 e.target,
                                 index,
@@ -320,11 +362,13 @@ function FileExplorer(props) {
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell>
-                        <TableCell align="right">
-                          <IconButton onClick={() => setDeletingFile(index)}>
-                            <Icon>delete</Icon>
-                          </IconButton>
-                        </TableCell>
+                        {props.userFiles && (
+                          <TableCell align="right">
+                            <IconButton onClick={() => setDeletingFile(index)}>
+                              <Icon>delete</Icon>
+                            </IconButton>
+                          </TableCell>
+                        )}
                       </Fragment>
                     )}
                   </TableRow>

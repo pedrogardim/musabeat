@@ -128,7 +128,7 @@ function App() {
           <MenuItem onClick={() => handlePageNav("sessions")}>
             {t("avatar.userSessions")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("files")}>
+          <MenuItem onClick={() => handlePageNav("userFiles")}>
             {t("avatar.userSamples")}
           </MenuItem>
           <MenuItem onClick={() => setUserOption(false)}>
@@ -180,7 +180,10 @@ function App() {
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer />
+            <FileExplorer explore />
+          </Route>
+          <Route exact path="/userFiles">
+            <FileExplorer userFiles />
           </Route>
           <Route exact path="/file/:key">
             <FilePage />
