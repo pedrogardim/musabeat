@@ -21,6 +21,8 @@ import {
   MenuItem,
   Tooltip,
   Avatar,
+  BottomNavigationAction,
+  BottomNavigation,
 } from "@material-ui/core";
 
 import "./FileExplorer.css";
@@ -39,6 +41,8 @@ function FileExplorer(props) {
   const [fileIdList, setFileIdList] = useState([]);
   const [filesUrl, setFilesUrl] = useState([]);
   const [filesUserData, setFilesUserData] = useState([]);
+
+  const [loaded, isLoaded] = useState(false);
 
   const [userLikedFiles, setUserLikedFiles] = useState([]);
 
@@ -76,6 +80,8 @@ function FileExplorer(props) {
     const dbFilesRef = firebase.firestore().collection("files");
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
+
+    //isLoaded(false);
 
     let fileQuery = await dbFilesRef
       .orderBy("loaded")
@@ -117,6 +123,10 @@ function FileExplorer(props) {
     const fileIdList = (await dbUserRef.get()).get(
       liked ? "likedFiles" : "files"
     );
+
+    //isLoaded(false);
+
+    console.log(fileIdList);
 
     setFileIdList(fileIdList);
 
@@ -279,6 +289,10 @@ function FileExplorer(props) {
   };
 
   useEffect(() => {
+    isLoaded(true);
+  }, [filedata]);
+
+  useEffect(() => {
     clearFiles();
     !!props.userFiles && user && getUserFilesList();
   }, [props.userFiles, user]);
@@ -296,8 +310,8 @@ function FileExplorer(props) {
   }, []);
 
   useEffect(() => {
-    console.log(props.userFiles);
-  }, [props.userFiles]);
+    isLoaded(false);
+  }, [showingLiked]);
 
   return (
     <div className="file-explorer">
@@ -313,7 +327,7 @@ function FileExplorer(props) {
           <Divider orientation="vertical" />
         </Fragment>
       )}
-      {!!filedata.length ? (
+      {loaded ? (
         <Table
           component={props.compact ? "div" : Paper}
           size="small"
@@ -337,7 +351,7 @@ function FileExplorer(props) {
                 )}
                 <Fragment>
                   <TableCell>Categories</TableCell>
-                  {props.explore && (
+                  {(props.explore || !!showingLiked) && (
                     <TableCell style={{ width: 50 }} align="center">
                       Like
                     </TableCell>
@@ -448,7 +462,7 @@ function FileExplorer(props) {
                 </TableCell>
                 {!props.compact && (
                   <Fragment>
-                    {props.explore && (
+                    {(props.explore || !!showingLiked) && (
                       <TableCell style={{ width: 50 }} align="center">
                         <IconButton onClick={() => handleLike(index)}>
                           <Icon
@@ -492,7 +506,7 @@ function FileExplorer(props) {
       ) : (
         <CircularProgress />
       )}
-      {!props.compact && (
+      {props.userFiles && (
         <Menu
           anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
           keepMounted
@@ -509,12 +523,29 @@ function FileExplorer(props) {
         </Menu>
       )}
 
-      <DeleteConfirm
-        fileExplore
-        open={deletingFile !== null}
-        action={() => deleteFile(deletingFile)}
-        onClose={() => setDeletingFile(null)}
-      />
+      {props.userFiles && (
+        <DeleteConfirm
+          fileExplore
+          open={deletingFile !== null}
+          action={() => deleteFile(deletingFile)}
+          onClose={() => setDeletingFile(null)}
+        />
+      )}
+
+      {props.userFiles && loaded && (
+        <BottomNavigation
+          className="fet-user-bottom-nav"
+          value={showingLiked}
+          onChange={(event, newValue) => {
+            getUserFilesList(newValue);
+            setShowingLiked(newValue);
+          }}
+          showLabels
+        >
+          <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
+          <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
+        </BottomNavigation>
+      )}
     </div>
   );
 }

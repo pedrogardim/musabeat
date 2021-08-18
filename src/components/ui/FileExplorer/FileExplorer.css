@@ -28,6 +28,10 @@
   flex-wrap: nowrap;
 }
 
+.fet-user-bottom-nav {
+  margin: 16px;
+}
+
 .fet-compact tr {
   transition: background-color 0.1s;
 }
