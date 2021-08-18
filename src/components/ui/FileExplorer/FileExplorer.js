@@ -30,6 +30,7 @@ import "./FileExplorer.css";
 import firebase from "firebase";
 
 import DeleteConfirm from "../Dialogs/DeleteConfirm";
+import NameInput from "../Dialogs/NameInput";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
 
@@ -51,10 +52,10 @@ function FileExplorer(props) {
   const [currentPlaying, setCurrentPlaying] = useState(null);
 
   const [deletingFile, setDeletingFile] = useState(null);
+  const [renamingFile, setRenamingFile] = useState(null);
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const [exploringPage, setExploringPage] = useState(false);
   const [lastVisible, setLastVisible] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
@@ -281,6 +282,21 @@ function FileExplorer(props) {
     setFilesUrl((prev) => prev.filter((e, i) => i !== index));
   };
 
+  const renameFile = (newValue) => {
+    let index = renamingFile;
+    //console.log(fileIdList[index]);
+    firebase
+      .firestore()
+      .collection("files")
+      .doc(fileIdList[index])
+      .update({ name: newValue });
+    setFiledata((prev) => {
+      let newFiledata = [...prev];
+      newFiledata[index].name = newValue;
+      return newFiledata;
+    });
+  };
+
   const clearFiles = () => {
     setFiledata([]);
     setFileIdList([]);
@@ -399,6 +415,11 @@ function FileExplorer(props) {
                   >
                     {`${row.name}.${fileExtentions[row.type]}`}
                   </Typography>
+                  {props.userFiles && filedata[index].user === user.uid && (
+                    <IconButton onClick={() => setRenamingFile(index)}>
+                      <Icon>edit</Icon>
+                    </IconButton>
+                  )}
                 </TableCell>
                 {props.explore && (
                   <TableCell
@@ -529,6 +550,13 @@ function FileExplorer(props) {
           open={deletingFile !== null}
           action={() => deleteFile(deletingFile)}
           onClose={() => setDeletingFile(null)}
+        />
+      )}
+      {props.userFiles && (
+        <NameInput
+          open={renamingFile !== null}
+          onSubmit={(newValue) => renameFile(newValue)}
+          onClose={() => setRenamingFile(null)}
         />
       )}
 

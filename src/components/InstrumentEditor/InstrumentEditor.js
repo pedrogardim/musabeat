@@ -386,14 +386,12 @@ function InstrumentEditor(props) {
         setRenamingLabel={setRenamingLabel}
       />
 
-      {renamingLabel !== null && (
-        <NameInput
-          select
-          open={renamingLabel !== null}
-          onClose={() => setRenamingLabel(null)}
-          onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}
-        />
-      )}
+      <NameInput
+        select
+        open={renamingLabel !== null}
+        onClose={() => setRenamingLabel(null)}
+        onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}
+      />
     </div>
   );
 }

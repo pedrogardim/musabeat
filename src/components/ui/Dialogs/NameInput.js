@@ -24,7 +24,7 @@ function NameInput(props) {
   };
 
   return (
-    <Dialog open="true" onClose={props.onClose}>
+    <Dialog open={props.open} onClose={props.onClose}>
       <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
         <TextField ref={inputRef} />

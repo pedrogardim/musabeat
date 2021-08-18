@@ -23,8 +23,6 @@ import {
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import NameInput from "../../Dialogs/NameInput";
-
 import { useTranslation } from "react-i18next";
 import {
   fileTags,

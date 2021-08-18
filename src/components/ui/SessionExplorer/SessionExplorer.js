@@ -268,12 +268,13 @@ function SessionExplorer(props) {
           </DialogActions>
         </Dialog>
       )} */}
-      {renameDialog !== null && (
-        <NameInput
-          onSubmit={handleSessionRename}
-          onClose={() => setRenameDialog(null)}
-        />
-      )}
+
+      <NameInput
+        open={renameDialog !== null}
+        onSubmit={handleSessionRename}
+        onClose={() => setRenameDialog(null)}
+      />
+
       {playingSession !== null && (
         <Workspace
           hidden

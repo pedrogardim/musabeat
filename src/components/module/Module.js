@@ -458,6 +458,7 @@ function Module(props) {
           {renameDialog && (
             <NameInput
               onSubmit={handleModuleRename}
+              open={renameDialog}
               onClose={() => setRenameDialog(false)}
             />
           )}
