@@ -40,6 +40,8 @@ function FileExplorer(props) {
   const [filesUrl, setFilesUrl] = useState([]);
   const [filesUserData, setFilesUserData] = useState([]);
 
+  const [userLikedFiles, setUserLikedFiles] = useState([]);
+
   const [players, setPlayers] = useState([]);
   const [loadingPlay, setLoadingPlay] = useState(null);
   const [currentPlaying, setCurrentPlaying] = useState(null);
@@ -47,6 +49,11 @@ function FileExplorer(props) {
   const [deletingFile, setDeletingFile] = useState(null);
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
+
+  const [exploringPage, setExploringPage] = useState(false);
+  const [lastVisible, setLastVisible] = useState(null);
+
+  const [showingLiked, setShowingLiked] = useState(false);
 
   const user = firebase.auth().currentUser;
 
@@ -64,13 +71,19 @@ function FileExplorer(props) {
     }
   };
 
-  const getFilesList = async () => {
+  const getFilesList = async (page) => {
     const user = firebase.auth().currentUser;
     const dbFilesRef = firebase.firestore().collection("files");
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
 
-    let fileQuery = await dbFilesRef.orderBy("loaded").limit(10).get();
+    let fileQuery = await dbFilesRef
+      .orderBy("loaded")
+      .startAfter(lastVisible)
+      .limit(10)
+      .get();
+
+    setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
 
     let filesData = fileQuery.docs.map((e) => e.data());
     let fileIdList = fileQuery.docs.map((e) => e.id);
@@ -95,13 +108,15 @@ function FileExplorer(props) {
     setFilesUserData(usersData);
   };
 
-  const getUserFilesList = async () => {
+  const getUserFilesList = async (liked) => {
     const user = firebase.auth().currentUser;
     const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
     const dbFilesRef = firebase.firestore().collection("files");
     const storageRef = firebase.storage();
 
-    const fileIdList = (await dbUserRef.get()).get("files");
+    const fileIdList = (await dbUserRef.get()).get(
+      liked ? "likedFiles" : "files"
+    );
 
     setFileIdList(fileIdList);
 
@@ -122,6 +137,15 @@ function FileExplorer(props) {
     setFilesUrl(filesUrl);
   };
 
+  const getUserLikes = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(user.uid)
+      .get()
+      .then((r) => setUserLikedFiles(r.get("likedFiles")));
+  };
+
   const handleDownload = (index) => {
     let url = filesUrl[index];
     console.log(url);
@@ -138,6 +162,30 @@ function FileExplorer(props) {
     };
     xhr.open("GET", url);
     xhr.send();
+  };
+
+  const handleLike = (index) => {
+    if (user === null) return;
+    let likedFileId = fileIdList[index];
+
+    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbFileRef = firebase.firestore().collection("files").doc(likedFileId);
+
+    if (!userLikedFiles.includes(likedFileId)) {
+      dbUserRef.update({
+        likedFiles: firebase.firestore.FieldValue.arrayUnion(likedFileId),
+      });
+
+      dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+      setUserLikedFiles((prev) => [...prev, likedFileId]);
+    } else {
+      dbUserRef.update({
+        likedFiles: firebase.firestore.FieldValue.arrayRemove(likedFileId),
+      });
+
+      dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+      setUserLikedFiles((prev) => prev.filter((e) => e !== likedFileId));
+    }
   };
 
   const playSound = (index) => {
@@ -223,13 +271,23 @@ function FileExplorer(props) {
     setFilesUrl((prev) => prev.filter((e, i) => i !== index));
   };
 
+  const clearFiles = () => {
+    setFiledata([]);
+    setFileIdList([]);
+    setFilesUrl([]);
+    setFilesUserData([]);
+  };
+
   useEffect(() => {
-    props.userFiles & user && getUserFilesList();
+    clearFiles();
+    !!props.userFiles && user && getUserFilesList();
   }, [props.userFiles, user]);
 
   useEffect(() => {
+    clearFiles();
     props.explore && getFilesList();
-  }, [props.explore]);
+    user && getUserLikes();
+  }, [props.explore, user]);
 
   useEffect(() => {
     return () => {
@@ -255,79 +313,98 @@ function FileExplorer(props) {
           <Divider orientation="vertical" />
         </Fragment>
       )}
-      <div className="file-explorer-column">
-        {!!filedata.length ? (
-          <TableContainer className="file-explorer-table">
-            <Table
-              component={!props.compact ? Paper : "div"}
-              size="small"
-              className={props.compact ? "fet-compact" : "fet-normal"}
-            >
-              {!props.compact && (
-                <TableHead>
-                  <TableRow>
-                    <TableCell style={{ width: 50 }}></TableCell>
-                    <TableCell>Name</TableCell>
-                    {props.explore && (
-                      <TableCell style={{ width: 50 }}> User</TableCell>
-                    )}
-                    <Fragment>
-                      <TableCell>Categories</TableCell>
-
-                      <TableCell align="right">Size</TableCell>
-                      <TableCell style={{ width: 50 }} align="right">
-                        Download
-                      </TableCell>
-                      {props.userFiles && (
-                        <TableCell style={{ width: 50 }} align="right">
-                          Delete
-                        </TableCell>
-                      )}
-                    </Fragment>
-                  </TableRow>
-                </TableHead>
-              )}
-              <TableBody>
-                {filedata.map((row, index) => (
-                  <TableRow
-                    key={row.name}
-                    onClick={(e) => handleFileSelect(e, index)}
+      {!!filedata.length ? (
+        <Table
+          component={props.compact ? "div" : Paper}
+          size="small"
+          className={`file-explorer-table ${
+            props.compact ? "fet-compact" : "fet-normal"
+          }`}
+        >
+          {!props.compact && (
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ width: 50 }}></TableCell>
+                <TableCell>Name</TableCell>
+                {props.explore && (
+                  <TableCell
+                    className="fet-collapsable-column"
+                    style={{ width: 50 }}
                   >
-                    <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                      {loadingPlay === index ? (
-                        <CircularProgress size={27} />
-                      ) : currentPlaying === index ? (
-                        <IconButton onClick={() => stopSound(index)}>
-                          <Icon>stop</Icon>
-                        </IconButton>
-                      ) : (
-                        <IconButton onClick={() => playSound(index)}>
-                          <Icon>play_arrow</Icon>
-                        </IconButton>
-                      )}
+                    {" "}
+                    User
+                  </TableCell>
+                )}
+                <Fragment>
+                  <TableCell>Categories</TableCell>
+                  {props.explore && (
+                    <TableCell style={{ width: 50 }} align="center">
+                      Like
                     </TableCell>
-                    <TableCell component="th" scope="row">
-                      <Typography
-                        variant="overline"
-                        className="fe-filename"
-                        onClick={() => openFilePage(fileIdList[index])}
-                      >
-                        {`${row.name}.${fileExtentions[row.type]}`}
-                      </Typography>
+                  )}
+
+                  <TableCell className="fet-collapsable-column" align="center">
+                    Size
+                  </TableCell>
+                  <TableCell style={{ width: 50 }} align="center">
+                    Download
+                  </TableCell>
+                  {props.userFiles && (
+                    <TableCell style={{ width: 50 }} align="center">
+                      Delete
                     </TableCell>
-                    <TableCell style={{ width: 50 }}>
-                      {filesUserData[index] && (
-                        <Tooltip title={filesUserData[index].displayName}>
-                          <Avatar
-                            alt={filesUserData[index].displayName}
-                            src={filesUserData[index].photoURL}
-                          />
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {filedata &&
-                        [
+                  )}
+                </Fragment>
+              </TableRow>
+            </TableHead>
+          )}
+          <TableBody>
+            {filedata.map((row, index) => (
+              <TableRow
+                key={row.name}
+                onClick={(e) => handleFileSelect(e, index)}
+              >
+                <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                  {loadingPlay === index ? (
+                    <CircularProgress size={27} />
+                  ) : currentPlaying === index ? (
+                    <IconButton onClick={() => stopSound(index)}>
+                      <Icon>stop</Icon>
+                    </IconButton>
+                  ) : (
+                    <IconButton onClick={() => playSound(index)}>
+                      <Icon>play_arrow</Icon>
+                    </IconButton>
+                  )}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  <Typography
+                    variant="overline"
+                    className="fe-filename"
+                    onClick={() => openFilePage(fileIdList[index])}
+                  >
+                    {`${row.name}.${fileExtentions[row.type]}`}
+                  </Typography>
+                </TableCell>
+                {props.explore && (
+                  <TableCell
+                    className="fet-collapsable-column"
+                    style={{ width: 50 }}
+                  >
+                    {filesUserData[index] && (
+                      <Tooltip title={filesUserData[index].displayName}>
+                        <Avatar
+                          alt={filesUserData[index].displayName}
+                          src={filesUserData[index].photoURL}
+                        />
+                      </Tooltip>
+                    )}
+                  </TableCell>
+                )}
+                <TableCell>
+                  <div className="fet-chip-cell">
+                    {filedata && props.userFiles
+                      ? [
                           filedata[index].categ[0],
                           filedata[index].categ[1]
                             ? filedata[index].categ[1]
@@ -350,52 +427,88 @@ function FileExplorer(props) {
                             className={"file-tag-chip"}
                             label={chip === "/" ? "..." : fileTags[chip]}
                           />
+                        ))
+                      : filedata[index].categ.map((chip, chipIndex) => (
+                          <Chip
+                            clickable={!!props.userFiles && chipIndex !== 0}
+                            onClick={(e) =>
+                              chipIndex !== 0 &&
+                              !!props.userFiles &&
+                              setTagSelectionTarget([
+                                e.target,
+                                index,
+                                chipIndex,
+                              ])
+                            }
+                            className={"file-tag-chip"}
+                            label={chip === "/" ? "..." : fileTags[chip]}
+                          />
                         ))}
-                    </TableCell>
-                    {!props.compact && (
-                      <Fragment>
-                        <TableCell align="right">
-                          {formatBytes(row.size)}
-                        </TableCell>
-                        <TableCell align="right">
-                          <IconButton onClick={() => handleDownload(index)}>
-                            <Icon>file_download</Icon>
-                          </IconButton>
-                        </TableCell>
-                        {props.userFiles && (
-                          <TableCell align="right">
-                            <IconButton onClick={() => setDeletingFile(index)}>
-                              <Icon>delete</Icon>
-                            </IconButton>
-                          </TableCell>
-                        )}
-                      </Fragment>
+                  </div>
+                </TableCell>
+                {!props.compact && (
+                  <Fragment>
+                    {props.explore && (
+                      <TableCell style={{ width: 50 }} align="center">
+                        <IconButton onClick={() => handleLike(index)}>
+                          <Icon
+                            color={
+                              userLikedFiles.includes(fileIdList[index])
+                                ? "secondary"
+                                : "inherit"
+                            }
+                          >
+                            favorite
+                          </Icon>
+                        </IconButton>
+                      </TableCell>
                     )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ) : (
-          <CircularProgress />
-        )}
-        {!props.compact && (
-          <Menu
-            anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
-            keepMounted
-            open={Boolean(tagSelectionTarget)}
-            onClose={() => setTagSelectionTarget(null)}
-          >
-            {tagSelectionTarget && tagSelectionTarget[2] === 1
-              ? fileTagDrumComponents.map((e, i) => (
-                  <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
-                ))
-              : fileTagDrumGenres.map((e, i) => (
-                  <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
-                ))}
-          </Menu>
-        )}
-      </div>
+                    <TableCell
+                      className="fet-collapsable-column"
+                      align="center"
+                    >
+                      <Typography variant="overline">
+                        {formatBytes(row.size)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton onClick={() => handleDownload(index)}>
+                        <Icon>file_download</Icon>
+                      </IconButton>
+                    </TableCell>
+                    {props.userFiles && (
+                      <TableCell align="center">
+                        <IconButton onClick={() => setDeletingFile(index)}>
+                          <Icon>delete</Icon>
+                        </IconButton>
+                      </TableCell>
+                    )}
+                  </Fragment>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      ) : (
+        <CircularProgress />
+      )}
+      {!props.compact && (
+        <Menu
+          anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
+          keepMounted
+          open={Boolean(tagSelectionTarget)}
+          onClose={() => setTagSelectionTarget(null)}
+        >
+          {tagSelectionTarget && tagSelectionTarget[2] === 1
+            ? fileTagDrumComponents.map((e, i) => (
+                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+              ))
+            : fileTagDrumGenres.map((e, i) => (
+                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+              ))}
+        </Menu>
+      )}
+
       <DeleteConfirm
         fileExplore
         open={deletingFile !== null}
