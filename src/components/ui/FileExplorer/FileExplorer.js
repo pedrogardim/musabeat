@@ -23,9 +23,10 @@ import {
   Avatar,
   BottomNavigationAction,
   BottomNavigation,
+  TextField,
 } from "@material-ui/core";
 
-import Skeleton from "@material-ui/lab/Skeleton";
+import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
 
 import "./FileExplorer.css";
 
@@ -61,6 +62,9 @@ function FileExplorer(props) {
   const [lastVisible, setLastVisible] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
+
+  const [searchTags, setSearchTags] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
 
   const user = firebase.auth().currentUser;
 
@@ -139,7 +143,7 @@ function FileExplorer(props) {
       return;
     }
 
-    console.log(fileIdList);
+    //console.log(fileIdList);
 
     setFileIdList(fileIdList);
 
@@ -171,7 +175,7 @@ function FileExplorer(props) {
 
   const handleDownload = (index) => {
     let url = filesUrl[index];
-    console.log(url);
+    //console.log(url);
     var xhr = new XMLHttpRequest();
     xhr.responseType = "blob";
     xhr.onload = function (event) {
@@ -342,8 +346,12 @@ function FileExplorer(props) {
   }, [showingLiked]);
 
   useEffect(() => {
-    console.log(loaded);
+    //console.log(loaded);
   }, [loaded]);
+
+  useEffect(() => {
+    //console.log(searchTags, searchValue);
+  }, [searchTags, searchValue]);
 
   return (
     <div className="file-explorer">
@@ -357,6 +365,34 @@ function FileExplorer(props) {
             </List>
           </div>
           <Divider orientation="vertical" />
+        </Fragment>
+      )}
+
+      {!props.compact && (
+        <Fragment>
+          <Autocomplete
+            multiple
+            freeSolo
+            className="file-explorer-searchbar"
+            options={fileTags}
+            onChange={(e, v) => {
+              setSearchTags(v);
+              setSearchValue("");
+            }}
+            value={searchTags}
+            /*             getOptionLabel={(option) => option.title}
+             */ renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="standard"
+                label="Search"
+                placeholder="Pick categories or search by file's or user's name"
+                onChange={(e) => setSearchValue(e.target.value)}
+                value={searchValue}
+              />
+            )}
+          />
+          <div className="break" />
         </Fragment>
       )}
 

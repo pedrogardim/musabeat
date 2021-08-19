@@ -23,6 +23,12 @@
   max-width: 1200px;
 }
 
+.file-explorer-searchbar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px 0;
+}
+
 .fet-chip-cell {
   display: flex !important;
   flex-wrap: nowrap;
