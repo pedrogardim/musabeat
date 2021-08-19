@@ -82,7 +82,7 @@ function FileExplorer(props) {
     }
   };
 
-  const getFilesList = async (page) => {
+  const getFilesList = async (tags, name) => {
     const user = firebase.auth().currentUser;
     const dbFilesRef = firebase.firestore().collection("files");
     const usersRef = firebase.firestore().collection("users");
@@ -90,13 +90,28 @@ function FileExplorer(props) {
 
     //isLoaded(false);
 
-    let fileQuery = await dbFilesRef
-      .orderBy("loaded")
-      .startAfter(lastVisible)
-      .limit(10)
-      .get();
+    let queryRules = () => {
+      let rules = dbFilesRef;
 
-    setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
+      if (name) {
+        rules = rules
+          .where("name", ">=", name)
+          .where("name", "<=", name + "\uf8ff");
+      }
+      if (tags && tags.length > 0) {
+        let tagsIds = tags
+          .map((e) => fileTags.indexOf(e))
+          .filter((e) => e !== -1);
+        console.log(tagsIds);
+        rules = rules.where("categ", "array-contains-any", tagsIds);
+      }
+
+      return rules;
+    };
+
+    let fileQuery = await queryRules().limit(10).get();
+
+    //setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
 
     if (fileQuery.empty) {
       setFiledata(null);
@@ -350,7 +365,8 @@ function FileExplorer(props) {
   }, [loaded]);
 
   useEffect(() => {
-    //console.log(searchTags, searchValue);
+    getFilesList(searchTags, searchValue);
+    //console.log("change triggered");
   }, [searchTags, searchValue]);
 
   return (
@@ -368,7 +384,7 @@ function FileExplorer(props) {
         </Fragment>
       )}
 
-      {!props.compact && (
+      {!props.compact && props.explore && (
         <Fragment>
           <Autocomplete
             multiple

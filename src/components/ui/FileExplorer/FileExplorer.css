@@ -21,6 +21,12 @@
   justify-content: center;
   width: 100%;
   max-width: 1200px;
+  min-height: 600px;
+}
+
+.file-explorer-table tr,
+.file-explorer-table td {
+  max-height: 61px;
 }
 
 .file-explorer-searchbar {
