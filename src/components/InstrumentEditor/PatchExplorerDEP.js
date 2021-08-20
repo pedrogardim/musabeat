@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import SavePatch from "../../components/ui/Dialogs/SavePatch";
 
-import "./PatchExplorer.css";
+import "./PatchExplorerDEP.css";
 
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
@@ -103,7 +103,7 @@ function PatchExplorer(props) {
       ? loadDrumPatch(patchKey, props.setInstrumentsLoaded, props.index).then(
           (r) => props.setInstrument(r)
         )
-      : patchLoader(patchKey, "", props.setInstrumentsLoaded).then((r) =>
+      : patchLoader(patchKey, props.setInstrumentsLoaded).then((r) =>
           props.setInstrument(r)
         );
 

@@ -1,0 +1,89 @@
+.patch-explorer {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  background-color: white;
+  overflow-y: scroll;
+}
+
+.patch-explorer-table {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  min-height: 600px;
+}
+
+.patch-explorer-table tr,
+.patch-explorer-table td {
+  max-height: 61px;
+}
+
+.patch-explorer-searchbar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 32px 0;
+}
+
+.pet-chip-cell {
+  display: flex !important;
+  flex-wrap: nowrap;
+}
+
+.pet-user-bottom-nav {
+  margin: 16px;
+}
+
+.pet-compact tr {
+  transition: background-color 0.1s;
+}
+
+.pet-compact tr:hover {
+  background-color: #00000012;
+  cursor: pointer;
+}
+
+.pet-compact {
+  position: relative;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.pet-compact button {
+  height: 32px !important;
+  width: 32px !important;
+}
+
+.pet-normal {
+  width: 100% !important;
+}
+
+.pet-list {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+@media only screen and (max-width: 800px) {
+  /* .patch-explorer-table {
+    width: 95% !important;
+  } */
+
+  .pet-collapsable-column {
+    display: none !important;
+  }
+}
+
+.fe-filename:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}

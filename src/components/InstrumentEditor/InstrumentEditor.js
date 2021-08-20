@@ -9,7 +9,7 @@ import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
-import PatchExplorer from "./PatchExplorer";
+import PatchExplorer from "./PatchExplorerDEP";
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
 

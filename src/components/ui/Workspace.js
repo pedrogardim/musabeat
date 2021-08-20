@@ -326,7 +326,7 @@ function Workspace(props) {
       else if (typeof module.instrument === "string") {
         patchLoader(
           module.instrument,
-          "",
+
           setInstrumentsLoaded,
           moduleIndex
         ).then((r) =>
@@ -412,13 +412,12 @@ function Workspace(props) {
     }
     //load from patch id
     else if (typeof module.instrument === "string") {
-      patchLoader(module.instrument, "", setInstrumentsLoaded, index).then(
-        (r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[index] = r;
-            return a;
-          })
+      patchLoader(module.instrument, setInstrumentsLoaded, index).then((r) =>
+        setInstruments((prev) => {
+          let a = [...prev];
+          a[index] = r;
+          return a;
+        })
       );
     } //load from obj
     else if (typeof module.instrument === "object" && !instruments[index]) {

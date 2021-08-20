@@ -24,6 +24,7 @@ import Workspace from "./components/ui/Workspace";
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import FilePage from "./components/ui/FileExplorer/FilePage";
+import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/AuthDialog";
@@ -184,6 +185,12 @@ function App() {
           </Route>
           <Route exact path="/userFiles">
             <FileExplorer userFiles />
+          </Route>
+          <Route exact path="/instruments">
+            <PatchExplorer explore />
+          </Route>
+          <Route exact path="/userInstruments">
+            <PatchExplorer userPatches />
           </Route>
           <Route exact path="/file/:key">
             <FilePage />

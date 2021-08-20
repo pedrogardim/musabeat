@@ -678,12 +678,7 @@ export const getChordsFromScale = (scale, root, extentions) => {
   return scalechords;
 };
 
-export const patchLoader = async (
-  input,
-  type,
-  setInstrumentsLoaded,
-  moduleIndex
-) => {
+export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
   let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
@@ -712,16 +707,16 @@ export const patchLoader = async (
   } else {
     instrumentLoaded(true);
   }
-  if (patch.base === "FM" || type === "FMSynth") {
+  if (patch.base === "FM") {
     instr = new Tone.PolySynth(Tone.FMSynth, options);
   }
-  if (patch.base === "AM" || type === "AMSynth") {
+  if (patch.base === "AM") {
     instr = new Tone.PolySynth(Tone.AMSynth, options);
   }
-  if (patch.base === "Mono" || type === "Synth") {
+  if (patch.base === "Mono") {
     instr = new Tone.PolySynth(Tone.MonoSynth, options);
   }
-  if (patch.base === "Synth" || type === "Synth") {
+  if (patch.base === "Synth") {
     instr = new Tone.PolySynth(Tone.Synth, options);
   }
   if (patch.base === undefined) {
@@ -778,14 +773,19 @@ export const patchLoader = async (
 export const loadSamplerFromObject = async (
   obj,
   setInstrumentsLoaded,
-  moduleIndex
+  moduleIndex,
+  nowLoaded
 ) => {
-  let instrumentLoaded = (isLoaded) => {
+  let instrumentLoaded = (isLoaded, sampler) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
       a[moduleIndex] = isLoaded;
       return a;
     });
+
+    //for PatchExplorer
+
+    if (nowLoaded !== undefined && isLoaded && sampler) nowLoaded(sampler);
   };
 
   instrumentLoaded(false);
@@ -807,7 +807,7 @@ export const loadSamplerFromObject = async (
   //console.log(urls);
 
   let sampler = new Tone.Sampler(urls, () =>
-    instrumentLoaded(true)
+    instrumentLoaded(true, sampler)
   ).toDestination();
 
   //sampler.set(options);
@@ -817,14 +817,17 @@ export const loadSamplerFromObject = async (
 
 export const loadSynthFromGetObject = (obj) => {
   //TODO: differ AM from FM Synth
+  let options = obj.hasOwnProperty("name") ? obj.options : obj;
 
-  let instrBase = obj.hasOwnProperty("filter")
+  let instrBase = options.hasOwnProperty("filter")
     ? Tone.MonoSynth
-    : obj.hasOwnProperty("modulation")
+    : options.hasOwnProperty("modulation")
     ? Tone.FMSynth
     : Tone.Synth;
 
-  let instr = new Tone.PolySynth(instrBase, obj).toDestination();
+  let instr = new Tone.PolySynth(instrBase, options).toDestination();
+
+  if (obj.hasOwnProperty("volume")) instr.volume.value = obj.volume;
 
   return instr;
 };
