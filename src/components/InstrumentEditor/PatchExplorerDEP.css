@@ -58,3 +58,7 @@
   margin: 16px;
   text-align: center;
 }
+
+.pet-row-compact > * {
+  max-width: 30px !important;
+}

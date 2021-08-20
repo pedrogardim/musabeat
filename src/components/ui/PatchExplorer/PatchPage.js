@@ -22,7 +22,7 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import "./FilePage.css";
+import "./PatchPage.css";
 
 import {
   fileExtentions,
@@ -34,7 +34,7 @@ import { colors } from "../../../utils/materialPalette";
 import { get } from "jquery";
 const waveColor = colors[2];
 
-function FilePage(props) {
+function PatchPage(props) {
   const { t } = useTranslation();
 
   const waveformWrapper = useRef(null);
@@ -433,7 +433,7 @@ const drawFileWave = (buffer, h, w) => {
   }
 };
 
-export default FilePage;
+export default PatchPage;
 
 function formatBytes(a, b = 2) {
   if (0 === a) return "0 Bytes";

@@ -9,7 +9,7 @@ import AudioFileItem from "./AudioFileItem";
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
-import PatchExplorer from "./PatchExplorerDEP";
+import PatchExplorer from "../ui/PatchExplorer/PatchExplorer";
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
 
@@ -32,10 +32,15 @@ function InstrumentEditor(props) {
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [filesId, setFilesId] = useState([]);
 
+  const [selectedPatch, setSelectedPatch] = useState(null);
+
   const [renamingLabel, setRenamingLabel] = useState(null);
 
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
+
+  const isDrum = props.module.type === 0;
+
   /* 
   const lookForPatch = () => {
     //temp
@@ -222,6 +227,49 @@ function InstrumentEditor(props) {
     win.focus();
   };
 
+  const saveUserPatch = (name, category) => {
+    console.log(name, category);
+    let user = firebase.auth().currentUser;
+
+    let patch = !isDrum
+      ? {
+          base: props.instrument._dummyVoice.name.replace("Synth", ""),
+          name: !!name ? name : "Untitled Patch",
+          creator: user.uid,
+          categ: !!category || isNaN(category) ? category : 0,
+          options: props.instrument.get(),
+          volume: props.module.volume,
+        }
+      : {
+          name: !!name ? name : "Untitled Drum Patch",
+          creator: user.uid,
+          categ: !!category || isNaN(category) ? category : 0,
+          urls: props.module.instrument.urls,
+          volume: props.module.volume,
+        };
+
+    if (typeof category === "number") patch.categ = parseInt(category);
+
+    const newPatchRef = firebase
+      .firestore()
+      .collection(!isDrum ? "patches" : "drumpatches");
+    newPatchRef.add(patch).then((r) => {
+      props.setModules((previous) =>
+        previous.map((module, i) => {
+          if (i === props.index) {
+            let newModule = { ...module };
+            newModule.instrument = r.id;
+            return newModule;
+          } else {
+            return module;
+          }
+        })
+      );
+    });
+    setSelectedPatch(patch.name);
+    props.setPatchExplorer(false);
+  };
+
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
@@ -326,14 +374,6 @@ function InstrumentEditor(props) {
   return (
     <div
       className="instrument-editor"
-      style={{
-        overflowY:
-          props.instrument.name === "Sampler" ||
-          props.instrument.name === "Players" ||
-          props.instrument.name === "GrainPlayer"
-            ? "overlay"
-            : "hidden",
-      }}
       onDragEnter={() => {
         setDraggingOver(true);
         ieWrapper.current.scrollTop = 0;
@@ -341,6 +381,7 @@ function InstrumentEditor(props) {
       ref={ieWrapper}
     >
       <PatchExplorer
+        compact
         patchExplorer={patchExplorer}
         index={props.index}
         setModules={props.setModules}

@@ -36,7 +36,6 @@ function PatchExplorer(props) {
 
   const [patchesList, setPatchesList] = useState(null);
   const [patchesCreatorList, setPatchesCreatorList] = useState([]);
-  const [selectedPatch, setSelectedPatch] = useState(<CircularProgress />);
   const [savePatchDialog, setSavePatchDialog] = useState(false);
 
   const fetchPatchName = (patchKey) => {

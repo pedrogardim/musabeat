@@ -63,6 +63,12 @@ function PatchExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
+  const [selectedPatch, setSelectedPatch] = useState(
+    props.module && typeof props.module.instrument === "string"
+      ? props.module.instrument
+      : null
+  );
+
   const [lastVisible, setLastVisible] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
@@ -77,7 +83,33 @@ function PatchExplorer(props) {
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
-      props.onPatchClick();
+      if (patchdata[index].base === "Sampler") {
+        loadSamplerFromObject(patchdata[index], () => {}, index).then(
+          (instr) => {
+            props.setInstrument(instr);
+          }
+        );
+      } else {
+        let instr = loadSynthFromGetObject(patchdata[index]);
+        props.setInstrument(instr);
+      }
+
+      props.setModules((previous) =>
+        previous.map((module, i) => {
+          if (i === props.index) {
+            let newModule = { ...module };
+            newModule.instrument = patchIdList[index];
+            newModule.volume = patchdata[index].volume;
+
+            return newModule;
+          } else {
+            return module;
+          }
+        })
+      );
+      setSelectedPatch(patchIdList[index]);
+      //props.setPatchExplorer(false);
+      props.setModulePage(null);
     }
   };
 
@@ -106,7 +138,9 @@ function PatchExplorer(props) {
       return rules;
     };
 
-    let patchQuery = await queryRules().limit(10).get();
+    let patchQuery = await queryRules()
+      .limit(props.compact ? 5 : 10)
+      .get();
 
     //setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
 
@@ -376,26 +410,17 @@ function PatchExplorer(props) {
   }, [searchTags, searchValue]);
 
   return (
-    <div className="patch-explorer">
-      {props.compact && (
-        <Fragment>
-          <div className="patch-explorer-column">
-            <List className="pet-list">
-              <ListItem divider button>
-                User Patches
-              </ListItem>
-            </List>
-          </div>
-          <Divider orientation="vertical" />
-        </Fragment>
-      )}
-
-      {!props.compact && props.explore && (
+    <div
+      className={`patch-explorer ${props.compact && "patch-explorer-compact"}`}
+    >
+      {(props.compact || props.explore) && (
         <Fragment>
           <Autocomplete
             multiple
             freeSolo
-            className="patch-explorer-searchbar"
+            className={`patch-explorer-searchbar ${
+              props.compact && "patch-explorer-searchbar-compact"
+            }`}
             options={instrumentsCategories}
             onChange={(e, v) => {
               setSearchTags(v);
@@ -419,136 +444,146 @@ function PatchExplorer(props) {
       )}
 
       {patchdata !== null ? (
-        <Table
-          component={props.compact ? "div" : Paper}
-          size="small"
-          className={`patch-explorer-table ${
-            props.compact ? "pet-compact" : "pet-normal"
-          }`}
+        <TableContainer
+          className={props.compact ? "pet-cont-compact" : "pet-cont"}
         >
-          {!props.compact && (
-            <TableHead>
-              <TableRow>
-                <TableCell style={{ width: 50 }}></TableCell>
-                <TableCell>Name</TableCell>
-                {props.explore && (
-                  <TableCell
-                    className="pet-collapsable-column"
-                    style={{ width: 50 }}
-                  >
-                    User
-                  </TableCell>
-                )}
-                <Fragment>
-                  <TableCell>Category</TableCell>
-                  {(props.explore || !!showingLiked) && (
-                    <TableCell style={{ width: 50 }} align="center">
-                      Like
+          <Table
+            component={props.compact ? "div" : Paper}
+            size={"small"}
+            className={`patch-explorer-table ${
+              props.compact ? "pet-compact" : "pet-normal"
+            }`}
+          >
+            {!props.compact && (
+              <TableHead>
+                <TableRow>
+                  <TableCell style={{ width: 50 }}></TableCell>
+                  <TableCell>Name</TableCell>
+                  {props.explore && (
+                    <TableCell
+                      className="pet-collapsable-column"
+                      style={{ width: 50 }}
+                    >
+                      User
                     </TableCell>
                   )}
+                  <Fragment>
+                    <TableCell>Category</TableCell>
+                    {(props.explore || !!showingLiked) && (
+                      <TableCell style={{ width: 50 }} align="center">
+                        Like
+                      </TableCell>
+                    )}
 
-                  {/* <TableCell className="pet-collapsable-column" align="center">
+                    {/* <TableCell className="pet-collapsable-column" align="center">
                     Size
                   </TableCell>
                   <TableCell style={{ width: 50 }} align="center">
                     Download
                   </TableCell> */}
-                  {props.userPatches && (
-                    <TableCell style={{ width: 50 }} align="center">
-                      Delete
-                    </TableCell>
-                  )}
-                </Fragment>
-              </TableRow>
-            </TableHead>
-          )}
-          <TableBody>
-            {loaded
-              ? patchdata.map((row, index) => (
-                  <TableRow
-                    key={row.name}
-                    onClick={(e) => handlePatchSelect(e, index)}
-                  >
-                    <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                      {loadingPlay === index ? (
-                        <CircularProgress size={27} />
-                      ) : currentPlaying === index ? (
-                        <IconButton onClick={() => stopPatch(index)}>
-                          <Icon>stop</Icon>
-                        </IconButton>
-                      ) : (
-                        <IconButton onClick={() => playPatch(index)}>
-                          <Icon>play_arrow</Icon>
-                        </IconButton>
-                      )}
-                    </TableCell>
-                    <TableCell component="th" scope="row">
-                      <Typography
-                        variant="overline"
-                        className="fe-filename"
-                        onClick={() => openPatchPage(patchIdList[index])}
-                      >
-                        {row.name}
-                      </Typography>
-                      {patchdata[index].base === "Sampler" && (
-                        <Tooltip arrow placement="top" title="Sampler">
-                          <Icon style={{ fontSize: 16, marginLeft: 4 }}>
-                            graphic_eq
-                          </Icon>
-                        </Tooltip>
-                      )}
-                      {props.userPatches && patchdata[index].user === user.uid && (
-                        <IconButton onClick={() => setRenamingPatch(index)}>
-                          <Icon>edit</Icon>
-                        </IconButton>
-                      )}
-                    </TableCell>
-                    {props.explore && (
-                      <TableCell
-                        className="pet-collapsable-column"
-                        style={{ width: 50 }}
-                      >
-                        {patchesUserData[index] && (
-                          <Tooltip title={patchesUserData[index].displayName}>
-                            <Avatar
-                              alt={patchesUserData[index].displayName}
-                              src={patchesUserData[index].photoURL}
-                            />
-                          </Tooltip>
-                        )}
+                    {props.userPatches && (
+                      <TableCell style={{ width: 50 }} align="center">
+                        Delete
                       </TableCell>
                     )}
-                    <TableCell>
-                      <div className="pet-chip-cell">
-                        <Chip
-                          clickable={true}
-                          onClick={(e) =>
-                            !!props.userPatches &&
-                            setTagSelectionTarget([e.target, index])
-                          }
-                          className={"file-tag-chip"}
-                          label={instrumentsCategories[patchdata[index].categ]}
-                        />
-                      </div>
-                    </TableCell>
-                    {!props.compact && (
-                      <Fragment>
-                        {(props.explore || !!showingLiked) && (
-                          <TableCell style={{ width: 50 }} align="center">
-                            <IconButton onClick={() => handleLike(index)}>
-                              <Icon
-                                color={
-                                  userLikedPatches.includes(patchIdList[index])
-                                    ? "secondary"
-                                    : "inherit"
-                                }
-                              >
-                                favorite
-                              </Icon>
-                            </IconButton>
-                          </TableCell>
+                  </Fragment>
+                </TableRow>
+              </TableHead>
+            )}
+            <TableBody>
+              {loaded
+                ? patchdata.map((row, index) => (
+                    <TableRow
+                      key={row.name}
+                      onClick={(e) => handlePatchSelect(e, index)}
+                      component="th"
+                      scope="row"
+                    >
+                      <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                        {loadingPlay === index ? (
+                          <CircularProgress size={27} />
+                        ) : currentPlaying === index ? (
+                          <IconButton onClick={() => stopPatch(index)}>
+                            <Icon>stop</Icon>
+                          </IconButton>
+                        ) : (
+                          <IconButton onClick={() => playPatch(index)}>
+                            <Icon>play_arrow</Icon>
+                          </IconButton>
                         )}
-                        {/* <TableCell
+                      </TableCell>
+                      <TableCell scope="row">
+                        <Typography
+                          variant="overline"
+                          className="fe-filename"
+                          onClick={() => openPatchPage(patchIdList[index])}
+                        >
+                          {row.name}
+                        </Typography>
+                        {patchdata[index].base === "Sampler" && (
+                          <Tooltip arrow placement="top" title="Sampler">
+                            <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                              graphic_eq
+                            </Icon>
+                          </Tooltip>
+                        )}
+                        {props.userPatches &&
+                          patchdata[index].user === user.uid && (
+                            <IconButton onClick={() => setRenamingPatch(index)}>
+                              <Icon>edit</Icon>
+                            </IconButton>
+                          )}
+                      </TableCell>
+                      {props.explore && (
+                        <TableCell
+                          className="pet-collapsable-column"
+                          style={{ width: 50 }}
+                        >
+                          {patchesUserData[index] && (
+                            <Tooltip title={patchesUserData[index].displayName}>
+                              <Avatar
+                                alt={patchesUserData[index].displayName}
+                                src={patchesUserData[index].photoURL}
+                              />
+                            </Tooltip>
+                          )}
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="pet-chip-cell">
+                          <Chip
+                            clickable={true}
+                            onClick={(e) =>
+                              !!props.userPatches &&
+                              setTagSelectionTarget([e.target, index])
+                            }
+                            className={"file-tag-chip"}
+                            label={
+                              instrumentsCategories[patchdata[index].categ]
+                            }
+                          />
+                        </div>
+                      </TableCell>
+                      {!props.compact && (
+                        <Fragment>
+                          {(props.explore || !!showingLiked) && (
+                            <TableCell style={{ width: 50 }} align="center">
+                              <IconButton onClick={() => handleLike(index)}>
+                                <Icon
+                                  color={
+                                    userLikedPatches.includes(
+                                      patchIdList[index]
+                                    )
+                                      ? "secondary"
+                                      : "inherit"
+                                  }
+                                >
+                                  favorite
+                                </Icon>
+                              </IconButton>
+                            </TableCell>
+                          )}
+                          {/* <TableCell
                           className="pet-collapsable-column"
                           align="center"
                         >
@@ -561,59 +596,68 @@ function PatchExplorer(props) {
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell> */}
-                        {props.userPatches && (
-                          <TableCell align="center">
-                            <IconButton onClick={() => setDeletingPatch(index)}>
-                              <Icon>delete</Icon>
-                            </IconButton>
-                          </TableCell>
-                        )}
-                      </Fragment>
-                    )}
-                  </TableRow>
-                ))
-              : Array(10)
-                  .fill(1)
-                  .map((e) => (
-                    <TableRow style={{ height: 61 }}>
-                      <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                        <IconButton>
-                          <Icon>play_arrow</Icon>
-                        </IconButton>
-                      </TableCell>
-                      <TableCell component="th" scope="row">
-                        <Typography variant="overline" className="fe-filename">
-                          <Skeleton variant="text" />
-                        </Typography>
-                      </TableCell>
-                      {props.explore && (
-                        <TableCell
-                          className="pet-collapsable-column"
-                          style={{ width: 50 }}
-                        >
-                          <Avatar />
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <div className="pet-chip-cell">
-                          <Chip
-                            clickable={false}
-                            className={"file-tag-chip"}
-                            label={"    "}
-                          />
-                        </div>
-                      </TableCell>
-                      {!props.compact && (
-                        <Fragment>
-                          {props.explore && (
-                            <TableCell style={{ width: 50 }} align="center">
-                              <IconButton>
-                                <Icon>favorite</Icon>
+                          {props.userPatches && (
+                            <TableCell align="center">
+                              <IconButton
+                                onClick={() => setDeletingPatch(index)}
+                              >
+                                <Icon>delete</Icon>
                               </IconButton>
                             </TableCell>
                           )}
+                        </Fragment>
+                      )}
+                    </TableRow>
+                  ))
+                : Array(10)
+                    .fill(1)
+                    .map((e) => (
+                      <TableRow>
+                        <TableCell
+                          style={{ width: props.compact ? 20 : 50 }}
+                          component="th"
+                          scope="row"
+                        >
+                          <IconButton>
+                            <Icon>play_arrow</Icon>
+                          </IconButton>
+                        </TableCell>
+                        <TableCell component="th" scope="row">
+                          <Typography
+                            variant="overline"
+                            className="fe-filename"
+                          >
+                            <Skeleton variant="text" />
+                          </Typography>
+                        </TableCell>
+                        {props.explore && (
+                          <TableCell
+                            className="pet-collapsable-column"
+                            style={{ width: 50 }}
+                          >
+                            <Avatar />
+                          </TableCell>
+                        )}
+                        <TableCell>
+                          <div className="pet-chip-cell">
+                            <Chip
+                              clickable={false}
+                              className={"file-tag-chip"}
+                              label={"    "}
+                            />
+                          </div>
+                        </TableCell>
+                        {!props.compact && (
+                          <Fragment>
+                            {props.explore && (
+                              <TableCell style={{ width: 50 }} align="center">
+                                <IconButton>
+                                  <Icon>favorite</Icon>
+                                </IconButton>
+                              </TableCell>
+                            )}
 
-                          {/* <TableCell
+                            {/* <TableCell
                             className="pet-collapsable-column"
                             align="center"
                           >
@@ -626,24 +670,44 @@ function PatchExplorer(props) {
                               <Icon>file_download</Icon>
                             </IconButton>
                           </TableCell> */}
-                          {props.userPatches && (
-                            <TableCell align="center">
-                              <IconButton>
-                                <Icon>delete</Icon>
-                              </IconButton>
-                            </TableCell>
-                          )}
-                        </Fragment>
-                      )}
-                    </TableRow>
-                  ))}
-          </TableBody>
-        </Table>
+                            {props.userPatches && (
+                              <TableCell align="center">
+                                <IconButton>
+                                  <Icon>delete</Icon>
+                                </IconButton>
+                              </TableCell>
+                            )}
+                          </Fragment>
+                        )}
+                      </TableRow>
+                    ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : (
         "Nothing Found"
       )}
 
       <div className="break" />
+
+      {props.compact && (
+        <BottomNavigation
+          className="patch-explorer-compact-bottom-nav"
+          value={showingLiked}
+          onChange={(event, newValue) => {
+            getUserPatchesList(newValue);
+            setShowingLiked(newValue);
+          }}
+          showLabels
+        >
+          <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
+          <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
+          <BottomNavigationAction
+            label="Instrument Editor"
+            icon={<Icon>tune</Icon>}
+          />
+        </BottomNavigation>
+      )}
 
       {props.userPatches && (
         <BottomNavigation

@@ -25,6 +25,7 @@ import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import FilePage from "./components/ui/FileExplorer/FilePage";
 import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
+import PatchPage from "./components/ui/PatchExplorer/PatchPage";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/AuthDialog";
@@ -186,15 +187,20 @@ function App() {
           <Route exact path="/userFiles">
             <FileExplorer userFiles />
           </Route>
+          <Route exact path="/file/:key">
+            <FilePage />
+          </Route>
+
           <Route exact path="/instruments">
             <PatchExplorer explore />
           </Route>
           <Route exact path="/userInstruments">
             <PatchExplorer userPatches />
           </Route>
-          <Route exact path="/file/:key">
-            <FilePage />
+          <Route exact path="/instrument/:key">
+            <PatchPage />
           </Route>
+
           <Route exact path="/session/:key">
             <Workspace
               setOpenedSession={setOpenedSession}
@@ -211,6 +217,7 @@ function App() {
               user={user}
             />
           </Route>
+
           <Route exact path="/admin">
             {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && (
               <AdminDashboard />
