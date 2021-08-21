@@ -835,7 +835,8 @@ export const loadSynthFromGetObject = (obj) => {
 export const loadDrumPatch = async (
   input,
   setInstrumentsLoaded,
-  moduleIndex
+  moduleIndex,
+  onLoad
 ) => {
   //drum patch with stardard configuration
   let patchRef =
@@ -883,14 +884,15 @@ export const loadDrumPatch = async (
     return a;
   });
 
-  let drumPlayers = new Tone.Players(urls, () =>
+  let drumPlayers = new Tone.Players(urls, () => {
     setInstrumentsLoaded((prev) => {
       //console.log("======LOADED=======")
       let a = [...prev];
       a[moduleIndex] = true;
       return a;
-    })
-  ).toDestination();
+    });
+    onLoad !== undefined && onLoad(drumPlayers);
+  }).toDestination();
 
   return drumPlayers;
 };

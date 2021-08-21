@@ -40,9 +40,11 @@ import {
   fileExtentions,
   fileTags,
   instrumentsCategories,
+  drumCategories,
   patchLoader,
   loadSynthFromGetObject,
   loadSamplerFromObject,
+  loadDrumPatch,
 } from "../../../assets/musicutils";
 
 function PatchExplorer(props) {
@@ -81,13 +83,18 @@ function PatchExplorer(props) {
   const [searchValue, setSearchValue] = useState("");
 
   const user = firebase.auth().currentUser;
+  const categories = props.isDrum ? drumCategories : instrumentsCategories;
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
-      if (patchdata[index].base === "Sampler") {
+      if (props.isDrum) {
+        loadDrumPatch(patchdata[index], () => {}, index).then((instr) => {
+          props.setInstrument(instr);
+        });
+      } else if (patchdata[index].base === "Sampler") {
         loadSamplerFromObject(patchdata[index], () => {}, index).then(
           (instr) => {
             props.setInstrument(instr);
@@ -118,7 +125,9 @@ function PatchExplorer(props) {
   };
 
   const getPatchesList = async (tags, name) => {
-    const dbPatchesRef = firebase.firestore().collection("patches");
+    const dbPatchesRef = firebase
+      .firestore()
+      .collection(props.isDrum ? "drumpatches" : "patches");
     const usersRef = firebase.firestore().collection("users");
 
     //isLoaded(false);
@@ -133,7 +142,11 @@ function PatchExplorer(props) {
       }
       if (tags && tags.length > 0) {
         let tagsIds = tags
-          .map((e) => instrumentsCategories.indexOf(e))
+          .map((e) =>
+            props.isDrum
+              ? drumCategories.indexOf(e)
+              : instrumentsCategories.indexOf(e)
+          )
           .filter((e) => e !== -1);
         //console.log(tagsIds);
         rules = rules.where("categ", "in", tagsIds);
@@ -181,10 +194,14 @@ function PatchExplorer(props) {
 
   const getUserPatchesList = async (liked) => {
     const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
-    const dbPatchesRef = firebase.firestore().collection("patches");
+    const dbPatchesRef = firebase
+      .firestore()
+      .collection(props.isDrum ? "drumpatches" : "patches");
 
     let patchIdList = (await dbUserRef.get())
-      .get(liked ? "likedPatches" : "patches")
+      .get(
+        liked ? (props.isDrum ? "likedDrumPatches" : "likedPatches") : "patches"
+      )
       .filter((e) => e !== selectedPatch);
 
     //isLoaded(false);
@@ -210,7 +227,7 @@ function PatchExplorer(props) {
   const getSelectedPatchInfo = async () => {
     let info = await firebase
       .firestore()
-      .collection("patches")
+      .collection(props.isDrum ? "drumpatches" : "patches")
       .doc(selectedPatch)
       .get();
 
@@ -236,7 +253,11 @@ function PatchExplorer(props) {
       .collection("users")
       .doc(user.uid)
       .get()
-      .then((r) => setUserLikedPatches(r.get("likedPatches")));
+      .then((r) =>
+        setUserLikedPatches(
+          r.get(props.isDrum ? "likedDrumPatches" : "likedPatches")
+        )
+      );
   };
 
   const handleLike = (index) => {
@@ -246,20 +267,36 @@ function PatchExplorer(props) {
     const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
     const dbPatchRef = firebase
       .firestore()
-      .collection("patches")
+      .collection(props.isDrum ? "drumpatches" : "patches")
       .doc(likedPatchId);
 
     if (!userLikedPatches.includes(likedPatchId)) {
-      dbUserRef.update({
-        likedPatches: firebase.firestore.FieldValue.arrayUnion(likedPatchId),
-      });
+      dbUserRef.update(
+        props.isDrum
+          ? {
+              likedDrumPatches:
+                firebase.firestore.FieldValue.arrayUnion(likedPatchId),
+            }
+          : {
+              likedPatches:
+                firebase.firestore.FieldValue.arrayUnion(likedPatchId),
+            }
+      );
 
       dbPatchRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
       setUserLikedPatches((prev) => [...prev, likedPatchId]);
     } else {
-      dbUserRef.update({
-        likedPatches: firebase.firestore.FieldValue.arrayRemove(likedPatchId),
-      });
+      dbUserRef.update(
+        props.isDrum
+          ? {
+              likedDrumPatches:
+                firebase.firestore.FieldValue.arrayRemove(likedPatchId),
+            }
+          : {
+              likedPatches:
+                firebase.firestore.FieldValue.arrayRemove(likedPatchId),
+            }
+      );
 
       dbPatchRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
       setUserLikedPatches((prev) => prev.filter((e) => e !== likedPatchId));
@@ -270,19 +307,35 @@ function PatchExplorer(props) {
     let instr = typeof input === "number" ? instruments[input] : input;
     let index = i ? i : input;
     setCurrentPlaying(index);
-    instr
-      .triggerAttackRelease("C3", "8n", "+0:0:2")
-      .triggerAttackRelease("E3", "8n", "+0:1:0")
-      .triggerAttackRelease("G3", "8n", "+0:1:2")
-      .triggerAttackRelease("B3", "8n", "+0:2")
-      .triggerAttackRelease("C4", "8n", "+0:2:2")
-      .triggerAttackRelease("E4", "8n", "+0:3:0")
-      .triggerAttackRelease("G4", "8n", "+0:3:2")
-      .triggerAttackRelease("B4", "8n", "+1:0:0");
+    if (props.isDrum) {
+      let playerIndex = 0;
+      let keysArray = [];
+      instr._buffers._buffers.forEach((v, key) => {
+        keysArray.push(key);
+      });
 
-    Tone.Draw.schedule(function () {
-      setCurrentPlaying(null);
-    }, "+1:0:2");
+      keysArray.forEach((e, i) => {
+        i < 7 && instr.player(e).start("+" + i * 0.2);
+      });
+
+      Tone.Draw.schedule(() => {
+        setCurrentPlaying(null);
+      }, "+1.2");
+    } else {
+      instr
+        .triggerAttackRelease("C3", "8n", "+0:0:2")
+        .triggerAttackRelease("E3", "8n", "+0:1:0")
+        .triggerAttackRelease("G3", "8n", "+0:1:2")
+        .triggerAttackRelease("B3", "8n", "+0:2")
+        .triggerAttackRelease("C4", "8n", "+0:2:2")
+        .triggerAttackRelease("E4", "8n", "+0:3:0")
+        .triggerAttackRelease("G4", "8n", "+0:3:2")
+        .triggerAttackRelease("B4", "8n", "+1:0:0");
+
+      Tone.Draw.schedule(() => {
+        setCurrentPlaying(null);
+      }, "+1:0:2");
+    }
   };
 
   const playPatch = (index) => {
@@ -294,7 +347,24 @@ function PatchExplorer(props) {
     } else {
       setLoadingPlay(index);
 
-      if (patchdata[index].base === "Sampler") {
+      if (props.isDrum) {
+        loadDrumPatch(
+          patchdata[index],
+          () => {},
+          index,
+          (instr) => {
+            console.log("loaded!");
+            playSequence(instr, index);
+            setLoadingPlay(null);
+          }
+        ).then((instr) => {
+          setInstruments((prev) => {
+            let newInstruments = [...prev];
+            newInstruments[index] = instr;
+            return newInstruments;
+          });
+        });
+      } else if (patchdata[index].base === "Sampler") {
         loadSamplerFromObject(
           patchdata[index],
           () => {},
@@ -326,13 +396,18 @@ function PatchExplorer(props) {
   };
 
   const stopPatch = (index) => {
-    instruments[index].releaseAll();
+    !props.isDrum
+      ? instruments[index].releaseAll()
+      : instruments[index].stopAll();
     setCurrentPlaying(null);
   };
 
   const openPatchPage = (id) => {
     //console.log(id);
-    const win = window.open("/instrument/" + id, "_blank");
+    const win = window.open(
+      (props.isDrum ? "/drumset/" : "/instrument/") + id,
+      "_blank"
+    );
     win.focus();
   };
 
@@ -364,15 +439,25 @@ function PatchExplorer(props) {
   const deletePatch = (index) => {
     let patchId = patchIdList[index];
 
-    firebase.firestore().collection("patches").doc(patchId).delete();
+    firebase
+      .firestore()
+      .collection(props.isDrum ? "drumpatches" : "patches")
+      .doc(patchId)
+      .delete();
 
     firebase
       .firestore()
       .collection("users")
       .doc(patchdata[index].user)
-      .update({
-        patches: firebase.firestore.FieldValue.arrayRemove(patchId),
-      });
+      .update(
+        props.isDrum
+          ? {
+              drumPatches: firebase.firestore.FieldValue.arrayRemove(patchId),
+            }
+          : {
+              patches: firebase.firestore.FieldValue.arrayRemove(patchId),
+            }
+      );
 
     setPatchdata((prev) => prev.filter((e, i) => i !== index));
     setPatchIdList((prev) => prev.filter((e, i) => i !== index));
@@ -383,7 +468,7 @@ function PatchExplorer(props) {
     //console.log(patchIdList[index]);
     firebase
       .firestore()
-      .collection("patches")
+      .collection(props.isDrum ? "drumpatches" : "patches")
       .doc(patchIdList[index])
       .update({ name: newValue });
     setPatchdata((prev) => {
@@ -449,7 +534,7 @@ function PatchExplorer(props) {
             className={`patch-explorer-searchbar ${
               props.compact && "patch-explorer-searchbar-compact"
             }`}
-            options={instrumentsCategories}
+            options={categories}
             onChange={(e, v) => {
               setSearchTags(v);
               setSearchValue("");
@@ -542,7 +627,7 @@ function PatchExplorer(props) {
                       <Typography variant="overline">
                         {selectedPatchInfo
                           ? selectedPatchInfo.name
-                          : "Save Custom Instrument"}
+                          : "Save Instrument"}
                       </Typography>
                       {selectedPatchInfo &&
                         selectedPatchInfo.base === "Sampler" && (
@@ -579,7 +664,7 @@ function PatchExplorer(props) {
                       <div className="pet-chip-cell">
                         <Chip
                           className={"file-tag-chip"}
-                          label={instrumentsCategories[selectedPatchInfo.categ]}
+                          label={categories[selectedPatchInfo.categ]}
                         />
                       </div>
                     )}
@@ -694,7 +779,7 @@ function PatchExplorer(props) {
                       )}
                       <TableCell>
                         <div className="pet-chip-cell">
-                          {instrumentsCategories[patchdata[index].categ] && (
+                          {categories[patchdata[index].categ] && (
                             <Chip
                               clickable={true}
                               onClick={(e) =>
@@ -702,9 +787,7 @@ function PatchExplorer(props) {
                                 setTagSelectionTarget([e.target, index])
                               }
                               className={"file-tag-chip"}
-                              label={
-                                instrumentsCategories[patchdata[index].categ]
-                              }
+                              label={categories[patchdata[index].categ]}
                             />
                           )}
                         </div>
@@ -879,7 +962,7 @@ function PatchExplorer(props) {
           open={Boolean(tagSelectionTarget)}
           onClose={() => setTagSelectionTarget(null)}
         >
-          {instrumentsCategories.map((e, i) => (
+          {categories.map((e, i) => (
             <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
           ))}
         </Menu>

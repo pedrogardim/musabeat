@@ -184,7 +184,7 @@ function App() {
           <Route exact path="/files">
             <FileExplorer explore />
           </Route>
-          <Route exact path="/userFiles">
+          <Route exact path="/userfiles">
             <FileExplorer userFiles />
           </Route>
           <Route exact path="/file/:key">
@@ -194,11 +194,20 @@ function App() {
           <Route exact path="/instruments">
             <PatchExplorer explore />
           </Route>
-          <Route exact path="/userInstruments">
+          <Route exact path="/userinstruments">
             <PatchExplorer userPatches />
           </Route>
           <Route exact path="/instrument/:key">
             <PatchPage />
+          </Route>
+          <Route exact path="/drumsets">
+            <PatchExplorer isDrum explore />
+          </Route>
+          <Route exact path="/userdrumsets">
+            <PatchExplorer isDrum userPatches />
+          </Route>
+          <Route exact path="/drumset/:key">
+            <PatchPage isDrum />
           </Route>
 
           <Route exact path="/session/:key">
