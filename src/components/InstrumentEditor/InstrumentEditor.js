@@ -253,6 +253,9 @@ function InstrumentEditor(props) {
     const newPatchRef = firebase
       .firestore()
       .collection(!isDrum ? "patches" : "drumpatches");
+
+    const userRef = firebase.firestore().collection("users").doc(user.uid);
+
     newPatchRef.add(patch).then((r) => {
       props.setModules((previous) =>
         previous.map((module, i) => {
@@ -265,9 +268,16 @@ function InstrumentEditor(props) {
           }
         })
       );
+
+      userRef.update(
+        !isDrum
+          ? { patches: firebase.firestore.FieldValue.arrayUnion(r.id) }
+          : { drumPatches: firebase.firestore.FieldValue.arrayUnion(r.id) }
+      );
+
+      setSelectedPatch(r.id);
     });
-    setSelectedPatch(patch.name);
-    props.setPatchExplorer(false);
+    setPatchExplorer(false);
   };
 
   let mainContent = "Nothing Here";
@@ -393,6 +403,8 @@ function InstrumentEditor(props) {
           setInstrument={props.setInstrument}
           setInstrumentsLoaded={props.setInstrumentsLoaded}
           module={props.module}
+          saveUserPatch={saveUserPatch}
+          isDrum={isDrum}
         />
       )}
 

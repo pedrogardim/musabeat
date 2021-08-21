@@ -34,6 +34,7 @@ import firebase from "firebase";
 
 import DeleteConfirm from "../Dialogs/DeleteConfirm";
 import NameInput from "../Dialogs/NameInput";
+import SavePatch from "../Dialogs/SavePatch";
 
 import {
   fileExtentions,
@@ -61,6 +62,7 @@ function PatchExplorer(props) {
 
   const [deletingPatch, setDeletingPatch] = useState(null);
   const [renamingPatch, setRenamingPatch] = useState(null);
+  const [savePatchDialog, setSavePatchDialog] = useState(false);
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
@@ -149,8 +151,12 @@ function PatchExplorer(props) {
       return;
     }
 
-    let patchesData = patchQuery.docs.map((e) => e.data());
-    let patchIdList = patchQuery.docs.map((e) => e.id);
+    let patchesData = patchQuery.docs
+      .filter((e) => e.id !== selectedPatch)
+      .map((e) => e.data());
+    let patchIdList = patchQuery.docs
+      .filter((e) => e.id !== selectedPatch)
+      .map((e) => e.id);
 
     setPatchdata(patchesData);
     setPatchIdList(patchIdList);
@@ -174,18 +180,16 @@ function PatchExplorer(props) {
   };
 
   const getUserPatchesList = async (liked) => {
-    const user = firebase.auth().currentUser;
     const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
-    const dbPatchesRef = firebase.firestore().collection("files");
-    const storageRef = firebase.storage();
+    const dbPatchesRef = firebase.firestore().collection("patches");
 
-    const patchIdList = (await dbUserRef.get()).get(
-      liked ? "likedPatches" : "files"
-    );
+    let patchIdList = (await dbUserRef.get())
+      .get(liked ? "likedPatches" : "patches")
+      .filter((e) => e !== selectedPatch);
 
     //isLoaded(false);
 
-    if (patchIdList.length === 0) {
+    if (!patchIdList || patchIdList.length === 0) {
       setPatchdata(null);
       return;
     }
@@ -194,19 +198,13 @@ function PatchExplorer(props) {
 
     setPatchIdList(patchIdList);
 
-    const filesData = await Promise.all(
+    let filesData = await Promise.all(
       patchIdList.map(async (e, i) => {
         return (await dbPatchesRef.doc(e).get()).data();
       })
     );
 
     setPatchdata(filesData);
-
-    const filesUrl = await Promise.all(
-      patchIdList.map(async (e, i) => {
-        return await storageRef.ref(e).getDownloadURL();
-      })
-    );
   };
 
   const getSelectedPatchInfo = async () => {
@@ -269,7 +267,6 @@ function PatchExplorer(props) {
   };
 
   const playSequence = (input, i) => {
-    console.log("playSequence trieggered");
     let instr = typeof input === "number" ? instruments[input] : input;
     let index = i ? i : input;
     setCurrentPlaying(index);
@@ -315,7 +312,6 @@ function PatchExplorer(props) {
         });
       } else {
         let instr = loadSynthFromGetObject(patchdata[index]);
-        console.log(patchdata[index].base, instr);
 
         setInstruments((prev) => {
           let newInstruments = [...prev];
@@ -366,18 +362,18 @@ function PatchExplorer(props) {
   };
 
   const deletePatch = (index) => {
-    let fileId = patchIdList[index];
+    let patchId = patchIdList[index];
 
-    firebase.storage().ref(fileId).delete();
+    firebase.storage().ref(patchId).delete();
 
-    firebase.firestore().collection("files").doc(fileId).delete();
+    firebase.firestore().collection("patches").doc(patchId).delete();
 
     firebase
       .firestore()
       .collection("users")
       .doc(patchdata[index].user)
       .update({
-        files: firebase.firestore.FieldValue.arrayRemove(fileId),
+        patches: firebase.firestore.FieldValue.arrayRemove(patchId),
       });
 
     setPatchdata((prev) => prev.filter((e, i) => i !== index));
@@ -525,60 +521,74 @@ function PatchExplorer(props) {
               </TableHead>
             )}
             <TableBody>
-              {selectedPatchInfo && (
+              {props.compact && (
                 <TableRow component="th" scope="row">
                   <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                    <Icon>done</Icon>
+                    {selectedPatchInfo ? (
+                      <Icon>done</Icon>
+                    ) : (
+                      <IconButton onClick={() => setSavePatchDialog(true)}>
+                        <Icon>save</Icon>
+                      </IconButton>
+                    )}
                   </TableCell>
                   <TableCell scope="row">
                     <div
                       style={{
+                        maxWidth: 200,
                         display: "flex",
                         flexDirection: "row",
                         alignItems: "center",
                       }}
                     >
-                      <Typography variant="overline" className="fe-filename">
-                        {selectedPatchInfo.name}
+                      <Typography variant="overline">
+                        {selectedPatchInfo
+                          ? selectedPatchInfo.name
+                          : "Save Custom Instrument"}
                       </Typography>
-                      {selectedPatchInfo.base === "Sampler" && (
-                        <Tooltip arrow placement="top" title="Sampler">
-                          <Icon style={{ fontSize: 16, marginLeft: 4 }}>
-                            graphic_eq
-                          </Icon>
-                        </Tooltip>
-                      )}
-                      {patchesUserData[selectedPatchInfo.creator] && (
-                        <Tooltip
-                          title={
-                            patchesUserData[selectedPatchInfo.creator].name
-                          }
-                        >
-                          <Avatar
-                            style={{ height: 24, width: 24, marginLeft: 8 }}
-                            alt={
-                              patchesUserData[selectedPatchInfo.creator]
-                                .displayName
+                      {selectedPatchInfo &&
+                        selectedPatchInfo.base === "Sampler" && (
+                          <Tooltip arrow placement="top" title="Sampler">
+                            <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                              graphic_eq
+                            </Icon>
+                          </Tooltip>
+                        )}
+                      {selectedPatchInfo &&
+                        patchesUserData[selectedPatchInfo.creator] && (
+                          <Tooltip
+                            title={
+                              patchesUserData[selectedPatchInfo.creator].name
                             }
-                            src={
-                              patchesUserData[selectedPatchInfo.creator]
-                                .photoURL
-                            }
-                          />
-                        </Tooltip>
-                      )}
+                          >
+                            <Avatar
+                              style={{ height: 24, width: 24, marginLeft: 8 }}
+                              alt={
+                                patchesUserData[selectedPatchInfo.creator]
+                                  .displayName
+                              }
+                              src={
+                                patchesUserData[selectedPatchInfo.creator]
+                                  .photoURL
+                              }
+                            />
+                          </Tooltip>
+                        )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className="pet-chip-cell">
-                      <Chip
-                        className={"file-tag-chip"}
-                        label={instrumentsCategories[selectedPatchInfo.categ]}
-                      />
-                    </div>
+                    {selectedPatchInfo && (
+                      <div className="pet-chip-cell">
+                        <Chip
+                          className={"file-tag-chip"}
+                          label={instrumentsCategories[selectedPatchInfo.categ]}
+                        />
+                      </div>
+                    )}
                   </TableCell>
                 </TableRow>
               )}
+
               {loaded
                 ? patchdata.map((row, index) => (
                     <TableRow
@@ -603,6 +613,7 @@ function PatchExplorer(props) {
                       <TableCell scope="row">
                         <div
                           style={{
+                            maxWidth: 200,
                             display: "flex",
                             flexDirection: "row",
                             alignItems: "center",
@@ -685,17 +696,19 @@ function PatchExplorer(props) {
                       )}
                       <TableCell>
                         <div className="pet-chip-cell">
-                          <Chip
-                            clickable={true}
-                            onClick={(e) =>
-                              !!props.userPatches &&
-                              setTagSelectionTarget([e.target, index])
-                            }
-                            className={"file-tag-chip"}
-                            label={
-                              instrumentsCategories[patchdata[index].categ]
-                            }
-                          />
+                          {instrumentsCategories[patchdata[index].categ] && (
+                            <Chip
+                              clickable={true}
+                              onClick={(e) =>
+                                !!props.userPatches &&
+                                setTagSelectionTarget([e.target, index])
+                              }
+                              className={"file-tag-chip"}
+                              label={
+                                instrumentsCategories[patchdata[index].categ]
+                              }
+                            />
+                          )}
                         </div>
                       </TableCell>
                       {!props.compact && (
@@ -833,7 +846,7 @@ function PatchExplorer(props) {
               ? props.setPatchExplorer(false)
               : v === 0
               ? getUserPatchesList()
-              : () => {}
+              : getUserPatchesList(true)
           }
           showLabels
         >
@@ -887,6 +900,14 @@ function PatchExplorer(props) {
           open={renamingPatch !== null}
           onSubmit={(newValue) => renamePatch(newValue)}
           onClose={() => setRenamingPatch(null)}
+        />
+      )}
+
+      {savePatchDialog && (
+        <SavePatch
+          isDrum={props.isDrum}
+          onClose={() => setSavePatchDialog(false)}
+          onSubmit={props.saveUserPatch}
         />
       )}
     </div>
