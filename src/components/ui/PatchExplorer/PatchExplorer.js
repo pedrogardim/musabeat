@@ -337,7 +337,7 @@ function PatchExplorer(props) {
   };
 
   const handleTagSelect = (tagName) => {
-    let tag = fileTags.indexOf(tagName);
+    /* let tag = fileTags.indexOf(tagName);
     let patchIndex = tagSelectionTarget[1];
     let tagIndex = tagSelectionTarget[2];
 
@@ -358,13 +358,11 @@ function PatchExplorer(props) {
         .update({ categ: tag });
     }
 
-    setTagSelectionTarget(null);
+    setTagSelectionTarget(null); */
   };
 
   const deletePatch = (index) => {
     let patchId = patchIdList[index];
-
-    firebase.storage().ref(patchId).delete();
 
     firebase.firestore().collection("patches").doc(patchId).delete();
 
@@ -385,7 +383,7 @@ function PatchExplorer(props) {
     //console.log(patchIdList[index]);
     firebase
       .firestore()
-      .collection("files")
+      .collection("patches")
       .doc(patchIdList[index])
       .update({ name: newValue });
     setPatchdata((prev) => {
