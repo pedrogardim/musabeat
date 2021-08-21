@@ -47,6 +47,7 @@ import {
 function PatchExplorer(props) {
   const [patchdata, setPatchdata] = useState([]);
   const [patchIdList, setPatchIdList] = useState([]);
+
   const [patchesUserData, setPatchesUserData] = useState([]);
 
   const [loaded, isLoaded] = useState(false);
@@ -68,6 +69,7 @@ function PatchExplorer(props) {
       ? props.module.instrument
       : null
   );
+  const [selectedPatchInfo, setSelectedPatchInfo] = useState(null);
 
   const [lastVisible, setLastVisible] = useState(null);
 
@@ -138,9 +140,7 @@ function PatchExplorer(props) {
       return rules;
     };
 
-    let patchQuery = await queryRules()
-      .limit(props.compact ? 5 : 10)
-      .get();
+    let patchQuery = await queryRules().limit(10).get();
 
     //setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
 
@@ -155,15 +155,22 @@ function PatchExplorer(props) {
     setPatchdata(patchesData);
     setPatchIdList(patchIdList);
 
-    const usersData = await Promise.all(
-      patchesData.map(async (e, i) => {
-        return e.creator
-          ? (await usersRef.doc(e.creator).get()).get("profile")
-          : {};
-      })
+    let usersToFetch = [
+      ...new Set(patchesData.map((e) => e.creator).filter((e) => e)),
+    ];
+
+    //console.log(usersToFetch);
+
+    let usersData = await Promise.all(
+      usersToFetch.map(async (e, i) => [
+        e,
+        (await usersRef.doc(e).get()).get("profile"),
+      ])
     );
 
-    setPatchesUserData(usersData);
+    //console.log(Object.fromEntries(usersData));
+
+    setPatchesUserData(Object.fromEntries(usersData));
   };
 
   const getUserPatchesList = async (liked) => {
@@ -200,6 +207,29 @@ function PatchExplorer(props) {
         return await storageRef.ref(e).getDownloadURL();
       })
     );
+  };
+
+  const getSelectedPatchInfo = async () => {
+    let info = await firebase
+      .firestore()
+      .collection("patches")
+      .doc(selectedPatch)
+      .get();
+
+    setSelectedPatchInfo(info.data());
+
+    if (!patchesUserData.hasOwnProperty(info.data().creator)) {
+      let userInfo = await firebase
+        .firestore()
+        .collection("users")
+        .doc(info.data().creator)
+        .get();
+      setPatchesUserData((prev) => {
+        let newUserData = { ...prev };
+        newUserData[info.data().creator] = userInfo.data().profile;
+        return newUserData;
+      });
+    }
   };
 
   const getUserLikes = () => {
@@ -405,6 +435,10 @@ function PatchExplorer(props) {
   }, [loaded]);
 
   useEffect(() => {
+    selectedPatch && getSelectedPatchInfo(selectedPatch);
+  }, [selectedPatch]);
+
+  useEffect(() => {
     getPatchesList(searchTags, searchValue);
     //console.log("change triggered");
   }, [searchTags, searchValue]);
@@ -491,12 +525,66 @@ function PatchExplorer(props) {
               </TableHead>
             )}
             <TableBody>
+              {selectedPatchInfo && (
+                <TableRow component="th" scope="row">
+                  <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                    <Icon>done</Icon>
+                  </TableCell>
+                  <TableCell scope="row">
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="overline" className="fe-filename">
+                        {selectedPatchInfo.name}
+                      </Typography>
+                      {selectedPatchInfo.base === "Sampler" && (
+                        <Tooltip arrow placement="top" title="Sampler">
+                          <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                            graphic_eq
+                          </Icon>
+                        </Tooltip>
+                      )}
+                      {patchesUserData[selectedPatchInfo.creator] && (
+                        <Tooltip
+                          title={
+                            patchesUserData[selectedPatchInfo.creator].name
+                          }
+                        >
+                          <Avatar
+                            style={{ height: 24, width: 24, marginLeft: 8 }}
+                            alt={
+                              patchesUserData[selectedPatchInfo.creator]
+                                .displayName
+                            }
+                            src={
+                              patchesUserData[selectedPatchInfo.creator]
+                                .photoURL
+                            }
+                          />
+                        </Tooltip>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="pet-chip-cell">
+                      <Chip
+                        className={"file-tag-chip"}
+                        label={instrumentsCategories[selectedPatchInfo.categ]}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
               {loaded
                 ? patchdata.map((row, index) => (
                     <TableRow
                       key={row.name}
                       onClick={(e) => handlePatchSelect(e, index)}
-                      component="th"
+                      component="tr"
                       scope="row"
                     >
                       <TableCell style={{ width: props.compact ? 20 : 50 }}>
@@ -513,37 +601,83 @@ function PatchExplorer(props) {
                         )}
                       </TableCell>
                       <TableCell scope="row">
-                        <Typography
-                          variant="overline"
-                          className="fe-filename"
-                          onClick={() => openPatchPage(patchIdList[index])}
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                          }}
                         >
-                          {row.name}
-                        </Typography>
-                        {patchdata[index].base === "Sampler" && (
-                          <Tooltip arrow placement="top" title="Sampler">
-                            <Icon style={{ fontSize: 16, marginLeft: 4 }}>
-                              graphic_eq
-                            </Icon>
-                          </Tooltip>
-                        )}
-                        {props.userPatches &&
-                          patchdata[index].user === user.uid && (
-                            <IconButton onClick={() => setRenamingPatch(index)}>
-                              <Icon>edit</Icon>
-                            </IconButton>
+                          <Typography
+                            variant="overline"
+                            className="fe-filename"
+                            onClick={() => openPatchPage(patchIdList[index])}
+                          >
+                            {row.name}
+                          </Typography>
+                          {patchdata[index].base === "Sampler" && (
+                            <Tooltip arrow placement="top" title="Sampler">
+                              <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                                graphic_eq
+                              </Icon>
+                            </Tooltip>
                           )}
+                          {props.userPatches &&
+                            patchdata[index].user === user.uid && (
+                              <IconButton
+                                onClick={() => setRenamingPatch(index)}
+                              >
+                                <Icon>edit</Icon>
+                              </IconButton>
+                            )}
+                          {props.compact &&
+                            patchesUserData[patchdata[index].creator] && (
+                              <Tooltip
+                                title={
+                                  patchesUserData[patchdata[index].creator]
+                                    .displayName
+                                }
+                              >
+                                <Avatar
+                                  style={{
+                                    height: 24,
+                                    width: 24,
+                                    marginLeft: 8,
+                                  }}
+                                  alt={
+                                    patchesUserData[patchdata[index].creator]
+                                      .displayName
+                                  }
+                                  src={
+                                    patchesUserData[patchdata[index].creator]
+                                      .photoURL
+                                  }
+                                />
+                              </Tooltip>
+                            )}
+                        </div>
                       </TableCell>
                       {props.explore && (
                         <TableCell
                           className="pet-collapsable-column"
                           style={{ width: 50 }}
                         >
-                          {patchesUserData[index] && (
-                            <Tooltip title={patchesUserData[index].displayName}>
+                          {patchesUserData[patchdata[index].creator] && (
+                            <Tooltip
+                              title={
+                                patchesUserData[patchdata[index].creator]
+                                  .displayName
+                              }
+                            >
                               <Avatar
-                                alt={patchesUserData[index].displayName}
-                                src={patchesUserData[index].photoURL}
+                                alt={
+                                  patchesUserData[patchdata[index].creator]
+                                    .displayName
+                                }
+                                src={
+                                  patchesUserData[patchdata[index].creator]
+                                    .photoURL
+                                }
                               />
                             </Tooltip>
                           )}
@@ -694,10 +828,13 @@ function PatchExplorer(props) {
         <BottomNavigation
           className="patch-explorer-compact-bottom-nav"
           value={showingLiked}
-          onChange={(event, newValue) => {
-            getUserPatchesList(newValue);
-            setShowingLiked(newValue);
-          }}
+          onChange={(e, v) =>
+            v === "ie"
+              ? props.setPatchExplorer(false)
+              : v === 0
+              ? getUserPatchesList()
+              : () => {}
+          }
           showLabels
         >
           <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
@@ -705,6 +842,7 @@ function PatchExplorer(props) {
           <BottomNavigationAction
             label="Instrument Editor"
             icon={<Icon>tune</Icon>}
+            value={"ie"}
           />
         </BottomNavigation>
       )}

@@ -380,19 +380,21 @@ function InstrumentEditor(props) {
       }}
       ref={ieWrapper}
     >
-      <PatchExplorer
-        compact
-        patchExplorer={patchExplorer}
-        index={props.index}
-        setModules={props.setModules}
-        setModulePage={props.setModulePage}
-        setPatchExplorer={setPatchExplorer}
-        instrument={props.instrument}
-        setInstruments={props.setInstruments}
-        setInstrument={props.setInstrument}
-        setInstrumentsLoaded={props.setInstrumentsLoaded}
-        module={props.module}
-      />
+      {patchExplorer && (
+        <PatchExplorer
+          compact
+          patchExplorer={patchExplorer}
+          index={props.index}
+          setModules={props.setModules}
+          setModulePage={props.setModulePage}
+          setPatchExplorer={setPatchExplorer}
+          instrument={props.instrument}
+          setInstruments={props.setInstruments}
+          setInstrument={props.setInstrument}
+          setInstrumentsLoaded={props.setInstrumentsLoaded}
+          module={props.module}
+        />
+      )}
 
       <div className="break" />
 
