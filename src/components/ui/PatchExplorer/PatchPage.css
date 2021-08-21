@@ -17,12 +17,12 @@
   margin: 8px;
 }
 
-.file-page-waveform {
+.ie-cont {
   position: relative;
   overflow: hidden;
 
-  height: 30%;
-  width: 40vw !important;
+  height: 45%;
+  width: 60vw !important;
 }
 
 .file-info {

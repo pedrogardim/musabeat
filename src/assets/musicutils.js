@@ -846,7 +846,7 @@ export const loadDrumPatch = async (
 
   let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
 
-  //console.log(patch);
+  console.log(patch);
 
   //handle empty urls obj
 

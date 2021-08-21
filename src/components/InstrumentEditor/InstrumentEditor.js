@@ -26,7 +26,7 @@ import { colors } from "../../utils/materialPalette";
 
 function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchExplorer, setPatchExplorer] = useState(true);
+  const [patchExplorer, setPatchExplorer] = useState(!props.patchPage);
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -232,14 +232,23 @@ function InstrumentEditor(props) {
     let user = firebase.auth().currentUser;
 
     let patch = !isDrum
-      ? {
-          base: props.instrument._dummyVoice.name.replace("Synth", ""),
-          name: !!name ? name : "Untitled Patch",
-          creator: user.uid,
-          categ: !!category || isNaN(category) ? category : 0,
-          options: props.instrument.get(),
-          volume: props.module.volume,
-        }
+      ? props.instrument.name === "Sampler"
+        ? {
+            base: "Sampler",
+            name: !!name ? name : "Untitled Patch",
+            creator: user.uid,
+            categ: !!category || isNaN(category) ? category : 0,
+            urls: props.module.instrument.urls,
+            volume: props.module.volume,
+          }
+        : {
+            base: props.instrument._dummyVoice.name.replace("Synth", ""),
+            name: !!name ? name : "Untitled Patch",
+            creator: user.uid,
+            categ: !!category || isNaN(category) ? category : 0,
+            options: props.instrument.get(),
+            volume: props.module.volume,
+          }
       : {
           name: !!name ? name : "Untitled Drum Patch",
           creator: user.uid,
@@ -291,7 +300,7 @@ function InstrumentEditor(props) {
       });
       //bufferObjects.sort((a, b) => a[1] - b[1]);
       mainContent = (
-        <Fragment>
+        <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
           <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
             {bufferObjects.map((e, i) => (
               <Fragment>
@@ -310,7 +319,7 @@ function InstrumentEditor(props) {
               </Fragment>
             ))}
           </List>
-        </Fragment>
+        </div>
       );
     } else if (props.instrument.name === "Sampler") {
       let bufferObjects = [];
@@ -318,7 +327,7 @@ function InstrumentEditor(props) {
         bufferObjects.push([e, i])
       );
       mainContent = (
-        <Fragment>
+        <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
           <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
             {bufferObjects.map((e, i) => (
               <Fragment>
@@ -336,7 +345,7 @@ function InstrumentEditor(props) {
               </Fragment>
             ))}
           </List>
-        </Fragment>
+        </div>
       );
     } else {
       mainContent = (
