@@ -1,38 +1,70 @@
 .file-explorer {
   position: absolute;
-  height: 100%;
   width: 100%;
-  bottom: 0;
+  height: 100%;
+  top: 0;
+  flex: 1 0;
   z-index: 2;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
   background-color: white;
-  overflow-y: scroll;
+}
+
+.file-explorer-compact {
+  max-height: 100%;
+  justify-content: space-between;
 }
 
 .file-explorer-table {
   position: relative;
-  display: flex;
+  /* display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
   width: 100%;
   max-width: 1200px;
   min-height: 600px;
+  height: 60%;
 }
 
-.file-explorer-table tr,
-.file-explorer-table td {
+.fet-compact {
+  min-height: 0 !important;
+}
+
+.fet-cont {
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.fet-cont-compact {
+  overflow-y: scroll;
+  overflow-x: hidden !important;
+
+  flex: 1;
+}
+
+.file-explorer-compact-bottom-nav {
+  /* position: absolute; */
+
+  width: 100%;
+}
+
+.file-explorer-table tr {
   max-height: 61px;
 }
 
 .file-explorer-searchbar {
   width: 100%;
   max-width: 1200px;
-  margin: 32px 0;
+  margin: 32px 8px;
+}
+
+.file-explorer-searchbar-compact {
+  margin: 8px !important;
 }
 
 .fet-chip-cell {
@@ -46,6 +78,12 @@
 
 .fet-compact tr {
   transition: background-color 0.1s;
+  overflow-y: scroll;
+  display: table-row !important;
+}
+
+.fet-compact td {
+  max-height: 16px !important;
 }
 
 .fet-compact tr:hover {
@@ -53,34 +91,23 @@
   cursor: pointer;
 }
 
-.fet-compact {
-  position: relative;
-  height: 100%;
-  overflow-y: scroll;
-}
-
 .fet-compact button {
   height: 32px !important;
   width: 32px !important;
 }
 
-.fet-normal {
+/* .fet-normal {
   width: 100% !important;
-}
-
-.fet-list {
-  height: 100% !important;
-  width: 100% !important;
-}
+} */
 
 @media only screen and (max-width: 800px) {
   /* .file-explorer-table {
     width: 95% !important;
   } */
 
-  .fet-collapsable-column {
+  /* .fet-collapsable-column {
     display: none !important;
-  }
+  } */
 }
 
 .fe-filename:hover {

@@ -41,6 +41,8 @@
 }
 .pet-cont-compact {
   overflow-y: scroll;
+  overflow-x: hidden !important;
+
   flex: 1;
 }
 

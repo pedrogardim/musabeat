@@ -575,7 +575,9 @@ function Module(props) {
               />
             )}
             {modulePage === "fileExplorer" && (
-              <FileExplorer onFileClick={handleFileClick} compact />
+              <div className="instrument-editor">
+                <FileExplorer onFileClick={handleFileClick} compact />
+              </div>
             )}
             {modulePage === "settings" && (
               <ModuleSettings
