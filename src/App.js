@@ -1,6 +1,6 @@
 import "./App.css";
 
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 
 import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
@@ -37,6 +37,8 @@ function App() {
   const { t, i18n } = useTranslation();
   const history = useHistory();
 
+  const wrapperRef = useRef(null);
+
   const [user, setUser] = useState(null);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
@@ -44,6 +46,8 @@ function App() {
 
   const [sideMenu, setSideMenu] = useState(false);
   const [openedSession, setOpenedSession] = useState(null);
+
+  const [isScrollBottom, setIsScrollBottom] = useState(false);
 
   const handlePageNav = (route, additional) => history.push(`/${route}`);
 
@@ -68,13 +72,19 @@ function App() {
     setUserOption(false);
   };
 
+  //used for some components
+
+  const detectScrollToBottom = (e) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
+      setIsScrollBottom((prev) => !prev);
+  };
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
   }, []);
 
   useEffect(() => {
     console.log(user);
-    //updateAppTitle();
   }, [user]);
 
   return (
@@ -108,7 +118,7 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <div className="app-wrapper">
+      <div className="app-wrapper" onScroll={detectScrollToBottom}>
         {authDialog && (
           <AuthDialog
             authDialog={authDialog}
@@ -185,29 +195,29 @@ function App() {
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer explore />
+            <FileExplorer explore isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles />
+            <FileExplorer userFiles isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/file/:key">
             <FilePage />
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer explore />
+            <PatchExplorer explore isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/userinstruments">
-            <PatchExplorer userPatches />
+            <PatchExplorer userPatches isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/instrument/:key">
             <PatchPage />
           </Route>
           <Route exact path="/drumsets">
-            <PatchExplorer isDrum explore />
+            <PatchExplorer isDrum explore isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/userdrumsets">
-            <PatchExplorer isDrum userPatches />
+            <PatchExplorer isDrum userPatches isScrollBottom={isScrollBottom} />
           </Route>
           <Route exact path="/drumset/:key">
             <PatchPage isDrum />

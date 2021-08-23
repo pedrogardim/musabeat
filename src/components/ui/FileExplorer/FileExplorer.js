@@ -46,7 +46,7 @@ function FileExplorer(props) {
   const [filesUrl, setFilesUrl] = useState([]);
   const [filesUserData, setFilesUserData] = useState([]);
 
-  const [loaded, isLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [userLikedFiles, setUserLikedFiles] = useState([]);
 
@@ -58,8 +58,9 @@ function FileExplorer(props) {
   const [renamingFile, setRenamingFile] = useState(null);
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
+  const [isFirstQuery, setIsFirstQuery] = useState(true);
 
-  const [lastVisible, setLastVisible] = useState(null);
+  const [lastItem, setLastItem] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
 
@@ -67,6 +68,8 @@ function FileExplorer(props) {
   const [searchValue, setSearchValue] = useState("");
 
   const user = firebase.auth().currentUser;
+
+  const itemsPerPage = 30;
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
@@ -82,36 +85,39 @@ function FileExplorer(props) {
     }
   };
 
-  const getFilesList = async (tags, name) => {
-    const user = firebase.auth().currentUser;
+  const getFilesList = async () => {
     const dbFilesRef = firebase.firestore().collection("files");
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
 
-    //isLoaded(false);
+    console.log("query triggered");
 
     let queryRules = () => {
       let rules = dbFilesRef;
 
-      if (name) {
+      if (searchValue) {
         rules = rules
-          .where("name", ">=", name)
-          .where("name", "<=", name + "\uf8ff");
+          .where("name", ">=", searchValue)
+          .where("name", "<=", searchValue + "\uf8ff");
       }
-      if (tags && tags.length > 0) {
-        let tagsIds = tags
+      if (searchTags && searchTags.length > 0) {
+        let tagsIds = searchTags
           .map((e) => fileTags.indexOf(e))
           .filter((e) => e !== -1);
-        console.log(tagsIds);
         rules = rules.where("categ", "array-contains-any", tagsIds);
       }
+      /* if (!isFirstQuery) {
+        rules = rules.startAfter(lastItem);
+      } */
 
       return rules;
     };
 
-    let fileQuery = await queryRules().limit(10).get();
+    let fileQuery = await queryRules().limit(itemsPerPage).get();
 
-    //setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
+    setLastItem((prev) => fileQuery.docs[fileQuery.docs.length - 1]);
+
+    //if (fileQuery.docs.length < itemsPerPage) setIsLastPage(true);
 
     if (fileQuery.empty) {
       setFiledata(null);
@@ -121,8 +127,10 @@ function FileExplorer(props) {
     let filesData = fileQuery.docs.map((e) => e.data());
     let fileIdList = fileQuery.docs.map((e) => e.id);
 
-    setFiledata(filesData);
-    setFileIdList(fileIdList);
+    setFiledata((prev) => [...prev, ...filesData]);
+    setFileIdList((prev) => [...prev, ...fileIdList]);
+
+    //get files url
 
     const filesUrl = await Promise.all(
       fileIdList.map(async (e, i) => {
@@ -130,22 +138,33 @@ function FileExplorer(props) {
       })
     );
 
-    setFilesUrl(filesUrl);
+    setFilesUrl((prev) => [...prev, ...filesUrl]);
+
+    //fetch user info
 
     let usersToFetch = [
-      ...new Set(filesData.map((e) => e.user).filter((e) => e)),
+      ...new Set(
+        filesData
+          .map((e) => e.user)
+          .filter((e) => e)
+          .filter((e) => !filesUserData.hasOwnProperty(e))
+      ),
     ];
 
-    console.log(usersToFetch);
+    if (usersToFetch.length > 0) {
+      let usersData = await Promise.all(
+        usersToFetch.map(async (e, i) => [
+          e,
+          (await usersRef.doc(e).get()).get("profile"),
+        ])
+      );
 
-    let usersData = await Promise.all(
-      usersToFetch.map(async (e, i) => [
-        e,
-        (await usersRef.doc(e).get()).get("profile"),
-      ])
-    );
+      setFilesUserData((prev) => {
+        return { ...prev, ...Object.fromEntries(usersData) };
+      });
+    }
 
-    setFilesUserData(Object.fromEntries(usersData));
+    //isFirstQuery && setIsFirstQuery(false);
   };
 
   const getUserFilesList = async (liked) => {
@@ -158,7 +177,7 @@ function FileExplorer(props) {
       liked ? "likedFiles" : "files"
     );
 
-    //isLoaded(false);
+    //setIsLoaded(false);
 
     if (fileIdList.length === 0) {
       setFiledata(null);
@@ -343,38 +362,44 @@ function FileExplorer(props) {
   };
 
   useEffect(() => {
-    if (filedata === null || filedata.length > 0) isLoaded(true);
+    if (filedata === null || filedata.length > 0) setIsLoaded(true);
   }, [filedata]);
 
   useEffect(() => {
-    clearFiles();
-    !!props.userFiles && user && getUserFilesList();
+    //clearFiles();
+    props.userFiles && user && getUserFilesList();
   }, [props.userFiles, user]);
 
   useEffect(() => {
-    clearFiles();
-    props.explore && getFilesList();
     user && getUserLikes();
-  }, [props.explore, user]);
+  }, [user]);
 
   useEffect(() => {
+    //clearFiles();
+    props.explore && getFilesList();
+    !props.compact && document.addEventListener("scroll", detectScrollToBottom);
     return () => {
       players.forEach((player) => !!player && player.dispose());
+      !props.compact &&
+        document.removeEventListener("scroll", detectScrollToBottom);
     };
   }, []);
 
   useEffect(() => {
-    isLoaded(false);
+    setIsLoaded(false);
   }, [showingLiked]);
 
   useEffect(() => {
-    //console.log(loaded);
-  }, [loaded]);
+    clearFiles();
+    isLoaded && getFilesList(searchTags, searchValue);
+    setIsLoaded(false);
 
-  useEffect(() => {
-    getFilesList(searchTags, searchValue);
     //console.log("change triggered");
   }, [searchTags, searchValue]);
+
+  useEffect(() => {
+    getFilesList();
+  }, [props.isScrollBottom]);
 
   return (
     <div
@@ -461,10 +486,10 @@ function FileExplorer(props) {
               </TableHead>
             )}
             <TableBody>
-              {loaded
+              {isLoaded
                 ? filedata.map((row, index) => (
                     <TableRow
-                      key={row.name}
+                      key={row.name + index}
                       onClick={(e) => handleFileSelect(e, index)}
                     >
                       <TableCell style={{ width: props.compact ? 20 : 50 }}>
