@@ -53,7 +53,7 @@ function PatchExplorer(props) {
 
   const [patchesUserData, setPatchesUserData] = useState([]);
 
-  const [loaded, isLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   const [userLikedPatches, setUserLikedPatches] = useState([]);
 
@@ -130,7 +130,7 @@ function PatchExplorer(props) {
       .collection(props.isDrum ? "drumpatches" : "patches");
     const usersRef = firebase.firestore().collection("users");
 
-    //isLoaded(false);
+    //setLoaded(false);
 
     let queryRules = () => {
       let rules = dbPatchesRef;
@@ -200,18 +200,24 @@ function PatchExplorer(props) {
 
     let patchIdList = (await dbUserRef.get())
       .get(
-        liked ? (props.isDrum ? "likedDrumPatches" : "likedPatches") : "patches"
+        liked
+          ? props.isDrum
+            ? "likedDrumPatches"
+            : "likedPatches"
+          : props.isDrum
+          ? "drumPatches"
+          : "patches"
       )
       .filter((e) => e !== selectedPatch);
 
-    //isLoaded(false);
+    //setLoaded(false);
+
+    console.log(patchIdList);
 
     if (!patchIdList || patchIdList.length === 0) {
       setPatchdata(null);
       return;
     }
-
-    //console.log(patchIdList);
 
     setPatchIdList(patchIdList);
 
@@ -485,7 +491,7 @@ function PatchExplorer(props) {
   };
 
   useEffect(() => {
-    if (patchdata === null || patchdata.length > 0) isLoaded(true);
+    if (patchdata === null || patchdata.length > 0) setLoaded(true);
   }, [patchdata]);
 
   useEffect(() => {
@@ -506,15 +512,15 @@ function PatchExplorer(props) {
   }, []);
 
   useEffect(() => {
-    isLoaded(false);
+    setLoaded(false);
   }, [showingLiked]);
 
   useEffect(() => {
-    //console.log(loaded);
-  }, [loaded]);
+    console.log(patchdata);
+  }, [patchdata]);
 
   useEffect(() => {
-    selectedPatch && getSelectedPatchInfo(selectedPatch);
+    props.compact && selectedPatch && getSelectedPatchInfo(selectedPatch);
   }, [selectedPatch]);
 
   useEffect(() => {
@@ -641,7 +647,8 @@ function PatchExplorer(props) {
                         patchesUserData[selectedPatchInfo.creator] && (
                           <Tooltip
                             title={
-                              patchesUserData[selectedPatchInfo.creator].name
+                              patchesUserData[selectedPatchInfo.creator]
+                                .displayName
                             }
                           >
                             <Avatar
@@ -675,7 +682,7 @@ function PatchExplorer(props) {
               {loaded
                 ? patchdata.map((row, index) => (
                     <TableRow
-                      key={row.name}
+                      key={"row" + index}
                       onClick={(e) => handlePatchSelect(e, index)}
                       component="tr"
                       scope="row"

@@ -3,12 +3,16 @@ export const TRANSLATIONS_EN = {
   sidemenu: {
     newSession: "New Session",
     explore: "Explore",
+    instruments: "Instruments",
+    drumsets: "Drum Sets",
+    files: "Files",
   },
   avatar: {
     profile: "Profile",
     userSessions: "My Sessions",
     userSamples: "My Samples",
     userPatches: "My Patches",
+    userDrumPatches: "My Drumsets",
     logOut: "Log Out",
   },
   workspace: {

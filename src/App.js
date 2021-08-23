@@ -130,11 +130,14 @@ function App() {
           <MenuItem onClick={() => handlePageNav("sessions")}>
             {t("avatar.userSessions")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userFiles")}>
+          <MenuItem onClick={() => handlePageNav("userfiles")}>
             {t("avatar.userSamples")}
           </MenuItem>
-          <MenuItem onClick={() => setUserOption(false)}>
+          <MenuItem onClick={() => handlePageNav("userinstruments")}>
             {t("avatar.userPatches")}
+          </MenuItem>
+          <MenuItem onClick={() => handlePageNav("userdrumsets")}>
+            {t("avatar.userDrumPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
         </Menu>
