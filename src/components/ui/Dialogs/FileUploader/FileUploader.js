@@ -39,6 +39,9 @@ function FileUploader(props) {
   const [uploadingFileIds, setUploadingFileIds] = useState([]);
   const [duplicatedFilesInfo, setDuplicatedFilesInfo] = useState([]);
   const [uploadingFileTags, setUploadingFileTags] = useState([]);
+
+  const [uploadingFilesBuffer, setUploadingFilesBuffer] = useState([]);
+
   const [labelsOnInstrument, setLabelsOnInstrument] = useState([]);
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
@@ -53,6 +56,7 @@ function FileUploader(props) {
     setDuplicatedFilesInfo([]);
     setUploadState([]);
     setLabelsOnInstrument([]);
+    setUploadingFilesBuffer([]);
   };
 
   const uploadFiles = () => {
@@ -70,10 +74,19 @@ function FileUploader(props) {
         props.instrument.context.rawContext.decodeAudioData(
           arraybuffer,
           (audiobuffer) => {
+            setUploadingFilesBuffer((prev) => {
+              let newBuffers = [...prev];
+              newBuffers[i] = audiobuffer;
+              return newBuffers;
+            });
+
             console.log(audiobuffer);
 
-            //skip if audio is too large
-            if (audiobuffer.duration > 10) {
+            //skip if audio is too large for sampler/sequencer
+            if (
+              audiobuffer.duration > 5 &&
+              (props.instrument.name === "Sampler" || props.module.type === 0)
+            ) {
               /* alert(
                 `Error on file: "${file.name}" - Try importing a smaller audio file`
               ); */
@@ -114,11 +127,15 @@ function FileUploader(props) {
 
             //add buffer directly to instrument
 
-            props.instrument.add(
-              labelOnInstrument,
-              audiobuffer,
-              () => isLastFile && props.setInstrumentLoaded(true)
-            );
+            if (props.module.type === 3) {
+              props.loadPlayer(audiobuffer);
+            } else {
+              props.instrument.add(
+                labelOnInstrument,
+                audiobuffer,
+                () => isLastFile && props.setInstrumentLoaded(true)
+              );
+            }
 
             /////
             //UPLOAD FILE
@@ -140,6 +157,7 @@ function FileUploader(props) {
               };
 
               if (props.module.type === 0) fileInfo.categ.push(0);
+              //if (props.module.type === 3) fileInfo.categ.push(1);
               if (props.instrument.name === "Sampler") fileInfo.categ.push(1);
 
               setUploadingFileTags((prev) => {
@@ -154,6 +172,7 @@ function FileUploader(props) {
 
               filesRef
                 .where("dur", "==", fileInfo.dur)
+                .where("name", "==", fileInfo.name)
                 .where("user", "==", user.uid)
                 .where("size", "==", file.size)
                 .get()
@@ -203,7 +222,9 @@ function FileUploader(props) {
                           Boolean(props.onInstrumentMod) &&
                             props.onInstrumentMod(ref.id, labelOnInstrument);
 
-                          props.getFilesName();
+                          props.updateOnFileLoaded();
+
+                          props.module.type !== 3 && props.getFilesName();
 
                           //add file id to user in db
 
@@ -251,7 +272,7 @@ function FileUploader(props) {
                     Boolean(props.onInstrumentMod) &&
                       props.onInstrumentMod(fileid, labelOnInstrument);
 
-                    props.getFilesName();
+                    props.module.type !== 3 && props.getFilesName();
 
                     setUploadState((prev) => {
                       let newState = [...prev];

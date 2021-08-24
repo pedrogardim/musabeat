@@ -78,10 +78,9 @@ function FileExplorer(props) {
 
   const handleFileSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
-      let url = filesUrl[index];
-
       props.onFileClick(
-        url,
+        fileIdList[index],
+        filesUrl[index],
         players[index] !== undefined && players[index].buffer
       );
     }

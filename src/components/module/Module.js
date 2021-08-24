@@ -167,13 +167,13 @@ function Module(props) {
 
   //Only used for players
 
-  const updateOnAudioFileLoaded = () => {
+  const updateOnFileLoaded = (dur) => {
     //console.log(props.instrument);
     props.setModules((previousModules) => {
       let newmodules = [...previousModules];
       if (props.instrument.buffer)
         newmodules[props.index].score[0].duration = parseFloat(
-          props.instrument.buffer.duration.toFixed(2)
+          (dur ? dur : props.instrument.buffer.duration).toFixed(2)
         );
       return newmodules;
     });
@@ -212,7 +212,7 @@ function Module(props) {
       props.setModules((prev) => {
         let newModules = [...prev];
         if (props.module.type === 3) {
-          newModules[props.index].instrument = { url };
+          newModules[props.index].instrument = { url: url };
         } else if (props.instrument.name === "Sampler") {
           let samplerPrms = props.instrument.get();
           delete samplerPrms.onerror;
@@ -228,7 +228,7 @@ function Module(props) {
     props.resetUndoHistory();
   };
 
-  const handleFileClick = (fileUrl, audiobuffer) => {
+  const handleFileClick = (fileId, fileUrl, audiobuffer) => {
     if (props.module.type === 3) {
       setInstrumentLoaded(false);
       props.instrument.dispose();
@@ -238,8 +238,8 @@ function Module(props) {
       ).toDestination();
 
       setInstrument(newPlayer);
-      updateOnAudioFileLoaded();
-      onInstrumentMod(fileUrl);
+      updateOnFileLoaded();
+      onInstrumentMod(fileId);
       setModulePage(null);
     }
   };
@@ -336,7 +336,7 @@ function Module(props) {
           module={props.module}
           setModules={props.setModules}
           moduleZoom={moduleZoom}
-          updateOnAudioFileLoaded={updateOnAudioFileLoaded}
+          updateOnFileLoaded={updateOnFileLoaded}
           fullScreen={fullScreen}
           timeline={props.timeline}
           timelineMode={props.timelineMode}

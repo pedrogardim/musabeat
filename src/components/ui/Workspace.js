@@ -314,15 +314,25 @@ function Workspace(props) {
 
       //player
       else if (module.type === 3) {
-        moduleInstruments[moduleIndex] = !!module.instrument.url
-          ? new Tone.GrainPlayer(module.instrument.url, () =>
-              setInstrumentsLoaded((prev) => {
+        module.instrument.url &&
+          firebase
+            .storage()
+            .ref(module.instrument.url)
+            .getDownloadURL()
+            .then((r) => {
+              let instrument = new Tone.GrainPlayer(r, () =>
+                setInstrumentsLoaded((prev) => {
+                  let a = [...prev];
+                  a[moduleIndex] = true;
+                  return a;
+                })
+              ).toDestination();
+              setInstruments((prev) => {
                 let a = [...prev];
-                a[moduleIndex] = true;
+                a[moduleIndex] = instrument;
                 return a;
-              })
-            ).toDestination()
-          : new Tone.GrainPlayer().toDestination();
+              });
+            });
 
         !module.instrument.url &&
           setInstrumentsLoaded((prev) => {
@@ -333,17 +343,13 @@ function Workspace(props) {
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
-        patchLoader(
-          module.instrument,
-
-          setInstrumentsLoaded,
-          moduleIndex
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[moduleIndex] = r;
-            return a;
-          })
+        patchLoader(module.instrument, setInstrumentsLoaded, moduleIndex).then(
+          (r) =>
+            setInstruments((prev) => {
+              let a = [...prev];
+              a[moduleIndex] = r;
+              return a;
+            })
         );
       } //load from obj
       else if (typeof module.instrument === "object") {
@@ -404,13 +410,25 @@ function Workspace(props) {
     }
     //player
     else if (module.type === 3) {
-      instrument = !!module.instrument.url
-        ? new Tone.GrainPlayer(module.instrument.url, () =>
-            setInstrumentsLoaded((prev) =>
-              prev.map((e, i) => (i === index ? true : e))
-            )
-          ).toDestination()
-        : new Tone.GrainPlayer().toDestination();
+      module.instrument.url &&
+        firebase
+          .storage()
+          .ref(module.instrument.url)
+          .getDownloadURL()
+          .then((r) => {
+            let instrument = new Tone.GrainPlayer(r, () =>
+              setInstrumentsLoaded((prev) => {
+                let a = [...prev];
+                a[index] = true;
+                return a;
+              })
+            ).toDestination();
+            setInstruments((prev) => {
+              let a = [...prev];
+              a[index] = instrument;
+              return a;
+            });
+          });
 
       !module.instrument.url &&
         setInstrumentsLoaded((prev) => {

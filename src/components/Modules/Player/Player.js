@@ -6,6 +6,7 @@ import firebase from "firebase";
 import AudioClip from "./AudioClip";
 import BackgroundGrid from "./BackgroundGrid";
 import PlayerOptions from "./PlayerOptions";
+import FileUploader from "../../ui/Dialogs/FileUploader/FileUploader";
 
 import Draggable from "react-draggable";
 import { FileDrop } from "react-file-drop";
@@ -21,6 +22,9 @@ function Player(props) {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [rescheduleEvent, setRescheduleEvent] = useState(null);
+
+  const [uploadingFiles, setUploadingFiles] = useState([]);
+
   const [draggingOver, setDraggingOver] = useState(false);
 
   const loadPlayer = (audiobuffer) => {
@@ -29,7 +33,7 @@ function Player(props) {
     let newInstrument = new Tone.GrainPlayer(audiobuffer).toDestination();
     props.setInstrument(newInstrument);
 
-    props.updateOnAudioFileLoaded();
+    props.updateOnFileLoaded(audiobuffer.duration);
   };
 
   const toggleCursor = (state) => {
@@ -94,70 +98,12 @@ function Player(props) {
     scheduleEvents();
   };
 
-  const handleFileDrop = async (files, event) => {
+  const handleFileDrop = (files, event) => {
     event.preventDefault();
-
     Tone.Transport.pause();
-
-    props.setInstrumentLoaded(false);
+    //let file = files[0];
     setDraggingOver(false);
-
-    let file = files[0];
-
-    let arrayBuffer = await file.arrayBuffer();
-
-    let audiobuffer = await props.instrument.context.rawContext.decodeAudioData(
-      arrayBuffer
-    );
-
-    if ((await audiobuffer) > 180) {
-      alert("Try importing a smaller audio file");
-      props.setInstrumentLoaded(true);
-      return;
-    } else {
-      /* props.setModules((previousModules) => {
-        let newmodules = [...previousModules];
-        newmodules[props.index].score[0].duration = parseFloat(
-          audiobuffer.duration.toFixed(2)
-        );
-        return newmodules;
-      }); */
-      loadPlayer(audiobuffer);
-
-      const user = firebase.auth().currentUser;
-
-      //console.log(user);
-
-      if (user) {
-        const storageRef = firebase.storage().ref(`/${user.uid}/${file.name}`);
-        const task = storageRef.put(file);
-
-        task.on(
-          "state_changed",
-          (snapshot) => {
-            //console.log(
-            //  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            //);
-          },
-          (error) => {
-            console.log(error);
-          },
-          () => {
-            storageRef.getDownloadURL().then((r) => {
-              props.onInstrumentMod(r);
-            });
-          }
-        );
-      }
-    }
-
-    //decode audio error
-    /* (e) => {
-          alert(
-            "Upps.. there was an error decoding your audio file, try to convert it to other format"
-          );
-          props.setInstrumentLoaded(true);
-        } */
+    setUploadingFiles([files[0]]);
   };
 
   //TODO: Optimize performance: clear on play/plause
@@ -207,7 +153,7 @@ function Player(props) {
   useEffect(() => {
     //TEMP: function on "module" component to make score adapts to audio file
     //console.log("IS LOADED?", props.instrument.loaded);
-    props.updateOnAudioFileLoaded();
+    props.updateOnFileLoaded();
   }, [props.instrument.loaded]);
 
   useEffect(() => {
@@ -258,6 +204,7 @@ function Player(props) {
             Drop your files here!
           </FileDrop>
         )}
+
         {!!props.instrument && props.loaded && score[0].duration > 0 && (
           <AudioClip
             index={0}
@@ -294,6 +241,17 @@ function Player(props) {
           setScore={setScore}
         />
       </div>
+      <FileUploader
+        open={uploadingFiles.length > 0}
+        files={uploadingFiles}
+        setUploadingFiles={setUploadingFiles}
+        loadPlayer={loadPlayer}
+        module={props.module}
+        instrument={props.instrument}
+        setInstrumentLoaded={props.setInstrumentLoaded}
+        onInstrumentMod={props.onInstrumentMod}
+        updateOnFileLoaded={props.updateOnFileLoaded}
+      />
     </div>
   );
 }
