@@ -363,12 +363,16 @@ function FileExplorer(props) {
     setFiledata([]);
     setFileIdList([]);
     setFilesUrl([]);
-    setFilesUserData([]);
+  };
+
+  const detectScrollToBottom = (e) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
+      !isQueryEnd && !isLoading && getFilesList();
   };
 
   useEffect(() => {
     //clearFiles();
-    props.explore && getFilesList();
+    (props.explore || props.compact) && getFilesList();
     return () => {
       players.forEach((player) => !!player && player.dispose());
     };
@@ -444,6 +448,7 @@ function FileExplorer(props) {
       {filedata !== null ? (
         <TableContainer
           className={props.compact ? "fet-cont-compact" : "fet-cont"}
+          onScroll={props.compact && detectScrollToBottom}
         >
           <Table
             component={props.compact ? "div" : Paper}

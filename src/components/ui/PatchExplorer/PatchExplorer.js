@@ -501,11 +501,17 @@ function PatchExplorer(props) {
   const clearPatches = () => {
     setPatchdata([]);
     setPatchIdList([]);
-    setPatchesUserData([]);
+  };
+
+  //!!only used when compacted!!
+
+  const detectScrollToBottom = (e) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
+      !isQueryEnd && !isLoading && getPatchesList();
   };
 
   useEffect(() => {
-    props.explore && getPatchesList();
+    (props.explore || props.compact) && getPatchesList();
 
     return () => {
       instruments.forEach((instr) => !!instr && instr.dispose());
@@ -518,7 +524,7 @@ function PatchExplorer(props) {
 
   useEffect(() => {
     clearPatches();
-    !!props.userPatches && user && getUserPatchesList();
+    props.userPatches && user && getUserPatchesList();
   }, [props.userPatches, user]);
 
   useEffect(() => {
@@ -581,6 +587,7 @@ function PatchExplorer(props) {
       {patchdata !== null ? (
         <TableContainer
           className={props.compact ? "pet-cont-compact" : "pet-cont"}
+          onScroll={props.compact && detectScrollToBottom}
         >
           <Table
             component={props.compact ? "div" : Paper}
@@ -933,7 +940,6 @@ function PatchExplorer(props) {
       {props.compact && (
         <BottomNavigation
           className="patch-explorer-compact-bottom-nav"
-          value={showingLiked}
           onChange={(e, v) =>
             v === "ie"
               ? props.setPatchExplorer(false)
@@ -956,7 +962,6 @@ function PatchExplorer(props) {
       {props.userPatches && (
         <BottomNavigation
           className="pet-user-bottom-nav"
-          value={showingLiked}
           onChange={(event, newValue) => {
             getUserPatchesList(newValue);
             setShowingLiked(newValue);
