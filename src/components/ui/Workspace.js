@@ -231,14 +231,23 @@ function Workspace(props) {
     }
     //
     else if (typeof sessionKey === "string") {
-      let sessionRef =
-        sessionKey !== null &&
-        firebase.firestore().collection("sessions").doc(sessionKey);
+      console.log(sessionKey);
+      let sessionRef = firebase
+        .firestore()
+        .collection("sessions")
+        .doc(sessionKey);
 
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
         let data = snapshot.data();
+        if (!data) {
+          console.log(
+            "======================= empty session data, loading again =========================="
+          );
+          loadSession();
+          return;
+        }
         //console.log(snapshot.val().modules + "-----");
         let sessionInfo = { ...data };
         delete sessionInfo.modules;
@@ -977,7 +986,7 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
-      {sessionKey && sessionData && (
+      {sessionKey && (
         <WorkspaceTitle
           sessionData={sessionData}
           setSessionData={setSessionData}
@@ -987,17 +996,16 @@ function Workspace(props) {
           sessionSize={sessionSize}
         />
       )}
-      {modules && sessionSize && sessionData.timeline && (
-        <WorkspaceTimeline
-          setTimelineMode={setTimelineMode}
-          timelineMode={timelineMode}
-          timeline={sessionData.timeline}
-          setTimeline={setTimeline}
-          modules={modules}
-          sessionSize={sessionSize}
-          setSessionSize={setSessionSize}
-        />
-      )}
+
+      <WorkspaceTimeline
+        setTimelineMode={setTimelineMode}
+        timelineMode={timelineMode}
+        timeline={sessionData && sessionData.timeline}
+        setTimeline={setTimeline}
+        modules={modules}
+        sessionSize={sessionSize}
+        setSessionSize={setSessionSize}
+      />
 
       <div className="workspace-module-cont">
         {modules !== null && sessionData ? (
@@ -1030,7 +1038,7 @@ function Workspace(props) {
             </Fragment>
           ))
         ) : !modules ? (
-          [1, 1, 1, 1].map(() => <PlaceholderModule />)
+          [1, 1].map(() => <PlaceholderModule />)
         ) : !modules.length && !instrumentsLoaded.length ? (
           <Fragment>
             <Typography variant="h1">:v</Typography>

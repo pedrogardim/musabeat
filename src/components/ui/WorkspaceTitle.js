@@ -15,6 +15,8 @@ import {
   Button,
 } from "@material-ui/core";
 
+import { Skeleton } from "@material-ui/lab";
+
 import SessionInfo from "./Dialogs/SessionInfo";
 
 import "./Workspace.css";
@@ -64,9 +66,9 @@ function WorkspaceTitle(props) {
   };
 
   useEffect(() => {
-    getSessionTitleInfo();
+    props.sessionData && getSessionTitleInfo();
     setExpanded(false);
-  }, [props.sessionKey, props.user]);
+  }, [props.sessionData, props.sessionKey, props.user]);
 
   /*  useEffect(() => {
     console.log(editorProfiles);
@@ -75,7 +77,7 @@ function WorkspaceTitle(props) {
   return (
     <div className="app-title">
       <Typography variant="h4">
-        {props.sessionData.name}
+        {props.sessionData ? props.sessionData.name : "..."}
         {expanded && (
           <IconButton onClick={() => setInfoDialog(true)}>
             <Icon>edit</Icon>
@@ -108,19 +110,20 @@ function WorkspaceTitle(props) {
 
       <div className="break" style={{ margin: 0 }} />
 
-      {creationDateString && (
-        <Typography variant="overline" style={{ fontSize: 10 }}>
-          {`${props.sessionData.bpm} BPM - ${Math.floor(
-            (Tone.Time("1m").toSeconds() * props.sessionSize) / 60
-          )}:${(
-            "0" +
-            Math.floor((Tone.Time("1m").toSeconds() * props.sessionSize) % 60)
-          ).slice(-2)} s - ${creationDateString}`}
-        </Typography>
-      )}
+      <Typography variant="overline" style={{ fontSize: 10 }}>
+        {`${props.sessionData ? props.sessionData.bpm : "-"} BPM - ${Math.floor(
+          (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) / 60
+        )}:${(
+          "0" +
+          Math.floor(
+            (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
+          )
+        ).slice(-2)} s - ${creationDateString || " "}`}
+      </Typography>
+
       <div className="break" />
 
-      {props.sessionData.editors.length &&
+      {editorProfiles.length > 0 ? (
         editorProfiles.map(
           (e) =>
             e !== null && (
@@ -128,11 +131,14 @@ function WorkspaceTitle(props) {
                 <Avatar src={e.photoURL} alt={e.displayName} />
               </Tooltip>
             )
-        )}
+        )
+      ) : (
+        <Avatar />
+      )}
 
       <div className="break" />
 
-      {expanded && (
+      {props.sessionData && expanded && (
         <Fragment>
           <Typography variant="body2">{`"${props.sessionData.description}"`}</Typography>
           <div className="break" />
