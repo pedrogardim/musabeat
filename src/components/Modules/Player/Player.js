@@ -27,10 +27,9 @@ function Player(props) {
     props.instrument.dispose();
 
     let newInstrument = new Tone.GrainPlayer(audiobuffer).toDestination();
+    props.setInstrument(newInstrument);
 
     props.updateOnAudioFileLoaded();
-
-    props.setInstrument(newInstrument);
   };
 
   const toggleCursor = (state) => {

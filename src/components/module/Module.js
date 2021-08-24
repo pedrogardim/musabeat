@@ -238,6 +238,7 @@ function Module(props) {
       ).toDestination();
 
       setInstrument(newPlayer);
+      updateOnAudioFileLoaded();
       onInstrumentMod(fileUrl);
       setModulePage(null);
     }
