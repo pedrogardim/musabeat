@@ -53,7 +53,7 @@ function PatchExplorer(props) {
 
   const [patchesUserData, setPatchesUserData] = useState([]);
 
-  const [loaded, setLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [userLikedPatches, setUserLikedPatches] = useState([]);
 
@@ -75,7 +75,10 @@ function PatchExplorer(props) {
   );
   const [selectedPatchInfo, setSelectedPatchInfo] = useState(null);
 
-  const [lastVisible, setLastVisible] = useState(null);
+  const [isFirstQuery, setIsFirstQuery] = useState(true);
+  const [isQueryEnd, setIsQueryEnd] = useState(false);
+
+  const [lastItem, setLastItem] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
 
@@ -85,8 +88,7 @@ function PatchExplorer(props) {
   const user = firebase.auth().currentUser;
   const categories = props.isDrum ? drumCategories : instrumentsCategories;
 
-  //const [userOption, setUserOption] = useState(false);
-  //const [sideMenu, setSideMenu] = useState(false);
+  const itemsPerPage = 25;
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -124,24 +126,23 @@ function PatchExplorer(props) {
     }
   };
 
-  const getPatchesList = async (tags, name) => {
-    const dbPatchesRef = firebase
-      .firestore()
-      .collection(props.isDrum ? "drumpatches" : "patches");
+  const getPatchesList = async (clear) => {
     const usersRef = firebase.firestore().collection("users");
 
     //setLoaded(false);
 
     let queryRules = () => {
-      let rules = dbPatchesRef;
+      let rules = firebase
+        .firestore()
+        .collection(props.isDrum ? "drumpatches" : "patches");
 
-      if (name) {
+      if (searchValue) {
         rules = rules
-          .where("name", ">=", name)
-          .where("name", "<=", name + "\uf8ff");
+          .where("name", ">=", searchValue)
+          .where("name", "<=", searchValue + "\uf8ff");
       }
-      if (tags && tags.length > 0) {
-        let tagsIds = tags
+      if (searchTags && searchTags.length > 0) {
+        let tagsIds = searchTags
           .map((e) =>
             props.isDrum
               ? drumCategories.indexOf(e)
@@ -151,17 +152,20 @@ function PatchExplorer(props) {
         //console.log(tagsIds);
         rules = rules.where("categ", "in", tagsIds);
       }
+      if (!clear && !isFirstQuery && lastItem) {
+        console.log("next page");
+        rules = rules.startAfter(lastItem);
+      }
 
       return rules;
     };
 
-    let patchQuery = await queryRules().limit(10).get();
+    let patchQuery = await queryRules().limit(itemsPerPage).get();
 
-    //setLastVisible(fileQuery.docs[fileQuery.docs.length - 1]);
+    setLastItem(patchQuery.docs[patchQuery.docs.length - 1]);
 
-    if (patchQuery.empty) {
-      setPatchdata(null);
-      return;
+    if (patchQuery.docs.length < itemsPerPage) {
+      setIsQueryEnd(true);
     }
 
     let patchesData = patchQuery.docs
@@ -174,22 +178,32 @@ function PatchExplorer(props) {
     setPatchdata(patchesData);
     setPatchIdList(patchIdList);
 
+    setIsLoading(patchesData === false);
+
     let usersToFetch = [
-      ...new Set(patchesData.map((e) => e.creator).filter((e) => e)),
+      ...new Set(
+        patchesData
+          .map((e) => e.user)
+          .filter((e) => e)
+          .filter((e) => !patchesUserData.hasOwnProperty(e))
+      ),
     ];
 
     //console.log(usersToFetch);
 
-    let usersData = await Promise.all(
-      usersToFetch.map(async (e, i) => [
-        e,
-        (await usersRef.doc(e).get()).get("profile"),
-      ])
-    );
+    if (usersToFetch.length > 0) {
+      let usersData = await Promise.all(
+        usersToFetch.map(async (e, i) => [
+          e,
+          (await usersRef.doc(e).get()).get("profile"),
+        ])
+      );
 
-    //console.log(Object.fromEntries(usersData));
-
-    setPatchesUserData(Object.fromEntries(usersData));
+      setPatchesUserData((prev) => {
+        return { ...prev, ...Object.fromEntries(usersData) };
+      });
+    }
+    setIsFirstQuery(patchesData === false);
   };
 
   const getUserPatchesList = async (liked) => {
@@ -221,13 +235,13 @@ function PatchExplorer(props) {
 
     setPatchIdList(patchIdList);
 
-    let filesData = await Promise.all(
+    let patchesData = await Promise.all(
       patchIdList.map(async (e, i) => {
         return (await dbPatchesRef.doc(e).get()).data();
       })
     );
 
-    setPatchdata(filesData);
+    setPatchdata(patchesData);
   };
 
   const getSelectedPatchInfo = async () => {
@@ -491,7 +505,15 @@ function PatchExplorer(props) {
   };
 
   useEffect(() => {
-    if (patchdata === null || patchdata.length > 0) setLoaded(true);
+    props.explore && getPatchesList();
+
+    return () => {
+      instruments.forEach((instr) => !!instr && instr.dispose());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (patchdata === null || patchdata.length > 0) setIsLoading(false);
   }, [patchdata]);
 
   useEffect(() => {
@@ -500,33 +522,27 @@ function PatchExplorer(props) {
   }, [props.userPatches, user]);
 
   useEffect(() => {
-    clearPatches();
-    props.explore && getPatchesList();
     user && getUserLikes();
   }, [props.explore, user]);
 
   useEffect(() => {
-    return () => {
-      instruments.forEach((instr) => !!instr && instr.dispose());
-    };
-  }, []);
-
-  useEffect(() => {
-    setLoaded(false);
+    clearPatches();
+    setIsLoading(false);
   }, [showingLiked]);
-
-  useEffect(() => {
-    console.log(patchdata);
-  }, [patchdata]);
 
   useEffect(() => {
     props.compact && selectedPatch && getSelectedPatchInfo(selectedPatch);
   }, [selectedPatch]);
 
   useEffect(() => {
-    getPatchesList(searchTags, searchValue);
+    clearPatches();
+    !isLoading && getPatchesList("clear");
     //console.log("change triggered");
   }, [searchTags, searchValue]);
+
+  useEffect(() => {
+    !isQueryEnd && !isLoading && getPatchesList();
+  }, [props.isScrollBottom]);
 
   return (
     <div
@@ -679,146 +695,139 @@ function PatchExplorer(props) {
                 </TableRow>
               )}
 
-              {loaded
-                ? patchdata.map((row, index) => (
-                    <TableRow
-                      key={"row" + index}
-                      onClick={(e) => handlePatchSelect(e, index)}
-                      component="tr"
-                      scope="row"
+              {patchdata.map((row, index) => (
+                <TableRow
+                  key={"row" + index}
+                  onClick={(e) => handlePatchSelect(e, index)}
+                  component="tr"
+                  scope="row"
+                >
+                  <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                    {loadingPlay === index ? (
+                      <CircularProgress size={27} />
+                    ) : currentPlaying === index ? (
+                      <IconButton onClick={() => stopPatch(index)}>
+                        <Icon>stop</Icon>
+                      </IconButton>
+                    ) : (
+                      <IconButton onClick={() => playPatch(index)}>
+                        <Icon>play_arrow</Icon>
+                      </IconButton>
+                    )}
+                  </TableCell>
+                  <TableCell scope="row">
+                    <div
+                      style={{
+                        maxWidth: 200,
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
                     >
-                      <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                        {loadingPlay === index ? (
-                          <CircularProgress size={27} />
-                        ) : currentPlaying === index ? (
-                          <IconButton onClick={() => stopPatch(index)}>
-                            <Icon>stop</Icon>
-                          </IconButton>
-                        ) : (
-                          <IconButton onClick={() => playPatch(index)}>
-                            <Icon>play_arrow</Icon>
-                          </IconButton>
-                        )}
-                      </TableCell>
-                      <TableCell scope="row">
-                        <div
-                          style={{
-                            maxWidth: 200,
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                          }}
-                        >
-                          <Typography
-                            variant="overline"
-                            className="fe-filename"
-                            onClick={() => openPatchPage(patchIdList[index])}
+                      <Typography
+                        variant="overline"
+                        className="fe-filename"
+                        onClick={() => openPatchPage(patchIdList[index])}
+                      >
+                        {row.name}
+                      </Typography>
+                      {patchdata[index].base === "Sampler" && (
+                        <Tooltip arrow placement="top" title="Sampler">
+                          <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                            graphic_eq
+                          </Icon>
+                        </Tooltip>
+                      )}
+                      {props.userPatches && patchdata[index].user === user.uid && (
+                        <IconButton onClick={() => setRenamingPatch(index)}>
+                          <Icon>edit</Icon>
+                        </IconButton>
+                      )}
+                      {props.compact &&
+                        patchesUserData[patchdata[index].creator] && (
+                          <Tooltip
+                            title={
+                              patchesUserData[patchdata[index].creator]
+                                .displayName
+                            }
                           >
-                            {row.name}
-                          </Typography>
-                          {patchdata[index].base === "Sampler" && (
-                            <Tooltip arrow placement="top" title="Sampler">
-                              <Icon style={{ fontSize: 16, marginLeft: 4 }}>
-                                graphic_eq
-                              </Icon>
-                            </Tooltip>
-                          )}
-                          {props.userPatches &&
-                            patchdata[index].user === user.uid && (
-                              <IconButton
-                                onClick={() => setRenamingPatch(index)}
-                              >
-                                <Icon>edit</Icon>
-                              </IconButton>
-                            )}
-                          {props.compact &&
-                            patchesUserData[patchdata[index].creator] && (
-                              <Tooltip
-                                title={
-                                  patchesUserData[patchdata[index].creator]
-                                    .displayName
-                                }
-                              >
-                                <Avatar
-                                  style={{
-                                    height: 24,
-                                    width: 24,
-                                    marginLeft: 8,
-                                  }}
-                                  alt={
-                                    patchesUserData[patchdata[index].creator]
-                                      .displayName
-                                  }
-                                  src={
-                                    patchesUserData[patchdata[index].creator]
-                                      .photoURL
-                                  }
-                                />
-                              </Tooltip>
-                            )}
-                        </div>
-                      </TableCell>
-                      {props.explore && (
-                        <TableCell
-                          className="pet-collapsable-column"
-                          style={{ width: 50 }}
-                        >
-                          {patchesUserData[patchdata[index].creator] && (
-                            <Tooltip
-                              title={
+                            <Avatar
+                              style={{
+                                height: 24,
+                                width: 24,
+                                marginLeft: 8,
+                              }}
+                              alt={
                                 patchesUserData[patchdata[index].creator]
                                   .displayName
                               }
+                              src={
+                                patchesUserData[patchdata[index].creator]
+                                  .photoURL
+                              }
+                            />
+                          </Tooltip>
+                        )}
+                    </div>
+                  </TableCell>
+                  {props.explore && (
+                    <TableCell
+                      className="pet-collapsable-column"
+                      style={{ width: 50 }}
+                    >
+                      {patchesUserData[patchdata[index].creator] && (
+                        <Tooltip
+                          title={
+                            patchesUserData[patchdata[index].creator]
+                              .displayName
+                          }
+                        >
+                          <Avatar
+                            alt={
+                              patchesUserData[patchdata[index].creator]
+                                .displayName
+                            }
+                            src={
+                              patchesUserData[patchdata[index].creator].photoURL
+                            }
+                          />
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <div className="pet-chip-cell">
+                      {categories[patchdata[index].categ] && (
+                        <Chip
+                          clickable={true}
+                          onClick={(e) =>
+                            !!props.userPatches &&
+                            setTagSelectionTarget([e.target, index])
+                          }
+                          className={"file-tag-chip"}
+                          label={categories[patchdata[index].categ]}
+                        />
+                      )}
+                    </div>
+                  </TableCell>
+                  {!props.compact && (
+                    <Fragment>
+                      {(props.explore || !!showingLiked) && (
+                        <TableCell style={{ width: 50 }} align="center">
+                          <IconButton onClick={() => handleLike(index)}>
+                            <Icon
+                              color={
+                                userLikedPatches.includes(patchIdList[index])
+                                  ? "secondary"
+                                  : "inherit"
+                              }
                             >
-                              <Avatar
-                                alt={
-                                  patchesUserData[patchdata[index].creator]
-                                    .displayName
-                                }
-                                src={
-                                  patchesUserData[patchdata[index].creator]
-                                    .photoURL
-                                }
-                              />
-                            </Tooltip>
-                          )}
+                              favorite
+                            </Icon>
+                          </IconButton>
                         </TableCell>
                       )}
-                      <TableCell>
-                        <div className="pet-chip-cell">
-                          {categories[patchdata[index].categ] && (
-                            <Chip
-                              clickable={true}
-                              onClick={(e) =>
-                                !!props.userPatches &&
-                                setTagSelectionTarget([e.target, index])
-                              }
-                              className={"file-tag-chip"}
-                              label={categories[patchdata[index].categ]}
-                            />
-                          )}
-                        </div>
-                      </TableCell>
-                      {!props.compact && (
-                        <Fragment>
-                          {(props.explore || !!showingLiked) && (
-                            <TableCell style={{ width: 50 }} align="center">
-                              <IconButton onClick={() => handleLike(index)}>
-                                <Icon
-                                  color={
-                                    userLikedPatches.includes(
-                                      patchIdList[index]
-                                    )
-                                      ? "secondary"
-                                      : "inherit"
-                                  }
-                                >
-                                  favorite
-                                </Icon>
-                              </IconButton>
-                            </TableCell>
-                          )}
-                          {/* <TableCell
+                      {/* <TableCell
                           className="pet-collapsable-column"
                           align="center"
                         >
@@ -831,68 +840,64 @@ function PatchExplorer(props) {
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell> */}
-                          {props.userPatches && (
-                            <TableCell align="center">
-                              <IconButton
-                                onClick={() => setDeletingPatch(index)}
-                              >
-                                <Icon>delete</Icon>
+                      {props.userPatches && (
+                        <TableCell align="center">
+                          <IconButton onClick={() => setDeletingPatch(index)}>
+                            <Icon>delete</Icon>
+                          </IconButton>
+                        </TableCell>
+                      )}
+                    </Fragment>
+                  )}
+                </TableRow>
+              ))}
+              {isLoading &&
+                Array(10)
+                  .fill(1)
+                  .map((e) => (
+                    <TableRow>
+                      <TableCell
+                        style={{ width: props.compact ? 20 : 50 }}
+                        component="th"
+                        scope="row"
+                      >
+                        <IconButton>
+                          <Icon>play_arrow</Icon>
+                        </IconButton>
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        <Typography variant="overline" className="fe-filename">
+                          <Skeleton variant="text" />
+                        </Typography>
+                      </TableCell>
+                      {props.explore && (
+                        <TableCell
+                          className="pet-collapsable-column"
+                          style={{ width: 50 }}
+                        >
+                          <Avatar />
+                        </TableCell>
+                      )}
+                      <TableCell>
+                        <div className="pet-chip-cell">
+                          <Chip
+                            clickable={false}
+                            className={"file-tag-chip"}
+                            label={"    "}
+                          />
+                        </div>
+                      </TableCell>
+                      {!props.compact && (
+                        <Fragment>
+                          {props.explore && (
+                            <TableCell style={{ width: 50 }} align="center">
+                              <IconButton>
+                                <Icon>favorite</Icon>
                               </IconButton>
                             </TableCell>
                           )}
-                        </Fragment>
-                      )}
-                    </TableRow>
-                  ))
-                : Array(10)
-                    .fill(1)
-                    .map((e) => (
-                      <TableRow>
-                        <TableCell
-                          style={{ width: props.compact ? 20 : 50 }}
-                          component="th"
-                          scope="row"
-                        >
-                          <IconButton>
-                            <Icon>play_arrow</Icon>
-                          </IconButton>
-                        </TableCell>
-                        <TableCell component="th" scope="row">
-                          <Typography
-                            variant="overline"
-                            className="fe-filename"
-                          >
-                            <Skeleton variant="text" />
-                          </Typography>
-                        </TableCell>
-                        {props.explore && (
-                          <TableCell
-                            className="pet-collapsable-column"
-                            style={{ width: 50 }}
-                          >
-                            <Avatar />
-                          </TableCell>
-                        )}
-                        <TableCell>
-                          <div className="pet-chip-cell">
-                            <Chip
-                              clickable={false}
-                              className={"file-tag-chip"}
-                              label={"    "}
-                            />
-                          </div>
-                        </TableCell>
-                        {!props.compact && (
-                          <Fragment>
-                            {props.explore && (
-                              <TableCell style={{ width: 50 }} align="center">
-                                <IconButton>
-                                  <Icon>favorite</Icon>
-                                </IconButton>
-                              </TableCell>
-                            )}
 
-                            {/* <TableCell
+                          {/* <TableCell
                             className="pet-collapsable-column"
                             align="center"
                           >
@@ -905,17 +910,17 @@ function PatchExplorer(props) {
                               <Icon>file_download</Icon>
                             </IconButton>
                           </TableCell> */}
-                            {props.userPatches && (
-                              <TableCell align="center">
-                                <IconButton>
-                                  <Icon>delete</Icon>
-                                </IconButton>
-                              </TableCell>
-                            )}
-                          </Fragment>
-                        )}
-                      </TableRow>
-                    ))}
+                          {props.userPatches && (
+                            <TableCell align="center">
+                              <IconButton>
+                                <Icon>delete</Icon>
+                              </IconButton>
+                            </TableCell>
+                          )}
+                        </Fragment>
+                      )}
+                    </TableRow>
+                  ))}
             </TableBody>
           </Table>
         </TableContainer>

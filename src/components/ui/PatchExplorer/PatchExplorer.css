@@ -1,21 +1,27 @@
 .patch-explorer {
   position: absolute;
   width: 100%;
-  height: 100%;
+
   top: 0;
+  flex: 1 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   align-content: center;
   background-color: white;
+  overflow-y: scroll;
+  padding: 64px 0 128px 0;
 }
 
 .patch-explorer-compact {
+  height: 100%;
   max-height: 100%;
   justify-content: space-between;
+  overflow: hidden;
+  padding: 0 !important;
 }
 
 .patch-explorer-table {
@@ -23,10 +29,8 @@
   /* display: flex;
   align-items: center;
   justify-content: center; */
-  width: 100%;
   max-width: 1200px;
-  min-height: 600px;
-  height: 60%;
+  top: 0;
 }
 
 .pet-compact {
@@ -35,13 +39,16 @@
 
 .pet-cont {
   overflow-y: hidden;
+  position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  min-height: 600px;
 }
 .pet-cont-compact {
   overflow-y: scroll;
   overflow-x: hidden !important;
+  min-height: 0;
 
   flex: 1;
 }
