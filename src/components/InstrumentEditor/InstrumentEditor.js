@@ -231,31 +231,31 @@ function InstrumentEditor(props) {
     console.log(name, category);
     let user = firebase.auth().currentUser;
 
-    let patch = !isDrum
+    let clearInfo = {
+      creator: user.uid,
+      categ: !!category || isNaN(category) ? category : 0,
+      volume: props.module.volume,
+      createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+
+    let patchInfo = !isDrum
       ? props.instrument.name === "Sampler"
         ? {
             base: "Sampler",
             name: !!name ? name : "Untitled Patch",
-            creator: user.uid,
-            categ: !!category || isNaN(category) ? category : 0,
             urls: props.module.instrument.urls,
-            volume: props.module.volume,
           }
         : {
             base: props.instrument._dummyVoice.name.replace("Synth", ""),
             name: !!name ? name : "Untitled Patch",
-            creator: user.uid,
-            categ: !!category || isNaN(category) ? category : 0,
             options: props.instrument.get(),
-            volume: props.module.volume,
           }
       : {
           name: !!name ? name : "Untitled Drum Patch",
-          creator: user.uid,
-          categ: !!category || isNaN(category) ? category : 0,
           urls: props.module.instrument.urls,
-          volume: props.module.volume,
         };
+
+    let patch = Object.assign({}, clearInfo, patchInfo);
 
     if (typeof category === "number") patch.categ = parseInt(category);
 
