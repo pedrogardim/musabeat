@@ -78,11 +78,17 @@ function FileExplorer(props) {
 
   const handleFileSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
+      if (props.sequencer && filedata[index].dur > 5) {
+        props.setSnackbarMessage("Try picking a file shorter than 5 seconds");
+        return;
+      }
       props.onFileClick(
         fileIdList[index],
         filesUrl[index],
-        players[index] !== undefined && players[index].buffer
+        players[index] !== undefined && players[index].buffer,
+        filedata[index].name
       );
+      props.setFileExplorer && props.setFileExplorer(false);
     }
   };
 

@@ -10,6 +10,8 @@ import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
 import PatchExplorer from "../ui/PatchExplorer/PatchExplorer";
+import FileExplorer from "../ui/FileExplorer/FileExplorer";
+
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
 
@@ -21,6 +23,8 @@ import {
   fileExtentions,
 } from "../../assets/musicutils";
 
+import { Fab, Icon } from "@material-ui/core";
+
 import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
 
@@ -31,6 +35,8 @@ function InstrumentEditor(props) {
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [filesId, setFilesId] = useState([]);
+
+  const [fileExplorer, setFileExplorer] = useState(false);
 
   const [selectedPatch, setSelectedPatch] = useState(null);
 
@@ -141,7 +147,7 @@ function InstrumentEditor(props) {
 
   const renamePlayersLabel = (input, newName) => {
     let labelName = !isNaN(input) ? parseInt(input) : input;
-    console.log(labelName, newName);
+    //console.log(labelName, newName);
 
     let drumMap = props.instrument._buffers._buffers;
     if (drumMap.has(newName)) return;
@@ -289,6 +295,8 @@ function InstrumentEditor(props) {
     setPatchExplorer(false);
   };
 
+  //used for
+
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
@@ -417,6 +425,16 @@ function InstrumentEditor(props) {
         />
       )}
 
+      {fileExplorer && (
+        <FileExplorer
+          onFileClick={props.handleFileClick}
+          setFileExplorer={setFileExplorer}
+          sequencer
+          compact
+          setSnackbarMessage={props.setSnackbarMessage}
+        />
+      )}
+
       <div className="break" />
 
       {!patchExplorer && mainContent}
@@ -433,6 +451,16 @@ function InstrumentEditor(props) {
         >
           Drop your files here!
         </FileDrop>
+      )}
+
+      {props.module.type === 0 && (
+        <Fab
+          style={{ position: "absolute", right: 16, bottom: 16 }}
+          onClick={() => setFileExplorer(true)}
+          color="primary"
+        >
+          <Icon>graphic_eq</Icon>
+        </Fab>
       )}
 
       <FileUploader

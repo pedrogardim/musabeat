@@ -344,7 +344,7 @@ function FileUploader(props) {
   }, [props.files]);
 
   useEffect(() => {
-    console.log(uploadState);
+    //console.log(uploadState);
   }, [uploadState]);
 
   return (

@@ -228,7 +228,7 @@ function Module(props) {
     props.resetUndoHistory();
   };
 
-  const handleFileClick = (fileId, fileUrl, audiobuffer) => {
+  const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
     if (props.module.type === 3) {
       setInstrumentLoaded(false);
       props.instrument.dispose();
@@ -241,6 +241,36 @@ function Module(props) {
       updateOnFileLoaded();
       onInstrumentMod(fileId);
       setModulePage(null);
+    } else {
+      setInstrumentLoaded(false);
+
+      let labelOnInstrument =
+        /* props.instrument.name === "Sampler"
+                ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
+                : */ name.split(".")[0];
+
+      //console.log(labelOnInstrument);
+
+      let labelVersion = 2;
+
+      while (
+        props.instrument.name === "Players" &&
+        props.instrument._buffers._buffers.has(labelOnInstrument)
+      ) {
+        labelOnInstrument =
+          labelOnInstrument.replace(/[0-9]/g, "").replace(" ", "") +
+          " " +
+          labelVersion;
+        labelVersion++;
+      }
+
+      props.instrument.add(
+        labelOnInstrument,
+        audiobuffer ? audiobuffer : fileUrl,
+        () => setInstrumentLoaded(true)
+      );
+
+      onInstrumentMod(fileId, labelOnInstrument);
     }
   };
 
@@ -573,6 +603,7 @@ function Module(props) {
                 setModulePage={setModulePage}
                 index={props.index}
                 setSnackbarMessage={props.setSnackbarMessage}
+                handleFileClick={handleFileClick}
               />
             )}
             {modulePage === "fileExplorer" && (
