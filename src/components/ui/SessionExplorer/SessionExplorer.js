@@ -179,7 +179,7 @@ function SessionExplorer(props) {
 
   useEffect(() => {
     setSessions([]);
-    getSessionList();
+    props.user && getSessionList();
     props.user && getUserLikes();
   }, [props.isUser, props.user]);
 
