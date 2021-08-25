@@ -79,7 +79,8 @@ function FileExplorer(props) {
   const handleFileSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
       if (props.sequencer && filedata[index].dur > 5) {
-        props.setSnackbarMessage("Try picking a file shorter than 5 seconds");
+        props.setSnackbarMessage &&
+          props.setSnackbarMessage("Try picking a file shorter than 5 seconds");
         return;
       }
       props.onFileClick(

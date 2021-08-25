@@ -46,11 +46,7 @@ function AudioFileItem(props) {
       </svg>
 
       <ListItemText
-        primary={
-          isNaN(props.fileLabel)
-            ? props.fileLabel
-            : labels[parseInt(props.fileLabel)]
-        }
+        primary={props.fileLabel}
         primaryTypographyProps={{
           variant: "body2",
           className: "audio-file-item-label",

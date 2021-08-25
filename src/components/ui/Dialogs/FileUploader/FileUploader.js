@@ -106,22 +106,22 @@ function FileUploader(props) {
 
             //console.log(labelOnInstrument);
 
-            let labelVersion = 2;
+            //find slot
+
+            let slotToInsetFile = 0;
 
             while (
-              props.instrument.name === "Players" &&
-              props.instrument._buffers._buffers.has(labelOnInstrument)
+              props.module.type === 0 &&
+              Object.keys(props.module.lbls).indexOf(slotToInsetFile) !== -1
             ) {
-              labelOnInstrument =
-                labelOnInstrument.replace(/[0-9]/g, "").replace(" ", "") +
-                " " +
-                labelVersion;
-              labelVersion++;
+              slotToInsetFile++;
             }
+
+            console.log(slotToInsetFile);
 
             setLabelsOnInstrument((prev) => {
               let newLbls = [...prev];
-              newLbls[i] = labelOnInstrument;
+              newLbls[slotToInsetFile] = labelOnInstrument;
               return newLbls;
             });
 
@@ -129,6 +129,13 @@ function FileUploader(props) {
 
             if (props.module.type === 3) {
               props.loadPlayer(audiobuffer);
+            } else if (props.module.type === 0) {
+              props.instrument.add(
+                slotToInsetFile,
+                audiobuffer,
+                () => isLastFile && props.setInstrumentLoaded(true)
+              );
+              props.setLabels(slotToInsetFile, labelOnInstrument);
             } else {
               props.instrument.add(
                 labelOnInstrument,
@@ -220,9 +227,14 @@ function FileUploader(props) {
                           //update instrument on "modules"
 
                           Boolean(props.onInstrumentMod) &&
-                            props.onInstrumentMod(ref.id, labelOnInstrument);
+                            props.onInstrumentMod(
+                              ref.id,
+                              labelOnInstrument,
+                              slotToInsetFile
+                            );
 
-                          props.updateOnFileLoaded();
+                          props.updateOnFileLoaded &&
+                            props.updateOnFileLoaded();
 
                           props.module.type !== 3 && props.getFilesName();
 

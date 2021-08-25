@@ -180,7 +180,15 @@ function Module(props) {
     props.resetUndoHistory();
   };
 
-  const onInstrumentMod = (url, name, isRemoving) => {
+  const setLabels = (index, newName) => {
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      newModules[props.index].lbls[index] = newName;
+      return newModules;
+    });
+  };
+
+  const onInstrumentMod = (url, name, soundindex, isRemoving) => {
     //update instrument info in module object
 
     if (props.module.type === 0) {
@@ -190,21 +198,37 @@ function Module(props) {
           .collection("drumpatches")
           .doc(props.module.instrument)
           .get()
-          .then((urls) => {
-            let urlsObj = urls.data().urls;
-            !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
+          .then((r) => {
+            let patch = r.data();
+
+            !isRemoving
+              ? (patch.urls[soundindex] = url)
+              : delete patch.urls[soundindex];
+            !isRemoving
+              ? (patch.lbls[soundindex] = name)
+              : delete patch.lbsl[soundindex];
+
             props.setModules((prev) => {
               let newModules = [...prev];
-              newModules[props.index].instrument = { urls: urlsObj };
+              newModules[props.index].instrument = { ...patch };
+              newModules[props.index].lbls = { ...patch.lbls };
               return newModules;
             });
           });
       } else {
-        let urlsObj = { ...props.module.instrument.urls };
-        !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
+        let patch = { ...props.module.instrument };
+
+        !isRemoving
+          ? (patch.urls[soundindex] = url)
+          : delete patch.urls[soundindex];
+        !isRemoving
+          ? (patch.lbls[soundindex] = name)
+          : delete patch.lbls[soundindex];
+
         props.setModules((prev) => {
           let newModules = [...prev];
-          newModules[props.index].instrument = { urls: urlsObj };
+          newModules[props.index].instrument = { ...patch };
+          newModules[props.index].lbls = { ...patch.lbls };
           return newModules;
         });
       }
@@ -241,36 +265,60 @@ function Module(props) {
       updateOnFileLoaded();
       onInstrumentMod(fileId);
       setModulePage(null);
-    } else {
+    } else if (props.module.type === 0) {
       setInstrumentLoaded(false);
 
-      let labelOnInstrument =
-        /* props.instrument.name === "Sampler"
-                ? Tone.Frequency(detectPitch(audiobuffer)[0]).toNote()
-                : */ name.split(".")[0];
+      let labelOnInstrument = name.split(".")[0];
 
-      //console.log(labelOnInstrument);
+      let slotToInsetFile = 0;
 
-      let labelVersion = 2;
+      if (typeof props.module.instrument === "string") {
+        firebase
+          .firestore()
+          .collection("drumpatches")
+          .doc(props.module.instrument)
+          .get()
+          .then((r) => {
+            console.log(Object.keys(r.data().urls), slotToInsetFile);
 
-      while (
-        props.instrument.name === "Players" &&
-        props.instrument._buffers._buffers.has(labelOnInstrument)
-      ) {
-        labelOnInstrument =
-          labelOnInstrument.replace(/[0-9]/g, "").replace(" ", "") +
-          " " +
-          labelVersion;
-        labelVersion++;
+            while (
+              props.module.type === 0 &&
+              Object.keys(r.data().urls).indexOf(
+                JSON.stringify(slotToInsetFile)
+              ) !== -1
+            ) {
+              slotToInsetFile++;
+            }
+            //console.log(slotToInsetFile);
+
+            onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
+
+            props.instrument.add(
+              props.module.type === 0 ? slotToInsetFile : labelOnInstrument,
+              audiobuffer ? audiobuffer : fileUrl,
+              () => setInstrumentLoaded(true)
+            );
+          });
+      } else {
+        //console.log(Object.keys(props.module.instrument.urls), slotToInsetFile);
+
+        while (
+          Object.keys(props.module.instrument.urls).indexOf(
+            JSON.stringify(slotToInsetFile)
+          ) !== -1
+        ) {
+          slotToInsetFile++;
+        }
+        //console.log(slotToInsetFile);
+
+        onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
+
+        props.instrument.add(
+          props.module.type === 0 ? slotToInsetFile : labelOnInstrument,
+          audiobuffer ? audiobuffer : fileUrl,
+          () => setInstrumentLoaded(true)
+        );
       }
-
-      props.instrument.add(
-        labelOnInstrument,
-        audiobuffer ? audiobuffer : fileUrl,
-        () => setInstrumentLoaded(true)
-      );
-
-      onInstrumentMod(fileId, labelOnInstrument);
     }
   };
 
@@ -604,6 +652,7 @@ function Module(props) {
                 index={props.index}
                 setSnackbarMessage={props.setSnackbarMessage}
                 handleFileClick={handleFileClick}
+                setLabels={setLabels}
               />
             )}
             {modulePage === "fileExplorer" && (

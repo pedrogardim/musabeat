@@ -6,6 +6,8 @@ import firebase from "firebase";
 import { List, Divider } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
+import DrumComponent from "./DrumComponent";
+
 import EnvelopeControl from "./EnvelopeControl";
 import SynthParameters from "./SynthParameters";
 import OscillatorEditor from "./OscillatorEditor";
@@ -23,7 +25,7 @@ import {
   fileExtentions,
 } from "../../assets/musicutils";
 
-import { Fab, Icon } from "@material-ui/core";
+import { Fab, Icon, Grid } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
@@ -64,23 +66,21 @@ function InstrumentEditor(props) {
     setUploadingFiles(files);
   };
 
-  const handlePlayersFileDelete = (fileName) => {
+  const handlePlayersFileDelete = (fileName, soundindex) => {
     //temp solution, Tone.Players doesn't allow .remove()
 
     //let filteredScore = props.module.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
 
     let newInstrument = new Tone.Players().toDestination();
-    let deletedBufferName = JSON.stringify(fileName);
 
     props.instrument._buffers._buffers.forEach((value, key) => {
-      if (JSON.stringify(key) !== deletedBufferName)
-        newInstrument.add(key, value);
+      if (JSON.stringify(soundindex) !== key) newInstrument.add(key, value);
     });
 
     props.instrument.dispose();
 
     props.setInstrument(newInstrument);
-    props.onInstrumentMod("", fileName, true);
+    props.onInstrumentMod("", fileName, soundindex, true);
   };
 
   const handleSamplerFileDelete = (fileName) => {
@@ -124,8 +124,6 @@ function InstrumentEditor(props) {
         })
       ).then((values) => {
         setFilesName(labelsWithFilename);
-
-        //console.log(labelsWithFilename);
       });
     };
 
@@ -145,85 +143,24 @@ function InstrumentEditor(props) {
     }
   };
 
-  const renamePlayersLabel = (input, newName) => {
-    let labelName = !isNaN(input) ? parseInt(input) : input;
-    //console.log(labelName, newName);
+  const renamePlayersLabel = (index, newName) => {
+    props.setLabels(index, newName);
 
-    let drumMap = props.instrument._buffers._buffers;
-    if (drumMap.has(newName)) return;
-    drumMap.set(newName, drumMap.get(input));
-    drumMap.delete(input);
     if (typeof props.module.instrument === "string") {
       firebase
         .firestore()
         .collection("drumpatches")
         .doc(props.module.instrument)
         .get()
-        .then((urls) => {
-          setFilesName((prev) => {
-            let newFileNames = { ...prev };
-            newFileNames[newName] = newFileNames[labelName];
-            delete newFileNames[labelName];
-            return newFileNames;
-          });
-
-          let urlsObj = urls.data().urls;
-          urlsObj[newName] = urlsObj[labelName];
-          delete urlsObj[labelName];
-
+        .then((patch) => {
           props.setModules((prev) => {
             let newModules = [...prev];
-            newModules[props.index].instrument = { urls: urlsObj };
-
-            newModules[props.index].score.forEach((measure, msreIndex) => {
-              Object.keys(measure).forEach((key) => {
-                if (measure[key] !== 0) {
-                  newModules[props.index].score[msreIndex][key] = measure[
-                    key
-                  ].map((e) => (e === labelName ? newName : e));
-                }
-              });
-            });
-
+            newModules[props.index].instrument = patch.data();
             return newModules;
           });
         });
-    } else {
-      setFilesName((prev) => {
-        let newFileNames = { ...prev };
-        newFileNames[newName] = newFileNames[labelName];
-        delete newFileNames[labelName];
-        return newFileNames;
-      });
-
-      let urlsObj = { ...props.module.instrument.urls };
-      urlsObj[newName] = urlsObj[labelName];
-      delete urlsObj[labelName];
-
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        newModules[props.index].instrument = { urls: urlsObj };
-        newModules[props.index].score.forEach((measure, msreIndex) => {
-          console.log(measure);
-          Object.keys(measure).forEach((key) => {
-            console.log(
-              measure[key],
-              labelName,
-              measure[key].includes(labelName)
-            );
-            if (measure[key] !== 0 && measure[key].includes(labelName)) {
-              newModules[props.index].score[msreIndex][key] = measure[key].map(
-                (e) => {
-                  console.log(e, labelName, newName);
-                  return e == labelName ? newName : e;
-                }
-              );
-            }
-          });
-        });
-        return newModules;
-      });
     }
+
     setRenamingLabel(null);
   };
 
@@ -259,6 +196,7 @@ function InstrumentEditor(props) {
       : {
           name: !!name ? name : "Untitled Drum Patch",
           urls: props.module.instrument.urls,
+          lbls: props.module.lbls,
         };
 
     let patch = Object.assign({}, clearInfo, patchInfo);
@@ -302,32 +240,44 @@ function InstrumentEditor(props) {
   if (props.instrument) {
     if (props.module.type === 0) {
       //console.log(props.instrument);
-      let bufferObjects = [];
-      props.instrument._buffers._buffers.forEach((e, i, a) => {
-        bufferObjects.push([e, i]);
-      });
+
       //bufferObjects.sort((a, b) => a[1] - b[1]);
       mainContent = (
-        <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
-          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-            {bufferObjects.map((e, i) => (
-              <Fragment>
-                <AudioFileItem
+        <Grid
+          container
+          direction="row"
+          justifyContent="center"
+          alignItems="stretch"
+          className={"ie-drum-cont"}
+          spacing={1}
+        >
+          {Array(32)
+            .fill(false)
+            .map((e, i) => (
+              <Grid xs={3} sm={3} md={3} lg={3} item>
+                <DrumComponent
+                  exists={props.instrument._buffers._buffers.has(
+                    JSON.stringify(i)
+                  )}
                   key={i}
                   index={i}
                   instrument={props.instrument}
                   handleFileDelete={handlePlayersFileDelete}
-                  buffer={e[0]}
-                  fileLabel={e[1]}
-                  fileName={filesName[e[1]]}
+                  buffer={props.instrument._buffers._buffers.get(
+                    JSON.stringify(i)
+                  )}
+                  fileLabel={
+                    props.module.lbls[i]
+                      ? `"${props.module.lbls[i]}"`
+                      : "Slot " + (i + 1)
+                  }
+                  fileName={filesName[i]}
                   setRenamingLabel={setRenamingLabel}
                   openFilePage={() => openFilePage(filesId[i])}
                 />
-                <Divider />
-              </Fragment>
+              </Grid>
             ))}
-          </List>
-        </div>
+        </Grid>
       );
     } else if (props.instrument.name === "Sampler") {
       let bufferObjects = [];
@@ -476,6 +426,7 @@ function InstrumentEditor(props) {
         getFilesName={getFilesName}
         renamePlayersLabel={renamePlayersLabel}
         setRenamingLabel={setRenamingLabel}
+        setLabels={props.setLabels}
       />
 
       <NameInput

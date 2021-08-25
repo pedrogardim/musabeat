@@ -149,7 +149,7 @@ function Sequencer(props) {
                 variant="overline"
                 style={{ textAlign: hovered === "left" ? "right" : "left" }}
               >
-                {isNaN(drumsound) ? drumsound : labels[parseInt(drumsound)]}
+                {props.module.lbls[row] ? props.module.lbls[row] : drumsound}
               </Typography>
             )}
             {Object.values(sequencerArray[currentMeasure]).map(

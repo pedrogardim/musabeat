@@ -29,7 +29,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
             7: [3],
           },
         ],
-        instrument: "FSnt2y846yp8Q0RfM7V9",
+        instrument: "8fsbChTqV7aaWNyI1hTC",
         type: 0,
         volume: 0,
         muted: false,

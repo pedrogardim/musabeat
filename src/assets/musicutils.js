@@ -836,7 +836,9 @@ export const loadDrumPatch = async (
   input,
   setInstrumentsLoaded,
   moduleIndex,
-  onLoad
+  onLoad,
+  setModules,
+  setLabels
 ) => {
   //drum patch with stardard configuration
   let patchRef =
@@ -893,6 +895,18 @@ export const loadDrumPatch = async (
     });
     onLoad !== undefined && onLoad(drumPlayers);
   }).toDestination();
+
+  setModules &&
+    setModules((prev) => {
+      let newModules = [...prev];
+      if (newModules[moduleIndex].lbls !== patch.lbls)
+        newModules[moduleIndex].lbls = patch.lbls;
+      return newModules;
+    });
+
+  setLabels && setLabels(patch.lbls);
+
+  drumPlayers.volume.value = patch.volume;
 
   return drumPlayers;
 };

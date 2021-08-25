@@ -49,6 +49,7 @@ function PatchPage(props) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [editMode, setEditMode] = useState(false);
+  const [drumLabels, setDrumLabels] = useState(false);
 
   const patchKey = useParams().key;
 
@@ -109,7 +110,9 @@ function PatchPage(props) {
         0,
         () => {
           setIsLoaded(true);
-        }
+        },
+        "",
+        setDrumLabels
       ).then((instr) => {
         setInstrument(instr);
       });
@@ -215,6 +218,14 @@ function PatchPage(props) {
     }
   };
 
+  const setLabels = (index, newName) => {
+    setPatchInfo((prev) => {
+      let newPatch = { ...prev };
+      newPatch.lbls[index] = newName;
+      return newPatch;
+    });
+  };
+
   /*   const huehue = () => {
     firebase
       .firestore()
@@ -234,12 +245,41 @@ function PatchPage(props) {
       );
   }; */
 
-  const onInstrumentMod = (url, name, isRemoving) => {
+  const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
+    //setInstrumentLoaded(false);
+
+    let labelOnInstrument = name.split(".")[0];
+
+    let slotToInsetFile = 0;
+
+    while (
+      props.isDrum &&
+      Object.keys(patchInfo.urls).indexOf(JSON.stringify(slotToInsetFile)) !==
+        -1
+    ) {
+      slotToInsetFile++;
+    }
+    console.log(slotToInsetFile);
+
+    onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
+
+    instrument.add(
+      props.isDrum ? slotToInsetFile : labelOnInstrument,
+      audiobuffer ? audiobuffer : fileUrl
+      //() => setInstrumentLoaded(true)
+    );
+  };
+
+  const onInstrumentMod = (url, name, soundindex, isRemoving) => {
     if (props.isDrum || instrument.name === "Sampler") {
       setPatchInfo((prev) => {
         let newPatchInfo = { ...prev };
-        let urlsObj = { ...patchInfo.urls };
-        !isRemoving ? (urlsObj[name] = url) : delete urlsObj[name];
+        !isRemoving
+          ? (newPatchInfo.urls[soundindex] = url)
+          : delete newPatchInfo.urls[soundindex];
+        !isRemoving
+          ? (newPatchInfo.lbls[soundindex] = name)
+          : delete newPatchInfo.lbls[soundindex];
         return newPatchInfo;
       });
     } else {
@@ -304,12 +344,15 @@ function PatchPage(props) {
             module={{
               type: props.isDrum ? 0 : 1,
               instrument: { urls: patchInfo.urls, ...patchInfo.options },
+              lbls: patchInfo.lbls,
             }}
             instrument={instrument}
             setInstruments={props.setInstruments}
             setInstrument={setInstrument}
             setInstrumentLoaded={isLoaded}
             onInstrumentMod={onInstrumentMod}
+            setLabels={setLabels}
+            handleFileClick={handleFileClick}
           />
         ) : (
           <CircularProgress />

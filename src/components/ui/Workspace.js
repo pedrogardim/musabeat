@@ -302,7 +302,9 @@ function Workspace(props) {
         loadDrumPatch(
           module.instrument,
           setInstrumentsLoaded,
-          moduleIndex
+          moduleIndex,
+          "",
+          setModules
         ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
