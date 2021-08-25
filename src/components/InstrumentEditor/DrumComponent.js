@@ -82,10 +82,21 @@ function DrumElement(props) {
           <Icon style={{ fontSize: 18 }}>close</Icon>
         </IconButton>
       </Tooltip>
+      <Typography variant="overline" className="dc-slot-indicator">
+        {props.index + 1}
+      </Typography>
     </ButtonBase>
   ) : (
-    <ButtonBase fullWidth={true} component={Paper} className={"drum-component"}>
-      <Typography variant="overline">{props.fileLabel}</Typography>
+    <ButtonBase
+      disabled
+      fullWidth={true}
+      component={Paper}
+      className={"drum-component"}
+    >
+      <Typography variant="overline">Empty slot</Typography>
+      <Typography variant="overline" className="dc-slot-indicator">
+        {props.index + 1}
+      </Typography>
     </ButtonBase>
   );
 }

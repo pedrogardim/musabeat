@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Fragment } from "react";
 
 import {
   Typography,
@@ -6,6 +6,7 @@ import {
   InputLabel,
   FormControl,
   Slider,
+  Grid,
 } from "@material-ui/core";
 
 import "./OscillatorEditor.css";
@@ -85,65 +86,71 @@ function OscillatorEditor(props) {
   useEffect(getOscillatorData, [props.instrument]);
 
   return (
-    <div className="oscillator-editor">
-      <Typography variant="overline">Oscillator</Typography>
-      <div className="break" />
-      <svg
-        width="128px"
-        height="64px"
-        style={{ border: "1px solid #05386b", marginBottom: 8 }}
-        ref={waveSvg}
-      >
-        <path d={oscillatorWaveForm} stroke="#05386b" fill="none" />
-      </svg>
-      <div className="break" />
-
-      <FormControl>
-        <InputLabel>Type</InputLabel>
-        <Select native value={oscType} onChange={handleOscTypeSelect}>
-          {oscTypes.map((e) => (
-            <option key={e} value={e}>
-              {e}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl>
-        <InputLabel>Wave</InputLabel>
-        <Select
-          disabled={oscType === "pwm" || oscType === "pulse"}
-          native
-          value={oscWave}
-          onChange={handleOscWaveSelect}
+    <Fragment>
+      <Grid item xs={6} className="oscillator-editor-grid">
+        <Typography variant="overline">Oscillator</Typography>
+        <div className="break" />
+        <svg
+          width="128px"
+          height="64px"
+          style={{ border: "1px solid #05386b", marginBottom: 8 }}
+          ref={waveSvg}
         >
-          {waveForms.map((e) => (
-            <option key={e} value={e} className="capitalize">
-              {e}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
-      <div className="break" />
+          <path d={oscillatorWaveForm} stroke="#05386b" fill="none" />
+        </svg>
+      </Grid>
+      <Grid
+        item
+        xs={6}
+        className="oscillator-editor-grid oscillator-editor-grid-parameters"
+      >
+        <FormControl>
+          <InputLabel>Type</InputLabel>
+          <Select native value={oscType} onChange={handleOscTypeSelect}>
+            {oscTypes.map((e) => (
+              <option key={e} value={e}>
+                {e}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel>Wave</InputLabel>
+          <Select
+            disabled={oscType === "pwm" || oscType === "pulse"}
+            native
+            value={oscWave}
+            onChange={handleOscWaveSelect}
+          >
+            {waveForms.map((e) => (
+              <option key={e} value={e} className="capitalize">
+                {e}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
+        <div className="break" />
 
-      <Slider
-        style={{ width: "70%" }}
-        disabled={oscType === "pwm" || oscType === "pulse"}
-        valueLabelDisplay="auto"
-        value={oscPartials}
-        onChange={handleOscPartialsSelect}
-        onChangeCommitted={() => {
-          props.onInstrumentMod();
-        }}
-        min={0}
-        max={24}
-        valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
-      />
+        <Slider
+          style={{ width: "70%" }}
+          disabled={oscType === "pwm" || oscType === "pulse"}
+          valueLabelDisplay="auto"
+          value={oscPartials}
+          onChange={handleOscPartialsSelect}
+          onChangeCommitted={() => {
+            props.onInstrumentMod();
+          }}
+          min={0}
+          max={24}
+          valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
+        />
+      </Grid>
 
       {/*Object.keys(props.instrument._dummyVoice.oscillator._oscillator).map((e,i)=>{
             console.log(e)
 
         })*/}
-    </div>
+    </Fragment>
   );
 }
 

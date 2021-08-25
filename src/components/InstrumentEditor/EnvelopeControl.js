@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
-import { Typography, Slider, Icon, IconButton } from "@material-ui/core";
+import { Typography, Slider, Icon, IconButton, Grid } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 
@@ -31,7 +31,7 @@ function EnvelopeControl(props) {
   }, [props.instrument, props.envelopeType]);
 
   return (
-    <div className="instrument-editor-envelope-container">
+    <Grid item xs={6} className="instrument-editor-envelope-container">
       <Typography
         variant="overline"
         className="instrument-editor-envelope-label"
@@ -81,8 +81,7 @@ function EnvelopeControl(props) {
             </div>
           )
       )}
-      <div className="break"></div>
-    </div>
+    </Grid>
   );
 }
 

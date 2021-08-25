@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
-import { Typography, Slider } from "@material-ui/core";
+import { Typography, Slider, Grid } from "@material-ui/core";
 
 import "./FilterEditor.css";
 
@@ -80,9 +80,10 @@ function FilterEditor(props) {
   }, [props.instrument]);
 
   return (
-    <div className="filter-editor">
-      <Typography variant="overline">
-        {/*<IconButton
+    <Fragment>
+      <Grid item xs={6} className="filter-editor-grid">
+        <Typography variant="overline">
+          {/*<IconButton
           color={filterState ? "primary" : "default"}
           onClick={toggleFilter}
           size="small"
@@ -90,44 +91,51 @@ function FilterEditor(props) {
         >
           <Icon>power_settings_new</Icon>
         </IconButton>*/}
-        Filter
-      </Typography>
-      <div className="break" />
+          Filter
+        </Typography>
+        <div className="break" />
 
-      <svg
-        width="128px"
-        height="64px"
-        style={{ border: "1px solid #05386b", marginBottom: 8 }}
+        <svg
+          width="128px"
+          height="64px"
+          style={{ border: "1px solid #05386b", marginBottom: 8 }}
+        >
+          {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
+          <path d={filterFRWave} stroke="#05386b" fill="none" />
+        </svg>
+      </Grid>
+      <Grid
+        item
+        xs={6}
+        className="filter-editor-grid filter-editor-grid-parameters"
       >
-        {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
-        <path d={filterFRWave} stroke="#05386b" fill="none" />
-      </svg>
-      <Typography variant="overline" className="filter-editor-labels">
-        {"Frequency:" + Math.floor(frequency) + "Hz"}
-      </Typography>
-      <Slider
-        valueLabelDisplay="auto"
-        min={20}
-        max={20000}
-        step={10}
-        value={frequency}
-        onChange={(e, v) => handleParameterChange("frequency", v)}
-        onChangeCommitted={registerToSynth}
-      />
-      <div className="break" />
-      <Typography variant="overline" className="filter-editor-labels">
-        {"Resonance:" + filterQ}
-      </Typography>
-      <Slider
-        valueLabelDisplay="auto"
-        min={0}
-        max={5}
-        step={0.1}
-        value={filterQ}
-        onChange={(e, v) => handleParameterChange("Q", v)}
-        onChangeCommitted={registerToSynth}
-      />
-    </div>
+        <Typography variant="overline" className="filter-editor-labels">
+          {"Frequency:" + Math.floor(frequency) + "Hz"}
+        </Typography>
+        <Slider
+          valueLabelDisplay="auto"
+          min={20}
+          max={20000}
+          step={10}
+          value={frequency}
+          onChange={(e, v) => handleParameterChange("frequency", v)}
+          onChangeCommitted={registerToSynth}
+        />
+        <div className="break" />
+        <Typography variant="overline" className="filter-editor-labels">
+          {"Resonance:" + filterQ}
+        </Typography>
+        <Slider
+          valueLabelDisplay="auto"
+          min={0}
+          max={5}
+          step={0.1}
+          value={filterQ}
+          onChange={(e, v) => handleParameterChange("Q", v)}
+          onChangeCommitted={registerToSynth}
+        />
+      </Grid>
+    </Fragment>
   );
 }
 

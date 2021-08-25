@@ -21,13 +21,12 @@
   position: relative;
   overflow: hidden;
 
-  height: 45%;
-  width: 60vw !important;
+  height: 30vw;
+  width: 40vw !important;
 }
 
 .file-info {
   height: 64px;
-
   width: 40%;
 }
 

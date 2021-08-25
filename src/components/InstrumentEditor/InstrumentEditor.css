@@ -33,17 +33,14 @@
   position: relative;
   display: flex;
   flex-direction: row;
-  flex-grow: 1;
-  width: 100%;
-  align-content: flex-end;
+  align-content: center;
   flex-wrap: wrap;
 }
 
 .instrument-editor-envelope-label {
-  max-height: 20px;
   width: 100%;
   text-align: center;
-  position: absolute;
+  position: relative;
   top: 0;
 }
 
@@ -51,7 +48,7 @@
   display: flex;
   position: relative;
   flex-direction: column;
-  height: calc(100% - 30px);
+  height: 64%;
   flex-grow: 1;
   align-items: center;
   align-content: center;
@@ -70,6 +67,15 @@
   height: 100%;
   padding: 8px;
   overflow-x: hidden;
+}
+
+.ie-synth-cont {
+  max-height: 100% !important;
+  width: 100% !important;
+}
+
+.ie-synth-cont > div {
+  width: 33.33% !important;
 }
 
 .turnonoff-button {

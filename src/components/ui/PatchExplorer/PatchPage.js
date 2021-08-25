@@ -80,7 +80,7 @@ function PatchPage(props) {
       }); */
 
       usersRef
-        .doc(r.get("user"))
+        .doc(r.get("creator"))
         .get()
         .then((user) => {
           setCreatorInfo(user.data());

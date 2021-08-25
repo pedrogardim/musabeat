@@ -6,6 +6,7 @@ import {
   Slider,
   FormControl,
   InputLabel,
+  Grid,
 } from "@material-ui/core";
 import { waveTypes } from "../../assets/musicutils";
 
@@ -61,8 +62,14 @@ function SynthParameters(props) {
     //console.log(props.instrument.get());
   }, [props.instrument]);
 
-  return (
-    <Fragment>
+  return props.instrument._dummyVoice.name === "MonoSynth" ? (
+    <FilterEditor
+      instrumentParamenters={instrumentParamenters}
+      handleFilterChange={handleFilterChange}
+      instrument={props.instrument}
+    />
+  ) : (
+    <Grid item xs={12}>
       {Object.keys(instrumentParamenters).map((parameter, index) =>
         parameter === "harmonicity" || parameter === "modulationIndex" ? (
           <Fragment>
@@ -101,14 +108,7 @@ function SynthParameters(props) {
           ""
         )
       )}
-      {props.instrument._dummyVoice.name === "MonoSynth" && (
-        <FilterEditor
-          instrumentParamenters={instrumentParamenters}
-          handleFilterChange={handleFilterChange}
-          instrument={props.instrument}
-        />
-      )}
-    </Fragment>
+    </Grid>
   );
 }
 

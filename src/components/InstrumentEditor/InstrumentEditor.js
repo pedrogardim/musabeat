@@ -307,37 +307,36 @@ function InstrumentEditor(props) {
       );
     } else {
       mainContent = (
-        <Fragment>
-          <div ref={oscColumn} className="instrument-editor-column" key={0}>
-            <OscillatorEditor
-              onInstrumentMod={props.onInstrumentMod}
-              instrument={props.instrument}
-              columnRef={oscColumn}
-            />
-          </div>
-          <div className="instrument-editor-column" key={1}>
-            <SynthParameters
-              onInstrumentMod={props.onInstrumentMod}
-              instrument={props.instrument}
-            />
-          </div>
-          <div
-            className="instrument-editor-column"
-            style={{ flexDirection: "column" }}
-            key={2}
-          >
-            {Object.keys(props.instrument.get()).map(
-              (envelope, envelopeIndex) =>
-                envelope.toLowerCase().includes("envelope") && (
-                  <EnvelopeControl
-                    onInstrumentMod={props.onInstrumentMod}
-                    instrument={props.instrument}
-                    envelopeType={envelope}
-                  />
-                )
-            )}
-          </div>
-        </Fragment>
+        <Grid
+          container
+          spacing={2}
+          className="ie-synth-cont"
+          direction="column"
+          alignItems="stretch"
+          justifyContent="center"
+        >
+          <OscillatorEditor
+            onInstrumentMod={props.onInstrumentMod}
+            instrument={props.instrument}
+            columnRef={oscColumn}
+          />
+
+          <SynthParameters
+            onInstrumentMod={props.onInstrumentMod}
+            instrument={props.instrument}
+          />
+
+          {Object.keys(props.instrument.get()).map(
+            (envelope, envelopeIndex) =>
+              envelope.toLowerCase().includes("envelope") && (
+                <EnvelopeControl
+                  onInstrumentMod={props.onInstrumentMod}
+                  instrument={props.instrument}
+                  envelopeType={envelope}
+                />
+              )
+          )}
+        </Grid>
       );
     }
   }

@@ -33,3 +33,10 @@
 .drum-component:hover button {
   visibility: visible !important;
 }
+
+.dc-slot-indicator {
+  position: absolute;
+  font-size: 12px;
+  top: 8px;
+  left: 8px;
+}
