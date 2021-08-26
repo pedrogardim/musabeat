@@ -23,6 +23,9 @@
 
   height: 30vw;
   width: 40vw !important;
+
+  min-height: 300px;
+  min-width: 400px;
 }
 
 .file-info {

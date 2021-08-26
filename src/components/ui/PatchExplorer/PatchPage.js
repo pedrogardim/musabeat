@@ -353,6 +353,7 @@ function PatchPage(props) {
             onInstrumentMod={onInstrumentMod}
             setLabels={setLabels}
             handleFileClick={handleFileClick}
+            setPatchInfo={setPatchInfo}
           />
         ) : (
           <CircularProgress />

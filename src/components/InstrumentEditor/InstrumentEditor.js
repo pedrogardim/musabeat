@@ -3,7 +3,7 @@ import React, { useState, Fragment, useRef, useEffect } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { List, Divider } from "@material-ui/core";
+import { List, Divider, Button } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
@@ -25,10 +25,11 @@ import {
   fileExtentions,
 } from "../../assets/musicutils";
 
-import { Fab, Icon, Grid } from "@material-ui/core";
+import { Fab, Icon, Grid, Select } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 import { colors } from "../../utils/materialPalette";
+import { PortraitSharp } from "@material-ui/icons";
 
 function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
@@ -49,14 +50,62 @@ function InstrumentEditor(props) {
 
   const isDrum = props.module.type === 0;
 
-  /* 
-  const lookForPatch = () => {
-    //temp
-    let instrumentOptions = Object.toJSON(instrument.get());
-    instruments.map((e,i)=>Object.toJSON(e.options) === instrumentOptions && setSelectedPatch(i))
+  const changeInstrumentType = async (e) => {
+    let newType = e.target.value;
 
-  }
- */
+    props.instrument.dispose();
+
+    let patch =
+      typeof props.module.instrument === "string"
+        ? await firebase
+            .firestore()
+            .collection("patches")
+            .doc(props.module.instrument)
+            .get()
+        : props.module.instrument;
+
+    let newInstrument =
+      newType === "Sampler"
+        ? new Tone.Sampler().toDestination()
+        : new Tone.PolySynth(Tone[newType]).toDestination();
+
+    let commonProps = Object.keys(newInstrument.get()).filter(
+      (e) => Object.keys(patch).indexOf(e) !== -1
+    );
+
+    let conserverdProps = Object.fromEntries(
+      commonProps.map((e, i) => [e, patch[e]])
+    );
+
+    newInstrument.set(conserverdProps);
+
+    console.log(newInstrument, conserverdProps);
+
+    props.setInstrument(newInstrument);
+
+    props.setModules &&
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].instrument = newInstrument.get();
+        if (newType === "Sampler") {
+          delete newModules[props.index].instrument.onerror;
+          delete newModules[props.index].instrument.onload;
+        }
+        return newModules;
+      });
+
+    props.setPatchInfo &&
+      props.setPatchInfo((prev) => {
+        let newPatch = { ...prev };
+        newPatch.base = newType.replace("Synth", "");
+        newPatch.options = newInstrument.get();
+        if (newType === "Sampler") {
+          delete newPatch.options.onerror;
+          delete newPatch.options.onload;
+        }
+        return newPatch;
+      });
+  };
 
   const handleFileDrop = (files, event) => {
     event.preventDefault();
@@ -286,57 +335,89 @@ function InstrumentEditor(props) {
       );
       mainContent = (
         <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
-          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-            {bufferObjects.map((e, i) => (
-              <Fragment>
-                <AudioFileItem
-                  key={i}
-                  index={i}
-                  instrument={props.instrument}
-                  handleFileDelete={handleSamplerFileDelete}
-                  buffer={e[0]}
-                  fileLabel={Tone.Frequency(e[1], "midi").toNote()}
-                  fileName={filesName[e[1]]}
-                  openFilePage={() => openFilePage(filesId[i])}
-                />
-                <Divider />
-              </Fragment>
+          <Select
+            native
+            value={
+              props.instrument._dummyVoice
+                ? props.instrument._dummyVoice.name
+                : props.instrument.name
+            }
+            onChange={changeInstrumentType}
+            style={{ width: "100%", height: 24 }}
+          >
+            {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
+              <option value={e}>{e}</option>
             ))}
+          </Select>
+          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+            {bufferObjects.length > 0
+              ? bufferObjects.map((e, i) => (
+                  <Fragment>
+                    <AudioFileItem
+                      key={i}
+                      index={i}
+                      instrument={props.instrument}
+                      handleFileDelete={handleSamplerFileDelete}
+                      buffer={e[0]}
+                      fileLabel={Tone.Frequency(e[1], "midi").toNote()}
+                      fileName={filesName[e[1]]}
+                      openFilePage={() => openFilePage(filesId[i])}
+                    />
+                    <Divider />
+                  </Fragment>
+                ))
+              : "No Files"}
           </List>
         </div>
       );
     } else {
       mainContent = (
-        <Grid
-          container
-          spacing={2}
-          className="ie-synth-cont"
-          direction="column"
-          alignItems="stretch"
-          justifyContent="center"
-        >
-          <OscillatorEditor
-            onInstrumentMod={props.onInstrumentMod}
-            instrument={props.instrument}
-            columnRef={oscColumn}
-          />
+        <Fragment>
+          <Select
+            native
+            value={
+              props.instrument._dummyVoice
+                ? props.instrument._dummyVoice.name
+                : props.instrument.name
+            }
+            onChange={changeInstrumentType}
+            style={{ width: "100%", height: 24 }}
+          >
+            {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
+              <option value={e}>{e}</option>
+            ))}
+          </Select>
+          <Grid
+            container
+            spacing={2}
+            className="ie-synth-cont"
+            direction="column"
+            alignItems="stretch"
+            justifyContent="center"
+          >
+            <OscillatorEditor
+              onInstrumentMod={props.onInstrumentMod}
+              instrument={props.instrument}
+              columnRef={oscColumn}
+            />
 
-          <SynthParameters
-            onInstrumentMod={props.onInstrumentMod}
-            instrument={props.instrument}
-          />
+            <SynthParameters
+              onInstrumentMod={props.onInstrumentMod}
+              instrument={props.instrument}
+            />
 
-          {Object.keys(props.instrument.get()).map(
-            (envelope, envelopeIndex) =>
-              envelope.toLowerCase().includes("envelope") && (
-                <EnvelopeControl
-                  onInstrumentMod={props.onInstrumentMod}
-                  instrument={props.instrument}
-                  envelopeType={envelope}
-                />
-              )
-          )}
-        </Grid>
+            {Object.keys(props.instrument.get()).map(
+              (envelope, envelopeIndex) =>
+                envelope.toLowerCase().includes("envelope") && (
+                  <EnvelopeControl
+                    onInstrumentMod={props.onInstrumentMod}
+                    instrument={props.instrument}
+                    envelopeType={envelope}
+                  />
+                )
+            )}
+          </Grid>
+        </Fragment>
       );
     }
   }
@@ -383,8 +464,6 @@ function InstrumentEditor(props) {
           setSnackbarMessage={props.setSnackbarMessage}
         />
       )}
-
-      <div className="break" />
 
       {!patchExplorer && mainContent}
       {draggingOver && props.instrument.name !== "PolySynth" && (

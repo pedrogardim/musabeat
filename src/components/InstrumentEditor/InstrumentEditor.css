@@ -72,6 +72,7 @@
 .ie-synth-cont {
   max-height: 100% !important;
   width: 100% !important;
+  margin: 0 !important;
 }
 
 .ie-synth-cont > div {

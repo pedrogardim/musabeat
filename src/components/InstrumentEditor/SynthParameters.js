@@ -69,12 +69,21 @@ function SynthParameters(props) {
       instrument={props.instrument}
     />
   ) : (
-    <Grid item xs={12}>
+    <Grid
+      item
+      xs={12}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        alignContent: "center",
+        flexWrap: "wrap",
+      }}
+    >
       {Object.keys(instrumentParamenters).map((parameter, index) =>
         parameter === "harmonicity" || parameter === "modulationIndex" ? (
           <Fragment>
-            <div className="break" />
-
             <Typography variant="overline">{parameter}</Typography>
             <div className="break" />
             <Slider
