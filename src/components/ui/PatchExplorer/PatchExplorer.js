@@ -183,13 +183,13 @@ function PatchExplorer(props) {
     let usersToFetch = [
       ...new Set(
         patchesData
-          .map((e) => e.user)
+          .map((e) => e.creator)
           .filter((e) => e)
           .filter((e) => !patchesUserData.hasOwnProperty(e))
       ),
     ];
 
-    //console.log(usersToFetch);
+    console.log(usersToFetch);
 
     if (usersToFetch.length > 0) {
       let usersData = await Promise.all(
