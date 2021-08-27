@@ -34,6 +34,8 @@ import { colors } from "../../../utils/materialPalette";
 
 const waveColor = colors[2];
 
+let isSustainPedal = false;
+
 function PatchPage(props) {
   const { t } = useTranslation();
 
@@ -79,12 +81,13 @@ function PatchPage(props) {
         loaded: firebase.firestore.FieldValue.increment(1),
       }); */
 
-      usersRef
-        .doc(r.get("creator"))
-        .get()
-        .then((user) => {
-          setCreatorInfo(user.data());
-        });
+      r.data().creator &&
+        usersRef
+          .doc(r.data().creator)
+          .get()
+          .then((user) => {
+            setCreatorInfo(user.data());
+          });
     });
 
     //liked by user
@@ -301,6 +304,54 @@ function PatchPage(props) {
     );
   };
 
+  const onMIDIMessage = (event) => {
+    if (event.data[0] === 176) {
+      event.data[2] === 0 && instrument.releaseAll();
+      isSustainPedal = event.data[2] === 127;
+    }
+
+    event.data[0] === 144 &&
+      instrument.triggerAttack(
+        Tone.Frequency(event.data[1], "midi"),
+        Tone.immediate(),
+        event.data[2] / 128
+      );
+    event.data[0] === 128 &&
+      !isSustainPedal &&
+      instrument.triggerRelease(
+        Tone.Frequency(event.data[1], "midi", Tone.immediate())
+      );
+  };
+
+  const initializeMidi = () => {
+    navigator.requestMIDIAccess().then(
+      (midiAccess) => {
+        midiAccess.inputs.forEach((entry) => {
+          console.log("mididdddd", instrument);
+          if (instrument)
+            entry.onmidimessage = (e) => {
+              instrument && onMIDIMessage(e);
+            };
+          var input = entry;
+          console.log(
+            "Input port [type:'" +
+              input.type +
+              "'] id:'" +
+              input.id +
+              "' manufacturer:'" +
+              input.manufacturer +
+              "' name:'" +
+              input.name +
+              "' version:'" +
+              input.version +
+              "'"
+          );
+        });
+      },
+      (err) => console.log(err)
+    );
+  };
+
   useEffect(() => {
     if (isLoaded) console.log(isLoaded);
   }, [isLoaded]);
@@ -308,6 +359,14 @@ function PatchPage(props) {
   useEffect(() => {
     console.log(patchInfo);
   }, [patchInfo]);
+
+  useEffect(() => {
+    !props.isDrum && initializeMidi();
+  }, [instrument]);
+
+  useEffect(() => {
+    console.log(isSustainPedal);
+  }, [isSustainPedal]);
 
   useEffect(() => {
     getPatchInfo();
