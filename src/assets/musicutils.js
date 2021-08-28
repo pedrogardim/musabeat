@@ -901,7 +901,7 @@ export const loadDrumPatch = async (
       let newModules = [...prev];
       if (
         JSON.stringify(newModules[moduleIndex].lbls) !==
-        JSON.stringify(newModules[moduleIndex].lbls)
+        JSON.stringify(patch.lbls)
       )
         newModules[moduleIndex].lbls = patch.lbls;
       return newModules;

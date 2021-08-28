@@ -400,13 +400,18 @@ function Workspace(props) {
         ).toDestination();
         instrument._buffers = buffers;
       } else {
-        loadDrumPatch(module.instrument, setInstrumentsLoaded, index).then(
-          (r) =>
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[index] = r;
-              return a;
-            })
+        loadDrumPatch(
+          module.instrument,
+          setInstrumentsLoaded,
+          index,
+          "",
+          setModules
+        ).then((r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[index] = r;
+            return a;
+          })
         );
       }
     }
