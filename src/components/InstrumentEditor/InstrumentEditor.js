@@ -79,7 +79,7 @@ function InstrumentEditor(props) {
 
     newInstrument.set(conserverdProps);
 
-    console.log(newInstrument, conserverdProps);
+    //console.log(newInstrument, conserverdProps);
 
     props.setInstrument(newInstrument);
 
@@ -143,19 +143,11 @@ function InstrumentEditor(props) {
 
     props.setInstrument(newInstrument);
 
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module };
-          newModule.instrument = {};
-          //newModule.instrument = newInstrument;
-          //newModule.score = [];
-          //newModule.score = filteredScore;
-          return newModule;
-        } else {
-          return module;
-        }
-      })
+    props.onInstrumentMod(
+      "",
+      Tone.Frequency(fileName, "midi").toNote(),
+      "",
+      true
     );
   };
 
@@ -220,7 +212,7 @@ function InstrumentEditor(props) {
   };
 
   const saveUserPatch = (name, category) => {
-    console.log(name, category);
+    //console.log(name, category);
     let user = firebase.auth().currentUser;
 
     let clearInfo = {
@@ -360,7 +352,9 @@ function InstrumentEditor(props) {
                       handleFileDelete={handleSamplerFileDelete}
                       buffer={e[0]}
                       fileLabel={Tone.Frequency(e[1], "midi").toNote()}
-                      fileName={filesName[e[1]]}
+                      fileName={
+                        filesName[Tone.Frequency(e[1], "midi").toNote()]
+                      }
                       openFilePage={() => openFilePage(filesId[i])}
                     />
                     <Divider />
@@ -423,6 +417,7 @@ function InstrumentEditor(props) {
   }
 
   useEffect(() => {
+    //console.log(props.instrument);
     (props.instrument.name === "Players" ||
       props.instrument.name === "Sampler") &&
       getFilesName();
@@ -457,11 +452,13 @@ function InstrumentEditor(props) {
 
       {fileExplorer && (
         <FileExplorer
+          compact
           onFileClick={props.handleFileClick}
           setFileExplorer={setFileExplorer}
-          sequencer
-          compact
+          setInstrumentLoaded={props.setInstrumentLoaded}
           setSnackbarMessage={props.setSnackbarMessage}
+          module={props.module}
+          instrument={props.instrument}
         />
       )}
 
@@ -481,7 +478,7 @@ function InstrumentEditor(props) {
         </FileDrop>
       )}
 
-      {props.module.type === 0 && (
+      {(props.module.type === 0 || props.instrument.name === "Sampler") && (
         <Fab
           style={{ position: "absolute", right: 16, bottom: 16 }}
           onClick={() => setFileExplorer(true)}

@@ -78,18 +78,51 @@ function FileExplorer(props) {
 
   const handleFileSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
-      if (props.sequencer && filedata[index].dur > 5) {
+      if (props.module.type === 0 && filedata[index].dur > 5) {
         props.setSnackbarMessage &&
           props.setSnackbarMessage("Try picking a file shorter than 5 seconds");
         return;
       }
-      props.onFileClick(
-        fileIdList[index],
-        filesUrl[index],
-        players[index] !== undefined && players[index].buffer,
-        filedata[index].name
-      );
-      props.setFileExplorer && props.setFileExplorer(false);
+
+      props.setInstrumentLoaded(false);
+
+      if (props.compact && props.instrument.name === "Sampler") {
+        let url = filesUrl[index];
+        //console.log(url);
+        var xhr = new XMLHttpRequest();
+        xhr.responseType = "blob";
+        xhr.onload = function (event) {
+          var blob = xhr.response;
+          //console.log(blob);
+          blob.arrayBuffer().then((arraybuffer) => {
+            //console.log(arraybuffer);
+            props.instrument.context.rawContext.decodeAudioData(
+              arraybuffer,
+              (audiobuffer) => {
+                //console.log(audiobuffer);
+                props.onFileClick(
+                  fileIdList[index],
+                  filesUrl[index],
+                  audiobuffer,
+                  filedata[index].name
+                );
+                props.setInstrumentLoaded(true);
+                props.setFileExplorer && props.setFileExplorer(false);
+              }
+            );
+          });
+        };
+        xhr.open("GET", url);
+        xhr.send();
+      } else {
+        props.onFileClick(
+          fileIdList[index],
+          filesUrl[index],
+          players[index] !== undefined && players[index].buffer,
+          filedata[index].name
+        );
+        props.setFileExplorer && props.setFileExplorer(false);
+      }
     }
   };
 

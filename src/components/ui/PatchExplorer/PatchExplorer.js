@@ -189,8 +189,6 @@ function PatchExplorer(props) {
       ),
     ];
 
-    console.log(usersToFetch);
-
     if (usersToFetch.length > 0) {
       let usersData = await Promise.all(
         usersToFetch.map(async (e, i) => [
@@ -253,7 +251,10 @@ function PatchExplorer(props) {
 
     setSelectedPatchInfo(info.data());
 
-    if (!patchesUserData.hasOwnProperty(info.data().creator)) {
+    if (
+      info.data().creator &&
+      !patchesUserData.hasOwnProperty(info.data().creator)
+    ) {
       let userInfo = await firebase
         .firestore()
         .collection("users")

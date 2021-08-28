@@ -14,7 +14,7 @@ import {
 import { clearEvents } from "../../utils/TransportSchedule";
 import NameInput from "../../components/ui/Dialogs/NameInput";
 
-import { loadEffect, effectTypes } from "../../assets/musicutils";
+import { loadEffect, effectTypes, detectPitch } from "../../assets/musicutils";
 
 import Sequencer from "../Modules/DrumSequencer/Sequencer";
 import ChordProgression from "../Modules/ChordProgression/ChordProgression";
@@ -85,9 +85,11 @@ function Module(props) {
   };
 
   const setInstrumentLoaded = (loaded) => {
-    props.setInstrumentsLoaded((prev) =>
-      prev.map((e, i) => (i === props.index ? loaded : e))
-    );
+    props.setInstrumentsLoaded((prev) => {
+      let instrLdd = [...prev];
+      instrLdd[props.index] = loaded;
+      return instrLdd;
+    });
   };
 
   const removeModule = () => {
@@ -188,64 +190,40 @@ function Module(props) {
     });
   };
 
-  const onInstrumentMod = (url, name, soundindex, isRemoving) => {
+  const onInstrumentMod = async (fileId, name, soundindex, isRemoving) => {
     //update instrument info in module object
+    if (props.module.type === 0 || props.instrument.name === "Sampler") {
+      let patch =
+        props.module.instrument === "string"
+          ? await firebase
+              .firestore()
+              .collection(props.module.type === 0 ? "drumpatches" : "patches")
+              .doc(props.module.instrument)
+              .get()
+              .data()
+          : { ...props.module.instrument };
 
-    if (props.module.type === 0) {
-      if (typeof props.module.instrument === "string") {
-        firebase
-          .firestore()
-          .collection("drumpatches")
-          .doc(props.module.instrument)
-          .get()
-          .then((r) => {
-            let patch = r.data();
-
-            !isRemoving
-              ? (patch.urls[soundindex] = url)
-              : delete patch.urls[soundindex];
-            !isRemoving
-              ? (patch.lbls[soundindex] = name)
-              : delete patch.lbsl[soundindex];
-
-            props.setModules((prev) => {
-              let newModules = [...prev];
-              newModules[props.index].instrument = { ...patch };
-              newModules[props.index].lbls = { ...patch.lbls };
-              return newModules;
-            });
-          });
-      } else {
-        let patch = { ...props.module.instrument };
-
-        !isRemoving
-          ? (patch.urls[soundindex] = url)
-          : delete patch.urls[soundindex];
+      !isRemoving
+        ? (patch.urls[props.module.type === 0 ? soundindex : name] = fileId)
+        : delete patch.urls[props.module.type === 0 ? soundindex : name];
+      if (props.module.type === 0) {
         !isRemoving
           ? (patch.lbls[soundindex] = name)
-          : delete patch.lbls[soundindex];
-
-        props.setModules((prev) => {
-          let newModules = [...prev];
-          newModules[props.index].instrument = { ...patch };
-          newModules[props.index].lbls = { ...patch.lbls };
-          return newModules;
-        });
+          : delete patch.lbsl[soundindex];
       }
+
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].instrument = { ...patch };
+        if (props.module.type === 0) {
+          newModules[props.index].lbls = { ...patch.lbls };
+        }
+        return newModules;
+      });
     } else {
       props.setModules((prev) => {
         let newModules = [...prev];
-        if (props.module.type === 3) {
-          newModules[props.index].instrument = { url: url };
-        } else if (props.instrument.name === "Sampler") {
-          let samplerPrms = props.instrument.get();
-          delete samplerPrms.onerror;
-          delete samplerPrms.onload;
-          samplerPrms.urls = { ...props.instrument.get().urls, [name]: url };
-          newModules[props.index].instrument = samplerPrms;
-        } else {
-          newModules[props.index].instrument = props.instrument.get();
-        }
+        newModules[props.index].instrument = props.instrument.get();
         return newModules;
       });
     }
@@ -253,6 +231,7 @@ function Module(props) {
   };
 
   const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
+    let isDrum = props.module.type === 0;
     if (props.module.type === 3) {
       setInstrumentLoaded(false);
       props.instrument.dispose();
@@ -265,24 +244,24 @@ function Module(props) {
       updateOnFileLoaded();
       onInstrumentMod(fileId);
       setModulePage(null);
-    } else if (props.module.type === 0) {
+    } else {
       setInstrumentLoaded(false);
 
-      let labelOnInstrument = name.split(".")[0];
+      let labelOnInstrument = isDrum
+        ? name.split(".")[0]
+        : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
 
       let slotToInsetFile = 0;
 
       if (typeof props.module.instrument === "string") {
         firebase
           .firestore()
-          .collection("drumpatches")
+          .collection(isDrum ? "drumpatches" : "patches")
           .doc(props.module.instrument)
           .get()
           .then((r) => {
-            console.log(Object.keys(r.data().urls), slotToInsetFile);
-
             while (
-              props.module.type === 0 &&
+              isDrum &&
               Object.keys(r.data().urls).indexOf(
                 JSON.stringify(slotToInsetFile)
               ) !== -1
@@ -291,13 +270,13 @@ function Module(props) {
             }
             //console.log(slotToInsetFile);
 
-            onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
-
             props.instrument.add(
-              props.module.type === 0 ? slotToInsetFile : labelOnInstrument,
+              isDrum ? slotToInsetFile : labelOnInstrument,
               audiobuffer ? audiobuffer : fileUrl,
               () => setInstrumentLoaded(true)
             );
+
+            onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
           });
       } else {
         //console.log(Object.keys(props.module.instrument.urls), slotToInsetFile);
@@ -311,13 +290,15 @@ function Module(props) {
         }
         //console.log(slotToInsetFile);
 
-        onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
-
         props.instrument.add(
-          props.module.type === 0 ? slotToInsetFile : labelOnInstrument,
+          isDrum ? slotToInsetFile : labelOnInstrument,
           audiobuffer ? audiobuffer : fileUrl,
           () => setInstrumentLoaded(true)
         );
+
+        //console.log(props.instrument);
+
+        onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
       }
     }
   };
