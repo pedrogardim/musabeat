@@ -355,9 +355,10 @@ function Module(props) {
           index={props.index}
           module={props.module}
           kit={0}
-          updateModules={props.setModules}
+          setModules={props.setModules}
           timeline={props.timeline}
           timelineMode={props.timelineMode}
+          isSessionLoaded={props.isSessionLoaded}
         />
       );
       break;
@@ -371,9 +372,10 @@ function Module(props) {
           sessionSize={props.sessionSize}
           index={props.index}
           module={props.module}
-          updateModules={props.setModules}
+          setModules={props.setModules}
           timeline={props.timeline}
           timelineMode={props.timelineMode}
+          isSessionLoaded={props.isSessionLoaded}
         />
       );
       break;
@@ -394,6 +396,7 @@ function Module(props) {
           setTimeline={props.setTimeline}
           selection={props.selection}
           setSelection={props.setSelection}
+          isSessionLoaded={props.isSessionLoaded}
         />
       );
       break;
@@ -418,6 +421,7 @@ function Module(props) {
           fullScreen={fullScreen}
           timeline={props.timeline}
           timelineMode={props.timelineMode}
+          isSessionLoaded={props.isSessionLoaded}
         />
       );
       break;
@@ -440,6 +444,7 @@ function Module(props) {
           timelineMode={props.timelineMode}
           selection={props.selection}
           setSelection={props.setSelection}
+          isSessionLoaded={props.isSessionLoaded}
         />
       );
       break;
@@ -457,7 +462,7 @@ function Module(props) {
   }, []);
 
   useEffect(() => {
-    onEffectCreated();
+    props.isLoaded && onEffectCreated();
   }, [effects]);
 
   useEffect(() => {

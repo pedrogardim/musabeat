@@ -143,11 +143,12 @@ function Player(props) {
   }, [props.module.score]);
 
   useEffect(() => {
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      newModules[props.index].score = [...score];
-      return newModules;
-    });
+    props.isSessionLoaded &&
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].score = [...score];
+        return newModules;
+      });
   }, [score]);
 
   useEffect(() => {

@@ -172,11 +172,12 @@ function PianoRoll(props) {
 
   useEffect(() => {
     scheduleEvents();
-    props.setModules((previousModules) => {
-      let newModules = [...previousModules];
-      newModules[props.index].score = notes;
-      return newModules;
-    });
+    props.isSessionLoaded &&
+      props.setModules((previousModules) => {
+        let newModules = [...previousModules];
+        newModules[props.index].score = notes;
+        return newModules;
+      });
   }, [notes]);
 
   useEffect(() => {

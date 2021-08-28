@@ -848,7 +848,7 @@ export const loadDrumPatch = async (
 
   let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
 
-  console.log(patch);
+  //console.log(patch);
 
   //handle empty urls obj
 
@@ -899,7 +899,10 @@ export const loadDrumPatch = async (
   setModules &&
     setModules((prev) => {
       let newModules = [...prev];
-      if (newModules[moduleIndex].lbls !== patch.lbls)
+      if (
+        JSON.stringify(newModules[moduleIndex].lbls) !==
+        JSON.stringify(newModules[moduleIndex].lbls)
+      )
         newModules[moduleIndex].lbls = patch.lbls;
       return newModules;
     });

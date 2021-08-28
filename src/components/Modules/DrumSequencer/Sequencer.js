@@ -90,11 +90,12 @@ function Sequencer(props) {
   };
 
   const updateModuleSequence = () => {
-    props.updateModules((previousModules) => {
-      let newModules = [...previousModules];
-      newModules[props.index].score = sequencerArray;
-      return newModules;
-    });
+    props.isSessionLoaded &&
+      props.setModules((previousModules) => {
+        let newModules = [...previousModules];
+        newModules[props.index].score = sequencerArray;
+        return newModules;
+      });
   };
 
   const handleMouseOver = (event) => {

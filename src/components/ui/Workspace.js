@@ -560,10 +560,9 @@ function Workspace(props) {
 
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
-    console.log("session ready!");
-    updateMode("simple");
+    console.log("=====session ready!=====");
+    updateSavingMode("simple");
     setIsLoaded(true);
-    setAreUnsavedChanges(true);
   };
 
   const setTimeline = (newTimeline) => {
@@ -589,16 +588,15 @@ function Workspace(props) {
     });
   }; */
 
-  const updateMode = (input) => {
+  const updateSavingMode = (input) => {
     if (props.user === null || !editMode) return;
     if (input === "simple") {
       clearInterval(autosaver);
       //console.log("autosaver initialized");
 
-      let intervalId = setInterval(
-        () => setAreUnsavedChanges((prev) => (prev ? false : prev)),
-        autoSaverTime
-      );
+      let intervalId = setInterval(() => {
+        setAreUnsavedChanges((prev) => (prev ? false : prev));
+      }, autoSaverTime);
 
       setAutosaver(intervalId);
     }
@@ -895,30 +893,33 @@ function Workspace(props) {
     //registerSession();
     console.log(modules);
     //console.log(modules, instruments, instrumentsLoaded);
+    if (isLoaded) {
+      savingMode === "simple" && setAreUnsavedChanges(true);
 
-    savingMode === "simple" && setAreUnsavedChanges(true);
+      savingMode === "collaborative" && saveToDatabase(modules, sessionData);
 
-    savingMode === "collaborative" && saveToDatabase(modules, sessionData);
-
-    modules && isLoaded && handleUndo();
+      modules && handleUndo();
+    }
   }, [modules]);
 
   useEffect(() => {
-    isLoaded && updateMode(savingMode);
+    isLoaded && updateSavingMode(savingMode);
   }, [savingMode]);
 
   useEffect(() => {
-    isLoaded && !timelineMode && adaptSessionSize();
-    sessionData &&
-      timelineMode !== sessionData.timeline.on &&
-      setSessionData((prev) => {
-        return { ...prev, timeline: { ...prev.timeline, on: timelineMode } };
-      });
+    if (isLoaded) {
+      !timelineMode && adaptSessionSize();
+      sessionData &&
+        timelineMode !== sessionData.timeline.on &&
+        setSessionData((prev) => {
+          return { ...prev, timeline: { ...prev.timeline, on: timelineMode } };
+        });
+    }
   }, [timelineMode]);
 
   useEffect(() => {
-    sessionData && console.log(sessionData.timeline);
-    savingMode === "simple" && setAreUnsavedChanges(true);
+    //sessionData && console.log(sessionData.timeline);
+    isLoaded && savingMode === "simple" && setAreUnsavedChanges(true);
   }, [sessionData]);
 
   /*  useEffect(() => {
@@ -938,14 +939,17 @@ function Workspace(props) {
       sessionData &&
       instrumentsLoaded &&
       instruments.every((val) => typeof val === "object") &&
+      !instruments.includes(undefined) &&
       instrumentsLoaded.every((val) => val === true) &&
+      !instrumentsLoaded.includes(undefined) &&
       sessionSize > 0 &&
       !isLoaded
     ) {
+      //console.log(instrumentsLoaded, sessionData, instruments);
       onSessionReady();
     }
     //temp
-  }, [instrumentsLoaded, sessionData]);
+  }, [instrumentsLoaded, sessionData, instruments]);
 
   useEffect(() => {
     //TODO: Completely clear Tone instance, disposing context
@@ -992,6 +996,8 @@ function Workspace(props) {
       return dialogText;
     };
     if (!props.hidden && isLoaded && !areUnsavedChanges) saveToDatabase();
+
+    //console.log("areUnsavedChanges", areUnsavedChanges);
   }, [areUnsavedChanges]);
 
   /**/
@@ -1053,6 +1059,7 @@ function Workspace(props) {
                 setSelection={setSelection}
                 duplicateModule={duplicateModule}
                 setSnackbarMessage={setSnackbarMessage}
+                isSessionLoaded={isLoaded}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

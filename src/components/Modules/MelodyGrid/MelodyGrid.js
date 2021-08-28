@@ -125,11 +125,12 @@ function MelodyGrid(props) {
   };
 
   const updateModuleSequence = () => {
-    props.updateModules((previousModules) => {
-      let newModules = [...previousModules];
-      newModules[props.index].score = melodyArray;
-      return newModules;
-    });
+    props.isSessionLoaded &&
+      props.setModules((previousModules) => {
+        let newModules = [...previousModules];
+        newModules[props.index].score = melodyArray;
+        return newModules;
+      });
   };
 
   const updateGridRows = () => {
