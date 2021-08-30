@@ -1,6 +1,6 @@
 .file-explorer {
   position: absolute;
-  width: 100%;
+  width: 100vw;
 
   top: 0;
   flex: 1 0;
@@ -29,6 +29,8 @@
   /* display: flex;
   align-items: center;
   justify-content: center; */
+  width: calc(100% - 32px) !important;
+
   max-width: 1200px;
   top: 0;
 }
@@ -38,7 +40,7 @@
 }
 
 .fet-cont {
-  overflow-y: hidden;
+  overflow: hidden !important;
   position: relative;
   display: flex;
   justify-content: center;
@@ -64,9 +66,9 @@
 }
 
 .file-explorer-searchbar {
-  width: 100%;
+  width: calc(100% - 32px);
   max-width: 1200px;
-  margin: 32px 8px;
+  margin: 32px 0px;
 }
 
 .file-explorer-searchbar-compact {
@@ -106,17 +108,31 @@
   width: 100% !important;
 } */
 
+@media only screen and (max-width: 667px) {
+  /* .file-explorer-table {
+    width: 95% !important;
+  } */
+
+  .fet-collapsable-column-667 {
+    display: none !important;
+  }
+}
+
 @media only screen and (max-width: 800px) {
   /* .file-explorer-table {
     width: 95% !important;
   } */
 
-  /* .fet-collapsable-column {
+  .fet-collapsable-column-800 {
     display: none !important;
-  } */
+  }
 }
 
 .fe-filename:hover {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.MuiTableCell-sizeSmall {
+  padding: 6px 8px !important;
 }

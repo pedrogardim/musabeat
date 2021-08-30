@@ -597,19 +597,11 @@ function PatchExplorer(props) {
               props.compact ? "pet-compact" : "pet-normal"
             }`}
           >
-            {!props.compact && (
+            {/* {!props.compact && (
               <TableHead>
                 <TableRow>
                   <TableCell style={{ width: 50 }}></TableCell>
                   <TableCell>Name</TableCell>
-                  {props.explore && (
-                    <TableCell
-                      className="pet-collapsable-column"
-                      style={{ width: 50 }}
-                    >
-                      User
-                    </TableCell>
-                  )}
                   <Fragment>
                     <TableCell>Category</TableCell>
                     {(props.explore || !!showingLiked) && (
@@ -623,7 +615,7 @@ function PatchExplorer(props) {
                   </TableCell>
                   <TableCell style={{ width: 50 }} align="center">
                     Download
-                  </TableCell> */}
+                  </TableCell>}
                     {props.userPatches && (
                       <TableCell style={{ width: 50 }} align="center">
                         Delete
@@ -632,7 +624,7 @@ function PatchExplorer(props) {
                   </Fragment>
                 </TableRow>
               </TableHead>
-            )}
+            )} */}
             <TableBody>
               {props.compact && (
                 <TableRow component="th" scope="row">
@@ -645,7 +637,7 @@ function PatchExplorer(props) {
                       </IconButton>
                     )}
                   </TableCell>
-                  <TableCell scope="row">
+                  <TableCell>
                     <div
                       style={{
                         maxWidth: 200,
@@ -690,7 +682,7 @@ function PatchExplorer(props) {
                         )}
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="pet-collapsable-column">
                     {selectedPatchInfo && (
                       <div className="pet-chip-cell">
                         <Chip
@@ -751,38 +743,6 @@ function PatchExplorer(props) {
                           <Icon>edit</Icon>
                         </IconButton>
                       )}
-                      {props.compact &&
-                        patchesUserData[patchdata[index].creator] && (
-                          <Tooltip
-                            title={
-                              patchesUserData[patchdata[index].creator]
-                                .displayName
-                            }
-                          >
-                            <Avatar
-                              style={{
-                                height: 24,
-                                width: 24,
-                                marginLeft: 8,
-                              }}
-                              alt={
-                                patchesUserData[patchdata[index].creator]
-                                  .displayName
-                              }
-                              src={
-                                patchesUserData[patchdata[index].creator]
-                                  .photoURL
-                              }
-                            />
-                          </Tooltip>
-                        )}
-                    </div>
-                  </TableCell>
-                  {props.explore && (
-                    <TableCell
-                      className="pet-collapsable-column"
-                      style={{ width: 50 }}
-                    >
                       {patchesUserData[patchdata[index].creator] && (
                         <Tooltip
                           title={
@@ -791,6 +751,11 @@ function PatchExplorer(props) {
                           }
                         >
                           <Avatar
+                            style={{
+                              height: 24,
+                              width: 24,
+                              marginLeft: 8,
+                            }}
                             alt={
                               patchesUserData[patchdata[index].creator]
                                 .displayName
@@ -801,10 +766,14 @@ function PatchExplorer(props) {
                           />
                         </Tooltip>
                       )}
-                    </TableCell>
-                  )}
+                    </div>
+                  </TableCell>
+
                   <TableCell>
-                    <div className="pet-chip-cell">
+                    <div
+                      className="pet-chip-cell"
+                      className="pet-collapsable-column"
+                    >
                       {categories[patchdata[index].categ] && (
                         <Chip
                           clickable={true}
@@ -878,14 +847,6 @@ function PatchExplorer(props) {
                           <Skeleton variant="text" />
                         </Typography>
                       </TableCell>
-                      {props.explore && (
-                        <TableCell
-                          className="pet-collapsable-column"
-                          style={{ width: 50 }}
-                        >
-                          <Avatar />
-                        </TableCell>
-                      )}
                       <TableCell>
                         <div className="pet-chip-cell">
                           <Chip

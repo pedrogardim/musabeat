@@ -2,7 +2,7 @@ import React, { useState, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
 import {
-  Fab,
+  IconButton,
   Icon,
   Popper,
   Paper,
@@ -27,7 +27,7 @@ function SessionSettings(props) {
 
   return (
     <Fragment>
-      <Fab
+      <IconButton
         ref={btnRef}
         color="primary"
         className="ws-fab ws-fab-settings"
@@ -35,7 +35,7 @@ function SessionSettings(props) {
         onClick={() => setAnchorEl((prev) => (prev ? null : btnRef.current))}
       >
         <Icon>settings</Icon>
-      </Fab>
+      </IconButton>
       <Popper
         open={!!anchorEl}
         anchorEl={anchorEl}

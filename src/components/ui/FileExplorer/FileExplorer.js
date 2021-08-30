@@ -496,19 +496,11 @@ function FileExplorer(props) {
               props.compact ? "fet-compact" : "fet-normal"
             }`}
           >
-            {!props.compact && (
+            {/* !props.compact && (
               <TableHead>
                 <TableRow>
                   <TableCell style={{ width: 50 }}></TableCell>
                   <TableCell>Name</TableCell>
-                  {props.explore && (
-                    <TableCell
-                      className="fet-collapsable-column"
-                      style={{ width: 50 }}
-                    >
-                      User
-                    </TableCell>
-                  )}
                   <Fragment>
                     <TableCell>Categories</TableCell>
                     {(props.explore || !!showingLiked) && (
@@ -534,7 +526,7 @@ function FileExplorer(props) {
                   </Fragment>
                 </TableRow>
               </TableHead>
-            )}
+            ) */}
             <TableBody>
               {filedata.map((row, index) => (
                 <TableRow
@@ -575,7 +567,7 @@ function FileExplorer(props) {
                           <Icon>edit</Icon>
                         </IconButton>
                       )}
-                      {props.compact && filesUserData[filedata[index].user] && (
+                      {filesUserData[filedata[index].user] && (
                         <Tooltip
                           title={
                             filesUserData[filedata[index].user].displayName
@@ -596,29 +588,7 @@ function FileExplorer(props) {
                       )}
                     </div>
                   </TableCell>
-
-                  {props.explore && (
-                    <TableCell
-                      className="fet-collapsable-column"
-                      style={{ width: 50 }}
-                    >
-                      {filesUserData[filedata[index].user] && (
-                        <Tooltip
-                          title={
-                            filesUserData[filedata[index].user].displayName
-                          }
-                        >
-                          <Avatar
-                            alt={
-                              filesUserData[filedata[index].user].displayName
-                            }
-                            src={filesUserData[filedata[index].user].photoURL}
-                          />
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  )}
-                  <TableCell>
+                  <TableCell className="fet-collapsable-column-667">
                     <div className="fet-chip-cell">
                       {filedata && props.userFiles
                         ? [
@@ -681,7 +651,7 @@ function FileExplorer(props) {
                         </TableCell>
                       )}
                       <TableCell
-                        className="fet-collapsable-column"
+                        className="fet-collapsable-column-800"
                         align="center"
                       >
                         <Typography variant="overline">
@@ -719,15 +689,7 @@ function FileExplorer(props) {
                           <Skeleton variant="text" />
                         </Typography>
                       </TableCell>
-                      {props.explore && (
-                        <TableCell
-                          className="fet-collapsable-column"
-                          style={{ width: 50 }}
-                        >
-                          <Avatar />
-                        </TableCell>
-                      )}
-                      <TableCell>
+                      <TableCell className="fet-collapsable-column-667">
                         <div className="fet-chip-cell">
                           {["    ", "    ", "    "].map((chip, chipIndex) => (
                             <Chip
@@ -749,7 +711,7 @@ function FileExplorer(props) {
                           )}
 
                           <TableCell
-                            className="fet-collapsable-column"
+                            className="fet-collapsable-column-800"
                             align="center"
                           >
                             <Typography variant="overline">

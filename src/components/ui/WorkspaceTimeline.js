@@ -139,7 +139,7 @@ function WorkspaceTimeline(props) {
       //console.log("cleared");
       clearInterval(cursorAnimator);
     };
-  }, []);
+  }, [props.timelineMode]);
 
   return (
     <div className="ws-timeline-cont">

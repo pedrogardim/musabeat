@@ -1,6 +1,6 @@
 .patch-explorer {
   position: absolute;
-  width: 100%;
+  width: 100vw;
 
   top: 0;
   flex: 1 0;
@@ -29,6 +29,7 @@
   /* display: flex;
   align-items: center;
   justify-content: center; */
+  width: calc(100% - 32px) !important;
   max-width: 1200px;
   top: 0;
 }
@@ -38,7 +39,7 @@
 }
 
 .pet-cont {
-  overflow-y: hidden;
+  overflow: hidden !important;
   position: relative;
   display: flex;
   justify-content: center;
@@ -64,9 +65,10 @@
 }
 
 .patch-explorer-searchbar {
-  width: 100%;
+  width: calc(100% - 32px) !important;
+  position: relative;
   max-width: 1200px;
-  margin: 32px 8px;
+  margin: 32px 0;
 }
 
 .patch-explorer-searchbar-compact {
@@ -106,14 +108,14 @@
   width: 100% !important;
 } */
 
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 480px) {
   /* .patch-explorer-table {
     width: 95% !important;
   } */
 
-  /* .pet-collapsable-column {
+  .pet-collapsable-column {
     display: none !important;
-  } */
+  }
 }
 
 .fe-filename:hover {

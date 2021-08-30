@@ -71,7 +71,7 @@ function ModulePicker(props) {
         !props.modules || !props.modules.length
           ? 0
           : Math.max(...props.modules.map((e) => e.id)) + 1,
-      name: t(`modulePicker.types.${selectedType}.name`),
+      name: "",
       type: selectedType,
       score:
         selectedType === 0 || selectedType === 1

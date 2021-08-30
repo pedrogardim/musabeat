@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Fab, Icon, CircularProgress } from "@material-ui/core";
+import { IconButton, Icon, CircularProgress } from "@material-ui/core";
 
 import { bounceSessionExport } from "../../utils/exportUtils";
 
@@ -29,7 +29,7 @@ function Exporter(props) {
   //it's necessary to trigger rescheduling after export
 
   return (
-    <Fab
+    <IconButton
       color="primary"
       className="ws-fab ws-fab-export"
       tabIndex={-1}
@@ -44,7 +44,7 @@ function Exporter(props) {
           value={exportProgress}
         />
       )}
-    </Fab>
+    </IconButton>
   );
 }
 

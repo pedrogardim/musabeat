@@ -13,6 +13,7 @@ import {
   Tooltip,
   Snackbar,
   Input,
+  Paper,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -82,6 +83,8 @@ function Workspace(props) {
   });
 
   const [selection, setSelection] = useState([]);
+
+  const [optionsMenu, setOptionsMenu] = useState(false);
 
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
@@ -570,6 +573,31 @@ function Workspace(props) {
     setIsLoaded(true);
   };
 
+  const resetWorkspace = () => {
+    setSavingMode("simple");
+    setAutosaver(null);
+    setAreUnsavedChanges(false);
+
+    setDBSessionRef(null);
+
+    setModules(null);
+    setSessionData(null);
+    setSessionSize(0);
+
+    setInstruments([]);
+    setInstrumentsLoaded([]);
+    setIsLoaded(false);
+    setEditMode(false);
+
+    setIsPlaying(false);
+
+    setModulePicker(false);
+    setMixerOpened(false);
+
+    //true: timeline ; false: loopmode
+    setTimelineMode(false);
+  };
+
   const setTimeline = (newTimeline) => {
     setSessionData((prev) => {
       return { ...prev, timeline: newTimeline };
@@ -643,7 +671,7 @@ function Workspace(props) {
 
   const togglePlaying = (e) => {
     e.preventDefault();
-    if (Tone.Transport.state !== "started") {
+    if (Tone.Transport.state !== "started" && isLoaded) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
@@ -668,6 +696,8 @@ function Workspace(props) {
       setSnackbarMessage(
         `${t("workspace.actions.copySuccess")} ${focusedModule + 1} "${
           module.name
+            ? module.name
+            : t(`modulePicker.types.${module.type}.name`)
         }"`
       );
     }
@@ -719,6 +749,8 @@ function Workspace(props) {
       setSnackbarMessage(
         `${t("workspace.actions.pasteSuccessMeasure")} ${focusedModule + 1} "${
           module.name
+            ? module.name
+            : t(`modulePicker.types.${module.type}.name`)
         }" ${
           subdivisionChanged
             ? `${t("workspace.actions.stepsChange")} ${clipboard.length}`
@@ -739,6 +771,8 @@ function Workspace(props) {
       setSnackbarMessage(
         `${t("workspace.actions.pasteSuccessChord")} ${focusedModule + 1} "${
           module.name
+            ? module.name
+            : t(`modulePicker.types.${module.type}.name`)
         }"`
       );
     }
@@ -766,7 +800,11 @@ function Workspace(props) {
       setSnackbarMessage(
         `Measure ${currentMeasure + 1} cleared, from module ${
           focusedModule + 1
-        } "${module.name}"`
+        } "${
+          module.name
+            ? module.name
+            : t(`modulePicker.types.${module.type}.name`)
+        }"`
       );
     }
     if (module.type === 4) {
@@ -871,6 +909,7 @@ function Workspace(props) {
   };
 
   useEffect(() => {
+    resetWorkspace();
     Tone.Transport.loop = true;
     Tone.Transport.loopStart = 0;
     instruments.forEach((e) => e.dispose());
@@ -1122,13 +1161,10 @@ function Workspace(props) {
       <div className="ws-fab-cont">
         <Fab
           tabIndex={-1}
-          color="primary"
-          className="ws-fab ws-fab-copy"
-          onClick={handleSessionCopy}
+          onClick={() => setOptionsMenu((prev) => (prev ? false : true))}
         >
-          <Icon>content_copy</Icon>
+          <Icon>{!optionsMenu ? "list" : "close"}</Icon>
         </Fab>
-
         <Fab
           tabIndex={-1}
           color="primary"
@@ -1137,19 +1173,32 @@ function Workspace(props) {
         >
           <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
         </Fab>
+      </div>
 
+      <Paper
+        className="ws-opt-btn-cont"
+        style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
+      >
+        <IconButton
+          tabIndex={-1}
+          color="primary"
+          className="ws-fab ws-fab-copy"
+          onClick={handleSessionCopy}
+        >
+          <Icon>content_copy</Icon>
+        </IconButton>
         {editMode && (
           <Fragment>
-            <Fab
+            <IconButton
               tabIndex={-1}
               className="ws-fab ws-fab-mix"
               color="primary"
               onClick={() => setMixerOpened((prev) => (prev ? false : true))}
             >
               <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-            </Fab>
+            </IconButton>
             <Tooltip title={t("misc.saveChanges")}>
-              <Fab
+              <IconButton
                 disabled={!areUnsavedChanges || !props.user}
                 tabIndex={-1}
                 className="ws-fab ws-fab-save"
@@ -1157,7 +1206,7 @@ function Workspace(props) {
                 onClick={() => setAreUnsavedChanges(false)}
               >
                 <Icon>save</Icon>
-              </Fab>
+              </IconButton>
             </Tooltip>
           </Fragment>
         )}
@@ -1178,7 +1227,7 @@ function Workspace(props) {
           sessionData={sessionData}
           setSessionData={setSessionData}
         />
-      </div>
+      </Paper>
 
       <Snackbar
         open={!!snackbarMessage}

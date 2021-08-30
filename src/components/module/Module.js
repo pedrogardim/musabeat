@@ -508,7 +508,11 @@ function Module(props) {
               <Icon style={{ fontSize: 20 }}>arrow_back_ios</Icon>
             </IconButton>
           )}
-          <span className="module-title">{props.module.name}</span>
+          <span className="module-title">
+            {props.module.name
+              ? props.module.name
+              : t(`modulePicker.types.${props.module.type}.name`)}
+          </span>
           {modulePage === "settings" && (
             <Tooltip title="Rename module">
               <IconButton

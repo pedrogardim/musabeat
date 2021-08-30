@@ -37,7 +37,7 @@
 .ws-timeline-cont {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   max-width: 732px;
 }
@@ -51,7 +51,8 @@
 }
 
 .ws-timeline-slider {
-  width: calc(100% - 64px) !important;
+  width: calc(100% - 128px) !important;
+  margin-left: 16px;
 }
 
 .ws-timeline-cursor {

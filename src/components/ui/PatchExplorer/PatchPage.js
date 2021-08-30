@@ -324,32 +324,33 @@ function PatchPage(props) {
   };
 
   const initializeMidi = () => {
-    navigator.requestMIDIAccess().then(
-      (midiAccess) => {
-        midiAccess.inputs.forEach((entry) => {
-          console.log("mididdddd", instrument);
-          if (instrument)
-            entry.onmidimessage = (e) => {
-              instrument && onMIDIMessage(e);
-            };
-          var input = entry;
-          console.log(
-            "Input port [type:'" +
-              input.type +
-              "'] id:'" +
-              input.id +
-              "' manufacturer:'" +
-              input.manufacturer +
-              "' name:'" +
-              input.name +
-              "' version:'" +
-              input.version +
-              "'"
-          );
-        });
-      },
-      (err) => console.log(err)
-    );
+    !!navigator.requestMIDIAccess &&
+      navigator.requestMIDIAccess().then(
+        (midiAccess) => {
+          midiAccess.inputs.forEach((entry) => {
+            console.log("mididdddd", instrument);
+            if (instrument)
+              entry.onmidimessage = (e) => {
+                instrument && onMIDIMessage(e);
+              };
+            var input = entry;
+            console.log(
+              "Input port [type:'" +
+                input.type +
+                "'] id:'" +
+                input.id +
+                "' manufacturer:'" +
+                input.manufacturer +
+                "' name:'" +
+                input.name +
+                "' version:'" +
+                input.version +
+                "'"
+            );
+          });
+        },
+        (err) => console.log(err)
+      );
   };
 
   useEffect(() => {

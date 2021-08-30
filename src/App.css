@@ -69,7 +69,7 @@ body *::-webkit-scrollbar-thumb {
 
 .app-log-beta-mark {
   position: absolute !important;
-  top: 0 !important;
+  top: 8px !important;
   right: 0 !important;
   font-size: 10px !important;
   line-height: 10px !important;
