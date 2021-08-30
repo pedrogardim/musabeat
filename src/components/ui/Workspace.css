@@ -1,12 +1,12 @@
 .workspace {
-  position: absolute;
+  position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
   background: white;
-  min-height: 100vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  flex: 1 0;
 
   align-items: center;
   justify-content: flex-start;

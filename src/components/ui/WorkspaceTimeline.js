@@ -142,47 +142,24 @@ function WorkspaceTimeline(props) {
   }, []);
 
   return (
-    <div
-      className={`ws-timeline ${!props.timelineMode && "ws-timeline-loop"}`}
-      ref={TLWrapper}
-      onMouseDown={handleMouseDown}
-      onMouseUp={() => setDraggingSelect(false)}
-      onMouseLeave={() => setDraggingSelect(false)}
-    >
+    <div className="ws-timeline-cont">
       <Tooltip title={props.timelineMode ? "Loop Mode" : "Timeline Mode"}>
         <IconButton
           className="ws-timeline-btn"
           onClick={() => props.setTimelineMode((prev) => !prev)}
-          style={{ position: "absolute", left: -64 }}
         >
           <Icon>{props.timelineMode ? "loop" : "linear_scale"}</Icon>
         </IconButton>
       </Tooltip>
-      {props.timelineMode ? (
-        <Fragment>
-          <div style={{ position: "absolute", right: -128 }}>
-            <IconButton
-              className="ws-timeline-btn"
-              onClick={() => setCompact((prev) => !prev)}
-            >
-              <Icon>expand</Icon>
-            </IconButton>
-            <TextField
-              label="Session Size"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              inputProps={{ min: 1, max: 128 }}
-              defaultValue={props.sessionSize}
-              onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
-              onBlur={(e) => handleSessionSizeChange(e)}
-              onMouseUp={(e) => handleSessionSizeChange(e)}
-              value={TLinputSessionSize}
-              onChange={(e) => setTLinputSessionSize(e.target.value)}
-            />
-          </div>
 
+      {props.timelineMode ? (
+        <div
+          className={`ws-timeline ${!props.timelineMode && "ws-timeline-loop"}`}
+          ref={TLWrapper}
+          onMouseDown={handleMouseDown}
+          onMouseUp={() => setDraggingSelect(false)}
+          onMouseLeave={() => setDraggingSelect(false)}
+        >
           {props.modules.map((module, moduleIndex) => {
             let moduleSize =
               module.type === 2
@@ -240,17 +217,43 @@ function WorkspaceTimeline(props) {
           >
             <div className="ws-timeline-cursor" />
           </Draggable>
-        </Fragment>
+        </div>
       ) : (
         <Slider
           min={0}
           max={1}
+          className={"ws-timeline-slider"}
           step={0.01}
           value={Tone.Transport.seconds / Tone.Transport.loopEnd}
           onChange={(e, v) =>
             (Tone.Transport.seconds = v * Tone.Transport.loopEnd)
           }
         />
+      )}
+
+      {props.timelineMode && (
+        <div>
+          <IconButton
+            className="ws-timeline-btn"
+            onClick={() => setCompact((prev) => !prev)}
+          >
+            <Icon>expand</Icon>
+          </IconButton>
+          <TextField
+            label="Session Size"
+            type="number"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{ min: 1, max: 128 }}
+            defaultValue={props.sessionSize}
+            onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
+            onBlur={(e) => handleSessionSizeChange(e)}
+            onMouseUp={(e) => handleSessionSizeChange(e)}
+            value={TLinputSessionSize}
+            onChange={(e) => setTLinputSessionSize(e.target.value)}
+          />
+        </div>
       )}
     </div>
   );

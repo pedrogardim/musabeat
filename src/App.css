@@ -1,10 +1,10 @@
 html {
+  height: 100vh;
   overflow: hidden;
-  height: 100%;
 }
 
 body {
-  height: 100%;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -21,6 +21,13 @@ body *::-webkit-scrollbar-thumb {
   background-color: rgb(196, 196, 196); /* color of the scroll thumb */
   border-radius: 16px; /* roundness of the scroll thumb */
   /* border: 3px solid orange;  */
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
 }
 
 /* .app-title {
@@ -69,9 +76,10 @@ body *::-webkit-scrollbar-thumb {
 }
 
 .app-wrapper {
-  max-height: calc(100vh - 64px);
-  height: calc(100vh - 64px);
+  flex: 1;
+  height: 100vh;
   overflow-y: scroll;
+  overflow-x: hidden;
   position: relative;
 }
 
