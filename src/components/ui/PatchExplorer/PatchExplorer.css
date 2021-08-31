@@ -13,7 +13,7 @@
   align-content: center;
   background-color: white;
   overflow-y: scroll;
-  padding: 64px 0 128px 0;
+  padding: 0px 0 128px 0;
 }
 
 .patch-explorer-compact {
@@ -39,7 +39,7 @@
 }
 
 .pet-cont {
-  overflow: hidden !important;
+  overflow: visible !important;
   position: relative;
   display: flex;
   justify-content: center;

@@ -24,6 +24,8 @@ import {
   BottomNavigationAction,
   BottomNavigation,
   TextField,
+  OutlinedInput,
+  InputAdornment,
 } from "@material-ui/core";
 
 import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
@@ -573,9 +575,19 @@ function PatchExplorer(props) {
              */ renderInput={(params) => (
               <TextField
                 {...params}
-                variant="standard"
-                label="Search"
-                placeholder="Pick categories or search by file's or user's name"
+                style={{ fontSize: 24 }}
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <Icon>search</Icon>
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                }}
                 onChange={(e) => setSearchValue(e.target.value)}
                 value={searchValue}
               />

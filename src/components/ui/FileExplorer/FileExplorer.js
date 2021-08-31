@@ -8,6 +8,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  InputAdornment,
   TableRow,
   CircularProgress,
   Icon,
@@ -472,9 +473,19 @@ function FileExplorer(props) {
              */ renderInput={(params) => (
               <TextField
                 {...params}
-                variant="standard"
-                label="Search"
-                placeholder="Pick categories or search by file's or user's name"
+                style={{ fontSize: 24 }}
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                    <>
+                      <InputAdornment position="start">
+                        <Icon>search</Icon>
+                      </InputAdornment>
+                      {params.InputProps.startAdornment}
+                    </>
+                  ),
+                }}
                 onChange={(e) => setSearchValue(e.target.value)}
                 value={searchValue}
               />
