@@ -162,7 +162,7 @@ function Module(props) {
         setTLVisibility((prev) =>
           moduleVisiblity !== prev ? moduleVisiblity : prev
         );
-      }, 100);
+      }, 200);
       setTLVisibilityAnimator(event);
     }
   };

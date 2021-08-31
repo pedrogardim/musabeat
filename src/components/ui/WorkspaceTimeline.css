@@ -58,11 +58,15 @@
 .ws-timeline-cursor {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.404);
-  height: 100%;
+  height: calc(100% - 4px);
   width: 2px;
   top: 0px;
   transition: width 0.3s;
   border-radius: 99px;
+}
+
+.ws-timeline-cursor-compact {
+  height: 100% !important;
 }
 
 .ws-timeline-cursor:hover {

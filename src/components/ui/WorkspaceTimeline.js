@@ -26,24 +26,6 @@ function WorkspaceTimeline(props) {
     props.sessionSize
   );
 
-  const toggleCursor = (state) => {
-    clearInterval(cursorAnimator);
-    state
-      ? setCursorAnimator(
-          setInterval(() => {
-            //temp fix
-            TLWrapper.current !== null &&
-              Tone.Transport.state === "started" &&
-              setCursorPosition(
-                (Tone.Transport.seconds /
-                  Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-                  TLWrapper.current.offsetWidth
-              );
-          }, 32)
-        )
-      : clearInterval(cursorAnimator);
-  };
-
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
       (element.x / TLWrapper.current.offsetWidth) *
@@ -126,14 +108,16 @@ function WorkspaceTimeline(props) {
     setCursorAnimator(
       setInterval(() => {
         //temp fix
-        TLWrapper.current !== null &&
-          setCursorPosition(
-            (Tone.Transport.seconds /
-              Tone.Time(Tone.Transport.loopEnd).toSeconds()) *
-              TLWrapper.current.offsetWidth
-          );
+
+        Tone.Transport.seconds <= Tone.Transport.loopEnd &&
+          Tone.Transport.seconds >= 0 &&
+          setCursorPosition(Tone.Transport.seconds / Tone.Transport.loopEnd);
       }, 16)
     );
+
+    handleSessionSizeChange({ target: { value: props.sessionSize } });
+
+    console.log(props.sessionSize);
 
     return () => {
       //console.log("cleared");
@@ -212,10 +196,19 @@ function WorkspaceTimeline(props) {
             onDrag={handleCursorDrag}
             onStart={handleCursorDragStart}
             onStop={handleCursorDragStop}
-            position={{ x: cursorPosition, y: 0 }}
+            position={{
+              x:
+                TLWrapper.current &&
+                cursorPosition * TLWrapper.current.offsetWidth,
+              y: 0,
+            }}
             bounds=".ws-timeline"
           >
-            <div className="ws-timeline-cursor" />
+            <div
+              className={`ws-timeline-cursor ${
+                compact && "ws-timeline-cursor-compact"
+              }`}
+            />
           </Draggable>
         </div>
       ) : (
@@ -224,7 +217,7 @@ function WorkspaceTimeline(props) {
           max={1}
           className={"ws-timeline-slider"}
           step={0.01}
-          value={Tone.Transport.seconds / Tone.Transport.loopEnd}
+          value={cursorPosition}
           onChange={(e, v) =>
             (Tone.Transport.seconds = v * Tone.Transport.loopEnd)
           }
