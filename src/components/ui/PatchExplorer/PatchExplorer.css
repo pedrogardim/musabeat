@@ -1,6 +1,6 @@
 .patch-explorer {
   position: absolute;
-  width: 100vw;
+  width: 100%;
 
   top: 0;
   flex: 1 0;
@@ -22,6 +22,7 @@
   justify-content: space-between;
   overflow: hidden;
   padding: 0 !important;
+  width: 100%;
 }
 
 .patch-explorer-table {
@@ -36,6 +37,7 @@
 
 .pet-compact {
   min-height: 0 !important;
+  width: 100% !important;
 }
 
 .pet-cont {

@@ -22,13 +22,14 @@
   overflow: hidden;
 
   height: 30%;
-  width: 40vw !important;
+  width: calc(100% - 32px) !important;
+  max-width: 680px;
 }
 
 .file-info {
-  height: 64px;
-
-  width: 40%;
+  width: calc(100% - 32px) !important;
+  max-width: 680px;
+  padding: 8px;
 }
 
 /* .file-info > div {

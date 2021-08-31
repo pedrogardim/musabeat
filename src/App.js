@@ -26,6 +26,7 @@ import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import FilePage from "./components/ui/FileExplorer/FilePage";
 import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
 import PatchPage from "./components/ui/PatchExplorer/PatchPage";
+import UserPage from "./components/ui/UserPage/UserPage";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/AuthDialog";
@@ -238,6 +239,10 @@ function App() {
               history={history}
               user={user}
             />
+          </Route>
+
+          <Route exact path="/user/:key">
+            <UserPage history={history} user={user} />
           </Route>
 
           <Route exact path="/admin">

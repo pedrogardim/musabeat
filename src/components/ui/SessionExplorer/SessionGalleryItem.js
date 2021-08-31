@@ -70,7 +70,7 @@ function SessionGalleryItem(props) {
         )}
       </div>
 
-      {!props.isUser && (
+      {!props.isUser && !props.userPage && (
         <div className="session-gallery-item-subtitle">
           <Avatar
             className="session-gallery-item-subtitle-avatar"
@@ -112,42 +112,47 @@ function SessionGalleryItem(props) {
           </Paper>
         )}
       </div>
-      <div className="session-gallery-item-footer">
-        {props.playingLoadingProgress !== 100 &&
-        props.playingSession &&
-        !!props.session.modules ? (
-          <CircularProgress value={props.playingLoadingProgress} />
-        ) : !!props.session.modules || props.playingLoadingProgress === 100 ? (
-          <IconButton onClick={props.setPlayingSession}>
-            <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
-          </IconButton>
-        ) : (
-          ""
-        )}
-        <Tooltip title={props.session.likes}>
-          <IconButton onClick={props.handleUserLike}>
-            <Icon color={props.likedByUser ? "secondary" : "inherit"}>
-              favorite
-            </Icon>
-          </IconButton>
-        </Tooltip>
-
-        {/*<IconButton>
-          <Icon>share</Icon>
-        </IconButton>*/}
-        <Tooltip title="Create a copy">
-          <IconButton onClick={() => props.createNewSession(props.session)}>
-            <Icon>content_copy</Icon>
-          </IconButton>
-        </Tooltip>
-        {props.isUser && (
-          <Tooltip title="Delete Session">
-            <IconButton onClick={() => props.handleSessionDelete(props.index)}>
-              <Icon>delete</Icon>
+      {!props.userPage && (
+        <div className="session-gallery-item-footer">
+          {props.playingLoadingProgress !== 100 &&
+          props.playingSession &&
+          !!props.session.modules ? (
+            <CircularProgress value={props.playingLoadingProgress} />
+          ) : !!props.session.modules ||
+            props.playingLoadingProgress === 100 ? (
+            <IconButton onClick={props.setPlayingSession}>
+              <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>
+            </IconButton>
+          ) : (
+            ""
+          )}
+          <Tooltip title={props.session.likes}>
+            <IconButton onClick={props.handleUserLike}>
+              <Icon color={props.likedByUser ? "secondary" : "inherit"}>
+                favorite
+              </Icon>
             </IconButton>
           </Tooltip>
-        )}
-      </div>
+
+          {/*<IconButton>
+          <Icon>share</Icon>
+        </IconButton>*/}
+          <Tooltip title="Create a copy">
+            <IconButton onClick={() => props.createNewSession(props.session)}>
+              <Icon>content_copy</Icon>
+            </IconButton>
+          </Tooltip>
+          {props.isUser && (
+            <Tooltip title="Delete Session">
+              <IconButton
+                onClick={() => props.handleSessionDelete(props.index)}
+              >
+                <Icon>delete</Icon>
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
+      )}
     </Paper>
   );
 }

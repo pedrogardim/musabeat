@@ -122,6 +122,14 @@ function SessionExplorer(props) {
       .doc(sessionKeys[index])
       .delete();
 
+    firebase
+      .firestore()
+      .collection("users")
+      .doc(sessions[index].creator)
+      .updata({
+        sessions: firebase.firestore.FieldValue.arrayRemove(sessionKeys[index]),
+      });
+
     setSessions((prev) => prev.filter((e, i) => i !== index));
     setSessionKeys((prev) => prev.filter((e, i) => i !== index));
 
@@ -212,34 +220,29 @@ function SessionExplorer(props) {
           )}
         </Fragment>
       ) : !!sessions.length ? (
-        <Fragment>
-          {sessions.map((session, sessionIndex) => (
-            <Fragment>
-              <SessionGalleryItem
-                handleSessionSelect={handleSessionSelect}
-                handleUserLike={() => handleUserLike(sessionIndex)}
-                handleSessionDelete={setDeleteDialog}
-                setPlayingSession={() =>
-                  setPlayingSession((prev) =>
-                    prev === sessionIndex ? null : sessionIndex
-                  )
-                }
-                playingLoadingProgress={playingLoadingProgress}
-                setRenameDialog={setRenameDialog}
-                playingSession={playingSession === sessionIndex}
-                key={`sgi${sessionIndex}`}
-                index={sessionIndex}
-                session={session}
-                isUser={props.isUser}
-                likedByUser={
-                  userLikes && userLikes.includes(sessionKeys[sessionIndex])
-                }
-                createNewSession={props.createNewSession}
-              />
-              {/* sessionIndex % 4 === 3 && <div className="break" /> */}
-            </Fragment>
-          ))}
-        </Fragment>
+        sessions.map((session, sessionIndex) => (
+          <SessionGalleryItem
+            handleSessionSelect={handleSessionSelect}
+            handleUserLike={() => handleUserLike(sessionIndex)}
+            handleSessionDelete={setDeleteDialog}
+            setPlayingSession={() =>
+              setPlayingSession((prev) =>
+                prev === sessionIndex ? null : sessionIndex
+              )
+            }
+            playingLoadingProgress={playingLoadingProgress}
+            setRenameDialog={setRenameDialog}
+            playingSession={playingSession === sessionIndex}
+            key={`sgi${sessionIndex}`}
+            index={sessionIndex}
+            session={session}
+            isUser={props.isUser}
+            likedByUser={
+              userLikes && userLikes.includes(sessionKeys[sessionIndex])
+            }
+            createNewSession={props.createNewSession}
+          />
+        ))
       ) : !sessions.length ? (
         Array(props.isUser ? 3 : 15)
           .fill(1)

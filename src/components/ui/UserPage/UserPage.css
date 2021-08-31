@@ -1,0 +1,26 @@
+.user-page {
+  position: absolute;
+  height: calc(100% - 30px);
+  width: 100%;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  background-color: white;
+}
+
+.user-page-avatar {
+  height: 96px !important;
+  width: 96px !important;
+}
+
+.user-page-info {
+  width: calc(100% - 32px) !important;
+  max-width: 680px;
+  padding: 8px;
+  margin: 16px !important;
+}

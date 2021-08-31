@@ -242,6 +242,19 @@ function FilePage(props) {
     }
   };
 
+  const handleClipClick = (e) => {
+    console.log(e);
+
+    Tone.Transport.seconds =
+      ((e.clientX - waveformWrapper.current.getBoundingClientRect().left) /
+        waveformWrapper.current.offsetWidth) *
+      fileInfo.dur;
+
+    setCursorPosition(
+      e.clientX - waveformWrapper.current.getBoundingClientRect().left
+    );
+  };
+
   const huehue = () => {
     firebase
       .firestore()
@@ -305,7 +318,12 @@ function FilePage(props) {
       )}
       <div className="break" />
 
-      <Paper elevation={3} className="file-page-waveform" ref={waveformWrapper}>
+      <Paper
+        elevation={3}
+        className="file-page-waveform"
+        onClick={handleClipClick}
+        ref={waveformWrapper}
+      >
         <canvas
           className="sampler-audio-clip-wave"
           id="file-page-canvas"
@@ -369,39 +387,37 @@ function FilePage(props) {
         <Grid
           container
           spacing={1}
-          style={{ width: "40%" }}
+          direction="row"
+          wrap="nowrap"
           className="file-info"
+          component={Paper}
         >
-          {isLoaded && (
-            <Grid item xs={6} sm={3}>
-              <Paper className="file-info-card">
-                <Typography variant="overline">
-                  {soundChannels[player._buffer.numberOfChannels] ||
-                    player._buffer.numbesrOfChannels ||
-                    "Multichannel"}
-                  <br />
-                  {player._buffer.sampleRate + " Hz"}
-                </Typography>
-              </Paper>
-            </Grid>
-          )}
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline">
-                {formatBytes(fileInfo.size)}
-              </Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline">{fileInfo.dur + " s"}</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline">{uploadDateString}</Typography>
-            </Paper>
-          </Grid>
+          <div className="file-info-card">
+            <Typography variant="overline">
+              {soundChannels[player._buffer.numberOfChannels] ||
+                player._buffer.numbesrOfChannels ||
+                "Multichannel"}
+              <br />
+              {player._buffer.sampleRate + " Hz"}
+            </Typography>
+          </div>
+          <Divider orientation="vertical" flexItem />
+
+          <div className="file-info-card">
+            <Typography variant="overline">
+              {formatBytes(fileInfo.size)}
+            </Typography>
+          </div>
+          <Divider orientation="vertical" flexItem />
+
+          <div className="file-info-card">
+            <Typography variant="overline">{fileInfo.dur + " s"}</Typography>
+          </div>
+          <Divider orientation="vertical" flexItem />
+
+          <div className="file-info-card">
+            <Typography variant="overline">{uploadDateString}</Typography>
+          </div>
         </Grid>
       )}
     </div>
