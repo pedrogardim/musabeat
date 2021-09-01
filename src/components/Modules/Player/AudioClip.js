@@ -40,7 +40,7 @@ function AudioClip(props) {
 
     props.setScore((prev) => {
       let newScore = [...prev];
-      newScore[props.index].time = parseFloat(newTime.toFixed(2));
+      newScore[props.index].time = Tone.Time(newTime).toBarsBeatsSixteenths();
       return newScore;
     });
   };
@@ -64,7 +64,9 @@ function AudioClip(props) {
       props.setScore((prev) => {
         let newScore = [...prev];
         newScore[props.index].duration =
-          newDuration <= maxDuration ? newDuration : maxDuration;
+          newDuration <= maxDuration
+            ? Tone.Time(newDuration).toBarsBeatsSixteenths()
+            : Tone.Time(maxDuration).toBarsBeatsSixteenths();
         return newScore;
       });
     }

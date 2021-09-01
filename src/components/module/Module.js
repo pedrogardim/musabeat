@@ -457,11 +457,7 @@ function Module(props) {
   }, [props.instrument, effects]);
 
   useEffect(() => {
-    if (
-      props.instrument !== null &&
-      props.instrument !== undefined &&
-      Tone.Transport.state !== "started"
-    ) {
+    if (props.instrument && Tone.Transport.state !== "started") {
       props.instrument.name === "Players"
         ? props.instrument.stopAll()
         : props.instrument.name === "GrainPlayer" ||
@@ -647,7 +643,13 @@ function Module(props) {
             )}
             {modulePage === "fileExplorer" && (
               <div className="instrument-editor">
-                <FileExplorer onFileClick={handleFileClick} compact />
+                <FileExplorer
+                  onFileClick={handleFileClick}
+                  setInstrumentLoaded={setInstrumentLoaded}
+                  isDrum={false}
+                  instrument={props.instrument}
+                  compact
+                />
               </div>
             )}
             {modulePage === "settings" && (

@@ -154,8 +154,8 @@ function Player(props) {
   useEffect(() => {
     //TEMP: function on "module" component to make score adapts to audio file
     //console.log("IS LOADED?", props.instrument.loaded);
-    props.updateOnFileLoaded();
-  }, [props.instrument.loaded]);
+    props.instrument && props.updateOnFileLoaded();
+  }, [props.instrument && props.instrument.loaded]);
 
   useEffect(() => {
     Tone.Transport.clear(rescheduleEvent);

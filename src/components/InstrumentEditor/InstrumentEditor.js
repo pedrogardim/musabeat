@@ -531,8 +531,8 @@ function InstrumentEditor(props) {
           instrument={props.instrument}
           setInstruments={props.setInstruments}
           setInstrument={props.setInstrument}
+          setInstrumentLoaded={props.setInstrumentLoaded}
           setInstrumentsLoaded={props.setInstrumentsLoaded}
-          module={props.module}
           saveUserPatch={saveUserPatch}
           isDrum={isDrum}
         />
@@ -541,12 +541,13 @@ function InstrumentEditor(props) {
       {fileExplorer && (
         <FileExplorer
           compact
+          setInstrumentLoaded={props.setInstrumentLoaded}
           onFileClick={props.handleFileClick}
           setFileExplorer={setFileExplorer}
-          setInstrumentLoaded={props.setInstrumentLoaded}
           setSnackbarMessage={props.setSnackbarMessage}
           module={props.module}
           instrument={props.instrument}
+          isDrum={isDrum}
         />
       )}
 

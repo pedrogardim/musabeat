@@ -296,7 +296,6 @@ function Workspace(props) {
 
     setInstruments(array);
 
-    let moduleInstruments = [];
     sessionModules.forEach((module, moduleIndex) => {
       //console.log(instrument)
       //sequencer
@@ -319,7 +318,7 @@ function Workspace(props) {
 
       //player
       else if (module.type === 3) {
-        module.instrument.url &&
+        if (module.instrument.url) {
           firebase
             .storage()
             .ref(module.instrument.url)
@@ -338,13 +337,21 @@ function Workspace(props) {
                 return a;
               });
             });
+        } else {
+          let instrument = new Tone.GrainPlayer();
 
-        !module.instrument.url &&
           setInstrumentsLoaded((prev) => {
             let a = [...prev];
             a[moduleIndex] = true;
             return a;
           });
+
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = instrument;
+            return a;
+          });
+        }
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
@@ -373,9 +380,13 @@ function Workspace(props) {
             })
           );
         } else {
-          moduleInstruments[moduleIndex] = loadSynthFromGetObject(
-            module.instrument
-          );
+          let instrument = loadSynthFromGetObject(module.instrument);
+
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = instrument;
+            return a;
+          });
           setInstrumentsLoaded((prev) => {
             let a = [...prev];
             a[moduleIndex] = true;
@@ -384,10 +395,6 @@ function Workspace(props) {
         }
       }
     });
-
-    //console.log(moduleInstruments);
-
-    setInstruments(moduleInstruments);
   };
 
   const loadNewModuleInstrument = (module, index, buffers) => {
@@ -420,7 +427,7 @@ function Workspace(props) {
     }
     //player
     else if (module.type === 3) {
-      module.instrument.url &&
+      if (module.instrument.url) {
         firebase
           .storage()
           .ref(module.instrument.url)
@@ -439,13 +446,21 @@ function Workspace(props) {
               return a;
             });
           });
+      } else {
+        let instrument = new Tone.GrainPlayer();
 
-      !module.instrument.url &&
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
           a[index] = true;
           return a;
         });
+
+        setInstruments((prev) => {
+          let a = [...prev];
+          a[index] = instrument;
+          return a;
+        });
+      }
     }
     //load from patch id
     else if (typeof module.instrument === "string") {
@@ -909,7 +924,7 @@ function Workspace(props) {
   };
 
   useEffect(() => {
-    resetWorkspace();
+    //resetWorkspace();
     Tone.Transport.loop = true;
     Tone.Transport.loopStart = 0;
     instruments.forEach((e) => e.dispose());
@@ -1005,6 +1020,8 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
+    console.log(instruments);
+
     instruments.forEach((e, i) => {
       if (modules && modules[i] && e) {
         e.volume.value = modules[i].volume;
