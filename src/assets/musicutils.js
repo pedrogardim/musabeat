@@ -696,7 +696,7 @@ export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
   const patchRef = firebase.firestore().collection("patches").doc(input);
 
   let patch = (await patchRef.get()).data();
-  console.log(patch);
+  //console.log(patch);
 
   let options = patch.options;
   let instrfx = [];

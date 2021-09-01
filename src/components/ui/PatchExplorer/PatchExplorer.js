@@ -98,15 +98,21 @@ function PatchExplorer(props) {
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
       if (props.isDrum) {
-        loadDrumPatch(patchdata[index], () => {}, index).then((instr) => {
+        loadDrumPatch(
+          patchdata[index],
+          props.compact ? props.setInstrumentsLoaded : () => {},
+          props.index
+        ).then((instr) => {
           props.setInstrument(instr);
         });
       } else if (patchdata[index].base === "Sampler") {
-        loadSamplerFromObject(patchdata[index], () => {}, index).then(
-          (instr) => {
-            props.setInstrument(instr);
-          }
-        );
+        loadSamplerFromObject(
+          patchdata[index],
+          props.compact ? props.setInstrumentsLoaded : () => {},
+          props.index
+        ).then((instr) => {
+          props.setInstrument(instr);
+        });
       } else {
         let instr = loadSynthFromGetObject(patchdata[index]);
         props.setInstrument(instr);

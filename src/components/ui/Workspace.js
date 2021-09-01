@@ -14,6 +14,7 @@ import {
   Snackbar,
   Input,
   Paper,
+  Fade,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -29,6 +30,7 @@ import SessionSettings from "./SessionSettings";
 import Mixer from "./mixer/Mixer";
 import SessionProgressBar from "./SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
+import LoadingScreen from "./LoadingScreen";
 
 import {
   patchLoader,
@@ -686,7 +688,11 @@ function Workspace(props) {
 
   const togglePlaying = (e) => {
     e.preventDefault();
-    if (Tone.Transport.state !== "started" && isLoaded) {
+    if (
+      Tone.Transport.state !== "started" &&
+      isLoaded &&
+      !instrumentsLoaded.includes(false)
+    ) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
@@ -905,9 +911,7 @@ function Workspace(props) {
     }
     switch (e.keyCode) {
       case 32:
-        e.target.classList[0] === "workspace" &&
-          !instrumentsLoaded.includes(false) &&
-          togglePlaying(e);
+        e.target.classList[0] === "workspace" && togglePlaying(e);
         break;
       case 8:
         handleBackspace();
@@ -993,6 +997,7 @@ function Workspace(props) {
   }, [sessionHistory]); */
 
   useEffect(() => {
+    Tone.Transport.pause();
     if (
       modules &&
       sessionData &&
@@ -1020,7 +1025,7 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
-    console.log(instruments);
+    //console.log(instruments);
 
     instruments.forEach((e, i) => {
       if (modules && modules[i] && e) {
@@ -1073,6 +1078,12 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
+      <Fade in={!Boolean(modules)} timeout={{ enter: 0, exit: 200 }}>
+        <div className="loading-screen-background">
+          <LoadingScreen />
+        </div>
+      </Fade>
+
       {sessionKey && (
         <WorkspaceTitle
           sessionData={sessionData}
