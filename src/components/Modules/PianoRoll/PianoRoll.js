@@ -11,7 +11,11 @@ import {
   clearEvents,
 } from "../../../utils/TransportSchedule";
 
+import { parseMidiFile } from "../../../assets/musicutils";
+
 import Draggable from "react-draggable";
+
+import { FileDrop } from "react-file-drop";
 
 import "./PianoRoll.css";
 import { colors } from "../../../utils/materialPalette";
@@ -28,6 +32,7 @@ function PianoRoll(props) {
   //TEMP: used only for detect window resizing on note component
   const [parentWidth, setParentWidth] = useState(0);
   const [selecting, setSelecting] = useState(false);
+  const [draggingOver, setDraggingOver] = useState(false);
 
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
 
@@ -44,6 +49,18 @@ function PianoRoll(props) {
           props.timelineMode
         )
       : clearEvents(props.module.id);
+  };
+
+  const handleFileDrop = (files, event) => {
+    if (files[0].type !== "audio/midi") return;
+
+    event.preventDefault();
+    Tone.Transport.pause();
+    let file = files[0];
+    setDraggingOver(false);
+    //console.log(file);
+    //parseMidiFile(file, setNotes);
+    file.arrayBuffer().then((r) => parseMidiFile(r, setNotes));
   };
 
   const handleDblClick = (event) => {
@@ -154,13 +171,15 @@ function PianoRoll(props) {
   };
 
   useEffect(() => {
-    window.addEventListener("resize", () =>
-      setParentWidth(PRWrapper.current.offsetWidth)
+    window.addEventListener(
+      "resize",
+      () => PRWrapper.current && setParentWidth(PRWrapper.current.offsetWidth)
     );
 
     return () => {
-      window.removeEventListener("resize", () =>
-        setParentWidth(PRWrapper.current.offsetWidth)
+      window.removeEventListener(
+        "resize",
+        () => PRWrapper.current && setParentWidth(PRWrapper.current.offsetWidth)
       );
     };
   }, []);
@@ -215,6 +234,7 @@ function PianoRoll(props) {
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
         onMouseUp={handleMouseUp}
+        onDragEnter={() => setDraggingOver(true)}
       >
         {Array(12 * 7)
           .fill(0)
@@ -294,6 +314,21 @@ function PianoRoll(props) {
           />
         </Draggable>
       </div>
+      {draggingOver && (
+        <FileDrop
+          onDragLeave={(e) => {
+            setDraggingOver(false);
+          }}
+          onDrop={(files, event) => handleFileDrop(files, event)}
+          className={"file-drop"}
+          index={props.index}
+          style={{
+            backgroundColor: colors[props.module.color][300],
+          }}
+        >
+          Drop your files here!
+        </FileDrop>
+      )}
     </div>
   );
 }

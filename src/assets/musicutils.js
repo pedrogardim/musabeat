@@ -3,9 +3,12 @@
 //================================================
 
 import * as Tone from "tone";
+
 import firebase from "firebase";
 
 import { PitchDetector } from "pitchy";
+
+import { Midi } from "@tonejs/midi";
 
 export const musicalNotes = [
   "C",
@@ -926,6 +929,21 @@ export const detectPitch = (audioBuffer, callback) => {
     audioBuffer.getChannelData(0),
     audioBuffer.sampleRate
   );
+};
+
+export const parseMidiFile = (file, setNotes) => {
+  //console.log(file);
+  let midifile = new Midi(file);
+
+  let newNotes = midifile.tracks[0].notes.map((e) => {
+    return {
+      duration: e.duration,
+      note: e.name,
+      time: parseFloat(e.time.toFixed(2)),
+      velocity: parseFloat(e.velocity.toFixed(2)),
+    };
+  });
+  setNotes((prev) => [...prev, ...newNotes]);
 };
 
 export const mapLogScale = (position, minp, maxp, minv, maxv) => {

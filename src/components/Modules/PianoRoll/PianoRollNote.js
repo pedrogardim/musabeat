@@ -48,7 +48,7 @@ function PianoRollNote(props) {
       props.parentRef.current.offsetWidth;
     let newNote = Tone.Frequency(-data.y / noteHeight + 107, "midi").toNote();
     //console.log(newNote, newTime);
-    let noteObj = { note: newNote, time: newTime };
+    let noteObj = { note: newNote, time: parseFloat(newTime.toFixed(2)) };
     props.changeNote(noteObj, props.index);
   };
 
@@ -58,9 +58,12 @@ function PianoRollNote(props) {
 
   const handleResizeStop = (a, b, c, d, e, f) => {
     let noteObj = {
-      duration:
-        (c.offsetWidth * Tone.Time("1m").toSeconds() * props.size) /
-        props.parentRef.current.offsetWidth,
+      duration: parseFloat(
+        (
+          (c.offsetWidth * Tone.Time("1m").toSeconds() * props.size) /
+          props.parentRef.current.offsetWidth
+        ).toFixed(2)
+      ),
     };
     props.changeNote(noteObj, props.index);
   };
