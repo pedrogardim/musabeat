@@ -939,7 +939,7 @@ export const parseMidiFile = (file, setNotes) => {
     return {
       duration: e.duration,
       note: e.name,
-      time: parseFloat(e.time.toFixed(2)),
+      time: Tone.Time(e.time).toBarsBeatsSixteenths(),
       velocity: parseFloat(e.velocity.toFixed(2)),
     };
   });

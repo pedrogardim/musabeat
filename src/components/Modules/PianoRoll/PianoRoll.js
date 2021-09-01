@@ -84,12 +84,14 @@ function PianoRoll(props) {
 
     let newNote = {
       note: Tone.Frequency(delta[0] + 24, "midi").toNote(),
-      time: (Tone.Time("1m").toSeconds() * delta[1]) / (props.module.size * 8),
+      time: Tone.Time(
+        (Tone.Time("1m").toSeconds() * delta[1]) / (props.module.size * 8)
+      ).toBarsBeatsSixteenths(),
       duration: "8n",
       velocity: 0.7,
     };
 
-    console.log(newNote);
+    //console.log(newNote);
 
     setNotes((prev) => {
       let newNotes = [...prev];
@@ -299,6 +301,7 @@ function PianoRoll(props) {
             parentWidth={parentWidth}
             selected={props.selection.includes(i)}
             setSelection={props.setSelection}
+            instrument={props.instrument}
           />
         ))}
         <Draggable

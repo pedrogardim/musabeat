@@ -35,20 +35,25 @@ function PianoRollNote(props) {
           : [...prev, props.index]
         : [props.index]
     );
+    props.instrument.triggerAttackRelease(
+      props.note.note,
+      props.note.duration,
+      Tone.immediate()
+    );
   };
 
   const handleDrag = (event, data) => {
     setNotePosition({ x: data.x, y: data.y });
-    //console.log(data);
   };
 
   const handleDragStop = (event, data) => {
-    let newTime =
+    let newTime = Tone.Time(
       (data.x * Tone.Time("1m").toSeconds() * props.size) /
-      props.parentRef.current.offsetWidth;
+        props.parentRef.current.offsetWidth
+    ).toBarsBeatsSixteenths();
     let newNote = Tone.Frequency(-data.y / noteHeight + 107, "midi").toNote();
     //console.log(newNote, newTime);
-    let noteObj = { note: newNote, time: parseFloat(newTime.toFixed(2)) };
+    let noteObj = { note: newNote, time: newTime };
     props.changeNote(noteObj, props.index);
   };
 
@@ -58,12 +63,10 @@ function PianoRollNote(props) {
 
   const handleResizeStop = (a, b, c, d, e, f) => {
     let noteObj = {
-      duration: parseFloat(
-        (
-          (c.offsetWidth * Tone.Time("1m").toSeconds() * props.size) /
+      duration: Tone.Time(
+        (c.offsetWidth * Tone.Time("1m").toSeconds() * props.size) /
           props.parentRef.current.offsetWidth
-        ).toFixed(2)
-      ),
+      ).toBarsBeatsSixteenths(),
     };
     props.changeNote(noteObj, props.index);
   };
@@ -71,7 +74,8 @@ function PianoRollNote(props) {
   const updateNotePosition = () => {
     noteHeight = props.parentRef.current.offsetHeight / 84;
     let noteX =
-      (props.note.time / (Tone.Time("1m").toSeconds() * props.size)) *
+      (Tone.Time(props.note.time).toSeconds() /
+        (Tone.Time("1m").toSeconds() * props.size)) *
       props.parentRef.current.offsetWidth;
     setNoteWidth(
       (Tone.Time(props.note.duration).toSeconds() /

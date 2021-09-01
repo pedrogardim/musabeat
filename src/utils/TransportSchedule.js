@@ -278,14 +278,16 @@ export const scheduleSamples = (
   if (!timelineMode) {
     for (let x = 0; x < loopTimes; x++) {
       score.forEach((event, eventIndex) => {
+        let scoreTime = Tone.Time(event.time).toSeconds();
+
         let isCursorinBetween =
-          cursorTime > event.time && cursorTime < event.time + event.duration;
+          cursorTime > scoreTime && cursorTime < scoreTime + event.duration;
 
         let eventOffset = parseFloat(
-          (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
+          (isCursorinBetween ? cursorTime - scoreTime : 0).toFixed(3)
         );
         let eventTime = parseFloat(
-          (isCursorinBetween ? cursorTime : event.time).toFixed(3)
+          (isCursorinBetween ? cursorTime : scoreTime).toFixed(3)
         );
 
         //console.log(eventTime, eventOffset);
@@ -303,14 +305,16 @@ export const scheduleSamples = (
   } else {
     timeline[moduleId].forEach((measure, index) => {
       score.forEach((event, eventIndex) => {
+        let scoreTime = Tone.Time(event.time).toSeconds();
+
         let isCursorinBetween =
-          cursorTime > event.time && cursorTime < event.time + event.duration;
+          cursorTime > scoreTime && cursorTime < scoreTime + event.duration;
 
         let eventOffset = parseFloat(
-          (isCursorinBetween ? cursorTime - event.time : 0).toFixed(3)
+          (isCursorinBetween ? cursorTime - scoreTime : 0).toFixed(3)
         );
         let eventTime = parseFloat(
-          (isCursorinBetween ? cursorTime : event.time).toFixed(3)
+          (isCursorinBetween ? cursorTime : scoreTime).toFixed(3)
         );
 
         //console.log(eventTime, eventOffset);
@@ -352,7 +356,7 @@ export const schedulePianoRoll = (
       score.forEach((e, i) => {
         let event = transport.schedule((time) => {
           instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
-        }, e.time + Tone.Time("1m").toSeconds() * moduleSize * x);
+        }, Tone.Time(e.time).toSeconds() + Tone.Time("1m").toSeconds() * moduleSize * x);
         scheduledNotes.push(event);
       });
     }
@@ -361,7 +365,7 @@ export const schedulePianoRoll = (
       score.forEach((e, i) => {
         let event = transport.schedule((time) => {
           instrument.triggerAttackRelease(e.note, e.duration, time, e.velocity);
-        }, e.time + Tone.Time("1m").toSeconds() * measure);
+        }, Tone.Time(e.time).toSeconds() + Tone.Time("1m").toSeconds() * measure);
         scheduledNotes.push(event);
       });
     });
