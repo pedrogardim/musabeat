@@ -495,7 +495,10 @@ function Module(props) {
           props.isFocused && "module-focused"
         }`}
       >
-        <div className="module-header">
+        <div
+          className="module-header"
+          onDoubleClick={() => setFullScreen((prev) => !prev)}
+        >
           {modulePage !== null && (
             <IconButton
               className="module-back-button"
