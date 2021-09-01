@@ -20,7 +20,9 @@ import { useTranslation } from "react-i18next";
 
 import logo from "./assets/img/logo.svg";
 
+import HomePage from "./components/ui/HomePage";
 import Workspace from "./components/ui/Workspace";
+
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
 import FilePage from "./components/ui/FileExplorer/FilePage";
@@ -178,7 +180,7 @@ function App() {
 
         <Switch>
           <Route exact path="/">
-            <p>Home!</p>
+            <HomePage />
           </Route>
           <Route exact path="/explore">
             <SessionExplorer

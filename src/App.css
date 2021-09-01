@@ -18,8 +18,8 @@ body *::-webkit-scrollbar-track {
 }
 
 body *::-webkit-scrollbar-thumb {
-  background-color: rgb(196, 196, 196); /* color of the scroll thumb */
-  border-radius: 16px; /* roundness of the scroll thumb */
+  background-color: rgba(0, 0, 0, 0.356); /* color of the scroll thumb */
+  border-radius: 4px; /* roundness of the scroll thumb */
   /* border: 3px solid orange;  */
 }
 

@@ -4,7 +4,11 @@ import { Tab, Tabs, AppBar } from "@material-ui/core";
 
 import PatchEditor from "./PatchEditor";
 
+import firebase from "firebase";
+
 import "./AdminDashboard.css";
+
+import { Button } from "@material-ui/core";
 
 function AdminDashboard(props) {
   const [value, setValue] = useState(0);
@@ -13,9 +17,25 @@ function AdminDashboard(props) {
     setValue(newValue);
   };
 
+  const updateStats = () => {
+    ["drumpatches", "files", "patches", "sessions", "users"].map((e) =>
+      firebase
+        .firestore()
+        .collection(e)
+        .get()
+        .then((r) =>
+          firebase
+            .firestore()
+            .collection("musa")
+            .doc("stats")
+            .update({ [e]: r.size })
+        )
+    );
+  };
+
   return (
-    <div>
-      <AppBar position="static">
+    <div className="file-page">
+      {/* <AppBar position="static">
         <Tabs
           value={value}
           onChange={handleChange}
@@ -28,7 +48,8 @@ function AdminDashboard(props) {
       </AppBar>
       <div className={"admin-panel-container"}>
         {value === 0 && <PatchEditor />}
-      </div>
+      </div> */}
+      <Button onClick={updateStats}>Update Stats</Button>
     </div>
   );
 }

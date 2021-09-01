@@ -1,0 +1,43 @@
+.app-logo {
+  overflow: visible;
+}
+
+.logo-seg {
+  fill: white;
+}
+
+.animated-logo-seg {
+  animation-name: loadingAnimation;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  fill: #3f51b5;
+}
+
+.animated-logo-seg1 {
+  animation-delay: 0s;
+}
+
+.animated-logo-seg2 {
+  animation-delay: 0.5s;
+}
+.animated-logo-seg3 {
+  animation-delay: 1s;
+}
+.animated-logo-seg4 {
+  animation-delay: 1.5s;
+}
+.animated-logo-seg5 {
+  animation-delay: 2s;
+}
+
+@keyframes loadingAnimation {
+  0% {
+    fill: #3f51b5;
+    transform: translateY(0);
+  }
+  100% {
+    fill: #3f51b533;
+    transform: translateY(10px);
+  }
+}
