@@ -28,6 +28,7 @@ import {
   loadSynthFromGetObject,
   loadSamplerFromObject,
   loadDrumPatch,
+  detectPitch,
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
@@ -251,7 +252,9 @@ function PatchPage(props) {
   const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
     //setInstrumentLoaded(false);
 
-    let labelOnInstrument = name.split(".")[0];
+    let labelOnInstrument = Tone.Frequency(
+      detectPitch(audiobuffer)[0]
+    ).toNote();
 
     let slotToInsetFile = 0;
 
@@ -277,12 +280,20 @@ function PatchPage(props) {
     if (props.isDrum || instrument.name === "Sampler") {
       setPatchInfo((prev) => {
         let newPatchInfo = { ...prev };
-        !isRemoving
-          ? (newPatchInfo.urls[soundindex] = url)
-          : delete newPatchInfo.urls[soundindex];
-        !isRemoving
-          ? (newPatchInfo.lbls[soundindex] = name)
-          : delete newPatchInfo.lbls[soundindex];
+
+        if (props.isDrum) {
+          !isRemoving
+            ? (newPatchInfo.urls[soundindex] = url)
+            : delete newPatchInfo.urls[soundindex];
+          !isRemoving
+            ? (newPatchInfo.lbls[soundindex] = name)
+            : delete newPatchInfo.lbls[soundindex];
+        } else {
+          !isRemoving
+            ? (newPatchInfo.urls[name] = url)
+            : delete newPatchInfo.urls[name];
+        }
+
         return newPatchInfo;
       });
     } else {
@@ -409,7 +420,7 @@ function PatchPage(props) {
             instrument={instrument}
             setInstruments={props.setInstruments}
             setInstrument={setInstrument}
-            setInstrumentLoaded={isLoaded}
+            setInstrumentLoaded={setIsLoaded}
             onInstrumentMod={onInstrumentMod}
             setLabels={setLabels}
             handleFileClick={handleFileClick}

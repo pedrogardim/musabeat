@@ -126,7 +126,7 @@ function SessionExplorer(props) {
       .firestore()
       .collection("users")
       .doc(sessions[index].creator)
-      .updata({
+      .update({
         sessions: firebase.firestore.FieldValue.arrayRemove(sessionKeys[index]),
       });
 

@@ -117,8 +117,6 @@ function WorkspaceTimeline(props) {
 
     handleSessionSizeChange({ target: { value: props.sessionSize } });
 
-    console.log(props.sessionSize);
-
     return () => {
       //console.log("cleared");
       clearInterval(cursorAnimator);
@@ -131,6 +129,7 @@ function WorkspaceTimeline(props) {
         <IconButton
           className="ws-timeline-btn"
           onClick={() => props.setTimelineMode((prev) => !prev)}
+          tabIndex={-1}
         >
           <Icon>{props.timelineMode ? "loop" : "linear_scale"}</Icon>
         </IconButton>
@@ -229,6 +228,7 @@ function WorkspaceTimeline(props) {
           <IconButton
             className="ws-timeline-btn"
             onClick={() => setCompact((prev) => !prev)}
+            tabIndex={-1}
           >
             <Icon>expand</Icon>
           </IconButton>

@@ -21,11 +21,14 @@
   position: relative;
   overflow: hidden;
 
-  height: 30vw;
-  width: 40vw !important;
+  height: 60vw;
+  width: 80vw !important;
 
   min-height: 300px;
   min-width: 400px;
+
+  max-height: 600px;
+  max-width: 1000px;
 }
 
 .file-info {

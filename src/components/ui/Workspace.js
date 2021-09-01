@@ -1236,7 +1236,6 @@ function Workspace(props) {
           vertical: "bottom",
           horizontal: "left",
         }}
-        style={{ marginBottom: 96 }}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
         action={

@@ -27,7 +27,10 @@ function NameInput(props) {
     <Dialog open={props.open} onClose={props.onClose}>
       <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
-        <TextField ref={inputRef} />
+        <TextField
+          defaultValue={props.defaultValue && props.defaultValue}
+          ref={inputRef}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>

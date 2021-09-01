@@ -26,6 +26,7 @@ import {
   TextField,
   OutlinedInput,
   InputAdornment,
+  Fab,
 } from "@material-ui/core";
 
 import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
@@ -90,6 +91,8 @@ function PatchExplorer(props) {
   const user = firebase.auth().currentUser;
   const categories = props.isDrum ? drumCategories : instrumentsCategories;
 
+  const usersRef = firebase.firestore().collection("users");
+
   const itemsPerPage = 25;
 
   const handlePatchSelect = (e, index) => {
@@ -129,9 +132,7 @@ function PatchExplorer(props) {
   };
 
   const getPatchesList = async (clear) => {
-    const usersRef = firebase.firestore().collection("users");
-
-    //setLoaded(false);
+    setIsLoading(true);
 
     let queryRules = () => {
       let rules = firebase
@@ -224,9 +225,9 @@ function PatchExplorer(props) {
       )
       .filter((e) => e !== selectedPatch);
 
-    //setLoaded(false);
+    setIsLoading(true);
 
-    console.log(patchIdList);
+    //console.log(patchIdList);
 
     if (!patchIdList || patchIdList.length === 0) {
       setPatchdata(null);
@@ -242,6 +243,30 @@ function PatchExplorer(props) {
     );
 
     setPatchdata(patchesData);
+
+    if (liked) {
+      let usersToFetch = [
+        ...new Set(
+          patchesData
+            .map((e) => e.creator)
+            .filter((e) => e)
+            .filter((e) => !patchesUserData.hasOwnProperty(e))
+        ),
+      ];
+
+      if (usersToFetch.length > 0) {
+        let usersData = await Promise.all(
+          usersToFetch.map(async (e, i) => [
+            e,
+            (await usersRef.doc(e).get()).get("profile"),
+          ])
+        );
+
+        setPatchesUserData((prev) => {
+          return { ...prev, ...Object.fromEntries(usersData) };
+        });
+      }
+    }
   };
 
   const getSelectedPatchInfo = async () => {
@@ -376,7 +401,7 @@ function PatchExplorer(props) {
           () => {},
           index,
           (instr) => {
-            console.log("loaded!");
+            //console.log("loaded!");
             playSequence(instr, index);
             setLoadingPlay(null);
           }
@@ -471,7 +496,7 @@ function PatchExplorer(props) {
     firebase
       .firestore()
       .collection("users")
-      .doc(patchdata[index].user)
+      .doc(patchdata[index].creator)
       .update(
         props.isDrum
           ? {
@@ -523,6 +548,7 @@ function PatchExplorer(props) {
 
   useEffect(() => {
     if (patchdata === null || patchdata.length > 0) setIsLoading(false);
+    //console.log(patchdata);
   }, [patchdata]);
 
   useEffect(() => {
@@ -537,6 +563,7 @@ function PatchExplorer(props) {
   useEffect(() => {
     clearPatches();
     setIsLoading(false);
+    user && getUserPatchesList(showingLiked);
   }, [showingLiked]);
 
   useEffect(() => {
@@ -556,6 +583,7 @@ function PatchExplorer(props) {
   return (
     <div
       className={`patch-explorer ${props.compact && "patch-explorer-compact"}`}
+      style={{ marginTop: props.userPatches && 32 }}
     >
       {(props.compact || props.explore) && (
         <Fragment>
@@ -707,116 +735,118 @@ function PatchExplorer(props) {
                 </TableRow>
               )}
 
-              {patchdata.map((row, index) => (
-                <TableRow
-                  key={"row" + index}
-                  onClick={(e) => handlePatchSelect(e, index)}
-                  component="tr"
-                  scope="row"
-                >
-                  <TableCell style={{ width: props.compact ? 20 : 50 }}>
-                    {loadingPlay === index ? (
-                      <CircularProgress size={27} />
-                    ) : currentPlaying === index ? (
-                      <IconButton onClick={() => stopPatch(index)}>
-                        <Icon>stop</Icon>
-                      </IconButton>
-                    ) : (
-                      <IconButton onClick={() => playPatch(index)}>
-                        <Icon>play_arrow</Icon>
-                      </IconButton>
-                    )}
-                  </TableCell>
-                  <TableCell scope="row">
-                    <div
-                      style={{
-                        maxWidth: 200,
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      }}
+              {patchdata.map(
+                (patch, index) =>
+                  patch && (
+                    <TableRow
+                      key={"row" + index}
+                      onClick={(e) => handlePatchSelect(e, index)}
+                      component="tr"
+                      scope="row"
                     >
-                      <Typography
-                        variant="overline"
-                        className="fe-filename"
-                        onClick={() => openPatchPage(patchIdList[index])}
-                      >
-                        {row.name}
-                      </Typography>
-                      {patchdata[index].base === "Sampler" && (
-                        <Tooltip arrow placement="top" title="Sampler">
-                          <Icon style={{ fontSize: 16, marginLeft: 4 }}>
-                            graphic_eq
-                          </Icon>
-                        </Tooltip>
-                      )}
-                      {props.userPatches && patchdata[index].user === user.uid && (
-                        <IconButton onClick={() => setRenamingPatch(index)}>
-                          <Icon>edit</Icon>
-                        </IconButton>
-                      )}
-                      {patchesUserData[patchdata[index].creator] && (
-                        <Tooltip
-                          title={
-                            patchesUserData[patchdata[index].creator]
-                              .displayName
-                          }
-                        >
-                          <Avatar
-                            style={{
-                              height: 24,
-                              width: 24,
-                              marginLeft: 8,
-                            }}
-                            alt={
-                              patchesUserData[patchdata[index].creator]
-                                .displayName
-                            }
-                            src={
-                              patchesUserData[patchdata[index].creator].photoURL
-                            }
-                          />
-                        </Tooltip>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <div
-                      className="pet-chip-cell"
-                      className="pet-collapsable-column"
-                    >
-                      {categories[patchdata[index].categ] && (
-                        <Chip
-                          clickable={true}
-                          onClick={(e) =>
-                            !!props.userPatches &&
-                            setTagSelectionTarget([e.target, index])
-                          }
-                          className={"file-tag-chip"}
-                          label={categories[patchdata[index].categ]}
-                        />
-                      )}
-                    </div>
-                  </TableCell>
-                  {!props.compact && (
-                    <Fragment>
-                      {(props.explore || !!showingLiked) && (
-                        <TableCell style={{ width: 50 }} align="center">
-                          <IconButton onClick={() => handleLike(index)}>
-                            <Icon
-                              color={
-                                userLikedPatches.includes(patchIdList[index])
-                                  ? "secondary"
-                                  : "inherit"
-                              }
-                            >
-                              favorite
-                            </Icon>
+                      <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                        {loadingPlay === index ? (
+                          <CircularProgress size={27} />
+                        ) : currentPlaying === index ? (
+                          <IconButton onClick={() => stopPatch(index)}>
+                            <Icon>stop</Icon>
                           </IconButton>
-                        </TableCell>
-                      )}
-                      {/* <TableCell
+                        ) : (
+                          <IconButton onClick={() => playPatch(index)}>
+                            <Icon>play_arrow</Icon>
+                          </IconButton>
+                        )}
+                      </TableCell>
+                      <TableCell scope="row">
+                        <div
+                          style={{
+                            maxWidth: 200,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Typography
+                            variant="overline"
+                            className="fe-filename"
+                            onClick={() => openPatchPage(patchIdList[index])}
+                          >
+                            {patch.name}
+                          </Typography>
+                          {patch.base === "Sampler" && (
+                            <Tooltip arrow placement="top" title="Sampler">
+                              <Icon style={{ fontSize: 16, marginLeft: 4 }}>
+                                graphic_eq
+                              </Icon>
+                            </Tooltip>
+                          )}
+                          {props.userPatches && patch.creator === user.uid && (
+                            <IconButton onClick={() => setRenamingPatch(index)}>
+                              <Icon>edit</Icon>
+                            </IconButton>
+                          )}
+                          {patchesUserData[patch.creator] &&
+                            (!props.userPatches ||
+                              (props.userPatches && showingLiked)) && (
+                              <Tooltip
+                                title={
+                                  patchesUserData[patch.creator].displayName
+                                }
+                              >
+                                <Avatar
+                                  style={{
+                                    height: 24,
+                                    width: 24,
+                                    marginLeft: 8,
+                                  }}
+                                  alt={
+                                    patchesUserData[patch.creator].displayName
+                                  }
+                                  src={patchesUserData[patch.creator].photoURL}
+                                />
+                              </Tooltip>
+                            )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        <div
+                          className="pet-chip-cell"
+                          className="pet-collapsable-column"
+                        >
+                          {categories[patch.categ] && (
+                            <Chip
+                              clickable={true}
+                              onClick={(e) =>
+                                !!props.userPatches &&
+                                setTagSelectionTarget([e.target, index])
+                              }
+                              className={"file-tag-chip"}
+                              label={categories[patch.categ]}
+                            />
+                          )}
+                        </div>
+                      </TableCell>
+                      {!props.compact && (
+                        <Fragment>
+                          {(props.explore || !!showingLiked) && (
+                            <TableCell style={{ width: 50 }} align="center">
+                              <IconButton onClick={() => handleLike(index)}>
+                                <Icon
+                                  color={
+                                    userLikedPatches.includes(
+                                      patchIdList[index]
+                                    )
+                                      ? "secondary"
+                                      : "inherit"
+                                  }
+                                >
+                                  favorite
+                                </Icon>
+                              </IconButton>
+                            </TableCell>
+                          )}
+                          {/* <TableCell
                           className="pet-collapsable-column"
                           align="center"
                         >
@@ -829,17 +859,20 @@ function PatchExplorer(props) {
                             <Icon>file_download</Icon>
                           </IconButton>
                         </TableCell> */}
-                      {props.userPatches && (
-                        <TableCell align="center">
-                          <IconButton onClick={() => setDeletingPatch(index)}>
-                            <Icon>delete</Icon>
-                          </IconButton>
-                        </TableCell>
+                          {props.userPatches && (
+                            <TableCell align="center">
+                              <IconButton
+                                onClick={() => setDeletingPatch(index)}
+                              >
+                                <Icon>delete</Icon>
+                              </IconButton>
+                            </TableCell>
+                          )}
+                        </Fragment>
                       )}
-                    </Fragment>
-                  )}
-                </TableRow>
-              ))}
+                    </TableRow>
+                  )
+              )}
               {isLoading &&
                 Array(10)
                   .fill(1)
@@ -933,19 +966,16 @@ function PatchExplorer(props) {
         </BottomNavigation>
       )}
 
-      {props.userPatches && (
-        <BottomNavigation
-          className="pet-user-bottom-nav"
-          onChange={(event, newValue) => {
-            getUserPatchesList(newValue);
-            setShowingLiked(newValue);
-          }}
-          showLabels
+      {!props.compact && (
+        <Fab
+          className="pe-fab"
+          color={showingLiked ? "secondary" : "primary"}
+          onClick={() => setShowingLiked((prev) => !prev)}
         >
-          <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
-          <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
-        </BottomNavigation>
+          <Icon>{showingLiked ? "favorite" : "person"}</Icon>
+        </Fab>
       )}
+
       {props.userPatches && (
         <Menu
           anchorEl={tagSelectionTarget && tagSelectionTarget[0]}

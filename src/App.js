@@ -40,7 +40,7 @@ function App() {
 
   const wrapperRef = useRef(null);
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(firebase.auth().currentUser);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [languagePicker, setLanguagePicker] = useState(false);

@@ -84,7 +84,7 @@ function FileUploader(props) {
 
             //skip if audio is too large for sampler/sequencer
             if (
-              audiobuffer.duration > 5 &&
+              audiobuffer.duration > 20 &&
               (props.instrument.name === "Sampler" || props.module.type === 0)
             ) {
               /* alert(

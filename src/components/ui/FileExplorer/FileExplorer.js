@@ -25,6 +25,7 @@ import {
   BottomNavigationAction,
   BottomNavigation,
   TextField,
+  Fab,
 } from "@material-ui/core";
 
 import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
@@ -220,7 +221,7 @@ function FileExplorer(props) {
       liked ? "likedFiles" : "files"
     );
 
-    //setIsLoading(false);
+    setIsLoading(false);
 
     if (fileIdList.length === 0) {
       setFiledata(null);
@@ -434,6 +435,7 @@ function FileExplorer(props) {
   useEffect(() => {
     clearFiles();
     setIsLoading(false);
+    getUserFilesList(showingLiked);
   }, [showingLiked]);
 
   useEffect(() => {
@@ -499,6 +501,7 @@ function FileExplorer(props) {
         <TableContainer
           className={props.compact ? "fet-cont-compact" : "fet-cont"}
           onScroll={props.compact && detectScrollToBottom}
+          style={{ marginTop: props.userFiles && 32 }}
         >
           <Table
             component={props.compact ? "div" : Paper}
@@ -768,20 +771,16 @@ function FileExplorer(props) {
         </BottomNavigation>
       )}
 
-      {props.userFiles && (
-        <BottomNavigation
-          className="fet-user-bottom-nav"
-          value={showingLiked}
-          onChange={(event, newValue) => {
-            getUserFilesList(newValue);
-            setShowingLiked(newValue);
-          }}
-          showLabels
+      {!props.compact && (
+        <Fab
+          className="fe-fab"
+          color={showingLiked ? "secondary" : "primary"}
+          onClick={() => setShowingLiked((prev) => !prev)}
         >
-          <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
-          <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
-        </BottomNavigation>
+          <Icon>{showingLiked ? "favorite" : "person"}</Icon>
+        </Fab>
       )}
+
       {props.userFiles && (
         <Menu
           anchorEl={tagSelectionTarget && tagSelectionTarget[0]}

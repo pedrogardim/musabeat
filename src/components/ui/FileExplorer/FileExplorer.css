@@ -138,3 +138,10 @@
 .MuiTableCell-sizeSmall {
   padding: 6px 8px !important;
 }
+
+.fe-fab {
+  position: fixed !important;
+  bottom: 32px;
+  right: 32px;
+  z-index: 6;
+}

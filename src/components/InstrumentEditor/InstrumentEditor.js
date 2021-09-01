@@ -194,14 +194,89 @@ function InstrumentEditor(props) {
         .doc(props.module.instrument)
         .get()
         .then((patch) => {
-          props.setModules((prev) => {
-            let newModules = [...prev];
-            newModules[props.index].instrument = patch.data();
-            return newModules;
-          });
+          props.setModules && !props.patchPage
+            ? props.setModules((prev) => {
+                let newModules = [...prev];
+                newModules[props.index].instrument = patch.data();
+
+                return newModules;
+              })
+            : props.setPatchInfo(patch.data());
         });
     }
 
+    setRenamingLabel(null);
+  };
+
+  const changeSamplerNote = (note, newNote) => {
+    //console.log(labelName, newName);
+
+    let drumMap = props.instrument._buffers._buffers;
+    if (drumMap.has(newNote)) return;
+
+    //props.instrument.add()
+    drumMap.set(
+      Tone.Frequency(newNote).toMidi(),
+      drumMap.get(Tone.Frequency(note).toMidi())
+    );
+    console.log(drumMap.delete(Tone.Frequency(note).toMidi()));
+
+    if (typeof props.module.instrument === "string") {
+      firebase
+        .firestore()
+        .collection("patches")
+        .doc(props.module.instrument)
+        .get()
+        .then((urls) => {
+          setFilesName((prev) => {
+            let newFileNames = { ...prev };
+            newFileNames[newNote] = newFileNames[note];
+            delete newFileNames[note];
+            return newFileNames;
+          });
+
+          let urlsObj = urls.data().urls;
+          urlsObj[newNote] = urlsObj[note];
+          delete urlsObj[note];
+
+          !props.patchPage
+            ? props.setModules((prev) => {
+                let newModules = [...prev];
+                newModules[props.index].instrument = { urls: urlsObj };
+
+                return newModules;
+              })
+            : props.setPatchInfo((prev) => {
+                let newPatch = { ...prev };
+                newPatch.urls = urlsObj;
+                return newPatch;
+              });
+        });
+    } else {
+      setFilesName((prev) => {
+        let newFileNames = { ...prev };
+        newFileNames[newNote] = newFileNames[note];
+        delete newFileNames[note];
+        return newFileNames;
+      });
+
+      let urlsObj = { ...props.module.instrument.urls };
+      urlsObj[newNote] = urlsObj[note];
+      delete urlsObj[note];
+
+      !props.patchPage
+        ? props.setModules((prev) => {
+            let newModules = [...prev];
+            newModules[props.index].instrument = { urls: urlsObj };
+
+            return newModules;
+          })
+        : props.setPatchInfo((prev) => {
+            let newPatch = { ...prev };
+            newPatch.urls = urlsObj;
+            return newPatch;
+          });
+    }
     setRenamingLabel(null);
   };
 
@@ -325,6 +400,7 @@ function InstrumentEditor(props) {
       props.instrument._buffers._buffers.forEach((e, i, a) =>
         bufferObjects.push([e, i])
       );
+      console.log(bufferObjects, filesName);
       mainContent = (
         <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
           <Select
@@ -356,6 +432,7 @@ function InstrumentEditor(props) {
                         filesName[Tone.Frequency(e[1], "midi").toNote()]
                       }
                       openFilePage={() => openFilePage(filesId[i])}
+                      setRenamingLabel={setRenamingLabel}
                     />
                     <Divider />
                   </Fragment>
@@ -423,6 +500,17 @@ function InstrumentEditor(props) {
       getFilesName();
   }, []);
 
+  useEffect(() => {
+    //console.log(props.instrument);
+    props.instrument &&
+      props.instrument.name === "Sampler" &&
+      console.log(
+        props.instrument._buffers._buffers,
+        props.module.instrument.urls,
+        filesName
+      );
+  }, [props.instrument]);
+
   return (
     <div
       className="instrument-editor"
@@ -471,7 +559,7 @@ function InstrumentEditor(props) {
           onDrop={(files, event) => handleFileDrop(files, event)}
           className={"file-drop"}
           style={{
-            backgroundColor: colors[props.module.color][300],
+            backgroundColor: "#3f51b5",
           }}
         >
           Drop your files here!
@@ -506,9 +594,19 @@ function InstrumentEditor(props) {
 
       <NameInput
         select
+        note={props.module.type !== 0}
+        defaultValue={
+          props.module.type === 0
+            ? props.module.lbls[renamingLabel]
+            : renamingLabel
+        }
         open={renamingLabel !== null}
         onClose={() => setRenamingLabel(null)}
-        onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}
+        onSubmit={(i) => {
+          props.module.type === 0
+            ? renamePlayersLabel(renamingLabel, i)
+            : changeSamplerNote(renamingLabel, i);
+        }}
       />
     </div>
   );

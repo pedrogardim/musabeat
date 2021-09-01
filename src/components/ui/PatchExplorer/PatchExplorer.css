@@ -46,7 +46,6 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 600px;
 }
 .pet-cont-compact {
   overflow-y: scroll;
@@ -123,4 +122,11 @@
 .fe-filename:hover {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.pe-fab {
+  position: fixed !important;
+  bottom: 32px;
+  right: 32px;
+  z-index: 6;
 }

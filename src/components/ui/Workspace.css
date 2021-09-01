@@ -30,8 +30,8 @@
 .ws-fab-cont {
   position: fixed !important;
   width: 54px;
-  bottom: 16px;
-  right: 16px;
+  bottom: 32px;
+  right: 32px;
   height: 128px;
   z-index: 2;
   display: flex;
@@ -40,8 +40,8 @@
 
 .ws-opt-btn-cont {
   position: fixed !important;
-  right: 16px;
-  bottom: 160px;
+  right: 32px;
+  bottom: 176px;
   display: flex;
   flex-direction: column;
   overflow: hidden;

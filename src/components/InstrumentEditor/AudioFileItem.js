@@ -29,30 +29,19 @@ function AudioFileItem(props) {
       : props.instrument.player(props.fileLabel).start(0);
   };
 
-  useEffect(
+  /* useEffect(
     () => drawWave(props.buffer.toArray(), setWavePath),
     [props.buffer]
-  );
+  ); */
 
   return (
     <ListItem button onClick={handleClick} className={"audio-file-item"}>
-      <svg
-        className="audio-file-item-waveform"
-        width="64px"
-        height="32px"
-        viewBow={"0 0 32 32"}
-      >
-        <path d={wavePath} stroke="#05386b" fill="none" />
-      </svg>
-
       <ListItemText
         primary={props.fileLabel}
         primaryTypographyProps={{
           variant: "body2",
           className: "audio-file-item-label",
-          onClick: () =>
-            props.instrument.name === "Players" &&
-            props.setRenamingLabel(props.fileLabel),
+          onClick: () => props.setRenamingLabel(props.fileLabel),
         }}
         secondary={props.fileName}
         secondaryTypographyProps={{
@@ -81,23 +70,5 @@ function AudioFileItem(props) {
     </ListItem>
   );
 }
-
-const drawWave = (wavearray, setWavePath) => {
-  if (!wavearray.length) {
-    return;
-  }
-
-  let pathstring = "M 0 16 ";
-
-  let wave = wavearray;
-  let scale = wave.length / 64;
-
-  for (let x = 0; x < 64; x++) {
-    pathstring +=
-      "L " + x + " " + (wave[Math.floor(x * scale)] * 16 + 16) + " ";
-  }
-
-  setWavePath(pathstring);
-};
 
 export default AudioFileItem;
