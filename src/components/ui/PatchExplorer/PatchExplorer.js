@@ -582,9 +582,9 @@ function PatchExplorer(props) {
     //console.log("change triggered");
   }, [searchTags, searchValue]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     !isQueryEnd && !isLoading && getPatchesList();
-  }, [props.isScrollBottom]);
+  }, [props.isScrollBottom]); */
 
   return (
     <div

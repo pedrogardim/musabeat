@@ -1,4 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
+import { Helmet } from "react-helmet";
+
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
@@ -76,6 +78,13 @@ function WorkspaceTitle(props) {
 
   return (
     <div className="app-title">
+      <Helmet>
+        <title>
+          {props.sessionData &&
+            editorProfiles[0] &&
+            `${props.sessionData.name} by ${editorProfiles[0].displayName} `}
+        </title>
+      </Helmet>
       <Typography variant="h4">
         {props.sessionData ? props.sessionData.name : "..."}
         {expanded && (

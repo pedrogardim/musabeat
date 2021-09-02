@@ -1,6 +1,7 @@
 import "./App.css";
 
 import React, { useState, useEffect, Fragment, useRef } from "react";
+import { Helmet } from "react-helmet";
 
 import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
@@ -36,6 +37,16 @@ import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 import { createNewSession } from "./utils/sessionUtils";
 
+const pageLabels = {
+  explore: "Explore",
+  files: "Files",
+  instruments: "Browse Instruments",
+  drumsets: "Drumsets",
+  userinstruments: "User Instruments",
+  userdrumsets: "User Drumsets",
+  userfiles: "User Files",
+};
+
 function App() {
   const { t, i18n } = useTranslation();
   const history = useHistory();
@@ -50,9 +61,12 @@ function App() {
   const [sideMenu, setSideMenu] = useState(false);
   const [openedSession, setOpenedSession] = useState(null);
 
-  const [isScrollBottom, setIsScrollBottom] = useState(false);
+  const [currentRoute, setCurrentRoute] = useState(null);
 
-  const handlePageNav = (route, additional) => history.push(`/${route}`);
+  const handlePageNav = (route, additional) => {
+    history.push(`/${route}`);
+    setCurrentRoute(route);
+  };
 
   const handleCreateNewSession = (session) => {
     createNewSession(session, handlePageNav, setOpenedSession);
@@ -73,13 +87,6 @@ function App() {
       .signOut()
       .then((r) => console.log("singout"));
     setUserOption(false);
-  };
-
-  //used for some components
-
-  const detectScrollToBottom = (e) => {
-    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
-      setIsScrollBottom((prev) => !prev);
   };
 
   useEffect(() => {
@@ -120,8 +127,13 @@ function App() {
             />
           </IconButton>
         </Toolbar>
+        {currentRoute && (
+          <Helmet>
+            <title>Musa - {pageLabels[currentRoute] || "Home"}</title>
+          </Helmet>
+        )}
       </AppBar>
-      <div className="app-wrapper" onScroll={detectScrollToBottom}>
+      <div className="app-wrapper">
         {authDialog && (
           <AuthDialog
             authDialog={authDialog}
@@ -198,29 +210,29 @@ function App() {
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer explore isScrollBottom={isScrollBottom} />
+            <FileExplorer explore />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles isScrollBottom={isScrollBottom} />
+            <FileExplorer userFiles />
           </Route>
           <Route exact path="/file/:key">
             <FilePage />
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer explore isScrollBottom={isScrollBottom} />
+            <PatchExplorer explore />
           </Route>
           <Route exact path="/userinstruments">
-            <PatchExplorer userPatches isScrollBottom={isScrollBottom} />
+            <PatchExplorer userPatches />
           </Route>
           <Route exact path="/instrument/:key">
             <PatchPage />
           </Route>
           <Route exact path="/drumsets">
-            <PatchExplorer isDrum explore isScrollBottom={isScrollBottom} />
+            <PatchExplorer isDrum explore />
           </Route>
           <Route exact path="/userdrumsets">
-            <PatchExplorer isDrum userPatches isScrollBottom={isScrollBottom} />
+            <PatchExplorer isDrum userPatches />
           </Route>
           <Route exact path="/drumset/:key">
             <PatchPage isDrum />

@@ -447,9 +447,9 @@ function FileExplorer(props) {
     //console.log("change triggered");
   }, [searchTags, searchValue]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     !isQueryEnd && !isLoading && getFilesList();
-  }, [props.isScrollBottom]);
+  }, [props.isScrollBottom]); */
 
   useEffect(() => {
     //console.log("isLoading", isLoading);

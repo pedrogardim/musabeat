@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
+import { Helmet } from "react-helmet";
 import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
@@ -1078,6 +1079,12 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
+      {isPlaying && (
+        <Helmet>
+          <title>{"▶ " + document.title}</title>
+        </Helmet>
+      )}
+
       <Fade in={!Boolean(modules)} timeout={{ enter: 0, exit: 200 }}>
         <div className="loading-screen-background">
           <LoadingScreen />
