@@ -31,7 +31,11 @@
   align-items: center;
   align-content: center;
   justify-content: center;
-  padding: 16px;
+  padding: 8px;
+}
+
+.home-page-card > * {
+  margin: 2px 0px;
 }
 
 .hp-card-logo {

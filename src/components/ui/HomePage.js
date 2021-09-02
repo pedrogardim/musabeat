@@ -15,6 +15,7 @@ import {
   Tooltip,
   Typography,
   Fab,
+  Button,
   CircularProgress,
   Card,
 } from "@material-ui/core";
@@ -33,8 +34,7 @@ function HomePage(props) {
   const waveformWrapper = useRef(null);
 
   const [stats, setStats] = useState(null);
-
-  const user = firebase.auth().currentUser;
+  const [userInfo, setUserInfo] = useState(null);
 
   const getStats = () => {
     firebase
@@ -43,6 +43,15 @@ function HomePage(props) {
       .doc("stats")
       .get()
       .then((r) => setStats(r.data()));
+
+    props.user
+      ? firebase
+          .firestore()
+          .collection("users")
+          .doc(props.user.uid)
+          .get()
+          .then((r) => setUserInfo(r.data()))
+      : setUserInfo(null);
   };
 
   useEffect(() => {
@@ -51,18 +60,31 @@ function HomePage(props) {
     return () => {
       //console.log("cleared");
     };
-  }, []);
+  }, [props.user]);
 
   return (
     <div className="home-page">
       <Card elevation={4} className="home-page-card">
         <AppLogo className="hp-card-logo" animated />
         <div className="break" />
-        <Typography variant="h5"> Welcome to Musa!</Typography>
+        <Typography variant="h5">
+          {" "}
+          {`Welcome ${userInfo ? userInfo.profile.displayName : "to Musa"}!`}
+        </Typography>
         <div className="break" />
-        <Typography variant="overline"> You are not logged in</Typography>
+        {props.user === null && (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => props.setAuthDialog(true)}
+          >
+            You are not logged in
+          </Button>
+        )}
         <div className="break" />
-        <Typography variant="body2">Our community created:</Typography>
+        <Typography variant="subtitle2">{`${
+          props.user ? "You have" : "Our community has"
+        } created:`}</Typography>
         <div className="break" />
         <Grid
           className="home-page-card-grid"
@@ -73,21 +95,33 @@ function HomePage(props) {
           wrap="nowrap"
         >
           <Grid item sm={3}>
-            <Typography variant={"h6"}>{stats && stats.sessions}</Typography>
+            <Typography variant={"h6"}>
+              {userInfo
+                ? userInfo.sessions.length
+                : stats
+                ? stats.sessions
+                : "..."}
+            </Typography>
 
             <Typography variant={"overline"}>Sessions</Typography>
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
             <Typography variant={"h6"}>
-              {stats && stats.patches + stats.drumpatches}
+              {userInfo
+                ? userInfo.patches.length + userInfo.drumPatches.length
+                : stats
+                ? stats.patches + stats.drumpatches
+                : "..."}
             </Typography>
 
             <Typography variant={"overline"}>Instruments</Typography>
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
-            <Typography variant={"h6"}>{stats && stats.files}</Typography>
+            <Typography variant={"h6"}>
+              {userInfo ? userInfo.files.length : stats ? stats.files : "..."}
+            </Typography>
 
             <Typography variant={"overline"}>Files</Typography>
           </Grid>

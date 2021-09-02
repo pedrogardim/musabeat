@@ -31,7 +31,7 @@ import PatchPage from "./components/ui/PatchExplorer/PatchPage";
 import UserPage from "./components/ui/UserPage/UserPage";
 
 import SideMenu from "./components/ui/SideMenu";
-import AuthDialog from "./components/ui/AuthDialog";
+import AuthDialog from "./components/ui/Dialogs/AuthDialog";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 import { createNewSession } from "./utils/sessionUtils";
@@ -116,7 +116,7 @@ function App() {
             <Avatar
               onClick={handleAvatarClick}
               alt={user && user.displayName}
-              src={user && user.photoURL}
+              src={user && user.photoURL ? user.photoURL : "https://null"}
             />
           </IconButton>
         </Toolbar>
@@ -180,7 +180,7 @@ function App() {
 
         <Switch>
           <Route exact path="/">
-            <HomePage />
+            <HomePage user={user} setAuthDialog={setAuthDialog} />
           </Route>
           <Route exact path="/explore">
             <SessionExplorer

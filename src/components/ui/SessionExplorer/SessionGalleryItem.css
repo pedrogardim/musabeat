@@ -29,7 +29,7 @@
 }
 
 .session-gallery-item-subtitle > span,
-p {
+.session-gallery-item-subtitle > p {
   max-width: 60;
   text-align: center;
   white-space: nowrap;
