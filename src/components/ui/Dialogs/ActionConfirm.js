@@ -9,7 +9,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 
-function DeleteConfirm(props) {
+function ActionConfirm(props) {
   const { t } = useTranslation();
 
   const handleConfirm = () => {
@@ -20,16 +20,25 @@ function DeleteConfirm(props) {
     <Dialog open={props.open} onClose={props.onClose}>
       <DialogTitle>{t("dialogs.areYouSure")}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{t("dialogs.irreversibleAction")}</DialogContentText>
+        <DialogContentText>
+          {props.delete
+            ? t("dialogs.irreversibleAction")
+            : props.dupSession
+            ? t("dialogs.dupSession")
+            : ""}
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>
-        <Button color="secondary" onClick={handleConfirm}>
-          {t("dialogs.delete")}
+        <Button
+          color={props.delete ? "secondary" : "primary"}
+          onClick={handleConfirm}
+        >
+          {props.delete ? t("dialogs.delete") : t("dialogs.confirm")}
         </Button>
       </DialogActions>
     </Dialog>
   );
 }
 
-export default DeleteConfirm;
+export default ActionConfirm;

@@ -33,6 +33,8 @@ import SessionProgressBar from "./SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
 import LoadingScreen from "./LoadingScreen";
 
+import ActionConfirm from "./Dialogs/ActionConfirm";
+
 import {
   patchLoader,
   loadDrumPatch,
@@ -73,6 +75,7 @@ function Workspace(props) {
 
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
+  const [sessionDupDialog, setSessionDupDialog] = useState(false);
 
   //true: timeline ; false: loopmode
   const [timelineMode, setTimelineMode] = useState(false);
@@ -1214,14 +1217,10 @@ function Workspace(props) {
         className="ws-opt-btn-cont"
         style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
       >
-        <IconButton
-          tabIndex={-1}
-          color="primary"
-          className="ws-fab ws-fab-copy"
-          onClick={handleSessionCopy}
-        >
-          <Icon>content_copy</Icon>
-        </IconButton>
+        <SessionSettings
+          sessionData={sessionData}
+          setSessionData={setSessionData}
+        />
         {editMode && (
           <Fragment>
             <IconButton
@@ -1258,10 +1257,14 @@ function Workspace(props) {
           />
         )}
 
-        <SessionSettings
-          sessionData={sessionData}
-          setSessionData={setSessionData}
-        />
+        <IconButton
+          tabIndex={-1}
+          color="primary"
+          className="ws-fab ws-fab-copy"
+          onClick={() => setSessionDupDialog(true)}
+        >
+          <Icon>content_copy</Icon>
+        </IconButton>
       </Paper>
 
       <Snackbar
@@ -1283,6 +1286,13 @@ function Workspace(props) {
             <Icon fontSize="small">close</Icon>
           </IconButton>
         }
+      />
+
+      <ActionConfirm
+        dupSession
+        open={sessionDupDialog}
+        onClose={() => setSessionDupDialog(false)}
+        action={handleSessionCopy}
       />
     </div>
   );

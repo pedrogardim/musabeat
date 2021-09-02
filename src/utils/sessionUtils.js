@@ -11,7 +11,8 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     description: "No description",
     tags: [],
     bpm: 120,
-    tl: false,
+
+    timeline: { 0: [0], size: 1, on: false },
     modules: [
       {
         id: 0,
@@ -38,8 +39,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   };
 
   let clearStats = {
-    //name: session !== undefined ? `Copy of ${session.name}` : "New Session",
-    name: "New Session",
+    name: session !== undefined ? `Copy of ${session.name}` : "New Session",
     copied: 0,
     opened: 0,
     played: 0,
@@ -47,7 +47,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     editors: [userId],
     likes: 0,
     createdOn: firebase.firestore.FieldValue.serverTimestamp(),
-    timeline: { 0: [0], size: 1 },
   };
 
   let newSession = Object.assign(

@@ -20,7 +20,7 @@ import {
 import SessionGalleryItem from "./SessionGalleryItem";
 import PlaceholderSGI from "./PlaceholderSGI";
 import NameInput from "../Dialogs/NameInput";
-import DeleteConfirm from "../Dialogs/DeleteConfirm";
+import ActionConfirm from "../Dialogs/ActionConfirm";
 
 import Workspace from "../Workspace";
 
@@ -250,7 +250,8 @@ function SessionExplorer(props) {
       ) : (
         ""
       )}
-      <DeleteConfirm
+      <ActionConfirm
+        delete
         open={deleteDialog !== null}
         onClose={() => setDeleteDialog(null)}
         action={handleSessionDelete}

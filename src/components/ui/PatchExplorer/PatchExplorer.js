@@ -35,7 +35,7 @@ import "./PatchExplorer.css";
 
 import firebase from "firebase";
 
-import DeleteConfirm from "../Dialogs/DeleteConfirm";
+import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
 import SavePatch from "../Dialogs/SavePatch";
 
@@ -996,7 +996,8 @@ function PatchExplorer(props) {
       )}
 
       {props.userPatches && (
-        <DeleteConfirm
+        <ActionConfirm
+          delete
           fileExplore
           open={deletingPatch !== null}
           action={() => deletePatch(deletingPatch)}

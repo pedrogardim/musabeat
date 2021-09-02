@@ -26,7 +26,7 @@ import InstrumentEditor from "../InstrumentEditor/InstrumentEditor";
 import ModuleSettings from "./ModuleSettings";
 import ModuleEffects from "./ModuleEffects";
 
-import DeleteConfirm from "../ui/Dialogs/DeleteConfirm";
+import ActionConfirm from "../ui/Dialogs/ActionConfirm";
 
 import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
@@ -685,7 +685,8 @@ function Module(props) {
           />
         )}
       </div>
-      <DeleteConfirm
+      <ActionConfirm
+        delete
         open={deleteDialog}
         onClose={() => setDeleteDialog(null)}
         action={removeModule}

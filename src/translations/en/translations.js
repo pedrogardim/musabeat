@@ -95,6 +95,8 @@ export const TRANSLATIONS_EN = {
   },
   dialogs: {
     cancel: "Cancel",
+    confirm: "OK",
+
     submit: "Submit",
     delete: "Delete",
     loginWithGoogle: "Log In with Google",
@@ -104,6 +106,7 @@ export const TRANSLATIONS_EN = {
     sessionInfo: "Session Info",
     patchName: "Patch Name",
     unsavedChanges: "Are you sure? Any unsaved changes will not be saved",
+    dupSession: "Create a copy of this session for your account?",
   },
   info: {
     name: "Name",

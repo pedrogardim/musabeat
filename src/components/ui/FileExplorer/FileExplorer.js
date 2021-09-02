@@ -34,7 +34,7 @@ import "./FileExplorer.css";
 
 import firebase from "firebase";
 
-import DeleteConfirm from "../Dialogs/DeleteConfirm";
+import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
@@ -801,7 +801,8 @@ function FileExplorer(props) {
       )}
 
       {props.userFiles && (
-        <DeleteConfirm
+        <ActionConfirm
+          delete
           fileExplore
           open={deletingFile !== null}
           action={() => deleteFile(deletingFile)}
