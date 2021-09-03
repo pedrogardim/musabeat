@@ -1,0 +1,14 @@
+.session-settings-cont {
+  padding: 16px !important;
+}
+
+.session-settings-tabs-cont {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: "center";
+  flex-direction: column;
+}
+
+.session-settings-checkbox-lbl {
+  /* width: 0 !important; */
+}

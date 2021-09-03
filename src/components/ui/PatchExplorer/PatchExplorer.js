@@ -29,7 +29,7 @@ import {
   Fab,
 } from "@material-ui/core";
 
-import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
+import { Skeleton, Autocomplete } from "@material-ui/lab";
 
 import "./PatchExplorer.css";
 

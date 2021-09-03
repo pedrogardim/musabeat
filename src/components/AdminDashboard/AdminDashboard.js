@@ -33,6 +33,14 @@ function AdminDashboard(props) {
     );
   };
 
+  const updatePremium = () => {
+    firebase
+      .firestore()
+      .collection("sessions")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ tags: [0, 1, 2] })));
+  };
+
   return (
     <div className="file-page">
       {/* <AppBar position="static">
@@ -50,6 +58,7 @@ function AdminDashboard(props) {
         {value === 0 && <PatchEditor />}
       </div> */}
       <Button onClick={updateStats}>Update Stats</Button>
+      <Button onClick={updatePremium}>updateSessions</Button>
     </div>
   );
 }

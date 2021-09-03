@@ -19,7 +19,7 @@ import {
 
 import { Skeleton } from "@material-ui/lab";
 
-import SessionInfo from "./Dialogs/SessionInfo";
+import { sessionTags } from "../../assets/musicutils";
 
 import "./Workspace.css";
 
@@ -29,7 +29,6 @@ function WorkspaceTitle(props) {
   const [creationDateString, setCreationDateString] = useState(null);
   const [editorProfiles, setEditorProfiles] = useState([]);
   const [expanded, setExpanded] = useState(false);
-  const [infoDialog, setInfoDialog] = useState(false);
 
   const history = useHistory();
 
@@ -50,8 +49,17 @@ function WorkspaceTitle(props) {
 
     props.user &&
       props.sessionData.editors &&
-      getEditorProfiles().then((data) => {
-        setEditorProfiles(data.map((e) => e.data().profile));
+      getEditorProfiles().then((r) => {
+        setEditorProfiles(
+          r.map((e) => {
+            props.user.uid === e.id &&
+              e.id === props.sessionData.creator &&
+              e.data().pr &&
+              props.setPremiumMode(true);
+            return e.data().profile;
+          })
+        );
+        //check if user is one of the editors, and if its premium
       });
   };
 
@@ -87,11 +95,7 @@ function WorkspaceTitle(props) {
       </Helmet>
       <Typography variant="h4">
         {props.sessionData ? props.sessionData.name : "..."}
-        {expanded && (
-          <IconButton onClick={() => setInfoDialog(true)}>
-            <Icon>edit</Icon>
-          </IconButton>
-        )}
+
         {!(props.editMode && !props.user) && (
           <IconButton onClick={() => setExpanded((prev) => !prev)}>
             <Icon
@@ -157,7 +161,7 @@ function WorkspaceTitle(props) {
                 <Chip
                   style={{ margin: "0px 4px" }}
                   key={props.index + e}
-                  label={e}
+                  label={sessionTags[e]}
                   variant="outlined"
                   onClick={() => handleTagClick(e)}
                   onDelete={() => handleTagDelete(i)}
@@ -166,14 +170,6 @@ function WorkspaceTitle(props) {
             </Fragment>
           )}
         </Fragment>
-      )}
-      {infoDialog && (
-        <SessionInfo
-          sessionKey={props.sessionKey}
-          sessionData={props.sessionData}
-          setSessionData={props.setSessionData}
-          onClose={() => setInfoDialog(false)}
-        />
       )}
     </div>
   );

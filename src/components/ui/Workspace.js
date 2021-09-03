@@ -69,7 +69,9 @@ function Workspace(props) {
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
   const [editMode, setEditMode] = useState(false);
+  const [premiumMode, setPremiumMode] = useState(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -1050,12 +1052,10 @@ function Workspace(props) {
   useEffect(() => {
     timelineMode && getSessionSizeFromTimeline();
   }, [timelineMode]);
-  /* 
+
   useEffect(() => {
-    console.log("editMode", editMode);
-    !props.hidden && props.setSessionEditMode(editMode);
-  }, [editMode]);
- */
+    premiumMode && console.log("=====PREMIUM MODE ON=====");
+  }, [premiumMode]);
 
   useEffect(() => {
     //console.log(areUnsavedChanges);
@@ -1102,6 +1102,7 @@ function Workspace(props) {
           editMode={editMode}
           user={props.user}
           sessionSize={sessionSize}
+          setPremiumMode={setPremiumMode}
         />
       )}
 
@@ -1217,10 +1218,13 @@ function Workspace(props) {
         className="ws-opt-btn-cont"
         style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
       >
-        <SessionSettings
-          sessionData={sessionData}
-          setSessionData={setSessionData}
-        />
+        {sessionData && (
+          <SessionSettings
+            premiumMode={premiumMode}
+            sessionData={sessionData}
+            setSessionData={setSessionData}
+          />
+        )}
         {editMode && (
           <Fragment>
             <IconButton
