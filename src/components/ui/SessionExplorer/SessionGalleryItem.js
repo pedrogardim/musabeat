@@ -49,14 +49,18 @@ function SessionGalleryItem(props) {
     <Paper
       className={`session-gallery-item ${
         hovered && "session-gallery-item-hovered"
-      }`}
+      } ${props.compact && "session-gallery-item-compact"}`}
       onClick={handleClick}
       onMouseOver={handleHover}
       onMouseOut={() => setHovered(false)}
     >
       <div className="session-gallery-item-title-cont">
         <Tooltip placement={"top"} title={props.session.name}>
-          <Typography variant="h5" className="session-gallery-item-title">
+          <Typography
+            variant={"h5"}
+            style={{ fontSize: props.compact && "1.2rem" }}
+            className="session-gallery-item-title"
+          >
             {props.session.name}
           </Typography>
         </Tooltip>
@@ -70,7 +74,7 @@ function SessionGalleryItem(props) {
         )}
       </div>
 
-      {!props.isUser && !props.userPage && (
+      {!(props.isUser || props.compact) && (
         <div className="session-gallery-item-subtitle">
           <Avatar
             className="session-gallery-item-subtitle-avatar"

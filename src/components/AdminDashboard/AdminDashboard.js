@@ -38,7 +38,7 @@ function AdminDashboard(props) {
       .firestore()
       .collection("sessions")
       .get()
-      .then((r) => r.forEach((e) => e.ref.update({ tags: [0, 1, 2] })));
+      .then((r) => r.forEach((e) => e.ref.update({ alwcp: true, hid: false })));
   };
 
   return (

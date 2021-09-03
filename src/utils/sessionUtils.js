@@ -47,6 +47,8 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     editors: [userId],
     likes: 0,
     createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+    alwcp: true,
+    hid: false,
   };
 
   let newSession = Object.assign(

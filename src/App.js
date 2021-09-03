@@ -226,7 +226,7 @@ function App() {
             <PatchExplorer userPatches user={user} />
           </Route>
           <Route exact path="/instrument/:key">
-            <PatchPage user={user} />
+            <PatchPage user={user} history={history} />
           </Route>
           <Route exact path="/drumsets">
             <PatchExplorer isDrum explore user={user} />

@@ -78,7 +78,7 @@ body *::-webkit-scrollbar-thumb {
 .app-wrapper {
   flex: 1;
   height: 100vh;
-  overflow-y: scroll;
+  overflow-y: overlay;
   overflow-x: hidden;
   position: relative;
 }

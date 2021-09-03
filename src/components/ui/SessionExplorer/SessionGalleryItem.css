@@ -9,6 +9,19 @@
   margin: 16px;
 }
 
+.session-gallery-item-compact {
+  height: auto;
+  flex-grow: 1 !important;
+  width: 1px !important;
+  min-width: 128px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px !important;
+  margin: 4px !important;
+}
+
 .session-gallery-item-title {
   text-align: center;
   position: relative;
@@ -52,13 +65,18 @@
 }
 
 .session-gallery-item-modules-cont {
-  flex: 1 1 100px;
+  flex: 1 1 1px;
   display: flex;
   flex-direction: column;
   width: 80%;
   margin: 24px;
   justify-content: center;
   transition: background-color 0.1s;
+}
+
+.session-gallery-item-compact > .session-gallery-item-modules-cont {
+  flex: 0 1 72px;
+  margin: 16px !important;
 }
 
 .session-gallery-item-hovered {

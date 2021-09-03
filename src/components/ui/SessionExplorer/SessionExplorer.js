@@ -59,6 +59,13 @@ function SessionExplorer(props) {
       if (searchTags && searchTags.length > 0) {
         rules = rules.where("categ", "array-contains-any", searchTags);
       }
+      if (props.isUser || props.target) {
+        rules = rules.where(
+          "creator",
+          "==",
+          props.target ? props.target : props.user.uid
+        );
+      }
       /* if (!clear && !isFirstQuery && lastItem) {
         console.log("next page");
         rules = rules.startAfter(lastItem);
@@ -206,8 +213,12 @@ function SessionExplorer(props) {
   }, [props.isUser, props.user]);
 
   return (
-    <div className="session-explorer">
-      {!props.isUser && (
+    <div
+      className={`session-explorer ${
+        props.compact && "session-explorer-compact"
+      }`}
+    >
+      {!(props.isUser || props.compact) && (
         <Autocomplete
           multiple
           freeSolo
@@ -260,6 +271,7 @@ function SessionExplorer(props) {
       ) : !!sessions.length ? (
         sessions.map((session, sessionIndex) => (
           <SessionGalleryItem
+            compact={props.compact}
             handleSessionSelect={handleSessionSelect}
             handleUserLike={() => handleUserLike(sessionIndex)}
             handleSessionDelete={setDeleteDialog}

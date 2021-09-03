@@ -22,7 +22,7 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import SessionGalleryItem from "../SessionExplorer/SessionGalleryItem";
+import SessionExplorer from "../SessionExplorer/SessionExplorer";
 
 import "./UserPage.css";
 
@@ -161,6 +161,7 @@ function UserPage(props) {
 
   return (
     <div className="user-page">
+      <div className="user-page-background" />
       {userInfo && (
         <Tooltip title={userInfo.profile.displayName}>
           <Avatar
@@ -171,14 +172,13 @@ function UserPage(props) {
         </Tooltip>
       )}
 
-      <div className="break" />
+      <Paper elevation={9} className="user-page-main-content">
+        {userInfo && (
+          <Typography variant="h3">{userInfo.profile.displayName}</Typography>
+        )}
+        <div className="break" />
 
-      {userInfo && (
-        <Typography variant="h3">{userInfo.profile.displayName}</Typography>
-      )}
-      <div className="break" />
-
-      {/* <div className="player-controls">
+        {/* <div className="player-controls">
         <Tooltip title={fileInfo && fileInfo.likes}>
           <IconButton onClick={handleUserLike}>
             <Icon color={isFileLiked ? "secondary" : "inherit"}>follow</Icon>
@@ -189,88 +189,67 @@ function UserPage(props) {
       </div>
       <div className="break" />*/}
 
-      {/* <IconButton onClick={huehue}>
+        {/* <IconButton onClick={huehue}>
         <Icon>manage_accounts</Icon>
       </IconButton>
 
       <div className="break" /> */}
 
-      {userInfo && (
-        <Grid
-          container
-          direction="row"
-          wrap="nowrap"
-          spacing={1}
-          component={Paper}
-          className="user-page-info"
-        >
-          <div className="file-info-card">
-            <Typography variant="overline">
-              Sessions
-              <br />
-              {userInfo.sessions.length}
-            </Typography>
-          </div>
-          <Divider orientation="vertical" flexItem />
+        {userInfo && (
+          <Grid
+            container
+            direction="row"
+            wrap="nowrap"
+            spacing={1}
+            component={Paper}
+            className="user-page-info"
+          >
+            <div className="file-info-card">
+              <Typography variant="overline">
+                Sessions
+                <br />
+                {userInfo.sessions.length}
+              </Typography>
+            </div>
+            <Divider orientation="vertical" flexItem />
 
-          <div className="file-info-card">
-            <Typography variant="overline">
-              Instruments
-              <br />
-              {userInfo.patches.length}
-            </Typography>
-          </div>
-          <Divider orientation="vertical" flexItem />
-          <div className="file-info-card">
-            <Typography variant="overline">
-              Drumsets
-              <br />
-              {userInfo.drumPatches.length}
-            </Typography>{" "}
-          </div>
-          <Divider orientation="vertical" flexItem />
-          <div className="file-info-card">
-            <Typography variant="overline">
-              Files
-              <br />
-              {userInfo.files.length}
-            </Typography>
-          </div>
-        </Grid>
-      )}
-      <div className="break" />
-      <Typography variant="overline">Sessions</Typography>
-      <div className="break" />
-
-      {userSessions &&
-        userSessions
-          .filter((e, i) => i < 6)
-          .map((session, sessionIndex) => (
-            <SessionGalleryItem
-              handleSessionSelect={() =>
-                openPage("session", userInfo.sessions[sessionIndex])
-              }
-              userPage
-              /*handleUserLike={() => handleUserLike(sessionIndex)}
-          handleSessionDelete={setDeleteDialog}
-          setPlayingSession={() =>
-            setPlayingSession((prev) =>
-              prev === sessionIndex ? null : sessionIndex
-            )
-          }
-          playingLoadingProgress={playingLoadingProgress}
-          setRenameDialog={setRenameDialog}
-          playingSession={playingSession === sessionIndex} */
-              key={`sgi${sessionIndex}`}
-              index={sessionIndex}
-              session={session}
-              isUser={props.isUser}
-              /* likedByUser={
-            userLikes && userLikes.includes(userInfo.sessions[sessionIndex])
-          } */
-              createNewSession={props.createNewSession}
-            />
-          ))}
+            <div className="file-info-card">
+              <Typography variant="overline">
+                Instruments
+                <br />
+                {userInfo.patches.length}
+              </Typography>
+            </div>
+            <Divider orientation="vertical" flexItem />
+            <div className="file-info-card">
+              <Typography variant="overline">
+                Drumsets
+                <br />
+                {userInfo.drumPatches.length}
+              </Typography>{" "}
+            </div>
+            <Divider orientation="vertical" flexItem />
+            <div className="file-info-card">
+              <Typography variant="overline">
+                Files
+                <br />
+                {userInfo.files.length}
+              </Typography>
+            </div>
+          </Grid>
+        )}
+        <div className="break" />
+        <Typography variant="overline">Sessions</Typography>
+        <div className="break" />
+        <div className="user-page-sessions-cont">
+          <SessionExplorer
+            history={props.history}
+            target={userKey}
+            user={props.user}
+            compact
+          />
+        </div>
+      </Paper>
     </div>
   );
 }
