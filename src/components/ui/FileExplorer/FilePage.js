@@ -255,23 +255,10 @@ function FilePage(props) {
     );
   };
 
-  const huehue = () => {
-    firebase
-      .firestore()
-      .collection("files")
-      .get()
-      .then((r) =>
-        r.forEach((e) => {
-          firebase
-            .firestore()
-            .collection("files")
-            .doc(e.id)
-            .update({
-              upOn: firebase.firestore.FieldValue.serverTimestamp(),
-            })
-            .then(console.log("done on file " + e.id));
-        })
-      );
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
   };
 
   useEffect(() => {
@@ -313,6 +300,7 @@ function FilePage(props) {
           <Avatar
             alt={creatorInfo.profile.displayName}
             src={creatorInfo.profile.photoURL}
+            onClick={() => openUserPage(fileInfo.user)}
           />
         </Tooltip>
       )}

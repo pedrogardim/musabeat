@@ -364,6 +364,12 @@ function PatchPage(props) {
       );
   };
 
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
+  };
+
   useEffect(() => {
     if (isLoaded) console.log(isLoaded);
   }, [isLoaded]);
@@ -403,6 +409,7 @@ function PatchPage(props) {
           <Avatar
             alt={creatorInfo.profile.displayName}
             src={creatorInfo.profile.photoURL}
+            onClick={() => openUserPage(patchInfo.creator)}
           />
         </Tooltip>
       )}

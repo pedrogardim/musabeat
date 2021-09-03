@@ -470,6 +470,12 @@ function PatchExplorer(props) {
     win.focus();
   };
 
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
+  };
+
   const handleTagSelect = (tagName) => {
     /* let tag = fileTags.indexOf(tagName);
     let patchIndex = tagSelectionTarget[1];
@@ -725,6 +731,9 @@ function PatchExplorer(props) {
                                 patchesUserData[selectedPatchInfo.creator]
                                   .photoURL
                               }
+                              onClick={() =>
+                                openUserPage(selectedPatchInfo.creator)
+                              }
                             />
                           </Tooltip>
                         )}
@@ -814,6 +823,7 @@ function PatchExplorer(props) {
                                     patchesUserData[patch.creator].displayName
                                   }
                                   src={patchesUserData[patch.creator].photoURL}
+                                  onClick={() => openUserPage(patch.creator)}
                                 />
                               </Tooltip>
                             )}

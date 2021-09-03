@@ -340,6 +340,12 @@ function FileExplorer(props) {
     win.focus();
   };
 
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
+  };
+
   const handleTagSelect = (tagName) => {
     let tag = fileTags.indexOf(tagName);
     let fileIndex = tagSelectionTarget[1];
@@ -596,6 +602,7 @@ function FileExplorer(props) {
                               filesUserData[filedata[index].user].displayName
                             }
                             src={filesUserData[filedata[index].user].photoURL}
+                            onClick={() => openUserPage(filedata[index].user)}
                           />
                         </Tooltip>
                       )}

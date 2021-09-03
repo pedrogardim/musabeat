@@ -27,7 +27,7 @@ function WorkspaceTitle(props) {
   const { t } = useTranslation();
 
   const [creationDateString, setCreationDateString] = useState(null);
-  const [editorProfiles, setEditorProfiles] = useState([]);
+  const [editorProfiles, setEditorProfiles] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
   const history = useHistory();
@@ -41,30 +41,33 @@ function WorkspaceTitle(props) {
 
     const getEditorProfiles = async () => {
       return Promise.all(
-        props.sessionData.editors.map((user) =>
-          firebase.firestore().collection("users").doc(user).get()
-        )
+        props.sessionData.editors.map(async (user) => {
+          let profile = (
+            await firebase.firestore().collection("users").doc(user).get()
+          ).data();
+          return [user, profile];
+        })
       );
     };
 
     props.user &&
       props.sessionData.editors &&
       getEditorProfiles().then((r) => {
-        setEditorProfiles(
-          r.map((e) => {
-            props.user.uid === e.id &&
-              e.id === props.sessionData.creator &&
-              e.data().pr &&
-              props.setPremiumMode(true);
-            return e.data().profile;
-          })
-        );
+        r.map((e) => {
+          props.user.uid === e[0] &&
+            e[0] === props.sessionData.creator &&
+            e[1].pr &&
+            props.setPremiumMode(true);
+        });
+        setEditorProfiles(Object.fromEntries(r));
         //check if user is one of the editors, and if its premium
       });
   };
 
-  const handleTagClick = (tag) => {
-    history.push(`/tag/${tag}`);
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
   };
 
   const handleTagDelete = (index) => {
@@ -80,17 +83,19 @@ function WorkspaceTitle(props) {
     setExpanded(false);
   }, [props.sessionData, props.sessionKey, props.user]);
 
-  /*  useEffect(() => {
+  useEffect(() => {
     console.log(editorProfiles);
-  }, [editorProfiles]); */
+  }, [editorProfiles]);
 
   return (
     <div className="app-title">
       <Helmet>
         <title>
           {props.sessionData &&
-            editorProfiles[0] &&
-            `${props.sessionData.name} by ${editorProfiles[0].displayName} `}
+            editorProfiles &&
+            `${props.sessionData.name} by ${
+              editorProfiles[props.sessionData.creator].displayName
+            } `}
         </title>
       </Helmet>
       <Typography variant="h4">
@@ -136,12 +141,16 @@ function WorkspaceTitle(props) {
 
       <div className="break" />
 
-      {editorProfiles.length > 0 ? (
-        editorProfiles.map(
+      {editorProfiles && Object.keys(editorProfiles).length > 0 ? (
+        Object.keys(editorProfiles).map(
           (e) =>
             e !== null && (
-              <Tooltip title={e.displayName}>
-                <Avatar src={e.photoURL} alt={e.displayName} />
+              <Tooltip title={editorProfiles[e].profile.displayName}>
+                <Avatar
+                  src={editorProfiles[e].profile.photoURL}
+                  alt={editorProfiles[e].profile.displayName}
+                  onClick={() => openUserPage(e)}
+                />
               </Tooltip>
             )
         )
@@ -163,7 +172,7 @@ function WorkspaceTitle(props) {
                   key={props.index + e}
                   label={sessionTags[e]}
                   variant="outlined"
-                  onClick={() => handleTagClick(e)}
+                  /* onClick={() => handleTagClick(e)} */
                   onDelete={() => handleTagDelete(i)}
                 />
               ))}

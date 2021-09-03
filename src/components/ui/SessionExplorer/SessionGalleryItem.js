@@ -41,6 +41,12 @@ function SessionGalleryItem(props) {
     dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
   };
 
+  const openUserPage = (id) => {
+    //console.log(id);
+    const win = window.open("/user/" + id, "_blank");
+    win.focus();
+  };
+
   useEffect(() => {
     fetchCreatorDisplayName();
   }, [props.session]);
@@ -79,7 +85,8 @@ function SessionGalleryItem(props) {
           <Avatar
             className="session-gallery-item-subtitle-avatar"
             src={creatorInfo.photoURL}
-          ></Avatar>
+            onClick={() => openUserPage(props.session.creator)}
+          />
           <Typography variant="overline">{creatorInfo.displayName}</Typography>
         </div>
       )}
