@@ -17,6 +17,8 @@ import {
   OutlinedInput,
 } from "@material-ui/core";
 
+import { Autocomplete } from "@material-ui/lab";
+
 import SessionGalleryItem from "./SessionGalleryItem";
 import PlaceholderSGI from "./PlaceholderSGI";
 import NameInput from "../Dialogs/NameInput";
@@ -28,6 +30,8 @@ import "./SessionExplorer.css";
 
 import firebase from "firebase";
 
+import { sessionTags } from "../../../assets/musicutils";
+
 function SessionExplorer(props) {
   const [sessions, setSessions] = useState([]);
   const [sessionKeys, setSessionKeys] = useState([]);
@@ -37,38 +41,44 @@ function SessionExplorer(props) {
   const [playingSession, setPlayingSession] = useState(null);
   const [playingLoadingProgress, setPlayingLoadingProgress] = useState(0);
 
-  const tag = useParams().key;
+  const [searchTags, setSearchTags] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
 
-  const getSessionList = (name) => {
+  const getSessionList = () => {
     //console.log(keyword);
-    const dbRef = props.isUser
-      ? firebase
-          .firestore()
-          .collection("sessions")
-          .where("creator", "==", props.user.uid)
-      : props.isTag
-      ? firebase
-          .firestore()
-          .collection("sessions")
-          .where("tags", "array-contains", tag.toLowerCase())
-      : name
-      ? firebase
-          .firestore()
-          .collection("sessions")
-          .where("name", ">=", name)
-          .where("name", "<=", name + "\uf8ff")
-      : firebase.firestore().collection("sessions");
 
-    dbRef.get().then((snapshot) => {
-      //console.log(snapshot.docs.map((e) => [e.id, e.data()]));
-      if (snapshot.empty) {
-        setSessionKeys(null);
-        setSessions(null);
-      } else {
-        setSessionKeys(snapshot.docs.map((e) => e.id));
-        setSessions(snapshot.docs.map((e) => e.data()));
+    let queryRules = () => {
+      let rules = firebase.firestore().collection("sessions");
+
+      if (searchValue) {
+        console.log("text");
+        rules = rules
+          .where("name", ">=", searchValue)
+          .where("name", "<=", searchValue + "\uf8ff");
       }
-    });
+      if (searchTags && searchTags.length > 0) {
+        rules = rules.where("categ", "array-contains-any", searchTags);
+      }
+      /* if (!clear && !isFirstQuery && lastItem) {
+        console.log("next page");
+        rules = rules.startAfter(lastItem);
+      } */
+
+      return rules;
+    };
+
+    queryRules()
+      .get()
+      .then((snapshot) => {
+        //console.log(snapshot.docs.map((e) => [e.id, e.data()]));
+        if (snapshot.empty) {
+          setSessionKeys(null);
+          setSessions(null);
+        } else {
+          setSessionKeys(snapshot.docs.map((e) => e.id));
+          setSessions(snapshot.docs.map((e) => e.data()));
+        }
+      });
   };
 
   const handleUserLike = (index) => {
@@ -167,7 +177,7 @@ function SessionExplorer(props) {
   };
 
   const handleSearch = (e) => {
-    e.key === "Enter" && getSessionList(e.target.value);
+    getSessionList(e.target.value);
   };
 
   useEffect(() => {
@@ -186,6 +196,10 @@ function SessionExplorer(props) {
   }, [playingSession]);
 
   useEffect(() => {
+    getSessionList();
+  }, [searchValue, searchTags]);
+
+  useEffect(() => {
     setSessions([]);
     getSessionList();
     props.user && getUserLikes();
@@ -193,16 +207,40 @@ function SessionExplorer(props) {
 
   return (
     <div className="session-explorer">
-      {props.isTag && <Typography variant="h3">{`Tag: "${tag}"`}</Typography>}
-      {!props.isTag && !props.isUser && (
-        <OutlinedInput
-          style={{ fontSize: 24 }}
-          startAdornment={
-            <InputAdornment position="start">
-              <Icon>search</Icon>
-            </InputAdornment>
-          }
+      {!props.isUser && (
+        <Autocomplete
+          multiple
+          freeSolo
+          className={`file-explorer-searchbar ${
+            props.compact && "file-explorer-searchbar-compact"
+          }`}
+          options={Array(129)
+            .fill()
+            .map((e, i) => (e = i))}
           onKeyPress={handleSearch}
+          onChange={(e, v) => setSearchTags(v)}
+          value={searchTags}
+          getOptionLabel={(e) => sessionTags[e]}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              style={{ fontSize: 24 }}
+              variant="outlined"
+              InputProps={{
+                ...params.InputProps,
+                startAdornment: (
+                  <>
+                    <InputAdornment position="start">
+                      <Icon>search</Icon>
+                    </InputAdornment>
+                    {params.InputProps.startAdornment}
+                  </>
+                ),
+              }}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          )}
         />
       )}
       <div className="break" />

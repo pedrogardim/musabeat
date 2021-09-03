@@ -246,15 +246,6 @@ function App() {
               createNewSession={handleCreateNewSession}
             />
           </Route>
-          <Route exact path="/tag/:key">
-            <SessionExplorer
-              isTag
-              createNewSession={handleCreateNewSession}
-              history={history}
-              user={user}
-            />
-          </Route>
-
           <Route exact path="/user/:key">
             <UserPage history={history} user={user} />
           </Route>
