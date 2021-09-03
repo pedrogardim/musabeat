@@ -61,3 +61,10 @@
   max-width: 680px;
   margin: 16px !important;
 }
+
+.up-fab {
+  position: fixed !important;
+  bottom: 32px;
+  right: 32px;
+  z-index: 6;
+}

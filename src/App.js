@@ -247,7 +247,7 @@ function App() {
             />
           </Route>
           <Route exact path="/user/:key">
-            <UserPage history={history} user={user} />
+            {user && <UserPage history={history} user={user} />}
           </Route>
 
           <Route exact path="/admin">

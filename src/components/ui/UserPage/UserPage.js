@@ -20,6 +20,7 @@ import {
   List,
   ListItem,
   Typography,
+  Fab,
 } from "@material-ui/core";
 
 import SessionExplorer from "../SessionExplorer/SessionExplorer";
@@ -44,12 +45,15 @@ function UserPage(props) {
   const [userInfo, setUserInfo] = useState(null);
   const [userSessions, setUserSessions] = useState(null);
 
+  const [isFollowing, setIsFollowing] = useState(false);
+
   const userKey = useParams().key;
+
+  const isUser = userKey === props.user.uid;
 
   const usersRef = firebase.firestore().collection("users");
   const userInfoRef = firebase.firestore().collection("users").doc(userKey);
   const sessionsRef = firebase.firestore().collection("sessions");
-  const user = firebase.auth().currentUser;
 
   const openPage = (route, id) => {
     //console.log(id);
@@ -83,70 +87,64 @@ function UserPage(props) {
     });
 
     //liked by user
-    /* if (user) {
+    if (props.user) {
       usersRef
-        .doc(user.uid)
+        .doc(props.user.uid)
         .get()
-        .then((r) => setIsFileLiked(r.data().likedFiles.includes(fileKey)));
-    } */
+        .then((r) => setIsFollowing(r.data().fllwing.includes(userKey)));
+    }
   };
 
-  const getUserSessions = () => {
-    Promise.all(
-      userInfo.sessions.map(async (e) => await sessionsRef.doc(e).get())
-    ).then((r) => setUserSessions(r.map((e) => e.data())));
-  };
+  const handleFollow = () => {
+    if (!isFollowing) {
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(props.user.uid)
+        .update({
+          fllwing: firebase.firestore.FieldValue.arrayUnion(userKey),
+        });
 
-  const handleUserFollow = () => {
-    /*  if (!isFileLiked) {
-      //file is not liked
-      setIsFileLiked(true);
-      setFileInfo((prev) => {
-        let newFileInfo = { ...prev };
-        newFileInfo.likes++;
-        return newFileInfo;
-      });
-      fileInfoRef.update({
-        likes: firebase.firestore.FieldValue.increment(1),
-      });
-      usersRef.doc(user.uid).update({
-        likedFiles: firebase.firestore.FieldValue.arrayUnion(fileKey),
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userKey)
+        .update({
+          fllrs: firebase.firestore.FieldValue.increment(1),
+        });
+
+      setIsFollowing(true);
+
+      setUserInfo((prev) => {
+        let a = { ...prev };
+        a.fllrs++;
+        return a;
       });
     } else {
-      setIsFileLiked(false);
-      setFileInfo((prev) => {
-        let newFileInfo = { ...prev };
-        newFileInfo.likes--;
-        return newFileInfo;
-      });
-      fileInfoRef.update({
-        likes: firebase.firestore.FieldValue.increment(-1),
-      });
-      usersRef.doc(user.uid).update({
-        likedFiles: firebase.firestore.FieldValue.arrayRemove(fileKey),
-      });
-    } */
-  };
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(props.user.uid)
+        .update({
+          fllwing: firebase.firestore.FieldValue.arrayRemove(userKey),
+        });
 
-  const huehue = () => {
-    firebase
-      .firestore()
-      .collection("sessions")
-      .get()
-      .then((r) =>
-        r.forEach((e) => {
-          firebase
-            .firestore()
-            .collection("users")
-            .doc(e.data().creator)
-            .update({
-              sessions: firebase.firestore.FieldValue.arrayUnion(e.id),
-            })
-            .then(
-              console.log("done on session " + e.id + " to user : " + e.creator)
-            );
-        })
-      );
+      firebase
+        .firestore()
+        .collection("users")
+        .doc(userKey)
+        .update({
+          fllrs: firebase.firestore.FieldValue.increment(-1),
+        });
+
+      setIsFollowing(false);
+
+      setUserInfo((prev) => {
+        let a = { ...prev };
+        a.fllrs--;
+        return a;
+      });
+    }
   };
 
   useEffect(() => {
@@ -154,10 +152,6 @@ function UserPage(props) {
 
     return () => {};
   }, []);
-
-  useEffect(() => {
-    userInfo && getUserSessions();
-  }, [userInfo]);
 
   return (
     <div className="user-page">
@@ -177,6 +171,10 @@ function UserPage(props) {
           <Typography variant="h3">{userInfo.profile.displayName}</Typography>
         )}
         <div className="break" />
+
+        {userInfo && (
+          <Typography variant="body1">{`${userInfo.fllrs} followers`}</Typography>
+        )}
 
         {/* <div className="player-controls">
         <Tooltip title={fileInfo && fileInfo.likes}>
@@ -239,7 +237,7 @@ function UserPage(props) {
           </Grid>
         )}
         <div className="break" />
-        <Typography variant="overline">Sessions</Typography>
+        <Typography variant="overline">Top Sessions</Typography>
         <div className="break" />
         <div className="user-page-sessions-cont">
           <SessionExplorer
@@ -250,6 +248,15 @@ function UserPage(props) {
           />
         </div>
       </Paper>
+      {!isUser && (
+        <Fab
+          onClick={handleFollow}
+          className="up-fab"
+          color={!isFollowing && "primary"}
+        >
+          <Icon>{!isFollowing ? "person_add" : "person_remove"}</Icon>
+        </Fab>
+      )}
     </div>
   );
 }

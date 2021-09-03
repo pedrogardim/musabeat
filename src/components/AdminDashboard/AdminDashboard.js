@@ -41,6 +41,14 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ alwcp: true, hid: false })));
   };
 
+  const updateUsers = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ fllrs: 0, fllwing: [] })));
+  };
+
   return (
     <div className="file-page">
       {/* <AppBar position="static">
@@ -58,7 +66,10 @@ function AdminDashboard(props) {
         {value === 0 && <PatchEditor />}
       </div> */}
       <Button onClick={updateStats}>Update Stats</Button>
+      <br />
       <Button onClick={updatePremium}>updateSessions</Button>
+      <br />
+      <Button onClick={updateUsers}>Update followers</Button>
     </div>
   );
 }
