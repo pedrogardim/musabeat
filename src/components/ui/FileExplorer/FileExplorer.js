@@ -71,8 +71,6 @@ function FileExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const user = firebase.auth().currentUser;
-
   const itemsPerPage = 25;
 
   //const [userOption, setUserOption] = useState(false);
@@ -213,8 +211,10 @@ function FileExplorer(props) {
   };
 
   const getUserFilesList = async (liked) => {
-    const user = firebase.auth().currentUser;
-    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbUserRef = firebase
+      .firestore()
+      .collection("users")
+      .doc(props.user.uid);
     const dbFilesRef = firebase.firestore().collection("files");
     const storageRef = firebase.storage();
 
@@ -254,7 +254,7 @@ function FileExplorer(props) {
     firebase
       .firestore()
       .collection("users")
-      .doc(user.uid)
+      .doc(props.user.uid)
       .get()
       .then((r) => setUserLikedFiles(r.get("likedFiles")));
   };
@@ -278,10 +278,13 @@ function FileExplorer(props) {
   };
 
   const handleLike = (index) => {
-    if (user === null) return;
+    if (props.user === null) return;
     let likedFileId = fileIdList[index];
 
-    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbUserRef = firebase
+      .firestore()
+      .collection("users")
+      .doc(props.user.uid);
     const dbFileRef = firebase.firestore().collection("files").doc(likedFileId);
 
     if (!userLikedFiles.includes(likedFileId)) {
@@ -426,19 +429,16 @@ function FileExplorer(props) {
   }, [filedata]);
 
   useEffect(() => {
-    clearFiles();
-    props.userFiles && user && getUserFilesList();
-  }, [props.userFiles, user]);
+    if (props.userFiles && props.user) {
+      clearFiles();
+      setIsLoading(false);
+      getUserFilesList(showingLiked);
+    }
+  }, [props.userFiles, props.user, showingLiked]);
 
   useEffect(() => {
-    user && getUserLikes();
-  }, [user]);
-
-  useEffect(() => {
-    clearFiles();
-    setIsLoading(false);
-    getUserFilesList(showingLiked);
-  }, [showingLiked]);
+    props.user && getUserLikes();
+  }, [props.user]);
 
   useEffect(() => {
     clearFiles();
@@ -446,10 +446,6 @@ function FileExplorer(props) {
 
     //console.log("change triggered");
   }, [searchTags, searchValue]);
-
-  /* useEffect(() => {
-    !isQueryEnd && !isLoading && getFilesList();
-  }, [props.isScrollBottom]); */
 
   useEffect(() => {
     //console.log("isLoading", isLoading);
@@ -578,11 +574,12 @@ function FileExplorer(props) {
                       >
                         {`${row.name}.${fileExtentions[row.type]}`}
                       </Typography>
-                      {props.userFiles && filedata[index].user === user.uid && (
-                        <IconButton onClick={() => setRenamingFile(index)}>
-                          <Icon>edit</Icon>
-                        </IconButton>
-                      )}
+                      {props.userFiles &&
+                        filedata[index].user === props.user.uid && (
+                          <IconButton onClick={() => setRenamingFile(index)}>
+                            <Icon>edit</Icon>
+                          </IconButton>
+                        )}
                       {filesUserData[filedata[index].user] && (
                         <Tooltip
                           title={
@@ -773,7 +770,7 @@ function FileExplorer(props) {
         </BottomNavigation>
       )}
 
-      {!props.compact && (
+      {!props.compact && props.userFiles && (
         <Fab
           className="fe-fab"
           color={showingLiked ? "secondary" : "primary"}

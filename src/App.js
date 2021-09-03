@@ -210,32 +210,32 @@ function App() {
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer explore />
+            <FileExplorer explore user={user} />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles />
+            <FileExplorer userFiles user={user} />
           </Route>
           <Route exact path="/file/:key">
-            <FilePage />
+            <FilePage user={user} />
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer explore />
+            <PatchExplorer explore user={user} />
           </Route>
           <Route exact path="/userinstruments">
-            <PatchExplorer userPatches />
+            <PatchExplorer userPatches user={user} />
           </Route>
           <Route exact path="/instrument/:key">
-            <PatchPage />
+            <PatchPage user={user} />
           </Route>
           <Route exact path="/drumsets">
-            <PatchExplorer isDrum explore />
+            <PatchExplorer isDrum explore user={user} />
           </Route>
           <Route exact path="/userdrumsets">
-            <PatchExplorer isDrum userPatches />
+            <PatchExplorer isDrum userPatches user={user} />
           </Route>
           <Route exact path="/drumset/:key">
-            <PatchPage isDrum />
+            <PatchPage isDrum user={user} />
           </Route>
 
           <Route exact path="/session/:key">

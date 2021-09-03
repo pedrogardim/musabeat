@@ -88,7 +88,6 @@ function PatchExplorer(props) {
   const [searchTags, setSearchTags] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
-  const user = firebase.auth().currentUser;
   const categories = props.isDrum ? drumCategories : instrumentsCategories;
 
   const usersRef = firebase.firestore().collection("users");
@@ -214,7 +213,10 @@ function PatchExplorer(props) {
   };
 
   const getUserPatchesList = async (liked) => {
-    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbUserRef = firebase
+      .firestore()
+      .collection("users")
+      .doc(props.user.uid);
     const dbPatchesRef = firebase
       .firestore()
       .collection(props.isDrum ? "drumpatches" : "patches");
@@ -305,7 +307,7 @@ function PatchExplorer(props) {
     firebase
       .firestore()
       .collection("users")
-      .doc(user.uid)
+      .doc(props.user.uid)
       .get()
       .then((r) =>
         setUserLikedPatches(
@@ -315,10 +317,13 @@ function PatchExplorer(props) {
   };
 
   const handleLike = (index) => {
-    if (user === null) return;
+    if (props.user === null) return;
     let likedPatchId = patchIdList[index];
 
-    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+    const dbUserRef = firebase
+      .firestore()
+      .collection("users")
+      .doc(props.user.uid);
     const dbPatchRef = firebase
       .firestore()
       .collection(props.isDrum ? "drumpatches" : "patches")
@@ -558,19 +563,16 @@ function PatchExplorer(props) {
   }, [patchdata]);
 
   useEffect(() => {
-    clearPatches();
-    props.userPatches && user && getUserPatchesList();
-  }, [props.userPatches, user]);
+    if (props.userPatches && props.user) {
+      clearPatches();
+      setIsLoading(false);
+      getUserPatchesList();
+    }
+  }, [props.userPatches, props.user, showingLiked]);
 
   useEffect(() => {
-    user && getUserLikes();
-  }, [props.explore, user]);
-
-  useEffect(() => {
-    clearPatches();
-    setIsLoading(false);
-    user && getUserPatchesList(showingLiked);
-  }, [showingLiked]);
+    props.user && getUserLikes();
+  }, [props.user]);
 
   useEffect(() => {
     props.compact && selectedPatch && getSelectedPatchInfo(selectedPatch);
@@ -786,11 +788,14 @@ function PatchExplorer(props) {
                               </Icon>
                             </Tooltip>
                           )}
-                          {props.userPatches && patch.creator === user.uid && (
-                            <IconButton onClick={() => setRenamingPatch(index)}>
-                              <Icon>edit</Icon>
-                            </IconButton>
-                          )}
+                          {props.userPatches &&
+                            patch.creator === props.user.uid && (
+                              <IconButton
+                                onClick={() => setRenamingPatch(index)}
+                              >
+                                <Icon>edit</Icon>
+                              </IconButton>
+                            )}
                           {patchesUserData[patch.creator] &&
                             (!props.userPatches ||
                               (props.userPatches && showingLiked)) && (
@@ -972,7 +977,7 @@ function PatchExplorer(props) {
         </BottomNavigation>
       )}
 
-      {!props.compact && (
+      {!props.compact && props.userPatches && (
         <Fab
           className="pe-fab"
           color={showingLiked ? "secondary" : "primary"}
