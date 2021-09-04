@@ -175,6 +175,7 @@ function UserPage(props) {
         {userInfo && (
           <Typography variant="body1">{`${userInfo.fllrs} followers`}</Typography>
         )}
+        <div className="break" />
 
         {/* <div className="player-controls">
         <Tooltip title={fileInfo && fileInfo.likes}>

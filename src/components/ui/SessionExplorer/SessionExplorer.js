@@ -271,6 +271,7 @@ function SessionExplorer(props) {
       ) : !!sessions.length ? (
         sessions.map((session, sessionIndex) => (
           <SessionGalleryItem
+            user={props.user}
             compact={props.compact}
             handleSessionSelect={handleSessionSelect}
             handleUserLike={() => handleUserLike(sessionIndex)}
@@ -332,6 +333,7 @@ function SessionExplorer(props) {
       {playingSession !== null && (
         <Workspace
           hidden
+          user={props.user}
           session={sessions[playingSession]}
           isPlaying={true}
           setPlayingLoadingProgress={setPlayingLoadingProgress}

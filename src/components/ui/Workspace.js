@@ -1193,6 +1193,7 @@ function Workspace(props) {
           modules={modules}
           instruments={instruments}
           setModules={setModules}
+          setMixerOpened={setMixerOpened}
         />
       )}
       {/*setModulesVolume={setModulesVolume}*/}
@@ -1218,23 +1219,24 @@ function Workspace(props) {
         className="ws-opt-btn-cont"
         style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
       >
-        {sessionData && (
-          <SessionSettings
-            premiumMode={premiumMode}
-            sessionData={sessionData}
-            setSessionData={setSessionData}
-          />
-        )}
+        <IconButton
+          tabIndex={-1}
+          className="ws-fab ws-fab-mix"
+          color="primary"
+          onClick={() => setMixerOpened((prev) => (prev ? false : true))}
+        >
+          <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+        </IconButton>
         {editMode && (
           <Fragment>
-            <IconButton
-              tabIndex={-1}
-              className="ws-fab ws-fab-mix"
-              color="primary"
-              onClick={() => setMixerOpened((prev) => (prev ? false : true))}
-            >
-              <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-            </IconButton>
+            {sessionData && (
+              <SessionSettings
+                premiumMode={premiumMode}
+                sessionData={sessionData}
+                setSessionData={setSessionData}
+              />
+            )}
+
             <Tooltip title={t("misc.saveChanges")}>
               <IconButton
                 disabled={!areUnsavedChanges || !props.user}
@@ -1261,14 +1263,34 @@ function Workspace(props) {
           />
         )}
 
-        <IconButton
-          tabIndex={-1}
-          color="primary"
-          className="ws-fab ws-fab-copy"
-          onClick={() => setSessionDupDialog(true)}
-        >
-          <Icon>content_copy</Icon>
-        </IconButton>
+        {sessionData && (
+          <Tooltip
+            title={
+              !props.user
+                ? "Log in to be able to copy sessions"
+                : (props.user && props.user.uid) !== sessionData.creator &&
+                  !sessionData.alwcp
+                ? "The user doesn't allow this session to be copied"
+                : "Create a copy"
+            }
+            placement="top"
+          >
+            <div>
+              <IconButton
+                tabIndex={-1}
+                color="primary"
+                className="ws-fab ws-fab-copy"
+                disabled={
+                  !props.user ||
+                  (props.user.uid !== sessionData.creator && !sessionData.alwcp)
+                }
+                onClick={() => setSessionDupDialog(true)}
+              >
+                <Icon>content_copy</Icon>
+              </IconButton>
+            </div>
+          </Tooltip>
+        )}
       </Paper>
 
       <Snackbar

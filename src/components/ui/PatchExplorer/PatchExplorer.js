@@ -590,6 +590,12 @@ function PatchExplorer(props) {
     //console.log("change triggered");
   }, [searchTags, searchValue]);
 
+  useEffect(() => {
+    clearPatches();
+    getPatchesList("clear");
+    //console.log("change triggered");
+  }, [props.isDrum]);
+
   /* useEffect(() => {
     !isQueryEnd && !isLoading && getPatchesList();
   }, [props.isScrollBottom]); */

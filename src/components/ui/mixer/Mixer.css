@@ -1,15 +1,14 @@
-.mixer{
-    position:fixed;
-    width:100vw;
-    z-index:1;
-    height:100vh;
-    background:white;
-    top:0;
-    display:flex;
-    flex-direction:row;
-    flex-wrap: nowrap;
-    justify-content:center;
-    align-items: center;
-    overflow: hidden;
-    
+.mixer {
+  position: fixed;
+  width: 100vw;
+  z-index: 1;
+  height: calc(100vh - 64px);
+  background: white;
+  top: 64px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }

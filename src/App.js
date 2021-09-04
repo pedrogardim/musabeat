@@ -192,7 +192,12 @@ function App() {
 
         <Switch>
           <Route exact path="/">
-            <HomePage user={user} setAuthDialog={setAuthDialog} />
+            <HomePage
+              user={user}
+              setAuthDialog={setAuthDialog}
+              handlePageNav={handlePageNav}
+              createNewSession={handleCreateNewSession}
+            />
           </Route>
           <Route exact path="/explore">
             <SessionExplorer

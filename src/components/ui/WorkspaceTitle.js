@@ -37,7 +37,7 @@ function WorkspaceTitle(props) {
     let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
       date.getMonth() + 1
     }/${date.getFullYear()}`;
-    setCreationDateString(creationDate);
+    setCreationDateString(isNaN(date.getDate()) ? "" : creationDate);
 
     const getEditorProfiles = async () => {
       return Promise.all(
@@ -83,9 +83,9 @@ function WorkspaceTitle(props) {
     setExpanded(false);
   }, [props.sessionData, props.sessionKey, props.user]);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     console.log(editorProfiles);
-  }, [editorProfiles]);
+  }, [editorProfiles]); */
 
   return (
     <div className="app-title">
@@ -136,7 +136,7 @@ function WorkspaceTitle(props) {
           Math.floor(
             (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
           )
-        ).slice(-2)} s - ${creationDateString || " "}`}
+        ).slice(-2)} s ${creationDateString && "- " + creationDateString}`}
       </Typography>
 
       <div className="break" />

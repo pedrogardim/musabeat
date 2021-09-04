@@ -131,8 +131,15 @@ function HomePage(props) {
         className="home-page-new-session-btn"
         color="primary"
         variant="extended"
+        onClick={() =>
+          props.createNewSession(
+            undefined,
+            props.handlePageNav,
+            props.setOpenedSession
+          )
+        }
       >
-        <Icon>add_circle</Icon>
+        <Icon style={{ marginRight: 8 }}>add_circle</Icon>
         Create a session
       </Fab>
     </div>

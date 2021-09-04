@@ -148,10 +148,29 @@ function SessionGalleryItem(props) {
           {/*<IconButton>
           <Icon>share</Icon>
         </IconButton>*/}
-          <Tooltip title="Create a copy">
-            <IconButton onClick={() => props.createNewSession(props.session)}>
-              <Icon>content_copy</Icon>
-            </IconButton>
+          <Tooltip
+            title={
+              !props.user
+                ? "Log in to be able to copy sessions"
+                : (props.user && props.user.uid) !== props.session.creator &&
+                  !props.session.alwcp
+                ? "The user doesn't allow this session to be copied"
+                : "Create a copy"
+            }
+            placement="top"
+          >
+            <div>
+              <IconButton
+                onClick={() => props.createNewSession(props.session)}
+                disabled={
+                  !props.user ||
+                  (props.user.uid !== props.session.creator &&
+                    !props.session.alwcp)
+                }
+              >
+                <Icon>content_copy</Icon>
+              </IconButton>
+            </div>
           </Tooltip>
           {props.isUser && (
             <Tooltip title="Delete Session">

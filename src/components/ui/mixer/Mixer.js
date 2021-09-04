@@ -1,6 +1,8 @@
 import "./Mixer.css";
 import ChannelStrip from "./ChannelStrip";
 
+import { Icon, IconButton } from "@material-ui/core";
+
 function Mixer(props) {
   const handleSliderMove = (index, value) => {
     props.instruments[index].volume.value = value;
@@ -37,6 +39,13 @@ function Mixer(props) {
           handleMute={() => handleMute(index)}
         />
       ))}
+      <IconButton
+        onClick={() => props.setMixerOpened(false)}
+        className="mp-closebtn"
+        color="primary"
+      >
+        <Icon>close</Icon>
+      </IconButton>
     </div>
   );
 }
