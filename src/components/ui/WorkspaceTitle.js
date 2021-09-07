@@ -83,9 +83,9 @@ function WorkspaceTitle(props) {
     setExpanded(false);
   }, [props.sessionData, props.sessionKey, props.user]);
 
-  /*   useEffect(() => {
+  useEffect(() => {
     console.log(editorProfiles);
-  }, [editorProfiles]); */
+  }, [editorProfiles]);
 
   return (
     <div className="app-title">
@@ -94,7 +94,7 @@ function WorkspaceTitle(props) {
           {props.sessionData &&
             editorProfiles &&
             `${props.sessionData.name} by ${
-              editorProfiles[props.sessionData.creator].displayName
+              editorProfiles[props.sessionData.creator].profile.displayName
             } `}
         </title>
       </Helmet>

@@ -156,11 +156,11 @@ function PianoRoll(props) {
   };
 
   const handleMouseOver = (event) => {
-    let hoverX =
+    /* let hoverX =
       (event.nativeEvent.pageX -
         PRWrapper.current.getBoundingClientRect().left) /
-      PRWrapper.current.offsetWidth;
-    setHovered(hoverX < 0.5 ? "left" : "right");
+      PRWrapper.current.offsetWidth; */
+    setHovered(true);
   };
 
   const handleMouseOut = (event) => {
@@ -255,16 +255,17 @@ function PianoRoll(props) {
               }}
             >
               {hovered && (
-                <Typography
-                  variant="overline"
-                  className="piano-roll-row-label"
-                  style={{
-                    color: colors[props.module.color][100],
-                    textAlign: hovered === "left" ? "right" : "left",
-                  }}
-                >
-                  {Tone.Frequency(i + 24, "midi").toNote()}
-                </Typography>
+                <div className="piano-roll-row-label">
+                  <Typography
+                    variant="overline"
+                    style={{
+                      color: colors[props.module.color][200],
+                      /* textAlign: hovered === "left" ? "right" : "left", */
+                    }}
+                  >
+                    {Tone.Frequency(i + 24, "midi").toNote()}
+                  </Typography>
+                </div>
               )}
               {Array(props.module.size * 8)
                 .fill(0)

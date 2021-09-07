@@ -157,11 +157,11 @@ function MelodyGrid(props) {
   };
 
   const handleMouseOver = (event) => {
-    let hoverX =
+    /* let hoverX =
       (event.nativeEvent.pageX -
         parentRef.current.getBoundingClientRect().left) /
-      parentRef.current.offsetWidth;
-    setHovered(hoverX < 0.5 ? "left" : "right");
+      parentRef.current.offsetWidth; */
+    setHovered(true);
   };
 
   useEffect(() => {
@@ -214,14 +214,16 @@ function MelodyGrid(props) {
         {gridScale.map((drumsound, row) => (
           <div className="melody-grid-row" key={row}>
             {hovered && (
-              <Typography
-                className="melody-grid-row-label"
-                variant="overline"
-                style={{ textAlign: hovered === "left" ? "right" : "left" }}
-              >
-                {drumsound}
-              </Typography>
+              <div className="sequencer-row-label">
+                <Typography
+                  variant="overline"
+                  style={{ color: colors[props.module.color][200] }}
+                >
+                  {drumsound}
+                </Typography>
+              </div>
             )}
+
             {Object.values(melodyArray[currentMeasure]).map((beat, column) => (
               <SequencerTile
                 key={[column, row]}

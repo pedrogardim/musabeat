@@ -145,13 +145,17 @@ function Sequencer(props) {
         {soundsMap.map((drumsound, row) => (
           <div className="sequencer-row" key={drumsound}>
             {hovered && (
-              <Typography
-                className="sequencer-row-label"
-                variant="overline"
-                style={{ textAlign: hovered === "left" ? "right" : "left" }}
-              >
-                {props.module.lbls[row] ? props.module.lbls[row] : drumsound}
-              </Typography>
+              <div className="sequencer-row-label">
+                <Typography
+                  variant="overline"
+                  style={{
+                    /* textAlign: hovered === "left" ? "right" : "left"; */
+                    color: colors[props.module.color][200],
+                  }}
+                >
+                  {props.module.lbls[row] ? props.module.lbls[row] : drumsound}
+                </Typography>
+              </div>
             )}
             {Object.values(sequencerArray[currentMeasure]).map(
               (beat, column) => (

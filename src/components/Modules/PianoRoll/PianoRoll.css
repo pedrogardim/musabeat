@@ -19,11 +19,10 @@
 .piano-roll-row-label {
   position: absolute;
   height: 100% !important;
-  vertical-align: middle !important;
-  line-height: 100% !important;
-
+  align-items: center; /* line-height: 100% !important; */
+  display: flex;
   pointer-events: none;
-  color: white !important;
+  color: white;
   /* mix-blend-mode: difference;
   filter: saturate(0); */
   width: calc(100% - 8px);
