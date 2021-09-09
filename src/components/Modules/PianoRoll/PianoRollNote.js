@@ -28,7 +28,7 @@ function PianoRollNote(props) {
     pointerEvents: props.dragSelection && "none",
   };
 
-  const handleMouseDown = (e) => {
+  const handleClick = (e) => {
     props.setSelection((prev) =>
       e.shiftKey
         ? prev.includes(props.index)
@@ -36,6 +36,7 @@ function PianoRollNote(props) {
           : [...prev, props.index]
         : [props.index]
     );
+
     props.instrument.triggerAttackRelease(
       props.note.note,
       props.note.duration,
@@ -45,6 +46,8 @@ function PianoRollNote(props) {
 
   const handleDrag = (event, data) => {
     setNotePosition({ x: data.x, y: data.y });
+    props.setDraggingNoteDelta({ x: data.deltaX, y: data.deltaY });
+    props.setDraggingNote([props.index, props.note]);
   };
 
   const handleDragStop = (event, data) => {
@@ -53,10 +56,12 @@ function PianoRollNote(props) {
         props.parentRef.current.offsetWidth
     ).toBarsBeatsSixteenths();
     let newNote = Tone.Frequency(-data.y / noteHeight + 107, "midi").toNote();
-    console.log(newNote, newTime);
     if (newTime.includes("-")) newTime = "0:0:0";
     let noteObj = { note: newNote, time: newTime };
     props.changeNote(noteObj, props.index);
+
+    props.setDraggingNoteDelta(null);
+    props.setDraggingNote(null);
   };
 
   const handleResize = (a, b, c, d, e, f) => {
@@ -92,7 +97,7 @@ function PianoRollNote(props) {
     //console.log(noteY, noteX, noteHeight, noteWidth);
   };
 
-  useEffect(() => {}, []);
+  //useEffect(() => {}, []);
 
   useEffect(() => {
     if (props.parentRef.current) {
@@ -111,9 +116,26 @@ function PianoRollNote(props) {
     //props.parentRef.current.offsetWidth,
   ]);
 
-  /*  useEffect(() => {
-    console.log(notePosition);
-  }, [notePosition]); */
+  //WIP: Multidrag
+
+  /* useEffect(() => {
+    if (
+      props.draggingNote &&
+      props.draggingNote[0] !== props.index &&
+      props.selected
+    ) {
+      if (props.draggingNoteDelta) {
+        setNotePosition((prev) => {
+          return {
+            x: prev.x + props.draggingNoteDelta.x,
+            y: prev.y + props.draggingNoteDelta.y,
+          };
+        });
+      } else {
+        handleDragStop("", { x: notePosition.x, y: notePosition.y });
+      }
+    }
+  }, [props.draggingNoteDelta]); */
 
   return (
     <Rnd
@@ -132,7 +154,7 @@ function PianoRollNote(props) {
       onDragStop={handleDragStop}
       onResize={handleResize}
       onResizeStop={handleResizeStop}
-      onMouseDown={handleMouseDown}
+      onClick={handleClick}
       position={notePosition}
       size={{ height: noteHeight, width: noteWidth }}
       bounds={".piano-roll"}

@@ -34,6 +34,9 @@ function PianoRoll(props) {
   const [dragSelection, setDragSelection] = useState(false);
   const [draggingOver, setDraggingOver] = useState(false);
 
+  const [draggingNoteDelta, setDraggingNoteDelta] = useState(null);
+  const [draggingNote, setDraggingNote] = useState(null);
+
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
 
   const scheduleEvents = () => {
@@ -126,6 +129,7 @@ function PianoRoll(props) {
   };
 
   const changeNote = (note, index) => {
+    console.log("change note", note);
     setNotes((prev) => {
       let newNotes = [...prev];
       newNotes[index] = Object.assign({}, prev[index], note);
@@ -218,10 +222,10 @@ function PianoRoll(props) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     let width = dragSelection[2] - dragSelection[0];
     let height = dragSelection[3] - dragSelection[1];
-    ctx.fillStyle = colors[props.module.color][300];
+    ctx.fillStyle = colors[props.module.color][200] + "50";
     ctx.strokeStyle = colors[props.module.color][700];
 
-    ctx.strokeRect(dragSelection[0], dragSelection[1], width, height);
+    ctx.fillRect(dragSelection[0], dragSelection[1], width, height);
   };
 
   useEffect(() => {
@@ -244,6 +248,7 @@ function PianoRoll(props) {
   }, [Tone.Transport.state]);
 
   useEffect(() => {
+    console.log("notes", notes);
     scheduleEvents();
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
@@ -271,6 +276,14 @@ function PianoRoll(props) {
     setDragSelection(false);
   }, [hovered]);
 
+  /* useEffect(() => {
+    console.log(draggingNote);
+  }, [draggingNote]);
+
+  useEffect(() => {
+    console.log(draggingNoteDelta);
+  }, [draggingNoteDelta]); */
+
   return (
     <div
       className="module-innerwrapper"
@@ -292,8 +305,11 @@ function PianoRoll(props) {
         onMouseOut={handleMouseOut}
         onKeyDown={handleKeyPress}
         onMouseDown={handleMouseDown}
+        /* onTouchStart={handleMouseDown} */
         onMouseUp={handleMouseUp}
+        /*  onTouchEnd={handleMouseUp} */
         onMouseMove={handleMouseMove}
+        /* onTouchMove={handleMouseMove} */
         onDragEnter={() => setDraggingOver(true)}
         onDoubleClick={handleDblClick}
       >
@@ -360,10 +376,15 @@ function PianoRoll(props) {
             sessionSize={props.sessionSize}
             size={props.module.size}
             parentWidth={parentWidth}
+            selection={props.selection}
             selected={props.selection.includes(i)}
             setSelection={props.setSelection}
             instrument={props.instrument}
             dragSelection={dragSelection}
+            draggingNote={draggingNote}
+            setDraggingNote={setDraggingNote}
+            draggingNoteDelta={draggingNoteDelta}
+            setDraggingNoteDelta={setDraggingNoteDelta}
           />
         ))}
         <canvas
