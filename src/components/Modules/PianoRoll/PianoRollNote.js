@@ -25,6 +25,7 @@ function PianoRollNote(props) {
     background: props.selected ? props.color[500] : props.color[300],
     color: props.selected ? props.color[100] : props.color[800],
     borderRadius: 3,
+    pointerEvents: props.dragSelection && "none",
   };
 
   const handleMouseDown = (e) => {
@@ -52,7 +53,8 @@ function PianoRollNote(props) {
         props.parentRef.current.offsetWidth
     ).toBarsBeatsSixteenths();
     let newNote = Tone.Frequency(-data.y / noteHeight + 107, "midi").toNote();
-    //console.log(newNote, newTime);
+    console.log(newNote, newTime);
+    if (newTime.includes("-")) newTime = "0:0:0";
     let noteObj = { note: newNote, time: newTime };
     props.changeNote(noteObj, props.index);
   };

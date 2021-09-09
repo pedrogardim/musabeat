@@ -1082,11 +1082,11 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
-      {isPlaying && (
+      {/* isPlaying && (
         <Helmet>
           <title>{"▶ " + document.title}</title>
         </Helmet>
-      )}
+      ) */}
 
       <Fade in={!Boolean(modules)} timeout={{ enter: 0, exit: 200 }}>
         <div className="loading-screen-background">
@@ -1167,7 +1167,7 @@ function Workspace(props) {
               style={{ marginTop: 48 }}
               onClick={() => setModulePicker(true)}
             >
-              <Icon style={{ fontSize: 40 }}>add</Icon>
+              <Icon style={{ fontSize: 40 }}>add_circle_outline</Icon>
             </IconButton>
           </Tooltip>
         )}

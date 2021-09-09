@@ -31,7 +31,7 @@ function PianoRoll(props) {
   );
   //TEMP: used only for detect window resizing on note component
   const [parentWidth, setParentWidth] = useState(0);
-  const [selecting, setSelecting] = useState(false);
+  const [dragSelection, setDragSelection] = useState(false);
   const [draggingOver, setDraggingOver] = useState(false);
 
   //PRWrapper.current && PRWrapper.current.scrollTo(0, 0);
@@ -65,21 +65,13 @@ function PianoRoll(props) {
 
   const handleDblClick = (event) => {
     let clickedPos = [
-      event.target.getBoundingClientRect().top,
-      event.target.getBoundingClientRect().left,
-    ];
-    let modulePos = [
-      PRWrapper.current.getBoundingClientRect().top,
-      PRWrapper.current.getBoundingClientRect().left,
+      event.pageY - PRWrapper.current.getBoundingClientRect().top,
+      event.pageX - PRWrapper.current.getBoundingClientRect().left,
     ];
 
     let delta = [
-      82 -
-        Math.floor(
-          (clickedPos[0] - modulePos[0]) / (PRWrapper.current.offsetHeight / 82)
-        ),
-      (clickedPos[1] - modulePos[1]) /
-        (PRWrapper.current.offsetWidth / (props.module.size * 8)),
+      84 - Math.ceil(clickedPos[0] / (PRWrapper.current.offsetHeight / 84)),
+      clickedPos[1] / (PRWrapper.current.offsetWidth / (props.module.size * 8)),
     ];
 
     let newNote = {
@@ -90,7 +82,6 @@ function PianoRoll(props) {
       duration: "8n",
       velocity: 0.7,
     };
-
     //console.log(newNote);
 
     setNotes((prev) => {
@@ -148,28 +139,89 @@ function PianoRoll(props) {
   };
 
   const handleMouseDown = (e) => {
-    if (e.target.className === "piano-roll-row-tile") {
+    let initialPoint = [
+      e.pageX - PRWrapper.current.getBoundingClientRect().left,
+      e.pageY - PRWrapper.current.getBoundingClientRect().top,
+    ];
+
+    if (e.target.className === "piano-roll") {
       //console.log("notes cleared!");
       props.setSelection([]);
+      setDragSelection([...initialPoint, ...initialPoint]);
     }
-    setSelecting([e.pageX, e.pageY]);
   };
 
-  const handleMouseOver = (event) => {
-    /* let hoverX =
-      (event.nativeEvent.pageX -
-        PRWrapper.current.getBoundingClientRect().left) /
-      PRWrapper.current.offsetWidth; */
-    setHovered(true);
+  const handleMouseMove = (event) => {
+    if (dragSelection) {
+      let newPoint = [
+        event.pageX - PRWrapper.current.getBoundingClientRect().left,
+        event.pageY - PRWrapper.current.getBoundingClientRect().top,
+      ];
+      setDragSelection((prev) => [prev[0], prev[1], ...newPoint]);
+
+      //console.log(dragSelection[1], newPoint[1]);
+
+      let timeRangeInSeconds = [dragSelection[0], newPoint[0]]
+        .map(
+          (e) =>
+            (e / PRWrapper.current.offsetWidth) *
+            Tone.Time("1m").toSeconds() *
+            props.module.size
+        )
+        .sort((a, b) => a - b);
+
+      let noteRangeInMidi = [dragSelection[1], newPoint[1]]
+        .map(
+          (n) => 84 - Math.ceil((n / PRWrapper.current.offsetHeight) * 84) + 24
+        )
+        .sort((a, b) => a - b);
+
+      const checkCondition = (note) => {
+        let midiNote = Tone.Frequency(note.note).toMidi();
+        let secTime = Tone.Time(note.time).toSeconds();
+        let secDur = Tone.Time(note.duration).toSeconds();
+
+        let noteCondition =
+          midiNote >= noteRangeInMidi[0] && midiNote <= noteRangeInMidi[1];
+        let timeCondition =
+          secTime + secDur >= timeRangeInSeconds[0] &&
+          secTime <= timeRangeInSeconds[1];
+        //console.log(timeCondition);
+        return noteCondition && timeCondition;
+      };
+
+      let noteSelection = notes
+        .map((e, i) => (checkCondition(e) ? i : false))
+        .filter((e) => e !== false);
+
+      props.setSelection(noteSelection);
+    }
   };
 
   const handleMouseOut = (event) => {
     setHovered(false);
-    setSelecting(false);
+    setDragSelection(false);
+  };
+
+  const handleMouseEnter = (event) => {
+    setHovered(true);
   };
 
   const handleMouseUp = (event) => {
-    setSelecting(false);
+    setDragSelection(false);
+  };
+
+  const drawDragSelectionBox = () => {
+    const canvas = document.getElementById("drag-select-box");
+    let ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let width = dragSelection[2] - dragSelection[0];
+    let height = dragSelection[3] - dragSelection[1];
+    ctx.fillStyle = colors[props.module.color][300];
+    ctx.strokeStyle = colors[props.module.color][700];
+
+    ctx.strokeRect(dragSelection[0], dragSelection[1], width, height);
   };
 
   useEffect(() => {
@@ -210,9 +262,14 @@ function PianoRoll(props) {
     scheduleEvents();
   }, [props.loaded, props.instrument, props.timeline, props.module.muted]);
 
-  /*  useEffect(() => {
-    console.log(props.selection);
-  }, [props.selection]); */
+  useEffect(() => {
+    drawDragSelectionBox();
+    //console.log(dragSelection);
+  }, [dragSelection]);
+
+  useEffect(() => {
+    setDragSelection(false);
+  }, [hovered]);
 
   return (
     <div
@@ -221,7 +278,7 @@ function PianoRoll(props) {
         (props.style,
         {
           backgroundColor: colors[props.module.color][900],
-          overflow: "scroll",
+          overflow: "overlay",
         })
       }
     >
@@ -231,12 +288,14 @@ function PianoRoll(props) {
         style={{
           width: props.moduleZoom * 100 + "%",
         }}
+        onMouseEnter={handleMouseEnter}
+        onMouseOut={handleMouseOut}
         onKeyDown={handleKeyPress}
         onMouseDown={handleMouseDown}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
         onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
         onDragEnter={() => setDraggingOver(true)}
+        onDoubleClick={handleDblClick}
       >
         {Array(12 * 7)
           .fill(0)
@@ -260,6 +319,8 @@ function PianoRoll(props) {
                     variant="overline"
                     style={{
                       color: colors[props.module.color][200],
+                      opacity: 0.5,
+                      pointerEvents: "none",
                       /* textAlign: hovered === "left" ? "right" : "left", */
                     }}
                   >
@@ -282,7 +343,6 @@ function PianoRoll(props) {
                           : colors[props.module.color][800]),
                     }}
                     className="piano-roll-row-tile"
-                    onDoubleClick={handleDblClick}
                   />
                 ))}
             </div>
@@ -303,18 +363,29 @@ function PianoRoll(props) {
             selected={props.selection.includes(i)}
             setSelection={props.setSelection}
             instrument={props.instrument}
+            dragSelection={dragSelection}
           />
         ))}
+        <canvas
+          id="drag-select-box"
+          style={{ pointerEvents: "none", zIndex: 4, position: "absolute" }}
+          height={PRWrapper.current && PRWrapper.current.offsetHeight}
+          width={PRWrapper.current && PRWrapper.current.offsetWidth}
+        />
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}
           onStart={handleCursorDragStart}
           onStop={handleCursorDragStop}
           position={{ x: cursorPosition, y: 0 }}
+          style={{ pointerEvents: dragSelection && "none" }}
         >
           <div
             className="sampler-cursor"
-            style={{ backgroundColor: "white" }}
+            style={{
+              backgroundColor: "white",
+              pointerEvents: dragSelection && "none",
+            }}
           />
         </Draggable>
       </div>
