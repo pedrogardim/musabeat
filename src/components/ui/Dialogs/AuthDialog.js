@@ -131,6 +131,8 @@ function AuthDialog(props) {
                 likedDrumPatches: [],
                 files: [],
                 likedFiles: [],
+                fllrs: 0,
+                fllwing: [],
               };
               firebase
                 .firestore()

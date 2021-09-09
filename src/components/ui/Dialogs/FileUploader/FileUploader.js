@@ -49,6 +49,8 @@ function FileUploader(props) {
   const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
   const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
 
+  const user = firebase.auth().currentUser;
+
   const onClose = () => {
     props.setUploadingFiles([]);
     setUploadingFileTags([]);
@@ -112,7 +114,9 @@ function FileUploader(props) {
 
             while (
               props.module.type === 0 &&
-              Object.keys(props.module.lbls).indexOf(slotToInsetFile) !== -1
+              props.instrument._buffers._buffers.has(
+                JSON.stringify(slotToInsetFile)
+              )
             ) {
               slotToInsetFile++;
             }
@@ -148,7 +152,6 @@ function FileUploader(props) {
             //UPLOAD FILE
             /////
 
-            const user = firebase.auth().currentUser;
             if (user) {
               let fileInfo = {
                 name: file.name.split(".")[0],
@@ -295,6 +298,13 @@ function FileUploader(props) {
                 });
 
               //add file info in database
+            } else {
+              setUploadState((prev) => {
+                let newState = [...prev];
+                newState[i] = "importedLocally";
+                return newState;
+              });
+              return;
             }
           },
           (e) => {
@@ -434,6 +444,8 @@ function FileUploader(props) {
                           ? "warning"
                           : uploadState[i] === "decodingError"
                           ? "warning"
+                          : uploadState[i] === "importedLocally"
+                          ? "offline_pin"
                           : uploadState[i]}
                       </Icon>
                     )}
