@@ -39,6 +39,7 @@ function Exporter(props) {
         <Icon>file_download</Icon>
       ) : (
         <CircularProgress
+          size={24}
           color={"secondary"}
           variant="determinate"
           value={exportProgress}

@@ -37,29 +37,35 @@ export const bounceSessionExport = async (
       : ""
   );
 
+  let offlineInstruments = [];
+  let offlineEffects = [];
+  let offlineContext;
+  let offlineLimiter;
+
   Tone.Offline(({ transport }) => {
-    //console.log(transport);
-    let offlineLimiter = new Tone.Limiter(0).toDestination();
+    offlineLimiter = new Tone.Limiter(0).toDestination();
+
+    offlineContext = transport.context;
 
     transport.bpm.value = sessionData.bpm;
 
     modules.map((module, moduleIndex) => {
       let originalInstrument = instruments[moduleIndex];
-      let thisinstrument;
-      let effects = module.fx.map((e) =>
-        !!e ? loadEffect(e.type, e.options) : false
-      );
+      offlineEffects[moduleIndex] = module.fx
+        ? module.fx.map((e) => (!!e ? loadEffect(e.type, e.options) : false))
+        : [];
 
       if (!module.muted) {
         switch (module.type) {
           case 0:
-            thisinstrument = new Tone.Players();
-            thisinstrument._buffers = instrumentBuffers[moduleIndex];
-            thisinstrument.volume.value = module.volume;
+            offlineInstruments[moduleIndex] = new Tone.Players();
+            offlineInstruments[moduleIndex]._buffers =
+              instrumentBuffers[moduleIndex];
+            offlineInstruments[moduleIndex].volume.value = module.volume;
 
             scheduleDrumSequence(
               module.score,
-              thisinstrument,
+              offlineInstruments[moduleIndex],
               transport,
               () => {},
               () => {},
@@ -71,17 +77,20 @@ export const bounceSessionExport = async (
             break;
           case 1:
             if (originalInstrument.name === "Sampler") {
-              thisinstrument = new Tone.Sampler();
-              thisinstrument.set(originalInstrument.get());
-              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+              offlineInstruments[moduleIndex] = new Tone.Sampler();
+              offlineInstruments[moduleIndex].set(originalInstrument.get());
+              offlineInstruments[moduleIndex]._buffers =
+                instrumentBuffers[moduleIndex];
             } else {
-              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+              offlineInstruments[moduleIndex] = loadSynthFromGetObject(
+                originalInstrument.get()
+              );
             }
-            thisinstrument.volume.value = module.volume;
+            offlineInstruments[moduleIndex].volume.value = module.volume;
 
             scheduleMelodyGrid(
               module.score,
-              thisinstrument,
+              offlineInstruments[moduleIndex],
               transport,
               () => {},
               () => {},
@@ -93,17 +102,20 @@ export const bounceSessionExport = async (
             break;
           case 2:
             if (originalInstrument.name === "Sampler") {
-              thisinstrument = new Tone.Sampler();
-              thisinstrument.set(originalInstrument.get());
-              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+              offlineInstruments[moduleIndex] = new Tone.Sampler();
+              offlineInstruments[moduleIndex].set(originalInstrument.get());
+              offlineInstruments[moduleIndex]._buffers =
+                instrumentBuffers[moduleIndex];
             } else {
-              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+              offlineInstruments[moduleIndex] = loadSynthFromGetObject(
+                originalInstrument.get()
+              );
             }
-            thisinstrument.volume.value = module.volume;
+            offlineInstruments[moduleIndex].volume.value = module.volume;
 
             scheduleChordProgression(
               module.score,
-              thisinstrument,
+              offlineInstruments[moduleIndex],
               transport,
               () => {},
               () => {},
@@ -114,14 +126,14 @@ export const bounceSessionExport = async (
             );
             break;
           case 3:
-            thisinstrument = new Tone.GrainPlayer(
+            offlineInstruments[moduleIndex] = new Tone.GrainPlayer(
               instrumentBuffers[moduleIndex]
             );
-            thisinstrument.volume.value = module.volume;
+            offlineInstruments[moduleIndex].volume.value = module.volume;
 
             scheduleSamples(
               module.score,
-              thisinstrument,
+              offlineInstruments[moduleIndex],
               0,
               transport,
               module.id
@@ -129,17 +141,20 @@ export const bounceSessionExport = async (
             break;
           case 4:
             if (originalInstrument.name === "Sampler") {
-              thisinstrument = new Tone.Sampler();
-              thisinstrument.set(originalInstrument.get());
-              thisinstrument._buffers = instrumentBuffers[moduleIndex];
+              offlineInstruments[moduleIndex] = new Tone.Sampler();
+              offlineInstruments[moduleIndex].set(originalInstrument.get());
+              offlineInstruments[moduleIndex]._buffers =
+                instrumentBuffers[moduleIndex];
             } else {
-              thisinstrument = loadSynthFromGetObject(originalInstrument.get());
+              offlineInstruments[moduleIndex] = loadSynthFromGetObject(
+                originalInstrument.get()
+              );
             }
-            thisinstrument.volume.value = module.volume;
+            offlineInstruments[moduleIndex].volume.value = module.volume;
 
             schedulePianoRoll(
               module.score,
-              thisinstrument,
+              offlineInstruments[moduleIndex],
               transport,
               module.id,
               module.size,
@@ -149,8 +164,8 @@ export const bounceSessionExport = async (
             );
             break;
         }
-        thisinstrument.chain(
-          ...effects.filter((e) => e !== false),
+        offlineInstruments[moduleIndex].chain(
+          ...offlineEffects[moduleIndex].filter((e) => e !== false),
           offlineLimiter
         );
       }
@@ -161,6 +176,7 @@ export const bounceSessionExport = async (
         (transport.seconds / (Tone.Time("1m").toSeconds() * sessionSize)) * 100
       );
     }, "1m");
+
     transport.start();
   }, exportDuration).then((e) => {
     let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
@@ -171,6 +187,12 @@ export const bounceSessionExport = async (
     downloadURI(url, `${sessionData.name}.wav`);
     forceReschedule();
     setIsReady(true);
+
+    offlineInstruments.map((e) => e && e.dispose());
+    offlineEffects.map((me) => me.map((e) => e && e.dispose()));
+    offlineLimiter.dispose();
+    offlineContext.close();
+    offlineContext.dispose();
 
     //});
   });

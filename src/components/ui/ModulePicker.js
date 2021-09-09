@@ -100,6 +100,7 @@ function ModulePicker(props) {
             }
           : "jSjo9Rzv3eg1vTkkEj1s",
       color: Math.floor(Math.random() * 14.99),
+      fx: [],
     };
 
     if (selectedType === 1) {

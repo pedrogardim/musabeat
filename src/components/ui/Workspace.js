@@ -632,8 +632,8 @@ function Workspace(props) {
   };
 
   const forceReschedule = () => {
-    console.log("forceReschedule");
-    setSessionSize(0);
+    //console.log("forceReschedule");
+    //setSessionSize(0);
     timelineMode ? getSessionSizeFromTimeline() : adaptSessionSize();
   };
 
