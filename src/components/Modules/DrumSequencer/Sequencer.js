@@ -153,7 +153,9 @@ function Sequencer(props) {
                     color: colors[props.module.color][200],
                   }}
                 >
-                  {props.module.lbls[row] ? props.module.lbls[row] : drumsound}
+                  {props.module.lbls[drumsound]
+                    ? props.module.lbls[drumsound]
+                    : drumsound}
                 </Typography>
               </div>
             )}

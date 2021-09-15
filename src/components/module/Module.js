@@ -194,22 +194,27 @@ function Module(props) {
     //update instrument info in module object
     if (props.module.type === 0 || props.instrument.name === "Sampler") {
       let patch =
-        props.module.instrument === "string"
-          ? await firebase
-              .firestore()
-              .collection(props.module.type === 0 ? "drumpatches" : "patches")
-              .doc(props.module.instrument)
-              .get()
-              .data()
+        typeof props.module.instrument === "string"
+          ? (
+              await firebase
+                .firestore()
+                .collection(props.module.type === 0 ? "drumpatches" : "patches")
+                .doc(props.module.instrument)
+                .get()
+            ).data()
           : { ...props.module.instrument };
+
+      //console.log(props.module.instrument, patch, soundindex, name);
 
       !isRemoving
         ? (patch.urls[props.module.type === 0 ? soundindex : name] = fileId)
         : delete patch.urls[props.module.type === 0 ? soundindex : name];
       if (props.module.type === 0) {
+        //console.log(patch.lbls, soundindex);
+
         !isRemoving
           ? (patch.lbls[soundindex] = name)
-          : delete patch.lbsl[soundindex];
+          : delete patch.lbls[soundindex];
       }
 
       props.setModules((prev) => {
@@ -262,13 +267,13 @@ function Module(props) {
           .then((r) => {
             while (
               isDrum &&
-              Object.keys(r.data().urls).indexOf(
+              Object.keys(r.data().urls).includes(
                 JSON.stringify(slotToInsetFile)
-              ) !== -1
+              )
             ) {
               slotToInsetFile++;
             }
-            //console.log(slotToInsetFile);
+            console.log(slotToInsetFile, Object.keys(r.data().urls));
 
             props.instrument.add(
               isDrum ? slotToInsetFile : labelOnInstrument,
@@ -282,13 +287,13 @@ function Module(props) {
         //console.log(Object.keys(props.module.instrument.urls), slotToInsetFile);
 
         while (
-          Object.keys(props.module.instrument.urls).indexOf(
+          Object.keys(props.module.instrument.urls).includes(
             JSON.stringify(slotToInsetFile)
-          ) !== -1
+          )
         ) {
           slotToInsetFile++;
         }
-        //console.log(slotToInsetFile);
+        console.log(slotToInsetFile, Object.keys(props.module.instrument.urls));
 
         props.instrument.add(
           isDrum ? slotToInsetFile : labelOnInstrument,
