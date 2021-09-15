@@ -18,6 +18,7 @@ function AppLogo(props) {
       x="0px"
       y="0px"
       viewBox="0 0 210.6 249.6"
+      style={{ ...props.style }}
     >
       {segments.map((e, i) => (
         <path

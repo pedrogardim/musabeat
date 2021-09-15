@@ -534,14 +534,14 @@ function Module(props) {
           {(props.module.type === 3 || props.module.type === 4) && (
             <IconButton
               className="module-zoom-button"
-              tabIndex="-1"
+              tabIndex={-1}
               onClick={handleZoom}
             >
               <Icon>search</Icon>
             </IconButton>
           )}
           <IconButton
-            tabIndex="-1"
+            tabIndex={-1}
             className="module-options-button"
             onClick={openMenu}
           >
@@ -552,12 +552,12 @@ function Module(props) {
             keepMounted
             open={Boolean(menuAnchorEl)}
             onClose={closeMenu}
-            tabIndex="-1"
+            tabIndex={-1}
           >
             <MenuItem
               className="module-menu-option"
               onClick={() => setFullScreen((prev) => !prev)}
-              tabIndex="-1"
+              tabIndex={-1}
             >
               <Icon>fullscreen</Icon>
               {t("module.options.fullscreen")}
@@ -575,7 +575,7 @@ function Module(props) {
               <MenuItem
                 onClick={handleFileExplorerButton}
                 className="module-menu-option"
-                tabIndex="-1"
+                tabIndex={-1}
               >
                 <Icon>graphic_eq</Icon>
                 {t("module.options.loadFile")}
@@ -584,7 +584,7 @@ function Module(props) {
               <MenuItem
                 onClick={handleInstrumentButtonMode}
                 className="module-menu-option"
-                tabIndex="-1"
+                tabIndex={-1}
               >
                 <Icon>piano</Icon>
                 {t("module.options.instrument")}
@@ -594,7 +594,7 @@ function Module(props) {
             <MenuItem
               onClick={handleSettingsButtonMode}
               className="module-menu-option"
-              tabIndex="-1"
+              tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">settings</Icon>
               {t("module.options.settings")}
@@ -602,7 +602,7 @@ function Module(props) {
             <MenuItem
               onClick={handleEffectButtonMode}
               className="module-menu-option"
-              tabIndex="-1"
+              tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">blur_on</Icon>
               {t("module.options.effects")}
@@ -610,7 +610,7 @@ function Module(props) {
             <MenuItem
               onClick={() => props.duplicateModule(props.index)}
               className="module-menu-option"
-              tabIndex="-1"
+              tabIndex={-1}
             >
               <Icon className="module-menu-option-icon">content_copy</Icon>
               {t("module.options.duplicate")}
@@ -618,7 +618,7 @@ function Module(props) {
             <MenuItem
               className="module-menu-option"
               onClick={() => setDeleteDialog(true)}
-              tabIndex="-1"
+              tabIndex={-1}
             >
               <Icon>delete</Icon>
               {t("module.options.remove")}

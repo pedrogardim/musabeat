@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Icon, IconButton } from "@material-ui/core";
 
 import { chordNotestoName } from "../../../assets/musicutils";

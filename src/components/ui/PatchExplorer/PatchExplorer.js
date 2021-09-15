@@ -628,12 +628,12 @@ function PatchExplorer(props) {
                 InputProps={{
                   ...params.InputProps,
                   startAdornment: (
-                    <>
+                    <Fragment>
                       <InputAdornment position="start">
                         <Icon>search</Icon>
                       </InputAdornment>
                       {params.InputProps.startAdornment}
-                    </>
+                    </Fragment>
                   ),
                 }}
                 onChange={(e) => setSearchValue(e.target.value)}

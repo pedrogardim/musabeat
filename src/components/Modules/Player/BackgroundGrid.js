@@ -1,3 +1,5 @@
+import React from "react";
+
 import "./BackgroundGrid.css";
 
 function BackgroundGrid(props) {

@@ -1,3 +1,4 @@
+import React from "react";
 import "./Sequencer.css";
 
 function SequencerTile(props) {

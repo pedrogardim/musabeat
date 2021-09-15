@@ -1075,7 +1075,7 @@ function Workspace(props) {
   return (
     <div
       className="workspace"
-      tabIndex="0"
+      tabIndex={0}
       style={{
         display: props.hidden ? "none" : "flex",
       }}
@@ -1148,7 +1148,7 @@ function Workspace(props) {
             </Fragment>
           ))
         ) : !modules ? (
-          [1, 1].map(() => <PlaceholderModule />)
+          [1, 1].map((e, i) => <PlaceholderModule key={"phm-" + i} />)
         ) : !modules.length && !instrumentsLoaded.length ? (
           <Fragment>
             <Typography variant="h1">:v</Typography>

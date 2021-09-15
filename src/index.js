@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import "./translations/i18n";
@@ -9,7 +9,7 @@ import reportWebVitals from "./reportWebVitals";
 import firebase from "firebase";
 
 import { Dialog, DialogTitle } from "@material-ui/core";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 
 const firebaseConfig = {
@@ -26,22 +26,36 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-ReactDOM.render(
-  //<React.StrictMode>
-  <ErrorBoundary
-    FallbackComponent={ErrorFallback}
-    onReset={() => {
-      // reset the state of your app so the error doesn't happen again
-    }}
-  >
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </ErrorBoundary>,
+const startApp = () => {
+  //console.log(device.cordova);
+  ReactDOM.render(
+    <Fragment>
+      <ErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onReset={() => {
+          // reset the state of your app so the error doesn't happen again
+        }}
+      >
+        <HashRouter>
+          <App />
+        </HashRouter>
+      </ErrorBoundary>
+    </Fragment>,
+    document.getElementById("root")
+  );
+};
 
-  //</React.StrictMode>,
-  document.getElementById("root")
-);
+if (window.cordova) {
+  document.addEventListener(
+    "deviceready",
+    () => {
+      startApp();
+    },
+    false
+  );
+} else {
+  startApp();
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

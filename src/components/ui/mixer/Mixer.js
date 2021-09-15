@@ -1,5 +1,6 @@
 import "./Mixer.css";
 import ChannelStrip from "./ChannelStrip";
+import React from "react";
 
 import { Icon, IconButton } from "@material-ui/core";
 
@@ -27,7 +28,7 @@ function Mixer(props) {
   };
 
   return (
-    <div className="mixer" tabIndex="-1" style={props.style}>
+    <div className="mixer" tabIndex={-1} style={props.style}>
       {props.modules.map((module, index) => (
         <ChannelStrip
           index={index}

@@ -30,6 +30,7 @@ import FilePage from "./components/ui/FileExplorer/FilePage";
 import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
 import PatchPage from "./components/ui/PatchExplorer/PatchPage";
 import UserPage from "./components/ui/UserPage/UserPage";
+import AppLogo from "./components/ui/AppLogo";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/Dialogs/AuthDialog";
@@ -108,10 +109,10 @@ function App() {
             <Icon>menu</Icon>
           </IconButton>
           <div className="app-logo">
+            <AppLogo alt={"musa"} style={{ height: 30 }} src={logo} />
             <Typography variant="overline" className="app-log-beta-mark">
               BETA
             </Typography>
-            <img alt={"musa"} style={{ height: 30 }} src={logo} />
           </div>
           <IconButton
             style={{ position: "absolute", right: 80 }}
@@ -119,11 +120,10 @@ function App() {
           >
             <Icon style={{ color: "white" }}>language</Icon>
           </IconButton>
-          <IconButton className="main-avatar">
+          <IconButton className="main-avatar" onClick={handleAvatarClick}>
             <Avatar
-              onClick={handleAvatarClick}
               alt={user && user.displayName}
-              src={user && user.photoURL ? user.photoURL : "https://null"}
+              src={user && user.photoURL && user.photoURL}
             />
           </IconButton>
         </Toolbar>

@@ -1,0 +1,31 @@
+[debug] [2021-09-10T09:20:29.564Z] ----------------------------------------------------------------------
+[debug] [2021-09-10T09:20:29.566Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2021-09-10T09:20:29.566Z] CLI Version:   9.12.1
+[debug] [2021-09-10T09:20:29.566Z] Platform:      darwin
+[debug] [2021-09-10T09:20:29.566Z] Node Version:  v12.18.3
+[debug] [2021-09-10T09:20:29.577Z] Time:          Fri Sep 10 2021 11:20:29 GMT+0200 (GMT+02:00)
+[debug] [2021-09-10T09:20:29.578Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2021-09-10T09:20:29.585Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-09-10T09:20:29.586Z] > authorizing via signed-in user (musamusicapp@gmail.com)
+[debug] [2021-09-10T09:20:29.586Z] [iam] checking project musamusicapp-c5d73 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2021-09-10T09:20:29.588Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2021-09-10T09:20:29.589Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2021-09-10T09:20:59.616Z] [iam] error while checking permissions, command may fail: FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2021-09-10T09:20:59.618Z] > refreshing access token with scopes: []
+[debug] [2021-09-10T09:20:59.618Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2021-09-10T09:21:29.625Z] Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+[debug] [2021-09-10T09:21:59.635Z] FirebaseError: Authentication Error: Your credentials are no longer valid. Please run firebase login --reauth
+
+For CI servers and headless environments, generate a new token with firebase login:ci
+    at invalidCredentialError (/usr/local/lib/node_modules/firebase-tools/lib/auth.js:141:12)
+    at refreshTokens (/usr/local/lib/node_modules/firebase-tools/lib/auth.js:448:15)
+    at processTicksAndRejections (internal/process/task_queues.js:97:5)
+[error] 
+[error] Error: Failed to get Firebase project musamusicapp-c5d73. Please make sure the project exists and your account has permission to access it.
