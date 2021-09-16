@@ -759,6 +759,10 @@ function PatchExplorer(props) {
                     {selectedPatchInfo && (
                       <div className="pet-chip-cell">
                         <Chip
+                          clickable
+                          onClick={() =>
+                            setSearchTags([selectedPatchInfo.categ])
+                          }
                           className={"file-tag-chip"}
                           label={categories[selectedPatchInfo.categ]}
                         />
@@ -853,10 +857,11 @@ function PatchExplorer(props) {
                         >
                           {categories[patch.categ] && (
                             <Chip
-                              clickable={true}
+                              clickable
                               onClick={(e) =>
-                                !!props.userPatches &&
-                                setTagSelectionTarget([e.target, index])
+                                props.userPatches
+                                  ? setTagSelectionTarget([e.target, index])
+                                  : setSearchTags([categories[patch.categ]])
                               }
                               className={"file-tag-chip"}
                               label={categories[patch.categ]}

@@ -633,13 +633,14 @@ function FileExplorer(props) {
                             <Chip
                               clickable={!!props.userFiles && chipIndex !== 0}
                               onClick={(e) =>
-                                chipIndex !== 0 &&
-                                !!props.userFiles &&
-                                setTagSelectionTarget([
-                                  e.target,
-                                  index,
-                                  chipIndex,
-                                ])
+                                !!props.userFiles
+                                  ? chipIndex !== 0 &&
+                                    setTagSelectionTarget([
+                                      e.target,
+                                      index,
+                                      chipIndex,
+                                    ])
+                                  : setSearchTags([fileTags[chip]])
                               }
                               className={"file-tag-chip"}
                               label={chip === "/" ? "..." : fileTags[chip]}
@@ -647,15 +648,16 @@ function FileExplorer(props) {
                           ))
                         : filedata[index].categ.map((chip, chipIndex) => (
                             <Chip
-                              clickable={!!props.userFiles && chipIndex !== 0}
+                              clickable={chipIndex !== 0}
                               onClick={(e) =>
-                                chipIndex !== 0 &&
-                                !!props.userFiles &&
-                                setTagSelectionTarget([
-                                  e.target,
-                                  index,
-                                  chipIndex,
-                                ])
+                                !!props.userFiles
+                                  ? chipIndex !== 0 &&
+                                    setTagSelectionTarget([
+                                      e.target,
+                                      index,
+                                      chipIndex,
+                                    ])
+                                  : setSearchTags([fileTags[chip]])
                               }
                               className={"file-tag-chip"}
                               label={chip === "/" ? "..." : fileTags[chip]}
