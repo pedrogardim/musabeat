@@ -1,5 +1,27 @@
 export const TRANSLATIONS_EN = {
-  welcome: "Welcome to the tutorial",
+  home: {
+    unloggedWelcome: "Welcome to MusaBeat!",
+    userWelcome: "Welcome",
+    notLoggedButton: "You are not logged in",
+    sessions: "Sessions",
+    communityCreated: "Our community has created:",
+    userCreated: "You hace created:",
+  },
+
+  auth: {
+    login: "Log in",
+    description:
+      "Store and share sessions in the cloud, and open them wherever and whenever you want. Create an account now!",
+    googleLogin: "Log In with Google",
+    emailLogin: "Log In with Email",
+    creatingAccount: "User not found, creating account",
+    createAccount: "Create account",
+    name: "Username",
+    email: "Email",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+  },
+
   sidemenu: {
     newSession: "New Session",
     explore: "Explore",
@@ -99,7 +121,6 @@ export const TRANSLATIONS_EN = {
 
     submit: "Submit",
     delete: "Delete",
-    loginWithGoogle: "Log In with Google",
     areYouSure: "Are you sure?",
     irreversibleAction: "This is an action that can't be undone",
     insertName: "Insert name",

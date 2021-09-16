@@ -68,8 +68,9 @@ function HomePage(props) {
         <AppLogo className="hp-card-logo" animated />
         <div className="break" />
         <Typography variant="h5">
-          {" "}
-          {`Welcome ${userInfo ? userInfo.profile.displayName : "to Musa"}!`}
+          {userInfo
+            ? t("home.userWelcome") + " " + userInfo.profile.displayName
+            : t("home.unloggedWelcome")}
         </Typography>
         <div className="break" />
         {props.user === null && (
@@ -78,13 +79,13 @@ function HomePage(props) {
             color="primary"
             onClick={() => props.setAuthDialog(true)}
           >
-            You are not logged in
+            {t("home.notLoggedButton")}
           </Button>
         )}
         <div className="break" />
-        <Typography variant="subtitle2">{`${
-          props.user ? "You have" : "Our community has"
-        } created:`}</Typography>
+        <Typography variant="subtitle2">
+          {t(props.user ? "home.userCreated" : "home.communityCreated")}
+        </Typography>
         <div className="break" />
         <Grid
           className="home-page-card-grid"
@@ -103,7 +104,7 @@ function HomePage(props) {
                 : "..."}
             </Typography>
 
-            <Typography variant={"overline"}>Sessions</Typography>
+            <Typography variant={"overline"}>{t("home.sessions")}</Typography>
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
@@ -115,7 +116,9 @@ function HomePage(props) {
                 : "..."}
             </Typography>
 
-            <Typography variant={"overline"}>Instruments</Typography>
+            <Typography variant={"overline"}>
+              {t("sidemenu.instruments")}
+            </Typography>
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
@@ -123,7 +126,7 @@ function HomePage(props) {
               {userInfo ? userInfo.files.length : stats ? stats.files : "..."}
             </Typography>
 
-            <Typography variant={"overline"}>Files</Typography>
+            <Typography variant={"overline"}>{t("sidemenu.files")}</Typography>
           </Grid>
         </Grid>
       </Card>
@@ -140,7 +143,7 @@ function HomePage(props) {
         }
       >
         <Icon style={{ marginRight: 8 }}>add_circle</Icon>
-        Create a session
+        {t("sidemenu.newSession")}
       </Fab>
     </div>
   );

@@ -1,5 +1,25 @@
 export const TRANSLATIONS_ES = {
-  welcome: "Bienvenido al tutorial",
+  home: {
+    unloggedWelcome: "¡Bienvenido a MusaBeat!",
+    userWelcome: "Bienvenido",
+    notLoggedButton: "No has iniciado sesión",
+    sessions: "Sesiones",
+    communityCreated: "La comunidad ha creado:",
+    userCreated: "Has creado:",
+  },
+  auth: {
+    login: "Iniciar sesión",
+    description:
+      "Guarda y comparte sesiones en la nube, y ábrelas donde y cuando quieras. ¡Ingresa ahora!",
+    googleLogin: "Ingresar con Google",
+    emailLogin: "Ingresar con correo electrónico",
+    creatingAccount: "Usuario no encontrado, creando una cuenta",
+    createAccount: "Crear cuenta",
+    name: "Nombre",
+    email: "Correo electrónico",
+    password: "Contraseña",
+    confirmPassword: "Confirmar contraseña",
+  },
   sidemenu: {
     newSession: "Crear sesion",
     explore: "Explorar",

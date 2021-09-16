@@ -218,13 +218,15 @@ function AuthDialog(props) {
       fullWidth={true}
       onClose={() => props.setAuthDialog(false)}
     >
-      <DialogTitle>Log in</DialogTitle>
+      <DialogTitle>
+        {" "}
+        {!creatingAccount ? t("auth.login") : t("auth.createAccount")}
+      </DialogTitle>
       {!emailLogIn && !creatingAccount && (
         <Fragment>
           <DialogContent>
             <DialogContentText className="auth-dialog-text">
-              Store and share unlimited sessions in the cloud, and open them
-              wherever and whenever you want. Create an account now!
+              {t("auth.description")}
             </DialogContentText>
           </DialogContent>
 
@@ -236,7 +238,7 @@ function AuthDialog(props) {
               onClick={handleGoogleLogin}
             >
               <img src={googleLogo} />
-              {t("dialogs.loginWithGoogle")}
+              {t("auth.googleLogin")}
             </Button>
             <Button
               className="auth-dialog-opt-btn"
@@ -245,7 +247,7 @@ function AuthDialog(props) {
               fullWidth={false}
               onClick={() => setEmailLogIn(true)}
             >
-              {t("Sign in with email")}
+              {t("auth.emailLogin")}
             </Button>
           </div>
         </Fragment>
@@ -255,7 +257,7 @@ function AuthDialog(props) {
         <DialogContent className="auth-dialog-input-cont">
           {creatingAccount && (
             <Typography variant="overline">
-              User not found, creating account
+              {t("auth.creatingAccount")}
             </Typography>
           )}
 
@@ -274,7 +276,7 @@ function AuthDialog(props) {
               required
               value={accountInfo.displayName}
               onChange={(e) => handleFieldChange("name", e)}
-              label={"Name"}
+              label={t("auth.name")}
               inputProps={{ type: "name" }}
               error={fieldErrors.includes("name")}
             />
@@ -283,7 +285,7 @@ function AuthDialog(props) {
             required
             value={accountInfo.email}
             onChange={(e) => handleFieldChange("email", e)}
-            label={"Email"}
+            label={t("auth.email")}
             inputProps={{ type: "email" }}
             error={fieldErrors.includes("email")}
           />
@@ -291,7 +293,7 @@ function AuthDialog(props) {
             required
             value={accountInfo.password}
             onChange={(e) => handleFieldChange("password", e)}
-            label={"Password"}
+            label={t("auth.password")}
             inputProps={{ type: "password" }}
             error={fieldErrors.includes("password")}
           />
@@ -300,7 +302,7 @@ function AuthDialog(props) {
               required
               value={accountInfo.password2}
               onChange={(e) => handleFieldChange("password2", e)}
-              label={"Confirm password"}
+              label={t("auth.confirmPassword")}
               inputProps={{ type: "password" }}
               error={fieldErrors.includes("password2")}
             />
@@ -313,7 +315,7 @@ function AuthDialog(props) {
             color="primary"
             variant="contained"
           >
-            Log In
+            {t(creatingAccount ? t("auth.createAccount") : t("auth.login"))}
           </Button>
         </DialogContent>
       )}
