@@ -295,6 +295,7 @@ function InstrumentEditor(props) {
       categ: !!category || isNaN(category) ? category : 0,
       volume: props.module.volume,
       createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+      likes: 0,
     };
 
     let patchInfo = !isDrum

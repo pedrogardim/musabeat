@@ -474,7 +474,7 @@ function PatchExplorer(props) {
   const openPatchPage = (id) => {
     //console.log(id);
     const win = window.open(
-      (props.isDrum ? "/drumset/" : "/instrument/") + id,
+      (props.isDrum ? "/#/drumset/" : "/#/instrument/") + id,
       "_blank"
     );
     win.focus();

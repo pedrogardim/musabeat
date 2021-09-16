@@ -49,6 +49,19 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ fllrs: 0, fllwing: [] })));
   };
 
+  const updateLikes = () => {
+    firebase
+      .firestore()
+      .collection("files")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ likes: 0 })));
+    firebase
+      .firestore()
+      .collection("patches")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ likes: 0 })));
+  };
+
   return (
     <div className="file-page">
       {/* <AppBar position="static">
@@ -63,13 +76,13 @@ function AdminDashboard(props) {
         </Tabs>
       </AppBar>
       <div className={"admin-panel-container"}>
-        {value === 0 && <PatchEditor />}
+        {value === 0 && <PåatchEditor />}
       </div> */}
       <Button onClick={updateStats}>Update Stats</Button>
       <br />
       <Button onClick={updatePremium}>updateSessions</Button>
       <br />
-      <Button onClick={updateUsers}>Update followers</Button>
+      <Button onClick={updateLikes}>Update files, patches like</Button>
     </div>
   );
 }

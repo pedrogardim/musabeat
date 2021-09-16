@@ -158,7 +158,7 @@ function FileUploader(props) {
                 size: file.size,
                 dur: parseFloat(audiobuffer.duration.toFixed(3)),
                 loaded: 1,
-                liked: 0,
+                likes: 0,
                 dl: 0,
                 user: user.uid,
                 categ: [],
