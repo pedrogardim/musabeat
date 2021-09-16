@@ -66,7 +66,7 @@ function WorkspaceTitle(props) {
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 

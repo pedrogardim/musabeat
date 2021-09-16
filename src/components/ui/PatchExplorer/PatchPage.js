@@ -366,7 +366,7 @@ function PatchPage(props) {
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 
@@ -457,6 +457,9 @@ function PatchPage(props) {
         <Tooltip title={patchInfo && patchInfo.likes}>
           <IconButton onClick={handleUserLike}>
             <Icon color={isPatchLiked ? "secondary" : "inherit"}>favorite</Icon>
+            <Typography className="like-btn-label" variant="overline">
+              {patchInfo && patchInfo.likes}
+            </Typography>
           </IconButton>
         </Tooltip>
 

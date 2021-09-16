@@ -23,6 +23,7 @@ function SessionGalleryItem(props) {
   const handleClick = (event) => {
     !event.target.classList.contains("MuiButtonBase-root") &&
       !event.target.classList.contains("MuiIcon-root") &&
+      !event.target.classList.contains("like-btn-label") &&
       props.handleSessionSelect(props.index);
   };
 
@@ -43,7 +44,7 @@ function SessionGalleryItem(props) {
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 
@@ -142,6 +143,9 @@ function SessionGalleryItem(props) {
               <Icon color={props.likedByUser ? "secondary" : "inherit"}>
                 favorite
               </Icon>
+              <Typography className="like-btn-label" variant="overline">
+                {props.session.likes}
+              </Typography>
             </IconButton>
           </Tooltip>
 

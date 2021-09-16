@@ -344,6 +344,11 @@ function PatchExplorer(props) {
 
       dbPatchRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
       setUserLikedPatches((prev) => [...prev, likedPatchId]);
+      setPatchdata((prev) => {
+        let newPatchdata = [...prev];
+        newPatchdata[index].likes = newPatchdata[index].likes + 1;
+        return newPatchdata;
+      });
     } else {
       dbUserRef.update(
         props.isDrum
@@ -359,6 +364,11 @@ function PatchExplorer(props) {
 
       dbPatchRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
       setUserLikedPatches((prev) => prev.filter((e) => e !== likedPatchId));
+      setPatchdata((prev) => {
+        let newPatchdata = [...prev];
+        newPatchdata[index].likes = newPatchdata[index].likes - 1;
+        return newPatchdata;
+      });
     }
   };
 
@@ -472,7 +482,7 @@ function PatchExplorer(props) {
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 
@@ -870,6 +880,12 @@ function PatchExplorer(props) {
                                 >
                                   favorite
                                 </Icon>
+                                <Typography
+                                  className="like-btn-label"
+                                  variant="overline"
+                                >
+                                  {patch.likes}
+                                </Typography>
                               </IconButton>
                             </TableCell>
                           )}

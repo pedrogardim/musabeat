@@ -353,7 +353,7 @@ function FileUploader(props) {
 
   const openFilePage = (id) => {
     //console.log(id);
-    const win = window.open("/file/" + id, "_blank");
+    const win = window.open("/#/file/" + id, "_blank");
     win.focus();
   };
 

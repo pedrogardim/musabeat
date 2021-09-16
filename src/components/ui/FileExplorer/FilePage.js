@@ -257,7 +257,7 @@ function FilePage(props) {
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 
@@ -362,6 +362,9 @@ function FilePage(props) {
         <Tooltip title={fileInfo && fileInfo.likes}>
           <IconButton onClick={handleUserLike}>
             <Icon color={isFileLiked ? "secondary" : "inherit"}>favorite</Icon>
+            <Typography className="like-btn-label" variant="overline">
+              {fileInfo && fileInfo.likes}
+            </Typography>
           </IconButton>
         </Tooltip>
 

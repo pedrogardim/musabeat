@@ -294,6 +294,11 @@ function FileExplorer(props) {
 
       dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
       setUserLikedFiles((prev) => [...prev, likedFileId]);
+      setFiledata((prev) => {
+        let newPatchdata = [...prev];
+        newPatchdata[index].likes = newPatchdata[index].likes + 1;
+        return newPatchdata;
+      });
     } else {
       dbUserRef.update({
         likedFiles: firebase.firestore.FieldValue.arrayRemove(likedFileId),
@@ -301,6 +306,11 @@ function FileExplorer(props) {
 
       dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
       setUserLikedFiles((prev) => prev.filter((e) => e !== likedFileId));
+      setFiledata((prev) => {
+        let newPatchdata = [...prev];
+        newPatchdata[index].likes = newPatchdata[index].likes - 1;
+        return newPatchdata;
+      });
     }
   };
 
@@ -336,13 +346,13 @@ function FileExplorer(props) {
 
   const openFilePage = (id) => {
     //console.log(id);
-    const win = window.open("/file/" + id, "_blank");
+    const win = window.open("/#/file/" + id, "_blank");
     win.focus();
   };
 
   const openUserPage = (id) => {
     //console.log(id);
-    const win = window.open("/user/" + id, "_blank");
+    const win = window.open("/#/user/" + id, "_blank");
     win.focus();
   };
 
@@ -667,6 +677,12 @@ function FileExplorer(props) {
                             >
                               favorite
                             </Icon>
+                            <Typography
+                              className="like-btn-label"
+                              variant="overline"
+                            >
+                              {row.likes}
+                            </Typography>
                           </IconButton>
                         </TableCell>
                       )}

@@ -26,6 +26,12 @@
   width: 100%;
   height: 0;
 }
+
+.like-btn-label {
+  position: absolute !important;
+  letter-spacing: 0 !important;
+  color: black;
+}
 /* 
 @media only screen and (max-width: 1024px) {
   .session-explorer {
