@@ -8,9 +8,12 @@ import {
   Icon,
   Typography,
   Divider,
+  IconButton,
 } from "@material-ui/core";
 
 import { useTranslation } from "react-i18next";
+
+import AppLogo from "./AppLogo";
 
 import "./SideMenu.css";
 
@@ -32,12 +35,13 @@ function SideMenu(props) {
 
   return (
     <Drawer anchor={"left"} open={props.open} onClose={handleClose}>
-      <Typography
-        style={{ textAlign: "center", height: 64, lineHeight: "64px" }}
-        variant="h6"
-      >
-        --Musa Logo--
-      </Typography>
+      <div className="side-menu-logo-cont">
+        {/* <IconButton onClick={handleClose}>
+          <Icon>close</Icon>
+        </IconButton> */}
+        <AppLogo className="app-logo-blue" />
+        <Typography variant="h5">MusaBeat</Typography>
+      </div>
       <Divider />
       <List className="side-menu-list">
         {["newSession", "explore", "instruments", "drumsets", "files"].map(

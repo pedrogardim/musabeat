@@ -41,3 +41,7 @@
     transform: translateY(10px);
   }
 }
+
+.app-logo-blue path {
+  fill: #3f51b5 !important;
+}

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Catamaran:wght@100;200;300;400;500;600;700;800&display=swap");
+
 html {
   height: 100vh;
   overflow: hidden;
@@ -40,6 +42,11 @@ body *::-webkit-scrollbar-thumb {
   top: 80px;
 } */
 
+.app-bar {
+  height: 56px !important;
+  min-height: 56px !important;
+}
+
 .app-title {
   position: relative;
   margin: 24px 0;
@@ -61,19 +68,19 @@ body *::-webkit-scrollbar-thumb {
   margin-bottom: 8px;
 }
 
-.app-logo {
+.app-logo-header {
   height: 100%;
-  width: 56px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   position: relative;
+  margin-left: 16px;
 }
 
 .app-log-beta-mark {
   position: absolute !important;
   top: 8px !important;
-  right: -16px !important;
+  right: -32px !important;
   font-size: 10px !important;
   line-height: 10px !important;
 }
@@ -98,6 +105,27 @@ body *::-webkit-scrollbar-thumb {
   right: 32px !important;
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
     0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+}
+
+.side-menu-logo-cont {
+  position: relative;
+  height: 56px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.side-menu-logo-cont h5 {
+  font-family: "Catamaran", sans-serif !important;
+  text-align: "center";
+  margin-left: 16px;
+}
+
+.side-menu-logo-cont svg {
+  height: 100%;
+  height: 30px;
+  margin-left: 24px;
 }
 
 .side-menu-icon {

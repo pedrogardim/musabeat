@@ -108,8 +108,8 @@ function App() {
           >
             <Icon>menu</Icon>
           </IconButton>
-          <div className="app-logo">
-            <AppLogo alt={"musa"} style={{ height: 30 }} src={logo} />
+          <div className="app-logo-header">
+            <AppLogo style={{ height: 30 }} src={logo} />
             <Typography variant="overline" className="app-log-beta-mark">
               BETA
             </Typography>
@@ -129,7 +129,7 @@ function App() {
         </Toolbar>
         {currentRoute && (
           <Helmet>
-            <title>Musa - {pageLabels[currentRoute] || "Home"}</title>
+            <title>MusaBeat - {pageLabels[currentRoute] || "Home"}</title>
           </Helmet>
         )}
       </AppBar>
