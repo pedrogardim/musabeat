@@ -51,7 +51,7 @@ function SessionExplorer(props) {
       let rules = firebase.firestore().collection("sessions");
 
       if (searchValue) {
-        console.log("text");
+        //console.log("text");
         rules = rules
           .where("name", ">=", searchValue)
           .where("name", "<=", searchValue + "\uf8ff");
