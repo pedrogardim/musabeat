@@ -9,8 +9,6 @@ html {
 body {
   height: 100vh;
   overflow: hidden;
-  padding-top: constant(safe-area-inset-top);
-  padding-top: env(safe-area-inset-top);
   background-color: white;
 }
 
@@ -45,6 +43,9 @@ body *::-webkit-scrollbar-thumb {
 .app-bar {
   height: 56px !important;
   min-height: 56px !important;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
 }
 
 .app-title {

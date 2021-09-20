@@ -10,11 +10,11 @@
   overflow: hidden !important;
 }
 
-.instrument-editor-patch-select {
+.instrument-editor-type-select {
   width: calc(100% - 16px);
-  margin: 8px;
-  height: 32px;
-  max-height: 32px;
+  margin: 4px 8px;
+  height: 24px;
+  max-height: 24px;
 }
 
 .instrument-editor-column {
@@ -71,7 +71,7 @@
 
 .ie-synth-cont {
   max-height: 100% !important;
-  width: 100% !important;
+  flex: 1 1 1px;
   margin: 0 !important;
 }
 

@@ -2,6 +2,7 @@
   "name": "musabeat",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
@@ -36,7 +37,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && cp -R build/ ../cordovaapp/www",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

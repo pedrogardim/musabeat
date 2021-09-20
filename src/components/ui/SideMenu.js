@@ -34,7 +34,13 @@ function SideMenu(props) {
   };
 
   return (
-    <Drawer anchor={"left"} open={props.open} onClose={handleClose}>
+    <Drawer
+      /*  ModalProps={{ disableScrollLock: true }} */
+      PaperProps={{ className: "side-menu-cont" }}
+      anchor={"left"}
+      open={props.open}
+      onClose={handleClose}
+    >
       <div className="side-menu-logo-cont">
         {/* <IconButton onClick={handleClose}>
           <Icon>close</Icon>

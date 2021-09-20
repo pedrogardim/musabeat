@@ -412,7 +412,7 @@ function InstrumentEditor(props) {
                 : props.instrument.name
             }
             onChange={changeInstrumentType}
-            style={{ width: "100%", height: 24 }}
+            className="instrument-editor-type-select"
           >
             {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
               <option value={e}>{e}</option>
@@ -453,7 +453,7 @@ function InstrumentEditor(props) {
                 : props.instrument.name
             }
             onChange={changeInstrumentType}
-            style={{ width: "100%", height: 24 }}
+            className="instrument-editor-type-select"
           >
             {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
               <option value={e}>{e}</option>
