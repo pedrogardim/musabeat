@@ -280,12 +280,6 @@ function InstrumentEditor(props) {
     setRenamingLabel(null);
   };
 
-  const openFilePage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/file/" + id, "_blank");
-    win.focus();
-  };
-
   const saveUserPatch = (name, category) => {
     //console.log(name, category);
     let user = firebase.auth().currentUser;
@@ -390,7 +384,9 @@ function InstrumentEditor(props) {
                   }
                   fileName={filesName[i]}
                   setRenamingLabel={setRenamingLabel}
-                  openFilePage={() => openFilePage(filesId[i])}
+                  openFilePage={() =>
+                    props.handlePageNav("file", filesId[i], true)
+                  }
                 />
               </Grid>
             ))}
@@ -432,7 +428,9 @@ function InstrumentEditor(props) {
                       fileName={
                         filesName[Tone.Frequency(e[1], "midi").toNote()]
                       }
-                      openFilePage={() => openFilePage(filesId[i])}
+                      openFilePage={() =>
+                        props.handlePageNav("file", filesId[i], true)
+                      }
                       setRenamingLabel={setRenamingLabel}
                     />
                     <Divider />
@@ -592,6 +590,7 @@ function InstrumentEditor(props) {
         renamePlayersLabel={renamePlayersLabel}
         setRenamingLabel={setRenamingLabel}
         setLabels={props.setLabels}
+        handlePageNav={props.handlePageNav}
       />
 
       <NameInput

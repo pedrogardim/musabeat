@@ -351,12 +351,6 @@ function FileUploader(props) {
     setTagSelectionTarget(null);
   };
 
-  const openFilePage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/file/" + id, "_blank");
-    win.focus();
-  };
-
   useEffect(() => {
     //console.log(props.files);
     if (props.files.length > 0) {
@@ -394,7 +388,8 @@ function FileUploader(props) {
                   }
                   secondaryTypographyProps={{
                     onClick: () =>
-                      uploadingFileIds[i] && openFilePage(uploadingFileIds[i]),
+                      uploadingFileIds[i] &&
+                      props.handlePageNav("file", uploadingFileIds[i], true),
                     variant: "overline",
                     className: uploadingFileIds[i] && "clickable-filename",
                   }}

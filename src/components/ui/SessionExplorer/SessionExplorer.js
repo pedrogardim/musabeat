@@ -177,12 +177,6 @@ function SessionExplorer(props) {
     });
   };
 
-  const handleSessionSelect = (index) => {
-    //props.setOpenedSession(sessionKeys[index]);
-    //props.setCurrentPage(null);
-    props.history.push(`/session/${sessionKeys[index]}`);
-  };
-
   const handleSearch = (e) => {
     getSessionList(e.target.value);
   };
@@ -273,7 +267,10 @@ function SessionExplorer(props) {
           <SessionGalleryItem
             user={props.user}
             compact={props.compact}
-            handleSessionSelect={handleSessionSelect}
+            handlePageNav={props.handlePageNav}
+            handleSessionSelect={() =>
+              props.handlePageNav("session", sessionKeys[sessionIndex])
+            }
             handleUserLike={() => handleUserLike(sessionIndex)}
             handleSessionDelete={setDeleteDialog}
             setPlayingSession={() =>

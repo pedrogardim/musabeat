@@ -55,12 +55,6 @@ function UserPage(props) {
   const userInfoRef = firebase.firestore().collection("users").doc(userKey);
   const sessionsRef = firebase.firestore().collection("sessions");
 
-  const openPage = (route, id) => {
-    //console.log(id);
-    const win = window.open(`/${route}/${id}`, "_blank");
-    win.focus();
-  };
-
   const getUserInfo = () => {
     userInfoRef.get().then((r) => {
       setUserInfo(r.data());
@@ -242,7 +236,7 @@ function UserPage(props) {
         <div className="break" />
         <div className="user-page-sessions-cont">
           <SessionExplorer
-            history={props.history}
+            handlePageNav={props.handlePageNav}
             target={userKey}
             user={props.user}
             compact

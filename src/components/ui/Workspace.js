@@ -1059,15 +1059,10 @@ function Workspace(props) {
 
   useEffect(() => {
     //console.log(areUnsavedChanges);
-    window.onbeforeunload = function (e) {
-      if (!areUnsavedChanges) return;
-      var dialogText = "Dialog text here";
-      e.returnValue = dialogText;
-      return dialogText;
-    };
+
     if (!props.hidden && isLoaded && !areUnsavedChanges) saveToDatabase();
 
-    //console.log("areUnsavedChanges", areUnsavedChanges);
+    props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
 
   /**/
@@ -1103,6 +1098,7 @@ function Workspace(props) {
           user={props.user}
           sessionSize={sessionSize}
           setPremiumMode={setPremiumMode}
+          handlePageNav={props.handlePageNav}
         />
       )}
 
@@ -1143,6 +1139,7 @@ function Workspace(props) {
                 duplicateModule={duplicateModule}
                 setSnackbarMessage={setSnackbarMessage}
                 isSessionLoaded={isLoaded}
+                handlePageNav={props.handlePageNav}
               />
               {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>

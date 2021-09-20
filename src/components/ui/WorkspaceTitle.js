@@ -64,12 +64,6 @@ function WorkspaceTitle(props) {
       });
   };
 
-  const openUserPage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/user/" + id, "_blank");
-    win.focus();
-  };
-
   const handleTagDelete = (index) => {
     props.setSessionData((prev) => {
       let newSessionData = { ...prev };
@@ -149,7 +143,7 @@ function WorkspaceTitle(props) {
                 <Avatar
                   src={editorProfiles[e].profile.photoURL}
                   alt={editorProfiles[e].profile.displayName}
-                  onClick={() => openUserPage(e)}
+                  onClick={() => props.handlePageNav("user", e, true)}
                 />
               </Tooltip>
             )

@@ -64,7 +64,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
 
   if (!userId) {
     setOpenedSession(newSession);
-    handlePageNav(`session/newSession`);
+    handlePageNav("session", "newSession");
     return;
   }
 
@@ -77,6 +77,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
         .doc(userId)
         .update({ sessions: firebase.firestore.FieldValue.arrayUnion(ref.id) });
     }
-    handlePageNav(`session/${ref.id}`);
+    handlePageNav("session", ref.id);
   });
 };

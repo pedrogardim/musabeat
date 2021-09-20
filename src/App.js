@@ -36,6 +36,8 @@ import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/Dialogs/AuthDialog";
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
+import ActionConfirm from "./components/ui/Dialogs/ActionConfirm";
+
 import { createNewSession } from "./utils/sessionUtils";
 
 const pageLabels = {
@@ -64,9 +66,25 @@ function App() {
 
   const [currentRoute, setCurrentRoute] = useState(null);
 
-  const handlePageNav = (route, additional) => {
-    history.push(`/${route}`);
+  const [followingRoute, setFollowingRoute] = useState(null);
+
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  const handlePageNav = (route, id, newTab) => {
+    if (newTab && !window.cordova) {
+      const win = window.open(`/#/${route}/${id}`, "_blank");
+      win.focus();
+    } else {
+      if (unsavedChanges && !followingRoute) {
+        setFollowingRoute([route, id, newTab]);
+        return;
+      }
+
+      history.push(id ? `/${route}/${id}` : `/${route}`);
+      setUnsavedChanges(false);
+    }
     setCurrentRoute(route);
+    setFollowingRoute(null);
   };
 
   const handleCreateNewSession = (session) => {
@@ -97,6 +115,15 @@ function App() {
   useEffect(() => {
     console.log(user);
   }, [user]);
+
+  useEffect(() => {
+    window.onbeforeunload = function (e) {
+      if (!unsavedChanges) return;
+      var dialogText = "Dialog text here";
+      e.returnValue = dialogText;
+      return dialogText;
+    };
+  }, [unsavedChanges]);
 
   return (
     <Fragment>
@@ -202,7 +229,7 @@ function App() {
           <Route exact path="/explore">
             <SessionExplorer
               createNewSession={handleCreateNewSession}
-              history={history}
+              handlePageNav={handlePageNav}
               user={user}
             />
           </Route>
@@ -210,37 +237,51 @@ function App() {
             <SessionExplorer
               isUser
               createNewSession={handleCreateNewSession}
-              history={history}
+              handlePageNav={handlePageNav}
               user={user}
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer explore user={user} />
+            <FileExplorer explore user={user} handlePageNav={handlePageNav} />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles user={user} />
+            <FileExplorer userFiles user={user} handlePageNav={handlePageNav} />
           </Route>
           <Route exact path="/file/:key">
-            <FilePage user={user} />
+            <FilePage user={user} handlePageNav={handlePageNav} />
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer explore user={user} />
+            <PatchExplorer explore user={user} handlePageNav={handlePageNav} />
           </Route>
           <Route exact path="/userinstruments">
-            <PatchExplorer userPatches user={user} />
+            <PatchExplorer
+              userPatches
+              user={user}
+              handlePageNav={handlePageNav}
+            />
           </Route>
           <Route exact path="/instrument/:key">
-            <PatchPage user={user} history={history} />
+            <PatchPage user={user} handlePageNav={handlePageNav} />
           </Route>
           <Route exact path="/drumsets">
-            <PatchExplorer isDrum explore user={user} />
+            <PatchExplorer
+              isDrum
+              explore
+              user={user}
+              handlePageNav={handlePageNav}
+            />
           </Route>
           <Route exact path="/userdrumsets">
-            <PatchExplorer isDrum userPatches user={user} />
+            <PatchExplorer
+              isDrum
+              userPatches
+              user={user}
+              handlePageNav={handlePageNav}
+            />
           </Route>
           <Route exact path="/drumset/:key">
-            <PatchPage isDrum user={user} />
+            <PatchPage isDrum user={user} handlePageNav={handlePageNav} />
           </Route>
 
           <Route exact path="/session/:key">
@@ -249,10 +290,12 @@ function App() {
               session={openedSession}
               user={user}
               createNewSession={handleCreateNewSession}
+              setUnsavedChanges={setUnsavedChanges}
+              handlePageNav={handlePageNav}
             />
           </Route>
           <Route exact path="/user/:key">
-            {user && <UserPage history={history} user={user} />}
+            {user && <UserPage handlePageNav={handlePageNav} user={user} />}
           </Route>
 
           <Route exact path="/admin">
@@ -262,6 +305,11 @@ function App() {
           </Route>
         </Switch>
       </div>
+      <ActionConfirm
+        open={Boolean(followingRoute)}
+        onClose={() => setFollowingRoute(null)}
+        action={() => handlePageNav(...followingRoute)}
+      />
     </Fragment>
   );
 }

@@ -252,6 +252,7 @@ function Player(props) {
         setInstrumentLoaded={props.setInstrumentLoaded}
         onInstrumentMod={props.onInstrumentMod}
         updateOnFileLoaded={props.updateOnFileLoaded}
+        handlePageNav={props.handlePageNav}
       />
     </div>
   );

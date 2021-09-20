@@ -344,18 +344,6 @@ function FileExplorer(props) {
     setCurrentPlaying(null);
   };
 
-  const openFilePage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/file/" + id, "_blank");
-    win.focus();
-  };
-
-  const openUserPage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/user/" + id, "_blank");
-    win.focus();
-  };
-
   const handleTagSelect = (tagName) => {
     let tag = fileTags.indexOf(tagName);
     let fileIndex = tagSelectionTarget[1];
@@ -586,7 +574,9 @@ function FileExplorer(props) {
                       <Typography
                         variant="overline"
                         className="fe-filename"
-                        onClick={() => openFilePage(fileIdList[index])}
+                        onClick={() =>
+                          props.handlePageNav("file", fileIdList[index], true)
+                        }
                       >
                         {`${row.name}.${fileExtentions[row.type]}`}
                       </Typography>
@@ -612,7 +602,13 @@ function FileExplorer(props) {
                               filesUserData[filedata[index].user].displayName
                             }
                             src={filesUserData[filedata[index].user].photoURL}
-                            onClick={() => openUserPage(filedata[index].user)}
+                            onClick={() =>
+                              props.handlePageNav(
+                                "user",
+                                filedata[index].user,
+                                true
+                              )
+                            }
                           />
                         </Tooltip>
                       )}

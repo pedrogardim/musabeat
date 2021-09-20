@@ -408,6 +408,7 @@ function Module(props) {
           timeline={props.timeline}
           timelineMode={props.timelineMode}
           isSessionLoaded={props.isSessionLoaded}
+          handlePageNav={props.handlePageNav}
         />
       );
       break;
@@ -647,6 +648,7 @@ function Module(props) {
                 setSnackbarMessage={props.setSnackbarMessage}
                 handleFileClick={handleFileClick}
                 setLabels={setLabels}
+                handlePageNav={props.handlePageNav}
               />
             )}
             {modulePage === "fileExplorer" && (

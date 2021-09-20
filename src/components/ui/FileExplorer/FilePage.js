@@ -31,7 +31,6 @@ import {
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
-import { get } from "jquery";
 const waveColor = colors[2];
 
 function FilePage(props) {
@@ -255,12 +254,6 @@ function FilePage(props) {
     );
   };
 
-  const openUserPage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/user/" + id, "_blank");
-    win.focus();
-  };
-
   useEffect(() => {
     console.log(player);
     if (isLoaded) drawFileWave(player.buffer, clipHeight, clipWidth);
@@ -300,7 +293,7 @@ function FilePage(props) {
           <Avatar
             alt={creatorInfo.profile.displayName}
             src={creatorInfo.profile.photoURL}
-            onClick={() => openUserPage(fileInfo.user)}
+            onClick={() => props.handlePageNav("user", fileInfo.user, true)}
           />
         </Tooltip>
       )}

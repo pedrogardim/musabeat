@@ -471,21 +471,6 @@ function PatchExplorer(props) {
     setCurrentPlaying(null);
   };
 
-  const openPatchPage = (id) => {
-    //console.log(id);
-    const win = window.open(
-      (props.isDrum ? "/#/drumset/" : "/#/instrument/") + id,
-      "_blank"
-    );
-    win.focus();
-  };
-
-  const openUserPage = (id) => {
-    //console.log(id);
-    const win = window.open("/#/user/" + id, "_blank");
-    win.focus();
-  };
-
   const handleTagSelect = (tagName) => {
     /* let tag = fileTags.indexOf(tagName);
     let patchIndex = tagSelectionTarget[1];
@@ -748,7 +733,11 @@ function PatchExplorer(props) {
                                   .photoURL
                               }
                               onClick={() =>
-                                openUserPage(selectedPatchInfo.creator)
+                                props.handlePageNav(
+                                  "user",
+                                  selectedPatchInfo.creator,
+                                  true
+                                )
                               }
                             />
                           </Tooltip>
@@ -806,7 +795,13 @@ function PatchExplorer(props) {
                           <Typography
                             variant="overline"
                             className="fe-filename"
-                            onClick={() => openPatchPage(patchIdList[index])}
+                            onClick={() =>
+                              props.handlePageNav(
+                                props.isDrum ? "drumset" : "instrument",
+                                patchIdList[index],
+                                true
+                              )
+                            }
                           >
                             {patch.name}
                           </Typography>
@@ -843,7 +838,13 @@ function PatchExplorer(props) {
                                     patchesUserData[patch.creator].displayName
                                   }
                                   src={patchesUserData[patch.creator].photoURL}
-                                  onClick={() => openUserPage(patch.creator)}
+                                  onClick={() =>
+                                    props.handlePageNav(
+                                      "user",
+                                      patch.creator,
+                                      true
+                                    )
+                                  }
                                 />
                               </Tooltip>
                             )}
