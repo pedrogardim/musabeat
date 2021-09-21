@@ -26,6 +26,7 @@ import {
   BottomNavigation,
   TextField,
   Fab,
+  Dialog,
 } from "@material-ui/core";
 
 import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
@@ -72,6 +73,7 @@ function FileExplorer(props) {
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
   const itemsPerPage = 25;
+  const user = props.user ? props.user : firebase.auth().currentUser;
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
@@ -211,10 +213,7 @@ function FileExplorer(props) {
   };
 
   const getUserFilesList = async (liked) => {
-    const dbUserRef = firebase
-      .firestore()
-      .collection("users")
-      .doc(props.user.uid);
+    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
     const dbFilesRef = firebase.firestore().collection("files");
     const storageRef = firebase.storage();
 
@@ -254,7 +253,7 @@ function FileExplorer(props) {
     firebase
       .firestore()
       .collection("users")
-      .doc(props.user.uid)
+      .doc(user.uid)
       .get()
       .then((r) => setUserLikedFiles(r.get("likedFiles")));
   };
@@ -278,13 +277,10 @@ function FileExplorer(props) {
   };
 
   const handleLike = (index) => {
-    if (props.user === null) return;
+    if (user === null) return;
     let likedFileId = fileIdList[index];
 
-    const dbUserRef = firebase
-      .firestore()
-      .collection("users")
-      .doc(props.user.uid);
+    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
     const dbFileRef = firebase.firestore().collection("files").doc(likedFileId);
 
     if (!userLikedFiles.includes(likedFileId)) {
@@ -441,8 +437,8 @@ function FileExplorer(props) {
   }, [props.userFiles, props.user, showingLiked]);
 
   useEffect(() => {
-    props.user && getUserLikes();
-  }, [props.user]);
+    user && getUserLikes();
+  }, [user]);
 
   useEffect(() => {
     clearFiles();
@@ -455,10 +451,8 @@ function FileExplorer(props) {
     //console.log("isLoading", isLoading);
   }, [isLoading]);
 
-  return (
-    <div
-      className={`file-explorer ${props.compact && "file-explorer-compact"}`}
-    >
+  const mainContent = (
+    <Fragment>
       {(props.compact || props.explore) && (
         <Fragment>
           <Autocomplete
@@ -513,43 +507,43 @@ function FileExplorer(props) {
             }`}
           >
             {/* !props.compact && (
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: 50 }}></TableCell>
-                  <TableCell>Name</TableCell>
-                  <Fragment>
-                    <TableCell>Categories</TableCell>
-                    {(props.explore || !!showingLiked) && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Like
-                      </TableCell>
-                    )}
+        <TableHead>
+          <TableRow>
+            <TableCell style={{ width: 50 }}></TableCell>
+            <TableCell>Name</TableCell>
+            <Fragment>
+              <TableCell>Categories</TableCell>
+              {(props.explore || !!showingLiked) && (
+                <TableCell style={{ width: 50 }} align="center">
+                  Like
+                </TableCell>
+              )}
 
-                    <TableCell
-                      className="fet-collapsable-column"
-                      align="center"
-                    >
-                      Size
-                    </TableCell>
-                    <TableCell style={{ width: 50 }} align="center">
-                      Download
-                    </TableCell>
-                    {props.userFiles && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Delete
-                      </TableCell>
-                    )}
-                  </Fragment>
-                </TableRow>
-              </TableHead>
-            ) */}
+              <TableCell
+                className="fet-collapsable-column"
+                align="center"
+              >
+                Size
+              </TableCell>
+              <TableCell style={{ width: 50 }} align="center">
+                Download
+              </TableCell>
+              {props.userFiles && (
+                <TableCell style={{ width: 50 }} align="center">
+                  Delete
+                </TableCell>
+              )}
+            </Fragment>
+          </TableRow>
+        </TableHead>
+      ) */}
             <TableBody>
               {filedata.map((row, index) => (
                 <TableRow
                   key={row.name + index}
                   onClick={(e) => handleFileSelect(e, index)}
                 >
-                  <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                  <TableCell style={{ width: 50 }}>
                     {loadingPlay === index ? (
                       <CircularProgress size={27} />
                     ) : currentPlaying === index ? (
@@ -580,12 +574,11 @@ function FileExplorer(props) {
                       >
                         {`${row.name}.${fileExtentions[row.type]}`}
                       </Typography>
-                      {props.userFiles &&
-                        filedata[index].user === props.user.uid && (
-                          <IconButton onClick={() => setRenamingFile(index)}>
-                            <Icon>edit</Icon>
-                          </IconButton>
-                        )}
+                      {props.userFiles && filedata[index].user === user.uid && (
+                        <IconButton onClick={() => setRenamingFile(index)}>
+                          <Icon>edit</Icon>
+                        </IconButton>
+                      )}
                       {filesUserData[filedata[index].user] && (
                         <Tooltip
                           title={
@@ -661,51 +654,50 @@ function FileExplorer(props) {
                           ))}
                     </div>
                   </TableCell>
-                  {!props.compact && (
-                    <Fragment>
-                      {(props.explore || !!showingLiked) && (
-                        <TableCell style={{ width: 50 }} align="center">
-                          <IconButton onClick={() => handleLike(index)}>
-                            <Icon
-                              color={
-                                userLikedFiles.includes(fileIdList[index])
-                                  ? "secondary"
-                                  : "inherit"
-                              }
-                            >
-                              favorite
-                            </Icon>
-                            <Typography
-                              className="like-btn-label"
-                              variant="overline"
-                            >
-                              {row.likes}
-                            </Typography>
-                          </IconButton>
-                        </TableCell>
-                      )}
-                      <TableCell
-                        className="fet-collapsable-column-800"
-                        align="center"
-                      >
-                        <Typography variant="overline">
-                          {formatBytes(row.size)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <IconButton onClick={() => handleDownload(index)}>
-                          <Icon>file_download</Icon>
+
+                  <Fragment>
+                    {(props.explore || props.compact || !!showingLiked) && (
+                      <TableCell style={{ width: 50 }} align="center">
+                        <IconButton onClick={() => handleLike(index)}>
+                          <Icon
+                            color={
+                              userLikedFiles.includes(fileIdList[index])
+                                ? "secondary"
+                                : "inherit"
+                            }
+                          >
+                            favorite
+                          </Icon>
+                          <Typography
+                            className="like-btn-label"
+                            variant="overline"
+                          >
+                            {row.likes}
+                          </Typography>
                         </IconButton>
                       </TableCell>
-                      {props.userFiles && (
-                        <TableCell align="center">
-                          <IconButton onClick={() => setDeletingFile(index)}>
-                            <Icon>delete</Icon>
-                          </IconButton>
-                        </TableCell>
-                      )}
-                    </Fragment>
-                  )}
+                    )}
+                    <TableCell
+                      className="fet-collapsable-column-800"
+                      align="center"
+                    >
+                      <Typography variant="overline">
+                        {formatBytes(row.size)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton onClick={() => handleDownload(index)}>
+                        <Icon>file_download</Icon>
+                      </IconButton>
+                    </TableCell>
+                    {props.userFiles && (
+                      <TableCell align="center">
+                        <IconButton onClick={() => setDeletingFile(index)}>
+                          <Icon>delete</Icon>
+                        </IconButton>
+                      </TableCell>
+                    )}
+                  </Fragment>
                 </TableRow>
               ))}
               {isLoading &&
@@ -713,7 +705,7 @@ function FileExplorer(props) {
                   .fill(1)
                   .map((e) => (
                     <TableRow style={{ height: 61 }}>
-                      <TableCell style={{ width: props.compact ? 20 : 50 }}>
+                      <TableCell style={{ width: 50 }}>
                         <IconButton>
                           <Icon>play_arrow</Icon>
                         </IconButton>
@@ -734,38 +726,36 @@ function FileExplorer(props) {
                           ))}
                         </div>
                       </TableCell>
-                      {!props.compact && (
-                        <Fragment>
-                          {props.explore && (
-                            <TableCell style={{ width: 50 }} align="center">
-                              <IconButton>
-                                <Icon>favorite</Icon>
-                              </IconButton>
-                            </TableCell>
-                          )}
-
-                          <TableCell
-                            className="fet-collapsable-column-800"
-                            align="center"
-                          >
-                            <Typography variant="overline">
-                              <Skeleton variant="text" />
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
+                      <Fragment>
+                        {props.explore && (
+                          <TableCell style={{ width: 50 }} align="center">
                             <IconButton>
-                              <Icon>file_download</Icon>
+                              <Icon>favorite</Icon>
                             </IconButton>
                           </TableCell>
-                          {props.userFiles && (
-                            <TableCell align="center">
-                              <IconButton>
-                                <Icon>delete</Icon>
-                              </IconButton>
-                            </TableCell>
-                          )}
-                        </Fragment>
-                      )}
+                        )}
+
+                        <TableCell
+                          className="fet-collapsable-column-800"
+                          align="center"
+                        >
+                          <Typography variant="overline">
+                            <Skeleton variant="text" />
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <IconButton>
+                            <Icon>file_download</Icon>
+                          </IconButton>
+                        </TableCell>
+                        {props.userFiles && (
+                          <TableCell align="center">
+                            <IconButton>
+                              <Icon>delete</Icon>
+                            </IconButton>
+                          </TableCell>
+                        )}
+                      </Fragment>
                     </TableRow>
                   ))}
             </TableBody>
@@ -834,6 +824,24 @@ function FileExplorer(props) {
           onClose={() => setRenamingFile(null)}
         />
       )}
+    </Fragment>
+  );
+
+  return props.compact ? (
+    <Dialog
+      open={true}
+      onClose={() => props.setFileExplorer(false)}
+      maxWidth="xl"
+      fullWidth="true"
+      PaperProps={{ style: { minHeight: "calc(100% - 64px)" } }}
+    >
+      {mainContent}
+    </Dialog>
+  ) : (
+    <div
+      className={`file-explorer ${props.compact && "file-explorer-compact"}`}
+    >
+      {mainContent}
     </div>
   );
 }

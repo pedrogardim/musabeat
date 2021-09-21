@@ -652,15 +652,14 @@ function Module(props) {
               />
             )}
             {modulePage === "fileExplorer" && (
-              <div className="instrument-editor">
-                <FileExplorer
-                  onFileClick={handleFileClick}
-                  setInstrumentLoaded={setInstrumentLoaded}
-                  isDrum={false}
-                  instrument={props.instrument}
-                  compact
-                />
-              </div>
+              <FileExplorer
+                onFileClick={handleFileClick}
+                setInstrumentLoaded={setInstrumentLoaded}
+                isDrum={false}
+                setFileExplorer={(x) => !x && setModulePage(null)}
+                instrument={props.instrument}
+                compact
+              />
             )}
             {modulePage === "settings" && (
               <ModuleSettings
