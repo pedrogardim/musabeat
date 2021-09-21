@@ -36,23 +36,19 @@ function Player(props) {
     props.updateOnFileLoaded(audiobuffer.duration);
   };
 
-  const toggleCursor = (state) => {
-    clearInterval(cursorAnimator);
-    state
-      ? setCursorAnimator(
-          setInterval(() => {
-            //temp fix
-            playerWrapper.current !== null &&
-              Tone.Transport.state === "started" &&
-              setCursorPosition(
-                ((Tone.Transport.seconds %
-                  (Tone.Time("1m").toSeconds() * props.module.size)) /
-                  (Tone.Time("1m").toSeconds() * props.module.size)) *
-                  playerWrapper.current.offsetWidth
-              );
-          }, 32)
-        )
-      : clearInterval(cursorAnimator);
+  const toggleCursor = () => {
+    setCursorAnimator(
+      setInterval(() => {
+        //temp fix
+        playerWrapper.current !== null &&
+          setCursorPosition(
+            ((Tone.Transport.seconds %
+              (Tone.Time("1m").toSeconds() * props.module.size)) /
+              (Tone.Time("1m").toSeconds() * props.module.size)) *
+              playerWrapper.current.offsetWidth
+          );
+      }, 32)
+    );
   };
 
   const scheduleEvents = (atRestart) => {
@@ -108,6 +104,7 @@ function Player(props) {
 
   //TODO: Optimize performance: clear on play/plause
   useEffect(() => {
+    toggleCursor();
     return () => {
       //console.log("cleared");
       clearInterval(cursorAnimator);
@@ -116,7 +113,6 @@ function Player(props) {
   }, []);
 
   useEffect(() => {
-    toggleCursor(Tone.Transport.state);
     scheduleEvents();
   }, [Tone.Transport.state]);
 

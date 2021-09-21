@@ -18,9 +18,11 @@ import {
 
 import "./Sequencer.css";
 import { colors } from "../../../utils/materialPalette";
+import { ContactsOutlined } from "@material-ui/icons";
 
 function Sequencer(props) {
   const parentRef = useRef(null);
+  const [cursorAnimator, setCursorAnimator] = useState(null);
   const [sequencerArray, setSequence] = useState(props.module.score);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [currentMeasure, setCurrentMeasure] = useState(0);
@@ -106,7 +108,40 @@ function Sequencer(props) {
     setHovered(hoverX < 0.5 ? "left" : "right");
   };
 
+  const toggleCursor = () => {
+    setCursorAnimator(
+      setInterval(() => {
+        let measure = parseInt(Tone.Transport.position.split(":")[0]);
+        let beat = Math.floor(
+          (Tone.Transport.seconds % Tone.Time("1m").toSeconds()) /
+            (Tone.Time("1m").toSeconds() /
+              Object.keys(props.module.score[0]).length)
+        );
+        //console.log("measure", measure);
+        //currentMeasure !== measure &&
+        if (measure < props.module.score.length) setCurrentMeasure(measure);
+        //currentBeat !== beat &&
+        setCurrentBeat(beat);
+      }, 32)
+    );
+  };
+
   //===================
+  /* 
+  useEffect(() => {
+    console.log("measure", currentMeasure);
+  }, [currentMeasure]);
+
+  useEffect(() => {
+    console.log("beat", currentBeat);
+  }, [currentBeat]); */
+
+  useEffect(() => {
+    toggleCursor();
+    return () => {
+      clearInterval(cursorAnimator);
+    };
+  }, []);
 
   useEffect(() => {
     scheduleNotes();

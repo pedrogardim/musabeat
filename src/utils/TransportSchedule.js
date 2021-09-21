@@ -48,8 +48,8 @@ export const scheduleDrumSequence = (
                 (note) =>
                   instrument.has(note) && instrument.player(note).start(time)
               );
-            updateBeat(beatIndex);
-            updateMeasure(measureIndex);
+            //updateBeat(beatIndex);
+            //updateMeasure(measureIndex);
           }, beatscheduletime);
           scheduledNotes.push(thisevent);
         });
@@ -72,8 +72,8 @@ export const scheduleDrumSequence = (
                 (note) =>
                   instrument.has(note) && instrument.player(note).start(time)
               );
-            updateBeat(beatIndex);
-            updateMeasure(measureIndex);
+            //updateBeat(beatIndex);
+            //updateMeasure(measureIndex);
           }, beatscheduletime);
           scheduledNotes.push(thisevent);
         });
@@ -122,8 +122,9 @@ export const scheduleMelodyGrid = (
                   time
                 )
               );
-            updateBeat(beatIndex);
-            updateMeasure(measureIndex);
+            //updateBeat(beatIndex);
+            //updateMeasure(measureIndex);
+            //console.log(beatIndex, measureIndex);
           }, beatscheduletime);
           scheduledNotes.push(thisevent);
         });
@@ -149,8 +150,8 @@ export const scheduleMelodyGrid = (
                   time
                 )
               );
-            updateBeat(beatIndex);
-            updateMeasure(measureIndex);
+            //updateBeat(beatIndex);
+            //updateMeasure(measureIndex);
           }, beatscheduletime);
           scheduledNotes.push(thisevent);
         });

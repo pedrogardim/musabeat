@@ -21,6 +21,7 @@ import { colors } from "../../../utils/materialPalette";
 
 function MelodyGrid(props) {
   const parentRef = useRef(null);
+  const [cursorAnimator, setCursorAnimator] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
   const [melodyArray, setMelodyArray] = useState(props.module.score);
   const [gridScale, setGridScale] = useState([
@@ -164,6 +165,41 @@ function MelodyGrid(props) {
     setHovered(true);
   };
 
+  const toggleCursor = () => {
+    setCursorAnimator(
+      setInterval(() => {
+        let measure = parseInt(Tone.Transport.position.split(":")[0]);
+        let beat = Math.floor(
+          (Tone.Transport.seconds % Tone.Time("1m").toSeconds()) /
+            (Tone.Time("1m").toSeconds() /
+              Object.keys(props.module.score[0]).length)
+        );
+        //console.log("measure", measure);
+        //currentMeasure !== measure &&
+        if (measure < props.module.score.length) setCurrentMeasure(measure);
+        //currentBeat !== beat &&
+        setCurrentBeat(beat);
+      }, 32)
+    );
+  };
+
+  //===================
+  /* 
+  useEffect(() => {
+    console.log("measure", currentMeasure);
+  }, [currentMeasure]);
+
+  useEffect(() => {
+    console.log("beat", currentBeat);
+  }, [currentBeat]); */
+
+  useEffect(() => {
+    toggleCursor();
+    return () => {
+      clearInterval(cursorAnimator);
+    };
+  }, []);
+
   useEffect(() => {
     setInstrument(props.instrument);
   }, [props.instrument]);
@@ -173,6 +209,7 @@ function MelodyGrid(props) {
     currentMeasure > props.module.score.length && setCurrentMeasure(0)
     setMelodyArray(props.module.score);
   }, [props.module.score]);
+
  */
 
   useEffect(() => {
@@ -193,10 +230,6 @@ function MelodyGrid(props) {
     updateGridRows();
     //console.log(gridScale);
   }, [props.module.root, props.module.scale, props.module.range]);
-
-  useEffect(() => {
-    //getScaleFromSequenceNotes();
-  }, []);
 
   return (
     <div

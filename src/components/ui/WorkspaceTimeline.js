@@ -213,7 +213,7 @@ function WorkspaceTimeline(props) {
       ) : (
         <Slider
           min={0}
-          max={1}
+          max={0.9999}
           className={"ws-timeline-slider"}
           step={0.01}
           value={cursorPosition}

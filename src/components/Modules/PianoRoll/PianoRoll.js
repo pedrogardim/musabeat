@@ -94,21 +94,18 @@ function PianoRoll(props) {
     });
   };
 
-  const toggleCursor = (state) => {
-    clearInterval(cursorAnimator);
-    state &&
-      setCursorAnimator(
-        setInterval(() => {
-          PRWrapper.current !== null &&
-            Tone.Transport.state === "started" &&
-            setCursorPosition(
-              ((Tone.Transport.seconds %
-                (Tone.Time("1m").toSeconds() * props.module.size)) /
-                (Tone.Time("1m").toSeconds() * props.module.size)) *
-                PRWrapper.current.offsetWidth
-            );
-        }, 32)
-      );
+  const toggleCursor = () => {
+    setCursorAnimator(
+      setInterval(() => {
+        PRWrapper.current !== null &&
+          setCursorPosition(
+            ((Tone.Transport.seconds %
+              (Tone.Time("1m").toSeconds() * props.module.size)) /
+              (Tone.Time("1m").toSeconds() * props.module.size)) *
+              PRWrapper.current.offsetWidth
+          );
+      }, 32)
+    );
   };
 
   const handleCursorDrag = (event, element) => {
@@ -229,12 +226,14 @@ function PianoRoll(props) {
   };
 
   useEffect(() => {
+    toggleCursor();
     window.addEventListener(
       "resize",
       () => PRWrapper.current && setParentWidth(PRWrapper.current.offsetWidth)
     );
 
     return () => {
+      clearInterval(cursorAnimator);
       window.removeEventListener(
         "resize",
         () => PRWrapper.current && setParentWidth(PRWrapper.current.offsetWidth)
@@ -243,12 +242,7 @@ function PianoRoll(props) {
   }, []);
 
   useEffect(() => {
-    toggleCursor(Tone.Transport.state);
-    //scheduleEvents();
-  }, [Tone.Transport.state]);
-
-  useEffect(() => {
-    console.log("notes", notes);
+    //console.log("notes", notes);
     scheduleEvents();
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
