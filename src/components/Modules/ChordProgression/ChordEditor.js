@@ -32,14 +32,14 @@ function ChordEditor(props) {
   //const [scaleChords, setScaleChords] = useState(getChordsFromScale(0, 0, 3));
   const scaleChords = getChordsFromScale(0, 0, 3);
   const [textInputValue, setTextInputValue] = useState(
-    chordNotestoName(props.chords[props.selectedChord].notes)
+    chordNotestoName(props.chords[props.activeChord].notes)
   );
   const [nullChord, setNullChord] = useState(false);
 
   const changeChordOnBtnClick = (notes) => {
     props.setChords((prev) => {
       let newChords = [...prev];
-      newChords[props.selectedChord].notes = notes;
+      newChords[props.activeChord].notes = notes;
       return newChords;
     });
     props.playChordPreview();
@@ -55,7 +55,7 @@ function ChordEditor(props) {
       setNullChord(false);
       props.setChords((prev) => {
         let newChords = [...prev];
-        newChords[props.selectedChord].notes = chord;
+        newChords[props.activeChord].notes = chord;
         return newChords;
       });
     }
@@ -68,20 +68,19 @@ function ChordEditor(props) {
       //avoid going out range
       if (
         (!downUp &&
-          parseInt(
-            newChords[props.selectedChord].notes[0].split(/(\d+)/)[1]
-          ) === 1) ||
+          parseInt(newChords[props.activeChord].notes[0].split(/(\d+)/)[1]) ===
+            1) ||
         (downUp &&
           parseInt(
-            newChords[props.selectedChord].notes[
-              newChords[props.selectedChord].notes.length - 1
+            newChords[props.activeChord].notes[
+              newChords[props.activeChord].notes.length - 1
             ].split(/(\d+)/)[1]
           ) === 7)
       ) {
         return prev;
       }
-      newChords[props.selectedChord].notes = newChords[
-        props.selectedChord
+      newChords[props.activeChord].notes = newChords[
+        props.activeChord
       ].notes.map((e) => {
         let splited = e.split(/(\d+)/);
         let newNum = downUp
@@ -89,14 +88,14 @@ function ChordEditor(props) {
           : parseInt(splited[1]) - 1;
         return splited[0] + newNum;
       });
-      console.log(newChords[props.selectedChord].notes);
+      console.log(newChords[props.activeChord].notes);
       return newChords;
     });
     props.playChordPreview();
   };
 
   const changeChordExpansion = (expand) => {
-    let thisNotes = props.chords[props.selectedChord].notes;
+    let thisNotes = props.chords[props.activeChord].notes;
     let thisMidiNotes = thisNotes.map((e) => Tone.Frequency(e).toMidi());
     let highestNote = thisMidiNotes[thisMidiNotes.length - 1];
     let notesDelta = thisMidiNotes.map((e) => (e + 12 - highestNote) % 12);
@@ -114,22 +113,20 @@ function ChordEditor(props) {
     props.setChords((prev) => {
       let newChords = [...prev];
       //avoid going out range
-      newChords[props.selectedChord].notes = expand
-        ? [...newChords[props.selectedChord].notes, noteToAdd].sort(
+      newChords[props.activeChord].notes = expand
+        ? [...newChords[props.activeChord].notes, noteToAdd].sort(
             (a, b) =>
               Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
           )
-        : newChords[props.selectedChord].notes.slice(0, -1);
+        : newChords[props.activeChord].notes.slice(0, -1);
       return newChords;
     });
     props.playChordPreview();
   };
 
   useEffect(() => {
-    setTextInputValue(
-      chordNotestoName(props.chords[props.selectedChord].notes)
-    );
-  }, [props.chords, props.selectedChord]);
+    setTextInputValue(chordNotestoName(props.chords[props.activeChord].notes));
+  }, [props.chords, props.activeChord]);
 
   return (
     <Dialog open="true" onClose={props.onClose} maxWidth="md" fullWidth>
@@ -196,8 +193,8 @@ function ChordEditor(props) {
           index={props.index}
           color={props.module.color}
           setChords={props.setChords}
-          selectedChord={props.selectedChord}
-          notes={props.chords[props.selectedChord].notes}
+          activeChord={props.activeChord}
+          notes={props.chords[props.activeChord].notes}
           playChordPreview={props.playChordPreview}
         />
       </DialogContent>

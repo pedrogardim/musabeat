@@ -21,7 +21,6 @@ function ChordProgression(props) {
   const [chords, setChords] = useState(props.module.score);
   const [activeChord, setActiveChord] = useState(0);
   const [activeRhythm, setActiveRhythm] = useState(null);
-  const [selectedChord, setSelectedChord] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
   const [editorOpen, setEditorOpen] = useState(false);
 
@@ -44,17 +43,9 @@ function ChordProgression(props) {
   const handleClick = (chordindex) => {
     instrument.releaseAll();
 
-    setSelectedChord((prevChord) => {
-      if (chordindex === prevChord) {
-        return null;
-      } else {
-        playChordPreview(chordindex);
-
-        return chordindex;
-      }
-    });
+    playChordPreview(chordindex);
     Tone.Transport.seconds =
-      chords[chordindex].time * Tone.Time("1m").toSeconds();
+      chords[chordindex].time * Tone.Time("1m").toSeconds() + 0.01;
   };
 
   const addMeasure = () => {
@@ -120,26 +111,28 @@ function ChordProgression(props) {
     props.setTimeline(newTimeline);
   };
 
-  const toggleCursor = () => {
-    setCursorAnimator(
-      setInterval(() => {
-        let currentTime = Tone.Transport.seconds / Tone.Time("1m").toSeconds();
-        let chord = chords.findIndex((e) => {
-          return currentTime >= e.time && currentTime <= e.time + e.duration;
-        });
+  const updateCursor = () => {
+    let currentTime = Tone.Transport.seconds / Tone.Time("1m").toSeconds();
+    let chord = props.module.score.findIndex((e) => {
+      return currentTime >= e.time && currentTime < e.time + e.duration;
+    });
 
-        let rhythm = Math.floor(
-          (currentTime % chords[chord].duration) /
-            (chords[chord].duration / chords[chord].rhythm.length)
-        );
+    if (chord === -1) return;
 
-        //console.log("measure", measure);
-        //currentMeasure !== measure &&
-        if (chord < props.module.score.length) setActiveChord(chord);
-        setActiveRhythm(rhythm);
-        //currentBeat !== beat &&
-      }, 32)
+    let rhythm = Math.floor(
+      (currentTime % props.module.score[chord].duration) /
+        (props.module.score[chord].duration /
+          props.module.score[chord].rhythm.length)
     );
+
+    //console.log("measure", measure);
+    //currentMeasure !== measure &&
+    if (chord < props.module.score.length) setActiveChord(chord);
+    setActiveRhythm(rhythm);
+  };
+
+  const toggleCursor = () => {
+    setCursorAnimator(setInterval(updateCursor, 32));
   };
 
   //===================
@@ -174,23 +167,16 @@ function ChordProgression(props) {
 
   useEffect(() => {
     //console.log(activeChord);
-    selectedChord !== null &&
-      Tone.Transport.state === "started" &&
-      setSelectedChord(activeChord);
+    props.setSelection(activeChord);
   }, [activeChord]);
 
-  /* useEffect(() => {
-    console.log(activeRhythm);
-  }, [activeRhythm]); */
+  useEffect(() => {
+    console.log("cursorAnimator", cursorAnimator);
+  }, [cursorAnimator]);
 
   useEffect(() => {
     scheduleChords();
   }, [props.sessionSize]);
-
-  useEffect(() => {
-    setActiveChord(selectedChord);
-    props.setSelection(selectedChord);
-  }, [selectedChord]);
 
   //temp fix for unwanted unscheduling
 
@@ -246,7 +232,7 @@ function ChordProgression(props) {
         <IconButton size="small" onClick={addMeasure}>
           <Icon>add</Icon>
         </IconButton>
-        {selectedChord !== null && (
+        {activeChord !== null && (
           <Fab
             style={{
               backgroundColor: colors[props.module.color][600],
@@ -263,7 +249,7 @@ function ChordProgression(props) {
         <ChordEditor
           index={props.index}
           chords={chords}
-          selectedChord={selectedChord}
+          activeChord={activeChord}
           playChordPreview={() => playChordPreview(activeChord)}
           module={props.module}
           setChords={setChords}

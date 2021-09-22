@@ -1116,6 +1116,8 @@ function Workspace(props) {
         {modules !== null && sessionData ? (
           modules.map((module, moduleIndex) => (
             <Fragment>
+              {/* moduleIndex % 3 === 0 && <div className="break" /> */}
+
               <Module
                 tabIndex={-1}
                 key={module.id}
@@ -1141,7 +1143,6 @@ function Workspace(props) {
                 isSessionLoaded={isLoaded}
                 handlePageNav={props.handlePageNav}
               />
-              {moduleIndex % 3 === 1 && <div className="break" />}
             </Fragment>
           ))
         ) : !modules ? (

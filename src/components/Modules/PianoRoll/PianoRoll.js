@@ -371,7 +371,9 @@ function PianoRoll(props) {
             size={props.module.size}
             parentWidth={parentWidth}
             selection={props.selection}
-            selected={props.selection.includes(i)}
+            selected={
+              typeof props.selection === "object" && props.selection.includes(i)
+            }
             setSelection={props.setSelection}
             instrument={props.instrument}
             dragSelection={dragSelection}

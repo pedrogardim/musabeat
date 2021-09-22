@@ -116,6 +116,7 @@ function ChordRhythmSequence(props) {
           </IconButton>
           {chord.map((rhythm, rhythmIndex) => (
             <ChordRhythmTile
+              key={"crt" + rhythmIndex}
               chordIndex={chordIndex}
               rhythmIndex={rhythmIndex}
               rhythm={rhythm}
