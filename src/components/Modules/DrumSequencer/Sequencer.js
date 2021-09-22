@@ -111,7 +111,9 @@ function Sequencer(props) {
   const toggleCursor = () => {
     setCursorAnimator(
       setInterval(() => {
-        let measure = parseInt(Tone.Transport.position.split(":")[0]);
+        let measure =
+          parseInt(Tone.Transport.position.split(":")[0]) %
+          props.module.score.length;
         let beat = Math.floor(
           (Tone.Transport.seconds % Tone.Time("1m").toSeconds()) /
             (Tone.Time("1m").toSeconds() /

@@ -17,6 +17,7 @@ import {
 import { colors } from "../../../utils/materialPalette";
 
 function ChordProgression(props) {
+  const [cursorAnimator, setCursorAnimator] = useState(null);
   const [chords, setChords] = useState(props.module.score);
   const [activeChord, setActiveChord] = useState(0);
   const [activeRhythm, setActiveRhythm] = useState(null);
@@ -74,7 +75,7 @@ function ChordProgression(props) {
 
     let measuresToAdd = newDuration - chordsLength;
 
-    console.log(chordsLength, newDuration, measuresToAdd);
+    //console.log(chordsLength, newDuration, measuresToAdd);
 
     setChords((prev) => {
       let newChords = [...prev];
@@ -119,6 +120,45 @@ function ChordProgression(props) {
     props.setTimeline(newTimeline);
   };
 
+  const toggleCursor = () => {
+    setCursorAnimator(
+      setInterval(() => {
+        let currentTime = Tone.Transport.seconds / Tone.Time("1m").toSeconds();
+        let chord = chords.findIndex((e) => {
+          return currentTime >= e.time && currentTime <= e.time + e.duration;
+        });
+
+        let rhythm = Math.floor(
+          (currentTime % chords[chord].duration) /
+            (chords[chord].duration / chords[chord].rhythm.length)
+        );
+
+        //console.log("measure", measure);
+        //currentMeasure !== measure &&
+        if (chord < props.module.score.length) setActiveChord(chord);
+        setActiveRhythm(rhythm);
+        //currentBeat !== beat &&
+      }, 32)
+    );
+  };
+
+  //===================
+  /* 
+  useEffect(() => {
+    console.log("measure", currentMeasure);
+  }, [currentMeasure]);
+
+  useEffect(() => {
+    console.log("beat", currentBeat);
+  }, [currentBeat]); */
+
+  useEffect(() => {
+    toggleCursor();
+    return () => {
+      clearInterval(cursorAnimator);
+    };
+  }, []);
+
   useEffect(() => {
     instrument && scheduleChords();
     updateChords();
@@ -133,10 +173,15 @@ function ChordProgression(props) {
   }, [props.instrument]);
 
   useEffect(() => {
+    //console.log(activeChord);
     selectedChord !== null &&
       Tone.Transport.state === "started" &&
       setSelectedChord(activeChord);
   }, [activeChord]);
+
+  /* useEffect(() => {
+    console.log(activeRhythm);
+  }, [activeRhythm]); */
 
   useEffect(() => {
     scheduleChords();

@@ -209,8 +209,8 @@ export const scheduleChordProgression = (
             }
 
             //console.log(chord.notes);
-            updateChord(chordIndex);
-            updateRhythm(rhythmIndex);
+            //updateChord(chordIndex);
+            //updateRhythm(rhythmIndex);
           }, rhythmscheduletime);
           scheduledChords.push(thisevent);
         });
@@ -246,8 +246,8 @@ export const scheduleChordProgression = (
             }
 
             //console.log(chord.notes);
-            updateChord(chordIndex);
-            updateRhythm(rhythmIndex);
+            //updateChord(chordIndex);
+            //updateRhythm(rhythmIndex);
           }, rhythmscheduletime);
           scheduledChords.push(thisevent);
         });

@@ -77,9 +77,9 @@ function WorkspaceTitle(props) {
     setExpanded(false);
   }, [props.sessionData, props.sessionKey, props.user]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(editorProfiles);
-  }, [editorProfiles]);
+  }, [editorProfiles]); */
 
   return (
     <div className="app-title">

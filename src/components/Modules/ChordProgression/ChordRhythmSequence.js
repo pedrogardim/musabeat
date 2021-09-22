@@ -122,8 +122,7 @@ function ChordRhythmSequence(props) {
               modifyRhythm={modifyRhythm}
               cursor={
                 measureChordIndex === chordIndex &&
-                props.activeRhythm === rhythmIndex &&
-                Tone.Transport.state === "started"
+                props.activeRhythm === rhythmIndex
               }
               color={props.color}
             />
