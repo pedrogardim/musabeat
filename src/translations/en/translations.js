@@ -114,11 +114,12 @@ export const TRANSLATIONS_EN = {
     allCategories: "All Categories",
     noCategory: "No Category",
     none: "None",
+    offlineAlert:
+      "MusaBeat requires a stable connection to the server. Check your internet connetion.",
   },
   dialogs: {
     cancel: "Cancel",
     confirm: "OK",
-
     submit: "Submit",
     delete: "Delete",
     areYouSure: "Are you sure?",

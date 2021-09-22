@@ -26,6 +26,8 @@ function ActionConfirm(props) {
             ? t("dialogs.irreversibleAction")
             : props.dupSession
             ? t("dialogs.dupSession")
+            : props.unsavedChanges
+            ? t("dialogs.unsavedChanges")
             : ""}
         </DialogContentText>
       </DialogContent>

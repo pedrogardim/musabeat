@@ -1083,11 +1083,7 @@ function Workspace(props) {
         </Helmet>
       ) */}
 
-      <Fade in={!Boolean(modules)} timeout={{ enter: 0, exit: 200 }}>
-        <div className="loading-screen-background">
-          <LoadingScreen />
-        </div>
-      </Fade>
+      <LoadingScreen open={!Boolean(modules)} />
 
       {sessionKey && (
         <WorkspaceTitle

@@ -142,6 +142,18 @@ body *::-webkit-scrollbar-thumb {
   color: #3f51b5;
 }
 
+.app-offline-screen {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  background-color: white;
+  z-index: 9999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 @keyframes flashing-alert-icon {
   0% {
     color: rgba(0, 0, 0, 0.137);

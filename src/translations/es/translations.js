@@ -112,6 +112,8 @@ export const TRANSLATIONS_ES = {
     allCategories: "Todas las Categorías",
     noCategory: "Sín Categoría",
     none: "Ninguno",
+    offlineAlert:
+      "MusaBeat requiere una conexión estable a al servidor. Comprueba tu conexión a internet.",
   },
   dialogs: {
     cancel: "Cancelar",

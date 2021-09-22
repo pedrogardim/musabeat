@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-import { Dialog } from "@material-ui/core";
+import { Fade } from "@material-ui/core";
 
 import AppLogo from "./AppLogo";
 
@@ -12,9 +12,11 @@ function LoadingScreen(props) {
   const { t } = useTranslation();
 
   return (
-    <div className="loading-screen-background">
-      <AppLogo className="loading-screen-logo" animated />
-    </div>
+    <Fade in={props.open} timeout={{ enter: 0, exit: 200 }}>
+      <div className="loading-screen-background">
+        <AppLogo className="loading-screen-logo" animated />
+      </div>
+    </Fade>
   );
 }
 

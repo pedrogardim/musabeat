@@ -14,7 +14,10 @@ import {
   Toolbar,
   AppBar,
   Typography,
+  Fade,
 } from "@material-ui/core";
+
+import * as Tone from "tone";
 
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
@@ -57,6 +60,7 @@ function App() {
   const wrapperRef = useRef(null);
 
   const [user, setUser] = useState(firebase.auth().currentUser);
+  const [isOnline, setIsOnline] = useState(true);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [languagePicker, setLanguagePicker] = useState(false);
@@ -110,6 +114,8 @@ function App() {
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
+    window.addEventListener("online", () => setIsOnline(true));
+    window.addEventListener("offline", () => setIsOnline(false));
   }, []);
 
   useEffect(() => {
@@ -127,6 +133,18 @@ function App() {
 
   return (
     <Fragment>
+      <Fade in={!isOnline}>
+        <div className="app-offline-screen">
+          <AppLogo
+            style={{ marginBottom: 32 }}
+            className="loading-screen-logo"
+            animated
+          />
+          <Typography align="center" variant="h5" style={{ padding: 64 }}>
+            {t("misc.offlineAlert")}
+          </Typography>
+        </div>
+      </Fade>
       <AppBar position="sticky">
         <Toolbar className="app-bar">
           <IconButton
@@ -160,7 +178,7 @@ function App() {
           </Helmet>
         )}
       </AppBar>
-      <div className="app-wrapper">
+      <div className="app-wrapper" onMouseDown={() => Tone.start()}>
         {authDialog && (
           <AuthDialog
             authDialog={authDialog}
@@ -306,6 +324,7 @@ function App() {
         </Switch>
       </div>
       <ActionConfirm
+        unsavedChanges
         open={Boolean(followingRoute)}
         onClose={() => setFollowingRoute(null)}
         action={() => handlePageNav(...followingRoute)}
