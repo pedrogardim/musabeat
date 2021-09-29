@@ -104,8 +104,8 @@ function ModulePicker(props) {
     };
 
     if (selectedType === 1) {
-      newModule.root = selectedRoot;
-      newModule.scale = selectedScale;
+      //newModule.root = selectedRoot;
+      //newModule.scale = selectedScale;
       newModule.range = selectedRange;
     }
 

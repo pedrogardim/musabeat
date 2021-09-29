@@ -16,7 +16,10 @@ import {
   Checkbox,
   FormControlLabel,
   Tooltip,
+  Select,
 } from "@material-ui/core";
+
+import { scales, musicalNotes } from "../../assets/musicutils";
 
 import { useTranslation } from "react-i18next";
 
@@ -188,6 +191,35 @@ function SessionSettings(props) {
                   valueLabelDisplay="auto"
                   onChangeCommitted={handleBpmChange}
                 />
+              </Grid>
+              <Grid item>
+                <Typography variant="overline">
+                  {t("module.settings.sessionScale")}
+                </Typography>
+                <div className="break" />
+
+                <Select
+                  native
+                  defaultValue={sessionData.root}
+                  onChange={(e) => handleInfoChange("root", e.target.value)}
+                >
+                  {musicalNotes.map((note, noteIndex) => (
+                    <option key={noteIndex} value={noteIndex}>
+                      {note}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  native
+                  defaultValue={sessionData.scale}
+                  onChange={(e) => handleInfoChange("scale", e.target.value)}
+                >
+                  {scales.map((scale, scaleIndex) => (
+                    <option key={scaleIndex} value={scaleIndex}>
+                      {t(`music.scales.${scaleIndex}`)}
+                    </option>
+                  ))}
+                </Select>
               </Grid>
             </Grid>
           </Grid>

@@ -8,7 +8,11 @@ import {
   clearEvents,
 } from "../../../utils/TransportSchedule";
 
-import { scales, musicalNotes } from "../../../assets/musicutils";
+import {
+  scales,
+  musicalNotes,
+  musicalNotesNoFlat,
+} from "../../../assets/musicutils";
 
 import {
   BottomNavigation,
@@ -136,24 +140,32 @@ function MelodyGrid(props) {
 
   const updateGridRows = () => {
     let newNotes = [];
+
+    let moduleRoot = props.module.root
+      ? props.module.root
+      : props.sessionData.root;
+    let moduleScale = props.module.scale
+      ? props.module.scale
+      : props.sessionData.scale;
     for (
       let x = 0;
       x < props.module.range[1] - props.module.range[0] + 1;
       x++
     ) {
       let root =
-        musicalNotes[props.module.root] + "" + (props.module.range[0] + x);
+        musicalNotesNoFlat[moduleRoot] + "" + (props.module.range[0] + x);
       //console.log(root,scales[props.module.scale][0])
       Tone.Frequency(root)
-        .harmonize(scales[props.module.scale][0])
+        .harmonize(scales[moduleScale][0])
         .map((e) => newNotes.push(e.toNote()));
     }
     newNotes.push(
       Tone.Frequency(
-        musicalNotes[props.module.root] + "" + (props.module.range[1] + 1)
+        musicalNotes[moduleRoot] + "" + (props.module.range[1] + 1)
       ).toNote()
     );
-    setGridScale(newNotes);
+    console.log(newNotes);
+    setGridScale(newNotes.filter((e) => e !== "undefinedNaN"));
     //TODO: Handle Hidden Notes
   };
 

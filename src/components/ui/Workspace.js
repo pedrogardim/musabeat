@@ -1123,6 +1123,7 @@ function Workspace(props) {
                 setInstruments={setInstruments}
                 loaded={instrumentsLoaded[moduleIndex]}
                 setInstrumentsLoaded={setInstrumentsLoaded}
+                sessionData={sessionData}
                 sessionSize={sessionSize}
                 setModules={setModules}
                 editMode={editMode}

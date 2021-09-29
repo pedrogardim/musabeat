@@ -11,13 +11,14 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     description: "No description",
     tags: [],
     bpm: 120,
-
+    root: 0,
+    scale: 0,
     timeline: { 0: [0], size: 1, on: false },
     modules: [
       {
         id: 0,
         name: "Sequencer",
-        color: 2,
+        color: Math.floor(Math.random() * 14.99),
         score: [
           {
             0: [0],
@@ -43,6 +44,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     copied: 0,
     opened: 0,
     played: 0,
+
     creator: userId,
     editors: [userId],
     likes: 0,

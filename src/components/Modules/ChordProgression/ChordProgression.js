@@ -252,6 +252,7 @@ function ChordProgression(props) {
           activeChord={activeChord}
           playChordPreview={() => playChordPreview(activeChord)}
           module={props.module}
+          sessionData={props.sessionData}
           setChords={setChords}
           onClose={() => setEditorOpen(false)}
         />

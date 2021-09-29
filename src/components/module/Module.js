@@ -362,6 +362,7 @@ function Module(props) {
           timeline={props.timeline}
           timelineMode={props.timelineMode}
           isSessionLoaded={props.isSessionLoaded}
+          sessionData={props.sessionData}
         />
       );
       break;
@@ -383,6 +384,7 @@ function Module(props) {
           selection={props.selection}
           setSelection={props.setSelection}
           isSessionLoaded={props.isSessionLoaded}
+          sessionData={props.sessionData}
         />
       );
       break;
@@ -670,6 +672,7 @@ function Module(props) {
                 index={props.index}
                 timeline={props.timeline}
                 setTimeline={props.setTimeline}
+                sessionData={props.sessionData}
               />
             )}
             {modulePage === "effects" && (

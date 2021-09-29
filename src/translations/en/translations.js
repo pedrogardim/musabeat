@@ -68,6 +68,7 @@ export const TRANSLATIONS_EN = {
     settings: {
       steps: "Steps",
       length: "Length (In measures)",
+      sessionScale: "Session",
     },
   },
   modulePicker: {

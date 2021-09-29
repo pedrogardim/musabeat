@@ -30,7 +30,14 @@ import "./ChordEditor.css";
 function ChordEditor(props) {
   const inputRef = useRef(null);
   //const [scaleChords, setScaleChords] = useState(getChordsFromScale(0, 0, 3));
-  const scaleChords = getChordsFromScale(0, 0, 3);
+  const moduleRoot = props.module.root
+    ? props.module.root
+    : props.sessionData.root;
+  const moduleScale = props.module.scale
+    ? props.module.scale
+    : props.sessionData.scale;
+
+  const scaleChords = getChordsFromScale(moduleRoot, moduleScale, 3);
   const [textInputValue, setTextInputValue] = useState(
     chordNotestoName(props.chords[props.activeChord].notes)
   );

@@ -62,6 +62,14 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ likes: 0 })));
   };
 
+  const updateSessions = () => {
+    firebase
+      .firestore()
+      .collection("sessions")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ root: 0, scale: 0 })));
+  };
+
   return (
     <div className="file-page">
       {/* <AppBar position="static">
@@ -83,6 +91,8 @@ function AdminDashboard(props) {
       <Button onClick={updatePremium}>updateSessions</Button>
       <br />
       <Button onClick={updateLikes}>Update files, patches like</Button>
+      <br />
+      <Button onClick={updateSessions}>Update session scale</Button>
     </div>
   );
 }

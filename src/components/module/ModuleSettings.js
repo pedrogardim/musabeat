@@ -1,7 +1,13 @@
 import * as Tone from "tone";
 
 import React, { Fragment } from "react";
-import { Select, InputLabel, FormControl, Slider } from "@material-ui/core";
+import {
+  Select,
+  InputLabel,
+  FormControl,
+  Slider,
+  Button,
+} from "@material-ui/core";
 
 import {
   adaptSequencetoSubdiv,
@@ -102,65 +108,60 @@ function ModuleSettings(props) {
 
   const handleRootChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module, root: newValue };
-
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+    props.setModules((prev) => {
+      let newMod = [...prev];
+      newMod[props.index].root = newValue;
+      return newMod;
+    });
     props.setSettingsMode(false);
   };
 
   const handleScaleChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module, scale: newValue };
-
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+    props.setModules((prev) => {
+      let newMod = [...prev];
+      newMod[props.index].scale = newValue;
+      return newMod;
+    });
     props.setSettingsMode(false);
   };
 
   const handleComplexityChange = (event) => {
     let newValue = parseInt(event.target.value);
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module, complexity: newValue };
-
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+    props.setModules((prev) => {
+      let newMod = [...prev];
+      newMod[props.index].complexity = newValue;
+      return newMod;
+    });
     props.setSettingsMode(false);
   };
 
   const handleOctaveRangeSelect = (e, v) => {
     let newValue = v;
-    props.setModules((previous) =>
-      previous.map((module, i) => {
-        if (i === props.index) {
-          let newModule = { ...module, range: newValue };
+    props.setModules((prev) => {
+      let newMod = [...prev];
+      newMod[props.index].range = newValue;
+      return newMod;
+    });
+  };
 
-          return newModule;
-        } else {
-          return module;
-        }
-      })
-    );
+  const toggleModuleScaleRoot = () => {
+    console.log(props.module.root);
+    if (props.module.root === undefined) {
+      props.setModules((prev) => {
+        let newMod = [...prev];
+        newMod[props.index].root = 0;
+        newMod[props.index].scale = 0;
+        return newMod;
+      });
+    } else {
+      props.setModules((prev) => {
+        let newMod = [...prev];
+        delete newMod[props.index].root;
+        delete newMod[props.index].scale;
+        return newMod;
+      });
+    }
   };
 
   mainContent = (
@@ -211,13 +212,27 @@ function ModuleSettings(props) {
         </FormControl>
       )}
 
+      <div className="break" />
+
+      {(props.module.type === 1 || props.module.type === 2) && (
+        <Button
+          color={props.module.root !== undefined ? "inherit" : "primary"}
+          variant="outlined"
+          onClick={toggleModuleScaleRoot}
+        >
+          {t("module.settings.sessionScale")}
+        </Button>
+      )}
+
       {(props.module.type === 1 || props.module.type === 2) && (
         <FormControl>
-          <InputLabel id="root-select-label">{t("music.root")}</InputLabel>
           <Select
             native
-            labelId="root-select-label"
-            value={props.module.root}
+            disabled={props.module.root === undefined}
+            label={t("music.root")}
+            value={
+              props.module.root ? props.module.root : props.sessionData.root
+            }
             onChange={handleRootChange}
           >
             {musicalNotes.map((note, noteIndex) => (
@@ -230,11 +245,13 @@ function ModuleSettings(props) {
       )}
       {(props.module.type === 1 || props.module.type === 2) && (
         <FormControl>
-          <InputLabel id="scale-select-label">{t("music.scale")}</InputLabel>
           <Select
             native
-            labelId="scale-select-label"
-            value={props.module.scale}
+            disabled={props.module.root === undefined}
+            label={t("music.scale")}
+            value={
+              props.module.scale ? props.module.scale : props.sessionData.scale
+            }
             onChange={handleScaleChange}
           >
             {scales.map((scale, scaleIndex) => (
@@ -245,6 +262,8 @@ function ModuleSettings(props) {
           </Select>
         </FormControl>
       )}
+      <div className="break" />
+
       {props.module.type === 1 && (
         <Fragment>
           <div style={{ width: "100%", height: "16px" }} />
