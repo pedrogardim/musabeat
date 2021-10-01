@@ -572,8 +572,26 @@ function FileExplorer(props) {
                           props.handlePageNav("file", fileIdList[index], true)
                         }
                       >
-                        {`${row.name}.${fileExtentions[row.type]}`}
+                        {row.name}
                       </Typography>
+                      <Tooltip title={fileExtentions[row.type]}>
+                        <Typography
+                          variant="overline"
+                          style={{
+                            border: "solid 1px #3f51b5",
+                            color: "#3f51b5",
+                            borderRadius: "8px",
+                            marginLeft: 8,
+                            padding: "4px",
+                            height: "0.6rem",
+                            fontSize: "0.6rem",
+                            lineHeight: 1,
+                            userSelect: "none",
+                          }}
+                        >
+                          {fileExtentions[row.type]}
+                        </Typography>
+                      </Tooltip>
                       {props.userFiles && filedata[index].user === user.uid && (
                         <IconButton onClick={() => setRenamingFile(index)}>
                           <Icon>edit</Icon>
