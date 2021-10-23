@@ -43,6 +43,8 @@ import ActionConfirm from "./components/ui/Dialogs/ActionConfirm";
 
 import { createNewSession } from "./utils/sessionUtils";
 
+import { createChordProgression } from "./assets/musicutils";
+
 const pageLabels = {
   explore: "Explore",
   files: "Files",
@@ -131,9 +133,17 @@ function App() {
     };
   }, [unsavedChanges]);
 
+  /////TESTING
+
+  useEffect(() => {
+    console.log(createChordProgression(0, 0, 3, 4));
+  }, []);
+
+  /////TESTING
+
   return (
     <Fragment>
-      <Fade in={!isOnline}>
+      <Fade in={false /* !isOnline */}>
         <div className="app-offline-screen">
           <AppLogo
             style={{ marginBottom: 32 }}

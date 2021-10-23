@@ -37,7 +37,11 @@ function ChordEditor(props) {
     ? props.module.scale
     : props.sessionData.scale;
 
-  const scaleChords = getChordsFromScale(moduleRoot, moduleScale, 3);
+  const scaleChords = getChordsFromScale(
+    moduleScale,
+    moduleRoot,
+    props.module.complexity
+  );
   const [textInputValue, setTextInputValue] = useState(
     chordNotestoName(props.chords[props.activeChord].notes)
   );

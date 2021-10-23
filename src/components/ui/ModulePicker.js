@@ -16,6 +16,8 @@ import {
   InputLabel,
 } from "@material-ui/core";
 
+import { createChordProgression } from "../../assets/musicutils";
+
 const moduletypes = [
   {
     name: "Drum Sequencer",
@@ -77,14 +79,13 @@ function ModulePicker(props) {
         selectedType === 0 || selectedType === 1
           ? [{ ...Array(selectedSteps).fill(0) }]
           : selectedType === 2
-          ? new Array(selectedSize).fill().map((e, i) => {
-              let chord = {
-                notes: ["E1", "E3", "E4", "G4", "B4"],
-                duration: 1,
-                time: i,
-                rhythm: [1],
-              };
-              return chord;
+          ? createChordProgression(
+              props.sessionData.scale,
+              props.sessionData.root,
+              3,
+              selectedSize
+            ).map((e, i) => {
+              return { notes: e, time: i, duration: 1, rhythm: [1] };
             })
           : selectedType === 3
           ? [{ time: 0, duration: 0 }]
@@ -107,6 +108,12 @@ function ModulePicker(props) {
       //newModule.root = selectedRoot;
       //newModule.scale = selectedScale;
       newModule.range = selectedRange;
+    }
+
+    if (selectedType === 2) {
+      //newModule.root = selectedRoot;
+      //newModule.scale = selectedScale;
+      newModule.complexity = 3;
     }
 
     if (selectedType === 3 || selectedType === 4) {

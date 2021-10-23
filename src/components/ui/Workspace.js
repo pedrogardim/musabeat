@@ -1178,6 +1178,7 @@ function Workspace(props) {
           loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}
           sessionSize={sessionSize}
+          sessionData={sessionData}
           timeline={sessionData.timeline}
           setTimeline={setTimeline}
         />

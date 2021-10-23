@@ -16,6 +16,8 @@ import {
 } from "../../../utils/TransportSchedule";
 import { colors } from "../../../utils/materialPalette";
 
+import { createChordProgression } from "../../../assets/musicutils";
+
 function ChordProgression(props) {
   const [cursorAnimator, setCursorAnimator] = useState(null);
   const [chords, setChords] = useState(props.module.score);
@@ -82,6 +84,22 @@ function ChordProgression(props) {
     });
   };
 
+  const generateProgression = () => {
+    let progNotes = createChordProgression(
+      props.module.scale ? props.module.scale : props.sessionData.scale,
+      props.module.root ? props.module.root : props.sessionData.root,
+      props.module.complexity,
+      chords.length
+    );
+
+    setChords((prev) => {
+      let newChords = prev.map((e, i) => {
+        return { ...e, notes: [...progNotes[i]] };
+      });
+      return newChords;
+    });
+  };
+
   const playChordPreview = (chordindex) => {
     instrument.releaseAll();
     instrument.triggerAttackRelease(
@@ -131,10 +149,6 @@ function ChordProgression(props) {
     setActiveRhythm(rhythm);
   };
 
-  const toggleCursor = () => {
-    setCursorAnimator(setInterval(updateCursor, 32));
-  };
-
   //===================
   /* 
   useEffect(() => {
@@ -146,7 +160,7 @@ function ChordProgression(props) {
   }, [currentBeat]); */
 
   useEffect(() => {
-    toggleCursor();
+    setCursorAnimator(setInterval(updateCursor, 32));
     return () => {
       clearInterval(cursorAnimator);
     };
@@ -170,9 +184,9 @@ function ChordProgression(props) {
     props.setSelection(activeChord);
   }, [activeChord]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     console.log("cursorAnimator", cursorAnimator);
-  }, [cursorAnimator]);
+  }, [cursorAnimator]); */
 
   useEffect(() => {
     scheduleChords();
@@ -244,6 +258,17 @@ function ChordProgression(props) {
             <Icon>edit</Icon>
           </Fab>
         )}
+        <Fab
+          style={{
+            backgroundColor: colors[props.module.color][600],
+            marginRight: 48,
+          }}
+          onClick={generateProgression}
+          className="edit-chord-button"
+          boxShadow={1}
+        >
+          <Icon>casino</Icon>
+        </Fab>
       </div>
       {editorOpen && (
         <ChordEditor

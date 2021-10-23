@@ -17,7 +17,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     modules: [
       {
         id: 0,
-        name: "Sequencer",
+        name: "",
         color: Math.floor(Math.random() * 14.99),
         score: [
           {

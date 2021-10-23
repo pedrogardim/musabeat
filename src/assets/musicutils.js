@@ -891,6 +891,24 @@ export const getChordsFromScale = (scale, root, extentions) => {
   return scalechords;
 };
 
+export const createChordProgression = (scale, root, extentions, length) => {
+  let scaleChords = getChordsFromScale(scale, root, extentions);
+
+  //console.log(scaleChords);
+
+  let chordIndexes = new Array(length)
+    .fill(0)
+    .map((e) => Math.floor(Math.random() * 6));
+
+  chordIndexes.map((e, i) =>
+    i > 0 && e === chordIndexes[i - 1] ? (e === 6 ? e - 1 : e + 1) : e
+  );
+
+  //console.log(chordIndexes);
+
+  return chordIndexes.map((e) => scaleChords[e]);
+};
+
 export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
   let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
