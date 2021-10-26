@@ -37,6 +37,8 @@ import AppLogo from "./components/ui/AppLogo";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/Dialogs/AuthDialog";
+import NewSessionDialog from "./components/ui/Dialogs/NewSessionDialog";
+
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
 import ActionConfirm from "./components/ui/Dialogs/ActionConfirm";
@@ -68,6 +70,11 @@ function App() {
   const [languagePicker, setLanguagePicker] = useState(false);
 
   const [sideMenu, setSideMenu] = useState(false);
+
+  const [newSessionDialog, setNewSessionDialog] = useState(false);
+
+  const [premiumMode, setPremiumMode] = useState(false);
+
   const [openedSession, setOpenedSession] = useState(null);
 
   const [currentRoute, setCurrentRoute] = useState(null);
@@ -189,6 +196,12 @@ function App() {
         )}
       </AppBar>
       <div className="app-wrapper" onMouseDown={() => Tone.start()}>
+        {newSessionDialog && (
+          <NewSessionDialog
+            setNewSessionDialog={setNewSessionDialog}
+            handleCreateNewSession={handleCreateNewSession}
+          />
+        )}
         {authDialog && (
           <AuthDialog
             authDialog={authDialog}
@@ -242,7 +255,7 @@ function App() {
           setOpenedSession={setOpenedSession}
           handlePageNav={handlePageNav}
           setSideMenu={setSideMenu}
-          createNewSession={handleCreateNewSession}
+          setNewSessionDialog={setNewSessionDialog}
         />
 
         <Switch>

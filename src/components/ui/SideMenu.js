@@ -23,11 +23,7 @@ function SideMenu(props) {
 
   const handleClick = (opt) => {
     opt === "newSession"
-      ? props.createNewSession(
-          undefined,
-          props.handlePageNav,
-          props.setOpenedSession
-        )
+      ? props.setNewSessionDialog(true)
       : props.handlePageNav(opt);
 
     props.setSideMenu(false);

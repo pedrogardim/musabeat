@@ -19,13 +19,11 @@ import {
   Select,
 } from "@material-ui/core";
 
-import { scales, musicalNotes } from "../../assets/musicutils";
+import { sessionTags, scales, musicalNotes } from "../../assets/musicutils";
 
 import { useTranslation } from "react-i18next";
 
 import { Autocomplete } from "@material-ui/lab";
-
-import { sessionTags } from "../../assets/musicutils";
 
 import "./SessionSettings.css";
 

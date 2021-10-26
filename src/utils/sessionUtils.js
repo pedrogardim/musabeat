@@ -8,7 +8,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     : null;
 
   let sessionTemplate = {
-    description: "No description",
+    description: "",
     tags: [],
     bpm: 120,
     root: 0,
@@ -40,7 +40,8 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   };
 
   let clearStats = {
-    name: session ? `Copy of ${session.name}` : "New Session",
+    //name: session ? `Copy of ${session.name}` : "New Session";
+    name: session.name,
     copied: 0,
     opened: 0,
     played: 0,

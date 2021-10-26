@@ -93,7 +93,11 @@ function WorkspaceTitle(props) {
         </title>
       </Helmet>
       <Typography variant="h4">
-        {props.sessionData ? props.sessionData.name : "..."}
+        {props.sessionData
+          ? props.sessionData.name
+            ? props.sessionData.name
+            : "Untitled Session"
+          : "..."}
 
         {!(props.editMode && !props.user) && (
           <IconButton onClick={() => setExpanded((prev) => !prev)}>
@@ -156,7 +160,11 @@ function WorkspaceTitle(props) {
 
       {props.sessionData && expanded && (
         <Fragment>
-          <Typography variant="body2">{`"${props.sessionData.description}"`}</Typography>
+          <Typography variant="body2">
+            {props.sessionData.description
+              ? `"${props.sessionData.description}"`
+              : "No Description"}
+          </Typography>
           <div className="break" />
           {props.sessionData.tags && !!props.sessionData.tags.length && (
             <Fragment>

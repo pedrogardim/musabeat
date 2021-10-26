@@ -77,7 +77,7 @@ function ModulePicker(props) {
       type: selectedType,
       score:
         selectedType === 0 || selectedType === 1
-          ? [{ ...Array(selectedSteps).fill(0) }]
+          ? [{ ...new Array(selectedSteps).fill(0) }]
           : selectedType === 2
           ? createChordProgression(
               props.sessionData.scale,
