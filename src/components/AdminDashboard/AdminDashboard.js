@@ -4,9 +4,13 @@ import { Tab, Tabs, AppBar } from "@material-ui/core";
 
 import PatchEditor from "./PatchEditor";
 
+import * as Tone from "tone";
+
 import firebase from "firebase";
 
 import "./AdminDashboard.css";
+
+import { encodeAudioFile } from "../../assets/musicutils";
 
 import { Button } from "@material-ui/core";
 
@@ -70,8 +74,35 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ root: 0, scale: 0 })));
   };
 
+  const convertAudio = (file) => {
+    console.log(file);
+    file.arrayBuffer().then((r) => {
+      console.log(r);
+      Tone.getContext().rawContext.decodeAudioData(r, (audiobuffer) => {
+        let blob = encodeAudioFile(audiobuffer, "MP3");
+
+        var bUrl = window.URL.createObjectURL(blob);
+
+        var link = document.createElement("a");
+        link.download = file.name.split(".")[0] + ".mp3";
+        link.href = bUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+    });
+  };
+
   return (
-    <div className="file-page">
+    <div
+      className="file-page"
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
       {/* <AppBar position="static">
         <Tabs
           value={value}
@@ -86,13 +117,11 @@ function AdminDashboard(props) {
       <div className={"admin-panel-container"}>
         {value === 0 && <PåatchEditor />}
       </div> */}
-      <Button onClick={updateStats}>Update Stats</Button>
-      <br />
+      {/* <Button onClick={updateStats}>Update Stats</Button>
       <Button onClick={updatePremium}>updateSessions</Button>
-      <br />
       <Button onClick={updateLikes}>Update files, patches like</Button>
-      <br />
-      <Button onClick={updateSessions}>Update session scale</Button>
+      <Button onClick={updateSessions}>Update session scale</Button> */}
+      <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
   );
 }

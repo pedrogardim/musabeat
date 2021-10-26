@@ -17,6 +17,7 @@
     "i18next": "^20.3.2",
     "i18next-browser-languagedetector": "^6.1.2",
     "jquery": "^3.6.0",
+    "lamejs": "^1.2.0",
     "midifile": "^2.0.0",
     "pitchy": "^2.0.3",
     "rc-knob": "^1.0.1",
