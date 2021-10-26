@@ -1186,6 +1186,7 @@ export const encodeAudioFile = (aBuffer, format) => {
     btwSample,
     btwOffset = 0,
     btwPos = 0;
+
   setUint32(0x46464952); // "RIFF"
   setUint32(btwLength - 8); // file length - 8
   setUint32(0x45564157); // "WAVE"
@@ -1228,8 +1229,10 @@ export const encodeAudioFile = (aBuffer, format) => {
   var left = new Int16Array(leftData);
   var right = new Int16Array(rightData);
 
-  if (format === "MP3") {
+  if (format === "mp3") {
     //STEREO
+    console.log(wavHdr.channels, left, right);
+
     if (wavHdr.channels === 2)
       return wavToMp3(wavHdr.channels, wavHdr.sampleRate, left, right);
     //MONO
@@ -1248,7 +1251,7 @@ export const encodeAudioFile = (aBuffer, format) => {
   }
 };
 
-export const wavToMp3 = (name, channels, sampleRate, left, right = null) => {
+export const wavToMp3 = (channels, sampleRate, left, right = null) => {
   var buffer = [];
   var mp3enc = new lamejs.Mp3Encoder(channels, sampleRate, 128);
   var remaining = left.length;

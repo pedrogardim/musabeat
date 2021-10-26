@@ -75,14 +75,11 @@ function AdminDashboard(props) {
   };
 
   const convertAudio = (file) => {
-    console.log(file);
     file.arrayBuffer().then((r) => {
-      console.log(r);
       Tone.getContext().rawContext.decodeAudioData(r, (audiobuffer) => {
-        let blob = encodeAudioFile(audiobuffer, "MP3");
+        let blob = encodeAudioFile(audiobuffer, "mp3");
 
         var bUrl = window.URL.createObjectURL(blob);
-
         var link = document.createElement("a");
         link.download = file.name.split(".")[0] + ".mp3";
         link.href = bUrl;

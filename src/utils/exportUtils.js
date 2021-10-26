@@ -7,7 +7,12 @@ import {
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
 
-import { loadSynthFromGetObject, loadEffect } from "../assets/musicutils";
+import {
+  loadSynthFromGetObject,
+  loadEffect,
+  encodeAudioFile,
+} from "../assets/musicutils";
+
 import * as Tone from "tone";
 
 export const bounceSessionExport = async (
@@ -19,7 +24,8 @@ export const bounceSessionExport = async (
   sessionSize,
   timeline,
   timelineMode,
-  forceReschedule
+  forceReschedule,
+  format
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
 
@@ -179,12 +185,13 @@ export const bounceSessionExport = async (
 
     transport.start();
   }, exportDuration).then((e) => {
-    let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
+    //let blob = new Blob([audioBufferToWav(e)], { type: "audio/wav" });
+    let blob = encodeAudioFile(e, format);
     //console.log(blob);
 
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
-    downloadURI(url, `${sessionData.name}.wav`);
+    downloadURI(url, `${sessionData.name}.${format.toLowerCase()}`);
     forceReschedule();
     setIsReady(true);
 
