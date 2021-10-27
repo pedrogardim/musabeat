@@ -21,7 +21,7 @@ export const TRANSLATIONS_ES = {
     confirmPassword: "Confirmar contraseña",
   },
   sidemenu: {
-    newSession: "Crear sesion",
+    newSession: "Crear sesión",
     explore: "Explorar",
     instruments: "Instrumentos",
     drumsets: "Sets de batería",
@@ -53,6 +53,7 @@ export const TRANSLATIONS_ES = {
       "Modo Vista: ¡No tienes el permiso para editar esta sesión! To be able to edit it create a copy",
     unloggedEditor:
       "No has iniciado sesión! Los cambios no serán guardados en la nube",
+    untitledSession: "Sesión sin nombre",
   },
   module: {
     options: {
@@ -115,6 +116,7 @@ export const TRANSLATIONS_ES = {
     none: "Ninguno",
     offlineAlert:
       "MusaBeat requiere una conexión estable a al servidor. Comprueba tu conexión a internet.",
+    initialModules: "Módulos Iniciales",
   },
   dialogs: {
     cancel: "Cancelar",

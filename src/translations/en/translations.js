@@ -54,6 +54,7 @@ export const TRANSLATIONS_EN = {
     viewMode:
       "View Mode: You don't have the permission to edit this session! To be able to edit it create a copy",
     unloggedEditor: "You are not logged in! Changes will not be saved",
+    untitledSession: "Untitled Session",
   },
   module: {
     options: {
@@ -117,6 +118,7 @@ export const TRANSLATIONS_EN = {
     none: "None",
     offlineAlert:
       "MusaBeat requires a stable connection to the server. Check your internet connetion.",
+    initialModules: "Initial Modules",
   },
   dialogs: {
     cancel: "Cancel",

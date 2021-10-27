@@ -96,7 +96,7 @@ function WorkspaceTitle(props) {
         {props.sessionData
           ? props.sessionData.name
             ? props.sessionData.name
-            : "Untitled Session"
+            : t("WSTitle.untitledSession")
           : "..."}
 
         {!(props.editMode && !props.user) && (

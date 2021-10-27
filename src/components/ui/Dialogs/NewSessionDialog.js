@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import "../ModulePicker.css";
+import "../SessionSettings.css";
 
 import {
   IconButton,
@@ -136,6 +136,16 @@ function NewSessionDialog(props) {
     });
   };
 
+  const removeModule = (moduleType) => {
+    setSession((prev) => {
+      let newSession = { ...prev };
+      newSession.modules = newSession.modules.filter(
+        (e) => e.type !== moduleType
+      );
+      return newSession;
+    });
+  };
+
   const handleInfoChange = (prop, value) => {
     setSession((prev) => {
       return { ...prev, [prop]: value };
@@ -151,11 +161,14 @@ function NewSessionDialog(props) {
     <Dialog
       open={true}
       onClose={() => props.setNewSessionDialog(false)}
-      PaperProps={{ className: "module-picker" }}
+      PaperProps={{ className: "session-settings-cont" }}
       maxWidth={"md"}
       fullWidth
     >
-      <DialogTitle variant="overline"> {t(`sidemenu.newSession`)}</DialogTitle>
+      <Typography variant="h6" align="center">
+        {t(`sidemenu.newSession`)}
+      </Typography>
+      <div className="break" style={{ height: 16 }} />
 
       {/* <p variant="overline">
         {t(`modulePicker.types.${selectedType}.description`)}
@@ -306,13 +319,26 @@ function NewSessionDialog(props) {
           <Grid item>
             <Typography variant="overline">
               {/* t("module.settings.sessionScale") */}
-              Initial Modules
+              {t("misc.initialModules")}
             </Typography>
             <div className="break" />
-            <ButtonGroup color="primary">
+            <ButtonGroup color="primary" style={{ margin: "auto" }}>
               {moduletypes.map((e, i) => (
                 <Tooltip title={t(`modulePicker.types.${i}.name`)}>
-                  <Button onClick={() => addModule(i)} key={e.name}>
+                  <Button
+                    color="primary"
+                    variant={
+                      session.modules.some((e) => e.type === i)
+                        ? "contained"
+                        : "outlined"
+                    }
+                    onClick={() =>
+                      session.modules.some((e) => e.type === i)
+                        ? removeModule(i)
+                        : addModule(i)
+                    }
+                    key={e.name}
+                  >
                     <Icon>{e.icon}</Icon>
                   </Button>
                 </Tooltip>
@@ -321,8 +347,15 @@ function NewSessionDialog(props) {
           </Grid>
         </Grid>
       </Grid>
+      <div className="break" style={{ height: 16 }} />
 
-      <Button onClick={handleCreateNewSession}>Create Session</Button>
+      <Button
+        color="primary"
+        variant="contained"
+        onClick={handleCreateNewSession}
+      >
+        {t("sidemenu.newSession")}
+      </Button>
       <IconButton
         onClick={() => props.setNewSessionDialog(false)}
         className="mp-closebtn"
