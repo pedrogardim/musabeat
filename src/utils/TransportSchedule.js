@@ -192,20 +192,22 @@ export const scheduleChordProgression = (
           let rhythmscheduletime =
             rhythmduration * rhythmIndex + chordtimetostart;
           let thisevent = transport.schedule((time) => {
-            switch (rhythm) {
-              case 0:
-                instrument.releaseAll(time);
-                break;
-              case 1:
-                instrument.triggerAttackRelease(
-                  chord.notes !== 0 ? chord.notes : [],
-                  rhythmduration,
-                  time
-                );
-                //console.log(chord.notes);
-                break;
-              default:
-                break;
+            if (typeof rhythm === "number") {
+              instrument.triggerAttackRelease(
+                chord.notes !== 0
+                  ? chord.notes[rhythm % chord.notes.length]
+                  : [],
+                rhythmduration,
+                time
+              );
+            } else if (rhythm === true) {
+              instrument.triggerAttackRelease(
+                chord.notes !== 0 ? chord.notes : [],
+                rhythmduration,
+                time
+              );
+            } else {
+              instrument.releaseAll(time);
             }
 
             //console.log(chord.notes);
@@ -229,20 +231,22 @@ export const scheduleChordProgression = (
           let rhythmscheduletime =
             rhythmduration * rhythmIndex + chordtimetostart;
           let thisevent = transport.schedule((time) => {
-            switch (rhythm) {
-              case 0:
-                instrument.releaseAll(time);
-                break;
-              case 1:
-                instrument.triggerAttackRelease(
-                  chord.notes !== 0 ? chord.notes : [],
-                  rhythmduration,
-                  time
-                );
-                //console.log(chord.notes);
-                break;
-              default:
-                break;
+            if (typeof rhythm === "number") {
+              instrument.triggerAttackRelease(
+                chord.notes !== 0
+                  ? chord.notes[rhythm % chord.notes.length]
+                  : [],
+                rhythmduration,
+                time
+              );
+            } else if (rhythm === true) {
+              instrument.triggerAttackRelease(
+                chord.notes !== 0 ? chord.notes : [],
+                rhythmduration,
+                time
+              );
+            } else {
+              instrument.releaseAll(time);
             }
 
             //console.log(chord.notes);

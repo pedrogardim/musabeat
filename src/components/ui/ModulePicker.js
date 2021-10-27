@@ -85,7 +85,7 @@ function ModulePicker(props) {
               3,
               selectedSize
             ).map((e, i) => {
-              return { notes: e, time: i, duration: 1, rhythm: [1] };
+              return { notes: e, time: i, duration: 1, rhythm: [true] };
             })
           : selectedType === 3
           ? [{ time: 0, duration: 0 }]

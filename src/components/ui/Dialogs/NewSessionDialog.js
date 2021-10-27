@@ -89,7 +89,7 @@ function NewSessionDialog(props) {
           : moduleType === 2
           ? createChordProgression(session.scale, session.root, 3, 2).map(
               (e, i) => {
-                return { notes: e, time: i, duration: 1, rhythm: [1] };
+                return { notes: e, time: i, duration: 1, rhythm: [true] };
               }
             )
           : moduleType === 3

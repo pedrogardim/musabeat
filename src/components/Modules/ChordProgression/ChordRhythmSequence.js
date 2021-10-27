@@ -17,6 +17,8 @@ function ChordRhythmSequence(props) {
   const [measureRhythm, setMeasureRhythm] = useState([]);
   const [measureChordIndex, setMeasureChordIndex] = useState(0);
 
+  const openArpSequencer = () => {};
+
   const getRhythmFromMeasure = () => {
     let measureRhythm = props.chords
       .filter((e) => Math.floor(e.time) === currentMeasure)
@@ -31,7 +33,7 @@ function ChordRhythmSequence(props) {
       ]
     );
 
-    let newRhythm = currentRhythm === 1 ? 0 : 1;
+    let newRhythm = currentRhythm ? false : true;
 
     props.setChords((previousChords) => {
       let newChords = [...previousChords];
@@ -55,7 +57,8 @@ function ChordRhythmSequence(props) {
       if (newSteps <= 16 && newSteps >= 1)
         newChords[chordIndexOnScore].rhythm = adaptSequencetoSubdiv(
           rhythmArray,
-          newSteps
+          newSteps,
+          2
         );
 
       return newChords;
@@ -117,6 +120,7 @@ function ChordRhythmSequence(props) {
           {chord.map((rhythm, rhythmIndex) => (
             <ChordRhythmTile
               key={"crt" + rhythmIndex}
+              chordNotes={props.chords[chordIndex].notes}
               chordIndex={chordIndex}
               rhythmIndex={rhythmIndex}
               rhythm={rhythm}
@@ -126,6 +130,7 @@ function ChordRhythmSequence(props) {
                 props.activeRhythm === rhythmIndex
               }
               color={props.color}
+              openArpSeq={openArpSequencer}
             />
           ))}
         </div>

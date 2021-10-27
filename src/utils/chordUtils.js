@@ -24,7 +24,7 @@ export const addChord = (direction, setChords, index, duration) => {
                   currentChordRhythm.length / 2,
                   currentChordRhythm.length
                 )
-            : [1],
+            : [true],
       };
 
       let currentChord = {
@@ -41,7 +41,7 @@ export const addChord = (direction, setChords, index, duration) => {
                   currentChordRhythm.length / 2,
                   currentChordRhythm.length
                 )
-            : [1],
+            : [true],
       };
 
       newChords[currentChordIndex] = currentChord;

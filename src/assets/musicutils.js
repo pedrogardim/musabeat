@@ -777,7 +777,7 @@ function gcd_two_numbers(x, y) {
 }
 
 export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
-  //arrayType: array of numbers = true, arrays of arrays = false/undefined
+  //arrayType: array of numbers = true, arrays of arrays = false/undefined, 2: chords rhythm
   let difference = newsubdivision / oldarray.length;
   let gdc = gcd_two_numbers(newsubdivision, oldarray.length);
 
@@ -839,7 +839,9 @@ export const adaptSequencetoSubdiv = (oldarray, newsubdivision, arrayType) => {
 
       if ((x + 1) % (oldarray.length / gdc) === 0) {
         for (let y = 0; y < difference - 1; y++) {
-          arrayType ? newsubdivarray.push(0) : newsubdivarray.push(0);
+          arrayType === 2
+            ? newsubdivarray.push(oldarray[x])
+            : newsubdivarray.push(0);
         }
       }
     }
