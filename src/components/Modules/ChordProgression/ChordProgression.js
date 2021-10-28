@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import Chord from "./Chord";
+import ChordArpeggiator from "./ChordArpeggiator";
 import ChordEditor from "./ChordEditor";
 import ChordRhythmSequence from "./ChordRhythmSequence";
 
@@ -25,6 +26,10 @@ function ChordProgression(props) {
   const [activeRhythm, setActiveRhythm] = useState(null);
   const [instrument, setInstrument] = useState(props.instrument);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [arpeggiatorOpen, setArpeggiatorOpen] = useState(false);
+  const [arpeggiatorState, setArpeggiatorState] = useState(
+    !isNaN(props.module.score[0].rhythm[0])
+  );
 
   const scheduleChords = () => {
     !props.module.muted
@@ -100,6 +105,20 @@ function ChordProgression(props) {
     });
   };
 
+  const toggleArpeggiator = (state) => {
+    //if (state !== !isNaN([...chords][0].rhythm[0])) return;
+    setChords((prev) => {
+      let newChords = [...prev];
+      newChords = newChords.map((e) => {
+        return {
+          ...e,
+          rhythm: !state ? [true] : [...Array(e.duration * 8).keys()],
+        };
+      });
+      return newChords;
+    });
+  };
+
   const playChordPreview = (chordindex) => {
     instrument.releaseAll();
     instrument.triggerAttackRelease(
@@ -169,7 +188,12 @@ function ChordProgression(props) {
   useEffect(() => {
     instrument && scheduleChords();
     updateChords();
+    setArpeggiatorState(typeof [...chords][0].rhythm[0] === "number");
   }, [chords]);
+
+  useEffect(() => {
+    toggleArpeggiator(arpeggiatorState);
+  }, [arpeggiatorState]);
 
   useEffect(() => {
     instrument && scheduleChords();
@@ -183,10 +207,10 @@ function ChordProgression(props) {
     //console.log(activeChord);
     props.setSelection(activeChord);
   }, [activeChord]);
-
-  /*  useEffect(() => {
-    console.log("cursorAnimator", cursorAnimator);
-  }, [cursorAnimator]); */
+  /* 
+  useEffect(() => {
+    console.log(arpeggiatorState);
+  }, [arpeggiatorState]); */
 
   useEffect(() => {
     scheduleChords();
@@ -263,6 +287,19 @@ function ChordProgression(props) {
             backgroundColor: colors[props.module.color][600],
             marginRight: 48,
           }}
+          onClick={() => setArpeggiatorState((prev) => !prev)}
+          className="edit-chord-button"
+          boxShadow={1}
+        >
+          <Icon style={{ transform: "rotate(-90deg) scaleX(-1)" }}>
+            waterfall_chart
+          </Icon>
+        </Fab>
+        <Fab
+          style={{
+            backgroundColor: colors[props.module.color][600],
+            marginRight: 96,
+          }}
           onClick={generateProgression}
           className="edit-chord-button"
           boxShadow={1}
@@ -282,12 +319,27 @@ function ChordProgression(props) {
           onClose={() => setEditorOpen(false)}
         />
       )}
+      {arpeggiatorOpen && (
+        <ChordArpeggiator
+          arpeggiatorState={arpeggiatorState}
+          index={props.index}
+          chords={chords}
+          activeChord={activeChord}
+          playChordPreview={() => playChordPreview(activeChord)}
+          module={props.module}
+          sessionData={props.sessionData}
+          setChords={setChords}
+          onClose={() => setArpeggiatorOpen(false)}
+        />
+      )}
       <ChordRhythmSequence
         activeChord={activeChord}
         activeRhythm={activeRhythm}
         chords={chords}
         color={colors[props.module.color]}
         setChords={setChords}
+        setArpeggiatorOpen={setArpeggiatorOpen}
+        arpeggiatorState={arpeggiatorState}
       />
     </div>
   );

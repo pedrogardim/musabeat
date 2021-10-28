@@ -16,12 +16,12 @@ function ChordRhythmTile(props) {
         "chord-rhythm-tile " + (props.cursor && "cursor-chord-rhythm-tile")
       }
       style={{
-        outline: "solid 1px " + props.color[900],
+        outline: !props.arpeggiatorState && "solid 1px " + props.color[900],
         backgroundColor:
           props.rhythm === true ? props.color[600] : props.color[300],
       }}
     >
-      {typeof props.rhythm === "number" &&
+      {props.arpeggiatorState &&
         (props.chordNotes ? props.chordNotes : [...Array(5).keys()]).map(
           (e, i) => (
             <div

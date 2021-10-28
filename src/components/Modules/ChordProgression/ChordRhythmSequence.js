@@ -17,7 +17,9 @@ function ChordRhythmSequence(props) {
   const [measureRhythm, setMeasureRhythm] = useState([]);
   const [measureChordIndex, setMeasureChordIndex] = useState(0);
 
-  const openArpSequencer = () => {};
+  const openArpeggiator = () => {
+    props.setArpeggiatorOpen(true);
+  };
 
   const getRhythmFromMeasure = () => {
     let measureRhythm = props.chords
@@ -94,6 +96,7 @@ function ChordRhythmSequence(props) {
             (measureChordIndex === chordIndex && "active-chord-rhythm-chord")
           }
           style={{
+            outline: "solid 1px " + props.color[900],
             width: props.chords.filter(
               (e) => Math.floor(e.time) === currentMeasure
             )[chordIndex]
@@ -130,7 +133,8 @@ function ChordRhythmSequence(props) {
                 props.activeRhythm === rhythmIndex
               }
               color={props.color}
-              openArpSeq={openArpSequencer}
+              openArpSeq={openArpeggiator}
+              arpeggiatorState={props.arpeggiatorState}
             />
           ))}
         </div>
