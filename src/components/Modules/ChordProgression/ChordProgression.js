@@ -188,11 +188,13 @@ function ChordProgression(props) {
   useEffect(() => {
     instrument && scheduleChords();
     updateChords();
-    setArpeggiatorState(typeof [...chords][0].rhythm[0] === "number");
+    props.isSessionLoaded &&
+      setArpeggiatorState(typeof [...chords][0].rhythm[0] === "number");
   }, [chords]);
 
   useEffect(() => {
-    toggleArpeggiator(arpeggiatorState);
+    props.isSessionLoaded && toggleArpeggiator(arpeggiatorState);
+    console.log("arpeggiatorState", arpeggiatorState);
   }, [arpeggiatorState]);
 
   useEffect(() => {
@@ -207,10 +209,6 @@ function ChordProgression(props) {
     //console.log(activeChord);
     props.setSelection(activeChord);
   }, [activeChord]);
-  /* 
-  useEffect(() => {
-    console.log(arpeggiatorState);
-  }, [arpeggiatorState]); */
 
   useEffect(() => {
     scheduleChords();
@@ -284,7 +282,9 @@ function ChordProgression(props) {
         )}
         <Fab
           style={{
-            backgroundColor: colors[props.module.color][600],
+            backgroundColor: arpeggiatorState
+              ? colors[props.module.color][600]
+              : "grey",
             marginRight: 48,
           }}
           onClick={() => setArpeggiatorState((prev) => !prev)}
@@ -330,6 +330,7 @@ function ChordProgression(props) {
           sessionData={props.sessionData}
           setChords={setChords}
           onClose={() => setArpeggiatorOpen(false)}
+          isSessionLoaded={props.isSessionLoaded}
         />
       )}
       <ChordRhythmSequence

@@ -35,7 +35,7 @@ function ChordArpeggiator(props) {
   const [parameters, setParameters] = useState({
     rate: rhythmSample.length / props.chords[0].duration,
     range: 1,
-    direction: rhythmSample[0] < rhythmSample[1] ? 0 : 1,
+    direction: rhythmSample[0] < rhythmSample[1] ? "up" : "down",
   });
 
   const handleParamChange = (param, value) => {
@@ -45,28 +45,30 @@ function ChordArpeggiator(props) {
   };
 
   useEffect(() => {
-    props.setChords((prev) => {
-      let newChords = [...prev];
-      newChords = newChords.map((e) => {
-        return {
-          ...e,
-          rhythm:
-            parameters.direction === "up"
-              ? [
-                  ...Array(e.duration * parameters.rate)
-                    .keys()
-                    .map((x) => x % e.notes.length),
-                ]
-              : [
-                  ...Array(e.duration * parameters.rate)
-                    .keys()
-                    .map((x) => x % e.notes.length),
-                ].reverse(),
-        };
-      });
+    console.log(
+      props.isSessionLoaded
+        ? "changed on ChordArpeggiator"
+        : "not changed on ChordArpeggiator"
+    );
+    props.isSessionLoaded &&
+      props.setChords((prev) => {
+        let newChords = [...prev];
+        newChords = newChords.map((e) => {
+          return {
+            ...e,
+            rhythm:
+              parameters.direction === "up"
+                ? [...Array(e.duration * parameters.rate).keys()].map(
+                    (x) => x % e.notes.length
+                  )
+                : [...Array(e.duration * parameters.rate).keys()]
+                    .map((x) => x % e.notes.length)
+                    .reverse(),
+          };
+        });
 
-      return newChords;
-    });
+        return newChords;
+      });
   }, [parameters]);
 
   return (

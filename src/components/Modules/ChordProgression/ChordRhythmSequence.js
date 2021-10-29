@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
@@ -108,18 +108,22 @@ function ChordRhythmSequence(props) {
               : 0,
           }}
         >
-          <IconButton
-            onClick={() => updateRhythmSteps(chordIndex, true)}
-            className="add-step-chord-rhythm-button"
-          >
-            <Icon>add</Icon>
-          </IconButton>
-          <IconButton
-            onClick={() => updateRhythmSteps(chordIndex, false)}
-            className="remove-step-chord-rhythm-button"
-          >
-            <Icon>remove</Icon>
-          </IconButton>
+          {!props.arpeggiatorState && (
+            <Fragment>
+              <IconButton
+                onClick={() => updateRhythmSteps(chordIndex, true)}
+                className="add-step-chord-rhythm-button"
+              >
+                <Icon>add</Icon>
+              </IconButton>
+              <IconButton
+                onClick={() => updateRhythmSteps(chordIndex, false)}
+                className="remove-step-chord-rhythm-button"
+              >
+                <Icon>remove</Icon>
+              </IconButton>
+            </Fragment>
+          )}
           {chord.map((rhythm, rhythmIndex) => (
             <ChordRhythmTile
               key={"crt" + rhythmIndex}

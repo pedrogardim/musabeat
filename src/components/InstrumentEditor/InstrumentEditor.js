@@ -397,7 +397,7 @@ function InstrumentEditor(props) {
       props.instrument._buffers._buffers.forEach((e, i, a) =>
         bufferObjects.push([e, i])
       );
-      console.log(bufferObjects, filesName);
+      //console.log(bufferObjects, filesName);
       mainContent = (
         <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
           <Select
