@@ -133,6 +133,37 @@ function SessionExplorer(props) {
 
   const handleSessionDelete = () => {
     let index = deleteDialog;
+
+    //clear all files and patches stats first
+
+    sessions[index].modules.forEach(async (e, i) => {
+      let filesobj =
+        typeof e.instrument === "string"
+          ? (
+              await firebase
+                .firestore()
+                .collection(e.type === 0 ? "drumpatches" : "patches")
+                .doc(e.instrument)
+                .get()
+            ).data()
+          : e.instrument;
+
+      typeof e.instrument === "string" &&
+        firebase
+          .firestore()
+          .collection(e.type === 0 ? "drumpatches" : "patches")
+          .doc(e.instrument)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+      Object.values(filesobj.urls).forEach((e) =>
+        firebase
+          .firestore()
+          .collection("files")
+          .doc(e)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) })
+      );
+    });
+
     firebase
       .firestore()
       .collection("sessions")

@@ -344,6 +344,11 @@ function Workspace(props) {
                 a[moduleIndex] = instrument;
                 return a;
               });
+              firebase
+                .firestore()
+                .collection("files")
+                .doc(module.instrument.url)
+                .update({ in: firebase.firestore.FieldValue.increment(1) });
             });
         } else {
           let instrument = new Tone.GrainPlayer();

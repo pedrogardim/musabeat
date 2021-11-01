@@ -79,7 +79,7 @@ function PatchPage(props) {
       //console.log(0, r.data().dur);
 
       /* patchInfoRef.update({
-        loaded: firebase.firestore.FieldValue.increment(1),
+        ld: firebase.firestore.FieldValue.increment(1),
       }); */
 
       r.data().creator &&

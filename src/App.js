@@ -142,9 +142,9 @@ function App() {
 
   /////TESTING
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(createChordProgression(0, 0, 3, 4));
-  }, []);
+  }, []); */
 
   /////TESTING
 

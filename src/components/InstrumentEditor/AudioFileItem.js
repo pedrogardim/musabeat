@@ -56,6 +56,7 @@ function AudioFileItem(props) {
           <IconButton
             onClick={() =>
               props.handleFileDelete(
+                props.fileId,
                 props.instrument.name === "Sampler"
                   ? Tone.Frequency(props.fileLabel).toMidi()
                   : props.fileLabel

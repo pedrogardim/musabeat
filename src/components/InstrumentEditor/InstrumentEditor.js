@@ -55,6 +55,8 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
+    props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
+
     let patch =
       typeof props.module.instrument === "string"
         ? await firebase
@@ -115,7 +117,7 @@ function InstrumentEditor(props) {
     setUploadingFiles(files);
   };
 
-  const handlePlayersFileDelete = (fileName, soundindex) => {
+  const handlePlayersFileDelete = (fileId, fileName, soundindex) => {
     //temp solution, Tone.Players doesn't allow .remove()
 
     //let filteredScore = props.module.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
@@ -129,10 +131,10 @@ function InstrumentEditor(props) {
     props.instrument.dispose();
 
     props.setInstrument(newInstrument);
-    props.onInstrumentMod("", fileName, soundindex, true);
+    props.onInstrumentMod(fileId, fileName, soundindex, true);
   };
 
-  const handleSamplerFileDelete = (fileName) => {
+  const handleSamplerFileDelete = (fileId, fileName) => {
     let newInstrument = new Tone.Sampler().toDestination();
 
     props.instrument._buffers._buffers.forEach((value, key) => {
@@ -144,7 +146,7 @@ function InstrumentEditor(props) {
     props.setInstrument(newInstrument);
 
     props.onInstrumentMod(
-      "",
+      fileId,
       Tone.Frequency(fileName, "midi").toNote(),
       "",
       true
@@ -186,6 +188,7 @@ function InstrumentEditor(props) {
 
   const renamePlayersLabel = (index, newName) => {
     props.setLabels(index, newName);
+    props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     if (typeof props.module.instrument === "string") {
       firebase
@@ -220,6 +223,7 @@ function InstrumentEditor(props) {
       drumMap.get(Tone.Frequency(note).toMidi())
     );
     console.log(drumMap.delete(Tone.Frequency(note).toMidi()));
+    props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     if (typeof props.module.instrument === "string") {
       firebase
@@ -289,6 +293,7 @@ function InstrumentEditor(props) {
       categ: !!category || isNaN(category) ? category : 0,
       volume: props.module.volume,
       createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+      in: 1,
       likes: 0,
     };
 
@@ -387,6 +392,7 @@ function InstrumentEditor(props) {
                   openFilePage={() =>
                     props.handlePageNav("file", filesId[i], true)
                   }
+                  fileId={filesId[i]}
                 />
               </Grid>
             ))}
@@ -428,6 +434,7 @@ function InstrumentEditor(props) {
                       fileName={
                         filesName[Tone.Frequency(e[1], "midi").toNote()]
                       }
+                      fileId={filesId[i]}
                       openFilePage={() =>
                         props.handlePageNav("file", filesId[i], true)
                       }
@@ -524,6 +531,7 @@ function InstrumentEditor(props) {
           compact
           patchExplorer={patchExplorer}
           index={props.index}
+          module={props.module}
           setModules={props.setModules}
           setModulePage={props.setModulePage}
           setPatchExplorer={setPatchExplorer}
@@ -534,6 +542,7 @@ function InstrumentEditor(props) {
           setInstrumentsLoaded={props.setInstrumentsLoaded}
           saveUserPatch={saveUserPatch}
           isDrum={isDrum}
+          updateFilesStatsOnChange={props.updateFilesStatsOnChange}
         />
       )}
 

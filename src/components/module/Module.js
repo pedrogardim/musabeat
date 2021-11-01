@@ -93,6 +93,8 @@ function Module(props) {
   };
 
   const removeModule = () => {
+    updateFilesStatsOnChange();
+
     //Tone.Transport.pause();
     props.setModules((prevModules) => {
       //prevModules.forEach(e=>clearEvents(e.id));
@@ -192,6 +194,7 @@ function Module(props) {
 
   const onInstrumentMod = async (fileId, name, soundindex, isRemoving) => {
     //update instrument info in module object
+
     if (props.module.type === 0 || props.instrument.name === "Sampler") {
       let patch =
         typeof props.module.instrument === "string"
@@ -203,6 +206,22 @@ function Module(props) {
                 .get()
             ).data()
           : { ...props.module.instrument };
+
+      typeof props.module.instrument === "string" &&
+        firebase
+          .firestore()
+          .collection(props.module.type === 0 ? "drumpatches" : "patches")
+          .doc(props.module.instrument)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(fileId)
+        .update({
+          in: firebase.firestore.FieldValue.increment(isRemoving ? -1 : 1),
+          ld: firebase.firestore.FieldValue.increment(isRemoving ? 0 : 1),
+        });
 
       //console.log(props.module.instrument, patch, soundindex, name);
 
@@ -325,6 +344,36 @@ function Module(props) {
       prev.map((e, i) => (i === props.index ? { ...e, fx: effectArray } : e))
     );
     //console.log(effects);
+  };
+
+  const updateFilesStatsOnChange = async () => {
+    //when change the instrument, update file "in" stat by -1
+
+    let filesobj =
+      typeof props.module.instrument === "string"
+        ? (
+            await firebase
+              .firestore()
+              .collection(props.module.type === 0 ? "drumpatches" : "patches")
+              .doc(props.module.instrument)
+              .get()
+          ).data()
+        : props.module.instrument;
+
+    typeof props.module.instrument === "string" &&
+      firebase
+        .firestore()
+        .collection(props.module.type === 0 ? "drumpatches" : "patches")
+        .doc(props.module.instrument)
+        .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+    Object.values(filesobj.urls).forEach((e) =>
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(e)
+        .update({ in: firebase.firestore.FieldValue.increment(-1) })
+    );
   };
 
   switch (props.module.type) {
@@ -651,6 +700,7 @@ function Module(props) {
                 handleFileClick={handleFileClick}
                 setLabels={setLabels}
                 handlePageNav={props.handlePageNav}
+                updateFilesStatsOnChange={updateFilesStatsOnChange}
               />
             )}
             {modulePage === "fileExplorer" && (

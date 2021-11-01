@@ -927,6 +927,11 @@ export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
   let instr;
   const patchRef = firebase.firestore().collection("patches").doc(input);
 
+  patchRef.update({
+    ld: firebase.firestore.FieldValue.increment(1),
+    in: firebase.firestore.FieldValue.increment(1),
+  });
+
   let patch = (await patchRef.get()).data();
   //console.log(patch);
 
@@ -1023,6 +1028,8 @@ export const loadSamplerFromObject = async (
     if (nowLoaded !== undefined && isLoaded && sampler) nowLoaded(sampler);
   };
 
+  let missingFiles = [];
+
   instrumentLoaded(false);
 
   //console.log("Sampler!");
@@ -1032,6 +1039,17 @@ export const loadSamplerFromObject = async (
       async (e, i) => await firebase.storage().ref(obj.urls[e]).getDownloadURL()
     )
   );
+
+  urlArray.map((e, i) => {
+    firebase
+      .firestore()
+      .collection("files")
+      .doc(obj.urls[i])
+      .update({
+        ld: firebase.firestore.FieldValue.increment(1),
+        in: firebase.firestore.FieldValue.increment(1),
+      });
+  });
 
   //console.log(urlArray);
 
@@ -1079,9 +1097,15 @@ export const loadDrumPatch = async (
   let patchRef =
     typeof input === "string"
       ? firebase.firestore().collection("drumpatches").doc(input)
-      : "";
+      : null;
 
-  let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
+  let patch = patchRef ? (await patchRef.get()).data() : input;
+
+  patchRef &&
+    patchRef.update({
+      ld: firebase.firestore.FieldValue.increment(1),
+      in: firebase.firestore.FieldValue.increment(1),
+    });
 
   //console.log(patch);
 
@@ -1105,6 +1129,17 @@ export const loadDrumPatch = async (
         await firebase.storage().ref(patch.urls[e]).getDownloadURL()
     )
   );
+
+  urlArray.map((e, i) => {
+    firebase
+      .firestore()
+      .collection("files")
+      .doc(Object.keys(patch.urls)[i])
+      .update({
+        ld: firebase.firestore.FieldValue.increment(1),
+        in: firebase.firestore.FieldValue.increment(1),
+      });
+  });
 
   //console.log(urlArray);
 

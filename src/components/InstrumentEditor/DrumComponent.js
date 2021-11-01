@@ -72,6 +72,7 @@ function DrumElement(props) {
           className="remove-drum-component-button"
           onClick={() =>
             props.handleFileDelete(
+              props.fileId,
               props.instrument.name === "Sampler"
                 ? Tone.Frequency(props.fileLabel).toMidi()
                 : props.fileLabel,

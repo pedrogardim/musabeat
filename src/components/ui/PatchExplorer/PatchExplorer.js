@@ -96,6 +96,7 @@ function PatchExplorer(props) {
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
+      props.updateFilesStatsOnChange();
       if (props.isDrum) {
         loadDrumPatch(
           patchdata[index],

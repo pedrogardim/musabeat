@@ -137,9 +137,9 @@ function FilePage(props) {
       Tone.Transport.setLoopPoints(0, r.data().dur);
       //console.log(0, r.data().dur);
 
-      fileInfoRef.update({
-        loaded: firebase.firestore.FieldValue.increment(1),
-      });
+      /* fileInfoRef.update({
+        ld: firebase.firestore.FieldValue.increment(1),
+      }); */
 
       usersRef
         .doc(r.get("user"))

@@ -69,7 +69,7 @@ function UserPage(props) {
       //console.log(0, r.data().dur);
 
       fileInfoRef.update({
-        loaded: firebase.firestore.FieldValue.increment(1),
+        ld: firebase.firestore.FieldValue.increment(1),
       });
 
       usersRef

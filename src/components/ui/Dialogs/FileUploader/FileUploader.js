@@ -29,6 +29,7 @@ import {
   detectPitch,
   fileTypes,
   fileExtentions,
+  encodeAudioFile,
 } from "../../../../assets/musicutils";
 
 import "./FileUploader.css";
@@ -157,7 +158,8 @@ function FileUploader(props) {
                 name: file.name.split(".")[0],
                 size: file.size,
                 dur: parseFloat(audiobuffer.duration.toFixed(3)),
-                loaded: 1,
+                ld: 1,
+                in: 0,
                 likes: 0,
                 dl: 0,
                 user: user.uid,
@@ -192,6 +194,9 @@ function FileUploader(props) {
                     filesRef.add(fileInfo).then((ref) => {
                       //upload file to storage
                       const storageRef = firebase.storage().ref(ref.id);
+
+                      //let convertedFile = encodeAudioFile(audiobuffer, "mp3");
+
                       const task = storageRef.put(file);
 
                       setUploadingFileIds((prev) => {
@@ -273,7 +278,7 @@ function FileUploader(props) {
                     });
 
                     originalFileRef.update({
-                      loaded: firebase.firestore.FieldValue.increment(1),
+                      ld: firebase.firestore.FieldValue.increment(1),
                     });
 
                     originalFileRef.get().then((result) => {
