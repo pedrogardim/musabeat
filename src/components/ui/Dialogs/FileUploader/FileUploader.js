@@ -195,71 +195,83 @@ function FileUploader(props) {
                       //upload file to storage
                       const storageRef = firebase.storage().ref(ref.id);
 
-                      //let convertedFile = encodeAudioFile(audiobuffer, "mp3");
+                      firebase
+                        .firestore()
+                        .collection("users")
+                        .doc(user.uid)
+                        .get()
+                        .then((r) => {
+                          let checkPr = r.data().pr;
 
-                      const task = storageRef.put(file);
+                          let finalFile =
+                            file.type !== "audio/mpeg" && !checkPr
+                              ? encodeAudioFile(audiobuffer, "mp3")
+                              : file;
 
-                      setUploadingFileIds((prev) => {
-                        let newFileIds = [...prev];
-                        newFileIds[i] = ref.id;
-                        return newFileIds;
-                      });
+                          const task = storageRef.put(finalFile);
 
-                      task.on(
-                        "state_changed",
-                        (snapshot) => {
-                          setUploadState((prev) => {
-                            let newState = [...prev];
-                            newState[i] =
-                              (snapshot.bytesTransferred /
-                                snapshot.totalBytes) *
-                              100;
-                            return newState;
-                          });
-                        },
-                        (error) => {
-                          console.log(error);
-                          filesRef.doc(ref.id).remove();
-
-                          setUploadState((prev) => {
-                            let newState = [...prev];
-                            newState[i] = "uploadError";
-                            return newState;
+                          setUploadingFileIds((prev) => {
+                            let newFileIds = [...prev];
+                            newFileIds[i] = ref.id;
+                            return newFileIds;
                           });
 
-                          return;
-                        },
-                        () => {
-                          /////IF UPLOAD SUCCEDS
+                          task.on(
+                            "state_changed",
+                            (snapshot) => {
+                              setUploadState((prev) => {
+                                let newState = [...prev];
+                                newState[i] =
+                                  (snapshot.bytesTransferred /
+                                    snapshot.totalBytes) *
+                                  100;
+                                return newState;
+                              });
+                            },
+                            (error) => {
+                              console.log(error);
+                              filesRef.doc(ref.id).remove();
 
-                          //update instrument on "modules"
+                              setUploadState((prev) => {
+                                let newState = [...prev];
+                                newState[i] = "uploadError";
+                                return newState;
+                              });
 
-                          Boolean(props.onInstrumentMod) &&
-                            props.onInstrumentMod(
-                              ref.id,
-                              labelOnInstrument,
-                              slotToInsetFile
-                            );
+                              return;
+                            },
+                            () => {
+                              /////IF UPLOAD SUCCEDS
 
-                          props.updateOnFileLoaded &&
-                            props.updateOnFileLoaded();
+                              //update instrument on "modules"
 
-                          props.module.type !== 3 && props.getFilesName();
+                              Boolean(props.onInstrumentMod) &&
+                                props.onInstrumentMod(
+                                  ref.id,
+                                  labelOnInstrument,
+                                  slotToInsetFile
+                                );
 
-                          //add file id to user in db
+                              props.updateOnFileLoaded &&
+                                props.updateOnFileLoaded();
 
-                          const userRef = firebase
-                            .firestore()
-                            .collection("users")
-                            .doc(user.uid);
+                              props.module.type !== 3 && props.getFilesName();
 
-                          userRef.update({
-                            files: firebase.firestore.FieldValue.arrayUnion(
-                              ref.id
-                            ),
-                          });
-                        }
-                      );
+                              //add file id to user in db
+
+                              const userRef = firebase
+                                .firestore()
+                                .collection("users")
+                                .doc(user.uid);
+
+                              userRef.update({
+                                files: firebase.firestore.FieldValue.arrayUnion(
+                                  ref.id
+                                ),
+                              });
+                            }
+                          );
+                        });
                     });
                   }
                   //the file is already uploaded to server, get its id

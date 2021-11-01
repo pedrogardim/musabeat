@@ -75,6 +75,7 @@ function AdminDashboard(props) {
   };
 
   const convertAudio = (file) => {
+    console.log(file);
     file.arrayBuffer().then((r) => {
       Tone.getContext().rawContext.decodeAudioData(r, (audiobuffer) => {
         let blob = encodeAudioFile(audiobuffer, "mp3");
