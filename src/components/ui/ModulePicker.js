@@ -3,6 +3,8 @@ import "./ModulePicker.css";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import firebase from "firebase";
+
 import {
   IconButton,
   Typography,
@@ -118,6 +120,36 @@ function ModulePicker(props) {
 
     if (selectedType === 3 || selectedType === 4) {
       newModule.size = 1;
+    }
+
+    if (typeof newModule.instrument === "string") {
+      firebase
+        .firestore()
+        .collection(newModule.type === 0 ? "drumpatches" : "patches")
+        .doc(newModule.instrument)
+        .update({
+          ld: firebase.firestore.FieldValue.increment(1),
+          in: firebase.firestore.FieldValue.increment(1),
+        });
+      if (newModule.type === 0) {
+        firebase
+          .firestore()
+          .collection(newModule.type === 0 ? "drumpatches" : "patches")
+          .doc(newModule.instrument)
+          .get()
+          .then((r) =>
+            Object.values(r.data().urls).map((e) =>
+              firebase
+                .firestore()
+                .collection("files")
+                .doc(e)
+                .update({
+                  ld: firebase.firestore.FieldValue.increment(1),
+                  in: firebase.firestore.FieldValue.increment(1),
+                })
+            )
+          );
+      }
     }
 
     let newModules;

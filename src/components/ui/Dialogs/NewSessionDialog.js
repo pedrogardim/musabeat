@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import firebase from "firebase";
+
 import "../SessionSettings.css";
 
 import {
@@ -76,6 +78,9 @@ function NewSessionDialog(props) {
   const [session, setSession] = useState(sessionTemplate);
 
   const addModule = (moduleType) => {
+    const initialDrumPatch = "8fsbChTqV7aaWNyI1hTC";
+    const initialPatch = "jSjo9Rzv3eg1vTkkEj1s";
+
     let newModule = {
       id:
         !session.modules || !session.modules.length
@@ -99,12 +104,12 @@ function NewSessionDialog(props) {
       muted: false,
       instrument:
         moduleType === 0
-          ? "8fsbChTqV7aaWNyI1hTC"
+          ? initialDrumPatch
           : moduleType === 3
           ? {
               url: "",
             }
-          : "jSjo9Rzv3eg1vTkkEj1s",
+          : initialPatch,
       color: Math.floor(Math.random() * 14.99),
       fx: [],
     };
@@ -153,6 +158,38 @@ function NewSessionDialog(props) {
   };
 
   const handleCreateNewSession = () => {
+    session.modules.map((e) => {
+      if (typeof e.instrument === "string") {
+        firebase
+          .firestore()
+          .collection(e.type === 0 ? "drumpatches" : "patches")
+          .doc(e.instrument)
+          .update({
+            ld: firebase.firestore.FieldValue.increment(1),
+            in: firebase.firestore.FieldValue.increment(1),
+          });
+        if (e.type === 0) {
+          firebase
+            .firestore()
+            .collection(e.type === 0 ? "drumpatches" : "patches")
+            .doc(e.instrument)
+            .get()
+            .then((r) =>
+              Object.values(r.data().urls).map((file) =>
+                firebase
+                  .firestore()
+                  .collection("files")
+                  .doc(file)
+                  .update({
+                    ld: firebase.firestore.FieldValue.increment(1),
+                    in: firebase.firestore.FieldValue.increment(1),
+                  })
+              )
+            );
+        }
+      }
+    });
+
     props.handleCreateNewSession(session);
     props.setNewSessionDialog(false);
   };

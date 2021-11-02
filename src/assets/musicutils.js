@@ -927,11 +927,6 @@ export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
   let instr;
   const patchRef = firebase.firestore().collection("patches").doc(input);
 
-  patchRef.update({
-    ld: firebase.firestore.FieldValue.increment(1),
-    in: firebase.firestore.FieldValue.increment(1),
-  });
-
   let patch = (await patchRef.get()).data();
   //console.log(patch);
 
@@ -1040,17 +1035,6 @@ export const loadSamplerFromObject = async (
     )
   );
 
-  urlArray.map((e, i) => {
-    firebase
-      .firestore()
-      .collection("files")
-      .doc(obj.urls[i])
-      .update({
-        ld: firebase.firestore.FieldValue.increment(1),
-        in: firebase.firestore.FieldValue.increment(1),
-      });
-  });
-
   //console.log(urlArray);
 
   let urls = Object.fromEntries(
@@ -1099,12 +1083,6 @@ export const loadDrumPatch = async (
       ? firebase.firestore().collection("drumpatches").doc(input)
       : null;
 
-  if (patchRef !== null)
-    patchRef.update({
-      ld: firebase.firestore.FieldValue.increment(1),
-      in: firebase.firestore.FieldValue.increment(1),
-    });
-
   let patch = patchRef ? (await patchRef.get()).data() : input;
 
   //console.log(patch);
@@ -1129,17 +1107,6 @@ export const loadDrumPatch = async (
         await firebase.storage().ref(patch.urls[e]).getDownloadURL()
     )
   );
-
-  urlArray.map((e, i) => {
-    firebase
-      .firestore()
-      .collection("files")
-      .doc(Object.values(patch.urls)[i])
-      .update({
-        ld: firebase.firestore.FieldValue.increment(1),
-        in: firebase.firestore.FieldValue.increment(1),
-      });
-  });
 
   //console.log(urlArray);
 

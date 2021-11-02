@@ -97,6 +97,36 @@ function PatchExplorer(props) {
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
       props.updateFilesStatsOnChange();
+      let id = patchIdList[index];
+
+      //increment "ld" & "in" counters for patch and files
+
+      firebase
+        .firestore()
+        .collection(props.isDrum ? "drumpatches" : "patches")
+        .doc(id)
+        .update({
+          ld: firebase.firestore.FieldValue.increment(1),
+          in: firebase.firestore.FieldValue.increment(1),
+        });
+
+      if (props.isDrum || patchdata[index].base === "Sampler") {
+        firebase
+          .firestore()
+          .collection(props.isDrum ? "drumpatches" : "patches")
+          .doc(id)
+          .get((e) =>
+            Object.values(e.data().urls)
+              .map((e) => firebase.firestore().collection("files").doc(e))
+              .update({
+                ld: firebase.firestore.FieldValue.increment(1),
+                in: firebase.firestore.FieldValue.increment(1),
+              })
+          );
+      }
+
+      //load patch
+
       if (props.isDrum) {
         loadDrumPatch(
           patchdata[index],

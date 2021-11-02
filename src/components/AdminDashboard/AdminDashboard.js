@@ -82,6 +82,42 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ pr: null })));
   };
 
+  const resetFilesAndPatchesIn = () => {
+    firebase
+      .firestore()
+      .collection("patches")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ in: 0, ld: 0 })));
+
+    firebase
+      .firestore()
+      .collection("drumpatches")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ in: 0, ld: 0 })));
+
+    firebase
+      .firestore()
+      .collection("files")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ in: 0, ld: 0 })));
+  };
+
+  //DANGER
+
+  const deleteAllSessions = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ likes: [], sessions: [] })));
+
+    firebase
+      .firestore()
+      .collection("sessions")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.delete()));
+  };
+
   const convertAudio = (file) => {
     console.log(file);
     file.arrayBuffer().then((r) => {
@@ -123,11 +159,12 @@ function AdminDashboard(props) {
       <div className={"admin-panel-container"}>
         {value === 0 && <PåatchEditor />}
       </div> */}
-      {/* <Button onClick={updateStats}>Update Stats</Button>
+      <Button onClick={updateStats}>Update Stats</Button>
+      {/* 
       <Button onClick={updatePremium}>updateSessions</Button>
       <Button onClick={updateLikes}>Update files, patches like</Button>
       <Button onClick={updateSessions}>Update session scale</Button> */}
-      <Button onClick={resetPremium}>Reset Premiums</Button>
+      <Button onClick={resetFilesAndPatchesIn}>resetFilesAndPatchesIn</Button>
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
   );
