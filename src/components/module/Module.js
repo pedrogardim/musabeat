@@ -115,6 +115,8 @@ function Module(props) {
     let newTimeline = { ...props.timeline };
     delete newTimeline[props.module.id];
     props.setTimeline(newTimeline);
+
+    props.setAreUnsavedChanges(false);
   };
 
   const handleModuleRename = (name) => {

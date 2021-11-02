@@ -1144,6 +1144,7 @@ function Workspace(props) {
                 setSnackbarMessage={setSnackbarMessage}
                 isSessionLoaded={isLoaded}
                 handlePageNav={props.handlePageNav}
+                setAreUnsavedChanges={setAreUnsavedChanges}
               />
             </Fragment>
           ))

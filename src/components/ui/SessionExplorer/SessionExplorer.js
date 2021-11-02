@@ -137,7 +137,7 @@ function SessionExplorer(props) {
     //clear all files and patches stats first
 
     sessions[index].modules.forEach(async (e, i) => {
-      let filesobj =
+      let instrobj =
         typeof e.instrument === "string"
           ? (
               await firebase
@@ -155,13 +155,21 @@ function SessionExplorer(props) {
           .doc(e.instrument)
           .update({ in: firebase.firestore.FieldValue.increment(-1) });
 
-      Object.values(filesobj.urls).forEach((e) =>
+      if (instrobj.urls)
+        Object.values(instrobj.urls).forEach((e) =>
+          firebase
+            .firestore()
+            .collection("files")
+            .doc(e)
+            .update({ in: firebase.firestore.FieldValue.increment(-1) })
+        );
+
+      if (instrobj.url)
         firebase
           .firestore()
           .collection("files")
-          .doc(e)
-          .update({ in: firebase.firestore.FieldValue.increment(-1) })
-      );
+          .doc(instrobj.url)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) });
     });
 
     firebase
