@@ -28,7 +28,7 @@ function ChordProgression(props) {
   const [editorOpen, setEditorOpen] = useState(false);
   const [arpeggiatorOpen, setArpeggiatorOpen] = useState(false);
   const [arpeggiatorState, setArpeggiatorState] = useState(
-    !isNaN(props.module.score[0].rhythm[0])
+    typeof props.module.score[0].rhythm[0] === "number"
   );
 
   const scheduleChords = () => {
@@ -194,7 +194,6 @@ function ChordProgression(props) {
 
   useEffect(() => {
     props.isSessionLoaded && toggleArpeggiator(arpeggiatorState);
-    console.log("arpeggiatorState", arpeggiatorState);
   }, [arpeggiatorState]);
 
   useEffect(() => {
