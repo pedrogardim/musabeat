@@ -201,7 +201,8 @@ function FileUploader(props) {
                         .doc(user.uid)
                         .get()
                         .then((r) => {
-                          let checkPr = r.data().pr;
+                          let checkPr =
+                            r.data().pr.seconds > ~~(+new Date() / 1000);
 
                           let finalFile =
                             file.type !== "audio/mpeg" && !checkPr

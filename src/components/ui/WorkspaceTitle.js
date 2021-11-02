@@ -33,7 +33,8 @@ function WorkspaceTitle(props) {
   const history = useHistory();
 
   const getSessionTitleInfo = async () => {
-    let date = new Date(props.sessionData.createdOn.seconds * 1000);
+    let date = props.sessionData.createdOn.toDate();
+
     let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
       date.getMonth() + 1
     }/${date.getFullYear()}`;
@@ -54,9 +55,12 @@ function WorkspaceTitle(props) {
       props.sessionData.editors &&
       getEditorProfiles().then((r) => {
         r.map((e) => {
-          props.user.uid === e[0] &&
+          if (
+            props.user.uid === e[0] &&
             e[0] === props.sessionData.creator &&
-            e[1].pr &&
+            e[1].pr !== null &&
+            e[1].pr.seconds > ~~(+new Date() / 1000)
+          )
             props.setPremiumMode(true);
         });
         setEditorProfiles(Object.fromEntries(r));

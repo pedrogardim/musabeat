@@ -74,6 +74,14 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ root: 0, scale: 0 })));
   };
 
+  const resetPremium = () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .get()
+      .then((r) => r.forEach((e) => e.ref.update({ pr: null })));
+  };
+
   const convertAudio = (file) => {
     console.log(file);
     file.arrayBuffer().then((r) => {
@@ -119,6 +127,7 @@ function AdminDashboard(props) {
       <Button onClick={updatePremium}>updateSessions</Button>
       <Button onClick={updateLikes}>Update files, patches like</Button>
       <Button onClick={updateSessions}>Update session scale</Button> */}
+      <Button onClick={resetPremium}>Reset Premiums</Button>
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
   );

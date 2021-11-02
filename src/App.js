@@ -73,7 +73,7 @@ function App() {
 
   const [newSessionDialog, setNewSessionDialog] = useState(false);
 
-  const [premiumMode, setPremiumMode] = useState(false);
+  //const [premiumMode, setPremiumMode] = useState(false);
 
   const [openedSession, setOpenedSession] = useState(null);
 

@@ -1099,13 +1099,13 @@ export const loadDrumPatch = async (
       ? firebase.firestore().collection("drumpatches").doc(input)
       : null;
 
-  let patch = patchRef ? (await patchRef.get()).data() : input;
-
-  patchRef &&
+  if (patchRef !== null)
     patchRef.update({
       ld: firebase.firestore.FieldValue.increment(1),
       in: firebase.firestore.FieldValue.increment(1),
     });
+
+  let patch = patchRef ? (await patchRef.get()).data() : input;
 
   //console.log(patch);
 
@@ -1134,7 +1134,7 @@ export const loadDrumPatch = async (
     firebase
       .firestore()
       .collection("files")
-      .doc(Object.keys(patch.urls)[i])
+      .doc(Object.values(patch.urls)[i])
       .update({
         ld: firebase.firestore.FieldValue.increment(1),
         in: firebase.firestore.FieldValue.increment(1),
