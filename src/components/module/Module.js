@@ -349,7 +349,7 @@ function Module(props) {
   const updateFilesStatsOnChange = async () => {
     //when change the instrument, update file "in" stat by -1
 
-    let filesobj =
+    let instrobj =
       typeof props.module.instrument === "string"
         ? (
             await firebase
@@ -367,13 +367,21 @@ function Module(props) {
         .doc(props.module.instrument)
         .update({ in: firebase.firestore.FieldValue.increment(-1) });
 
-    Object.values(filesobj.urls).forEach((e) =>
+    if (instrobj.urls)
+      Object.values(instrobj.urls).forEach((e) =>
+        firebase
+          .firestore()
+          .collection("files")
+          .doc(e)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) })
+      );
+
+    if (instrobj.url)
       firebase
         .firestore()
         .collection("files")
-        .doc(e)
-        .update({ in: firebase.firestore.FieldValue.increment(-1) })
-    );
+        .doc(instrobj.url)
+        .update({ in: firebase.firestore.FieldValue.increment(-1) });
   };
 
   switch (props.module.type) {
