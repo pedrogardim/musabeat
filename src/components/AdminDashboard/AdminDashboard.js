@@ -71,7 +71,7 @@ function AdminDashboard(props) {
       .firestore()
       .collection("sessions")
       .get()
-      .then((r) => r.forEach((e) => e.ref.update({ root: 0, scale: 0 })));
+      .then((r) => r.forEach((e) => e.ref.update({ rte: false })));
   };
 
   const resetPremium = () => {
@@ -162,8 +162,8 @@ function AdminDashboard(props) {
       <Button onClick={updateStats}>Update Stats</Button>
       {/* 
       <Button onClick={updatePremium}>updateSessions</Button>
-      <Button onClick={updateLikes}>Update files, patches like</Button>
-      <Button onClick={updateSessions}>Update session scale</Button> */}
+      <Button onClick={updateLikes}>Update files, patches like</Button>*/}
+      <Button onClick={updateSessions}>Update session scale</Button>
       <Button onClick={resetFilesAndPatchesIn}>resetFilesAndPatchesIn</Button>
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>

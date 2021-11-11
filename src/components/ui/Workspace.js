@@ -47,6 +47,20 @@ import { clearEvents } from "../../utils/TransportSchedule";
 
 Tone.Transport.loopEnd = "1m";
 
+const userSubmitedSessionProps = [
+  "alwcp",
+  "bpm",
+  "description",
+  "editors",
+  "hid",
+  "name",
+  "root",
+  "rte",
+  "scale",
+  "tags",
+  "timeline",
+];
+
 function Workspace(props) {
   const { t } = useTranslation();
 
@@ -93,6 +107,8 @@ function Workspace(props) {
   const [selection, setSelection] = useState([]);
 
   const [optionsMenu, setOptionsMenu] = useState(false);
+
+  const [listener, setListener] = useState(() => () => {});
 
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
@@ -518,56 +534,48 @@ function Workspace(props) {
   const saveToDatabase = (mod, data) => {
     //console.log(DBSessionRef, isLoaded);
     if (DBSessionRef !== null) {
-      //console.log("saved", modules, sessionData);
-
       savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
 
-      let newSessionData = !data || !mod ? { ...sessionData } : { ...data };
+      let newSessionData = !!data ? deepCopy(data) : {};
+
+      let newModules = !!mod ? deepCopy(mod) : {};
 
       //temp fix: delete properties to avoid overwrites
-      delete newSessionData.createdOn;
-      delete newSessionData.creator;
-      delete newSessionData.opened;
-      delete newSessionData.played;
-      delete newSessionData.copied;
-      delete newSessionData.likes;
+      if (data) {
+        delete newSessionData.createdOn;
+        delete newSessionData.creator;
+        delete newSessionData.opened;
+        delete newSessionData.played;
+        delete newSessionData.copied;
+        delete newSessionData.likes;
+      }
 
-      !data || !mod
-        ? DBSessionRef.update({
-            ...newSessionData,
-            modules: modules,
-          })
-        : DBSessionRef.update({ ...newSessionData, modules: mod });
+      if (mod) {
+        newSessionData.modules = newModules;
+      }
+
+      DBSessionRef.update({
+        ...newSessionData,
+      });
     }
-    /* DBSessionRef.get().then((snapshot) => {
-        snapshot !== modules
-          ? DBSessionRef.child("modules").set(modules)
-          : console.log("Checked but not atualized");
-      }); */
   };
 
-  const updateFromDatabase = (modulesData) => {
-    if (JSON.stringify(modules) !== JSON.stringify(modulesData.modules)) {
-      //console.log("modules loaded from server:", modulesData.modules);
+  const updateFromDatabase = (sessionSnapshot) => {
+    setModules((prev) => {
+      let check =
+        JSON.stringify(prev) !== JSON.stringify(sessionSnapshot.modules);
+      console.log(check ? "It's different modules" : "It's the same modules");
+      return check ? sessionSnapshot.modules : prev;
+    });
 
-      setModules(modulesData.modules);
-
-      //console.log("UPDATED");
-    } else {
-      //console.log("ITS THE SAME!!!");
-    }
-    /* 
-    let data = { ...modulesData };
+    let data = { ...sessionSnapshot };
     delete data.modules;
 
-    if (JSON.stringify(data) !== JSON.stringify(sessionData)) {
-      console.log(
-        "SESSION DATA UPDATED",
-        JSON.stringify(modulesData.modules),
-        JSON.stringify(modules)
-      );
-      setSessionData(data);
-    } */
+    setSessionData((prev) => {
+      let check = !compareObjectProperties(data, prev);
+      console.log(check ? "It's different data" : "It's the same data");
+      return check ? data : prev;
+    });
   };
 
   const onSessionReady = () => {
@@ -597,8 +605,8 @@ function Workspace(props) {
     Tone.Transport.seconds = 0;
     props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
     console.log("=====session ready!=====");
-    updateSavingMode("simple");
     setIsLoaded(true);
+    setSavingMode(sessionData.rte ? "rte" : "simple");
   };
 
   const resetWorkspace = () => {
@@ -650,8 +658,10 @@ function Workspace(props) {
   }; */
 
   const updateSavingMode = (input) => {
-    if (props.user === null || !editMode) return;
+    //console.log("inin", input);
     if (input === "simple") {
+      listener();
+      setListener(() => () => {});
       clearInterval(autosaver);
       //console.log("autosaver initialized");
 
@@ -660,6 +670,24 @@ function Workspace(props) {
       }, autoSaverTime);
 
       setAutosaver(intervalId);
+    } else {
+      //console.log(DBSessionRef);
+      if (!props.hidden && DBSessionRef !== null) {
+        //console.log("RTE Activated", DBSessionRef);
+        listener();
+        setAreUnsavedChanges(false);
+        saveToDatabase(modules, sessionData);
+        let DBlistener = DBSessionRef.onSnapshot(
+          (snapshot) => {
+            updateFromDatabase(snapshot.data());
+          },
+          (er) => {
+            console.log("onSnapshot Error:", er);
+          }
+        );
+
+        setListener(() => () => DBlistener());
+      }
     }
   };
 
@@ -947,8 +975,8 @@ function Workspace(props) {
     console.log("transport cleared");
 
     let session = {
-      description: "No description",
-      tags: ["musa"],
+      description: "",
+      tags: [],
       bpm: Tone.Transport.bpm.value,
       modules: modules,
     };
@@ -970,15 +998,16 @@ function Workspace(props) {
     if (isLoaded) {
       savingMode === "simple" && setAreUnsavedChanges(true);
 
-      savingMode === "collaborative" && saveToDatabase(modules, sessionData);
+      savingMode === "rte" && saveToDatabase(modules, null);
 
       modules && handleUndo();
     }
   }, [modules]);
 
   useEffect(() => {
-    isLoaded && updateSavingMode(savingMode);
-  }, [savingMode]);
+    //console.log("savingMode", savingMode, isLoaded, !!props.user, editMode);
+    if (isLoaded && !!props.user && editMode) updateSavingMode(savingMode);
+  }, [isLoaded, editMode, savingMode, DBSessionRef, props.user]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -993,7 +1022,11 @@ function Workspace(props) {
 
   useEffect(() => {
     //sessionData && console.log(sessionData.timeline);
-    isLoaded && savingMode === "simple" && setAreUnsavedChanges(true);
+    sessionData && setSavingMode(sessionData.rte ? "rte" : "simple");
+    if (isLoaded) {
+      savingMode === "simple" && setAreUnsavedChanges(true);
+      savingMode === "rte" && saveToDatabase(null, sessionData);
+    }
   }, [sessionData]);
 
   /*  useEffect(() => {
@@ -1025,6 +1058,10 @@ function Workspace(props) {
     }
     //temp
   }, [instrumentsLoaded, sessionData, instruments]);
+
+  useEffect(() => {
+    console.log("listener", listener);
+  }, [listener]);
 
   useEffect(() => {
     //TODO: Completely clear Tone instance, disposing context
@@ -1065,7 +1102,13 @@ function Workspace(props) {
   useEffect(() => {
     //console.log(areUnsavedChanges);
 
-    if (!props.hidden && isLoaded && !areUnsavedChanges) saveToDatabase();
+    if (
+      !props.hidden &&
+      isLoaded &&
+      savingMode === "simple" &&
+      !areUnsavedChanges
+    )
+      saveToDatabase(modules, sessionData);
 
     props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
@@ -1329,3 +1372,11 @@ function Workspace(props) {
 export default Workspace;
 
 const deepCopy = (a) => JSON.parse(JSON.stringify(a));
+
+const compareObjectProperties = (a, b) =>
+  userSubmitedSessionProps
+    .map((e) => {
+      e === "name" && console.log(JSON.stringify(a[e]), JSON.stringify(b[e]));
+      return JSON.stringify(a[e]) === JSON.stringify(b[e]);
+    })
+    .every((e) => e === true);

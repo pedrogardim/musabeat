@@ -176,6 +176,31 @@ function SessionSettings(props) {
                     labelPlacement="end"
                   />
                 </Tooltip>
+                <Tooltip
+                  title={
+                    !props.premiumMode
+                      ? "Upgrade to Premium to use this feature"
+                      : "Edit this session in real-time with other users"
+                  }
+                  interactive={!props.premiumMode}
+                  placement="top-start"
+                >
+                  <FormControlLabel
+                    className="session-settings-checkbox-lbl"
+                    control={
+                      <Checkbox
+                        color="primary"
+                        checked={newSessionData.rte}
+                        disabled={!props.premiumMode}
+                        onChange={(e) =>
+                          handleInfoChange("rte", e.target.checked)
+                        }
+                      />
+                    }
+                    label="Real-time Editing"
+                    labelPlacement="end"
+                  />
+                </Tooltip>
               </Grid>
             </Grid>
 
