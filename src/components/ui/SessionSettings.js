@@ -17,6 +17,7 @@ import {
   FormControlLabel,
   Tooltip,
   Select,
+  Avatar,
 } from "@material-ui/core";
 
 import { sessionTags, scales, musicalNotes } from "../../assets/musicutils";
@@ -24,6 +25,8 @@ import { sessionTags, scales, musicalNotes } from "../../assets/musicutils";
 import { useTranslation } from "react-i18next";
 
 import { Autocomplete } from "@material-ui/lab";
+
+import AddUserDialog from "../ui/Dialogs/AddUserDialog";
 
 import "./SessionSettings.css";
 
@@ -33,6 +36,7 @@ function SessionSettings(props) {
   const btnRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [newSessionData, setNewSessionData] = useState(props.sessionData);
+  const [userDialog, setUserDialog] = useState(false);
   const sessionData = props.sessionData;
 
   const handleBpmChange = (field, value) => {
@@ -244,6 +248,41 @@ function SessionSettings(props) {
                   ))}
                 </Select>
               </Grid>
+              <div className="break" style={{ height: 16 }} />
+
+              <Grid item>
+                <Typography variant="overline">{t("Editors")}</Typography>
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  {props.editorProfiles &&
+                  Object.keys(props.editorProfiles).length > 0 ? (
+                    Object.keys(props.editorProfiles).map(
+                      (e) =>
+                        e !== null && (
+                          <Tooltip
+                            title={props.editorProfiles[e].profile.displayName}
+                          >
+                            <Avatar
+                              src={props.editorProfiles[e].profile.photoURL}
+                              alt={props.editorProfiles[e].profile.displayName}
+                              style={{ marginRight: 8 }}
+                              onClick={() =>
+                                props.handlePageNav("user", e, true)
+                              }
+                            />
+                          </Tooltip>
+                        )
+                    )
+                  ) : (
+                    <Avatar />
+                  )}
+                  <IconButton
+                    style={{ height: 40, width: 40 }}
+                    onClick={() => setUserDialog(true)}
+                  >
+                    <Icon>add</Icon>
+                  </IconButton>
+                </div>
+              </Grid>
             </Grid>
           </Grid>
           <IconButton
@@ -255,6 +294,13 @@ function SessionSettings(props) {
           </IconButton>
         </Dialog>
       )}
+
+      <AddUserDialog
+        open={userDialog}
+        onClose={() => setUserDialog(false)}
+        setNewSessionData={setNewSessionData}
+        setEditorProfiles={props.setEditorProfiles}
+      />
     </Fragment>
   );
 }

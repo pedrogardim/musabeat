@@ -104,6 +104,7 @@ function Workspace(props) {
     future: [],
   });
 
+  const [editorProfiles, setEditorProfiles] = useState(null);
   const [selection, setSelection] = useState([]);
 
   const [optionsMenu, setOptionsMenu] = useState(false);
@@ -564,7 +565,7 @@ function Workspace(props) {
     setModules((prev) => {
       let check =
         JSON.stringify(prev) !== JSON.stringify(sessionSnapshot.modules);
-      console.log(check ? "It's different modules" : "It's the same modules");
+      //console.log(check ? "It's different modules" : "It's the same modules");
       return check ? sessionSnapshot.modules : prev;
     });
 
@@ -573,7 +574,7 @@ function Workspace(props) {
 
     setSessionData((prev) => {
       let check = !compareObjectProperties(data, prev);
-      console.log(check ? "It's different data" : "It's the same data");
+      //console.log(check ? "It's different data" : "It's the same data");
       return check ? data : prev;
     });
   };
@@ -1060,7 +1061,7 @@ function Workspace(props) {
   }, [instrumentsLoaded, sessionData, instruments]);
 
   useEffect(() => {
-    console.log("listener", listener);
+    //console.log("listener", listener);
   }, [listener]);
 
   useEffect(() => {
@@ -1143,6 +1144,8 @@ function Workspace(props) {
           sessionSize={sessionSize}
           setPremiumMode={setPremiumMode}
           handlePageNav={props.handlePageNav}
+          editorProfiles={editorProfiles}
+          setEditorProfiles={setEditorProfiles}
         />
       )}
 
@@ -1279,6 +1282,8 @@ function Workspace(props) {
                 premiumMode={premiumMode}
                 sessionData={sessionData}
                 setSessionData={setSessionData}
+                editorProfiles={editorProfiles}
+                setEditorProfiles={setEditorProfiles}
               />
             )}
 
@@ -1375,8 +1380,9 @@ const deepCopy = (a) => JSON.parse(JSON.stringify(a));
 
 const compareObjectProperties = (a, b) =>
   userSubmitedSessionProps
-    .map((e) => {
-      e === "name" && console.log(JSON.stringify(a[e]), JSON.stringify(b[e]));
-      return JSON.stringify(a[e]) === JSON.stringify(b[e]);
-    })
+    .map(
+      (e) =>
+        //e === "name" && console.log(JSON.stringify(a[e]), JSON.stringify(b[e]));
+        JSON.stringify(a[e]) === JSON.stringify(b[e])
+    )
     .every((e) => e === true);

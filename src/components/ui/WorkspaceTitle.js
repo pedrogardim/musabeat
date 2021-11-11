@@ -27,7 +27,6 @@ function WorkspaceTitle(props) {
   const { t } = useTranslation();
 
   const [creationDateString, setCreationDateString] = useState(null);
-  const [editorProfiles, setEditorProfiles] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
   const history = useHistory();
@@ -65,7 +64,7 @@ function WorkspaceTitle(props) {
           )
             props.setPremiumMode(true);
         });
-        setEditorProfiles(Object.fromEntries(r));
+        props.setEditorProfiles(Object.fromEntries(r));
         //check if user is one of the editors, and if its premium
       });
   };
@@ -84,17 +83,18 @@ function WorkspaceTitle(props) {
   }, [props.sessionData, props.sessionKey, props.user]);
 
   /* useEffect(() => {
-    console.log(editorProfiles);
-  }, [editorProfiles]); */
+    console.log(props.editorProfiles);
+  }, [props.editorProfiles]); */
 
   return (
     <div className="app-title">
       <Helmet>
         <title>
           {props.sessionData &&
-            editorProfiles &&
+            props.editorProfiles &&
             `${props.sessionData.name} by ${
-              editorProfiles[props.sessionData.creator].profile.displayName
+              props.editorProfiles[props.sessionData.creator].profile
+                .displayName
             } `}
         </title>
       </Helmet>
@@ -145,14 +145,15 @@ function WorkspaceTitle(props) {
 
       <div className="break" />
 
-      {editorProfiles && Object.keys(editorProfiles).length > 0 ? (
-        Object.keys(editorProfiles).map(
+      {props.editorProfiles && Object.keys(props.editorProfiles).length > 0 ? (
+        Object.keys(props.editorProfiles).map(
           (e) =>
             e !== null && (
-              <Tooltip title={editorProfiles[e].profile.displayName}>
+              <Tooltip title={props.editorProfiles[e].profile.displayName}>
                 <Avatar
-                  src={editorProfiles[e].profile.photoURL}
-                  alt={editorProfiles[e].profile.displayName}
+                  style={{ marginRight: 8 }}
+                  src={props.editorProfiles[e].profile.photoURL}
+                  alt={props.editorProfiles[e].profile.displayName}
                   onClick={() => props.handlePageNav("user", e, true)}
                 />
               </Tooltip>
