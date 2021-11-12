@@ -203,7 +203,7 @@ function AuthDialog(props) {
     firebase
       .firestore()
       .collection("users")
-      .where("profile.displayName", "==", name)
+      .where("profile.username", "==", name)
       .limit(1)
       .get()
       .then((r) => {
@@ -309,7 +309,7 @@ function AuthDialog(props) {
             {creatingAccount && (
               <TextField
                 required
-                value={accountInfo.displayName}
+                value={accountInfo.username}
                 onChange={(e) => handleFieldChange("name", e)}
                 label={t("auth.name")}
                 inputProps={{ type: "name" }}

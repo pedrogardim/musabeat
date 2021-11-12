@@ -84,7 +84,7 @@ function SessionGalleryItem(props) {
               props.handlePageNav("user", props.session.creator, true)
             }
           />
-          <Typography variant="overline">{creatorInfo.displayName}</Typography>
+          <Typography variant="overline">{creatorInfo.username}</Typography>
         </div>
       )}
 

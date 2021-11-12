@@ -259,11 +259,11 @@ function SessionSettings(props) {
                       (e) =>
                         e !== null && (
                           <Tooltip
-                            title={props.editorProfiles[e].profile.displayName}
+                            title={props.editorProfiles[e].profile.username}
                           >
                             <Avatar
                               src={props.editorProfiles[e].profile.photoURL}
-                              alt={props.editorProfiles[e].profile.displayName}
+                              alt={props.editorProfiles[e].profile.username}
                               style={{ marginRight: 8 }}
                               onClick={() =>
                                 props.handlePageNav("user", e, true)

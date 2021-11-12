@@ -151,9 +151,9 @@ function UserPage(props) {
     <div className="user-page">
       <div className="user-page-background" />
       {userInfo && (
-        <Tooltip title={userInfo.profile.displayName}>
+        <Tooltip title={userInfo.profile.username}>
           <Avatar
-            alt={userInfo.profile.displayName}
+            alt={userInfo.profile.username}
             src={userInfo.profile.photoURL}
             className="user-page-avatar"
           />
@@ -162,7 +162,7 @@ function UserPage(props) {
 
       <Paper elevation={9} className="user-page-main-content">
         {userInfo && (
-          <Typography variant="h3">{userInfo.profile.displayName}</Typography>
+          <Typography variant="h3">{userInfo.profile.username}</Typography>
         )}
         <div className="break" />
 

@@ -750,14 +750,14 @@ function PatchExplorer(props) {
                           <Tooltip
                             title={
                               patchesUserData[selectedPatchInfo.creator]
-                                .displayName
+                                .username
                             }
                           >
                             <Avatar
                               style={{ height: 24, width: 24, marginLeft: 8 }}
                               alt={
                                 patchesUserData[selectedPatchInfo.creator]
-                                  .displayName
+                                  .username
                               }
                               src={
                                 patchesUserData[selectedPatchInfo.creator]
@@ -855,9 +855,7 @@ function PatchExplorer(props) {
                             (!props.userPatches ||
                               (props.userPatches && showingLiked)) && (
                               <Tooltip
-                                title={
-                                  patchesUserData[patch.creator].displayName
-                                }
+                                title={patchesUserData[patch.creator].username}
                               >
                                 <Avatar
                                   style={{
@@ -865,9 +863,7 @@ function PatchExplorer(props) {
                                     width: 24,
                                     marginLeft: 8,
                                   }}
-                                  alt={
-                                    patchesUserData[patch.creator].displayName
-                                  }
+                                  alt={patchesUserData[patch.creator].username}
                                   src={patchesUserData[patch.creator].photoURL}
                                   onClick={() =>
                                     props.handlePageNav(

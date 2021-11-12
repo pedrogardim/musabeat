@@ -69,7 +69,7 @@ function HomePage(props) {
         <div className="break" />
         <Typography variant="h5">
           {userInfo
-            ? t("home.userWelcome") + " " + userInfo.profile.displayName
+            ? t("home.userWelcome") + " " + userInfo.profile.username
             : t("home.unloggedWelcome")}
         </Typography>
         <div className="break" />

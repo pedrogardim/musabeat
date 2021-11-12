@@ -36,8 +36,8 @@ function AddUserDialog(props) {
     }
 
     let query = usersRef
-      .where("profile.displayName", ">=", value)
-      .where("profile.displayName", "<=", value + "\uf8ff")
+      .where("profile.username", ">=", value)
+      .where("profile.username", "<=", value + "\uf8ff")
       .limit(10);
 
     query.get().then((snapshot) =>
@@ -88,16 +88,16 @@ function AddUserDialog(props) {
           }`}
           options={userQueryResult}
           onChange={(e, v) => handleSubmit(v.id)}
-          getOptionLabel={(option) => option.displayName}
+          getOptionLabel={(option) => option.username}
           renderOption={(op, st) => (
             <ul style={{ display: "flex", alignItems: "center" }}>
               <Avatar
                 style={{ height: 24, width: 24, marginRight: 16 }}
                 src={op.photoURL}
-                alt={op.displayName}
+                alt={op.username}
               />
               <Typography style={{ marginRight: 16, lineHeight: 1 }}>
-                {op.displayName}
+                {op.username}
               </Typography>
               <Typography variant={"overline"} style={{ lineHeight: 1 }}>
                 {op.email}

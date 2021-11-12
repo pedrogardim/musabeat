@@ -399,9 +399,9 @@ function PatchPage(props) {
       )}
       <div className="break" />
       {creatorInfo && (
-        <Tooltip title={creatorInfo.profile.displayName}>
+        <Tooltip title={creatorInfo.profile.username}>
           <Avatar
-            alt={creatorInfo.profile.displayName}
+            alt={creatorInfo.profile.username}
             src={creatorInfo.profile.photoURL}
             onClick={() => props.handlePageNav("user", patchInfo.creator, true)}
           />

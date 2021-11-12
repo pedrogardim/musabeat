@@ -93,8 +93,7 @@ function WorkspaceTitle(props) {
           {props.sessionData &&
             props.editorProfiles &&
             `${props.sessionData.name} by ${
-              props.editorProfiles[props.sessionData.creator].profile
-                .displayName
+              props.editorProfiles[props.sessionData.creator].profile.username
             } `}
         </title>
       </Helmet>
@@ -149,11 +148,11 @@ function WorkspaceTitle(props) {
         Object.keys(props.editorProfiles).map(
           (e) =>
             e !== null && (
-              <Tooltip title={props.editorProfiles[e].profile.displayName}>
+              <Tooltip title={props.editorProfiles[e].profile.username}>
                 <Avatar
                   style={{ marginRight: 8 }}
                   src={props.editorProfiles[e].profile.photoURL}
-                  alt={props.editorProfiles[e].profile.displayName}
+                  alt={props.editorProfiles[e].profile.username}
                   onClick={() => props.handlePageNav("user", e, true)}
                 />
               </Tooltip>

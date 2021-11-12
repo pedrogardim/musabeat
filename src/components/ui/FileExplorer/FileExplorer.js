@@ -599,9 +599,7 @@ function FileExplorer(props) {
                       )}
                       {filesUserData[filedata[index].user] && (
                         <Tooltip
-                          title={
-                            filesUserData[filedata[index].user].displayName
-                          }
+                          title={filesUserData[filedata[index].user].username}
                         >
                           <Avatar
                             style={{
@@ -609,9 +607,7 @@ function FileExplorer(props) {
                               width: 24,
                               marginLeft: 8,
                             }}
-                            alt={
-                              filesUserData[filedata[index].user].displayName
-                            }
+                            alt={filesUserData[filedata[index].user].username}
                             src={filesUserData[filedata[index].user].photoURL}
                             onClick={() =>
                               props.handlePageNav(

@@ -294,7 +294,7 @@ function PatchExplorer(props) {
               {e.patch.creator && (
                 <Tooltip
                   title={
-                    patchesCreatorList[i] && patchesCreatorList[i].displayName
+                    patchesCreatorList[i] && patchesCreatorList[i].username
                   }
                 >
                   <Avatar
@@ -305,7 +305,7 @@ function PatchExplorer(props) {
                       fontSize: 10,
                     }}
                     alt={
-                      patchesCreatorList[i] && patchesCreatorList[i].displayName
+                      patchesCreatorList[i] && patchesCreatorList[i].username
                     }
                     src={
                       patchesCreatorList[i] && patchesCreatorList[i].photoURL
