@@ -42,45 +42,28 @@ function UserPage(props) {
 
   const waveformWrapper = useRef(null);
 
+  const [userKey, setUserKey] = useState(null);
+
   const [userInfo, setUserInfo] = useState(null);
   const [userSessions, setUserSessions] = useState(null);
 
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const userKey = useParams().key;
+  const isUser = props.user && userKey === props.user.uid;
 
-  const isUser = userKey === props.user.uid;
+  const username = useParams().key;
 
   const usersRef = firebase.firestore().collection("users");
-  const userInfoRef = firebase.firestore().collection("users").doc(userKey);
   const sessionsRef = firebase.firestore().collection("sessions");
 
   const getUserInfo = () => {
-    userInfoRef.get().then((r) => {
-      setUserInfo(r.data());
+    usersRef
+      .where("profile.username", "==", username)
+      .limit(1)
+      .get()
+      .then((r) => setUserInfo(r.docs[0].data()));
 
-      /* let date = new Date(r.data().upOn.seconds * 1000);
-      let creationDate = `${t("misc.uploadedOn")} ${date.getDate()}/${
-        date.getMonth() + 1
-      }/${date.getFullYear()}`;
-      setUploadDateString(creationDate);
-      Tone.Transport.loop = false;
-      Tone.Transport.setLoopPoints(0, r.data().dur);
-      //console.log(0, r.data().dur);
-
-      fileInfoRef.update({
-        ld: firebase.firestore.FieldValue.increment(1),
-      });
-
-      usersRef
-        .doc(r.get("user"))
-        .get()
-        .then((user) => {
-          setCreatorInfo(user.data());
-        }); */
-    });
-
-    //liked by user
+    //followed by user
     if (props.user) {
       usersRef
         .doc(props.user.uid)
@@ -91,21 +74,13 @@ function UserPage(props) {
 
   const handleFollow = () => {
     if (!isFollowing) {
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(props.user.uid)
-        .update({
-          fllwing: firebase.firestore.FieldValue.arrayUnion(userKey),
-        });
+      usersRef.doc(props.user.uid).update({
+        fllwing: firebase.firestore.FieldValue.arrayUnion(userKey),
+      });
 
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(userKey)
-        .update({
-          fllrs: firebase.firestore.FieldValue.increment(1),
-        });
+      usersRef.doc(userKey).update({
+        fllrs: firebase.firestore.FieldValue.increment(1),
+      });
 
       setIsFollowing(true);
 
@@ -115,21 +90,13 @@ function UserPage(props) {
         return a;
       });
     } else {
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(props.user.uid)
-        .update({
-          fllwing: firebase.firestore.FieldValue.arrayRemove(userKey),
-        });
+      usersRef.doc(props.user.uid).update({
+        fllwing: firebase.firestore.FieldValue.arrayRemove(userKey),
+      });
 
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(userKey)
-        .update({
-          fllrs: firebase.firestore.FieldValue.increment(-1),
-        });
+      usersRef.doc(userKey).update({
+        fllrs: firebase.firestore.FieldValue.increment(-1),
+      });
 
       setIsFollowing(false);
 
@@ -143,8 +110,6 @@ function UserPage(props) {
 
   useEffect(() => {
     getUserInfo();
-
-    return () => {};
   }, []);
 
   return (

@@ -128,7 +128,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log(user);
+    //console.log(user);
   }, [user]);
 
   useEffect(() => {
@@ -336,7 +336,7 @@ function App() {
             />
           </Route>
           <Route exact path="/user/:key">
-            {user && <UserPage handlePageNav={handlePageNav} user={user} />}
+            <UserPage handlePageNav={handlePageNav} user={user} />
           </Route>
 
           <Route exact path="/admin">
