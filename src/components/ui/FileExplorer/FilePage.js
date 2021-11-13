@@ -293,7 +293,9 @@ function FilePage(props) {
           <Avatar
             alt={creatorInfo.profile.username}
             src={creatorInfo.profile.photoURL}
-            onClick={() => props.handlePageNav("user", fileInfo.user, true)}
+            onClick={() =>
+              props.handlePageNav("user", creatorInfo.profile.username, true)
+            }
           />
         </Tooltip>
       )}

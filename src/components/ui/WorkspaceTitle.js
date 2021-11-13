@@ -153,7 +153,13 @@ function WorkspaceTitle(props) {
                   style={{ marginRight: 8 }}
                   src={props.editorProfiles[e].profile.photoURL}
                   alt={props.editorProfiles[e].profile.username}
-                  onClick={() => props.handlePageNav("user", e, true)}
+                  onClick={() =>
+                    props.handlePageNav(
+                      "user",
+                      props.editorProfiles[e].profile.username,
+                      true
+                    )
+                  }
                 />
               </Tooltip>
             )

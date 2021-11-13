@@ -266,7 +266,11 @@ function SessionSettings(props) {
                               alt={props.editorProfiles[e].profile.username}
                               style={{ marginRight: 8 }}
                               onClick={() =>
-                                props.handlePageNav("user", e, true)
+                                props.handlePageNav(
+                                  "user",
+                                  props.editorProfiles[e].profile.username,
+                                  true
+                                )
                               }
                             />
                           </Tooltip>

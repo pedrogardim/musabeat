@@ -12,6 +12,8 @@ import {
 
 import "./SessionGalleryItem.css";
 
+import { useTranslation } from "react-i18next";
+
 import firebase from "firebase";
 
 import { colors } from "../../../utils/materialPalette";
@@ -19,6 +21,8 @@ import { colors } from "../../../utils/materialPalette";
 function SessionGalleryItem(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
+
+  const { t } = useTranslation();
 
   const handleClick = (event) => {
     !event.target.classList.contains("MuiButtonBase-root") &&
@@ -62,7 +66,9 @@ function SessionGalleryItem(props) {
             style={{ fontSize: props.compact && "1.2rem" }}
             className="session-gallery-item-title"
           >
-            {props.session.name}
+            {props.session.name
+              ? props.session.name
+              : t("WSTitle.untitledSession")}
           </Typography>
         </Tooltip>
         {props.isUser && (
@@ -81,7 +87,7 @@ function SessionGalleryItem(props) {
             className="session-gallery-item-subtitle-avatar"
             src={creatorInfo.photoURL}
             onClick={() =>
-              props.handlePageNav("user", props.session.creator, true)
+              props.handlePageNav("user", creatorInfo.username, true)
             }
           />
           <Typography variant="overline">{creatorInfo.username}</Typography>

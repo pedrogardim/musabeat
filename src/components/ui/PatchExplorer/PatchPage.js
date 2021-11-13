@@ -403,7 +403,9 @@ function PatchPage(props) {
           <Avatar
             alt={creatorInfo.profile.username}
             src={creatorInfo.profile.photoURL}
-            onClick={() => props.handlePageNav("user", patchInfo.creator, true)}
+            onClick={() =>
+              props.handlePageNav("user", creatorInfo.profile.username, true)
+            }
           />
         </Tooltip>
       )}
