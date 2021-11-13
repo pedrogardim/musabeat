@@ -109,6 +109,8 @@ function Workspace(props) {
 
   const [optionsMenu, setOptionsMenu] = useState(false);
 
+  const [notifications, setNotifications] = useState([]);
+
   const [listener, setListener] = useState(() => () => {});
 
   const sessionKey = useParams().key;
@@ -259,7 +261,6 @@ function Workspace(props) {
     }
     //
     else if (typeof sessionKey === "string") {
-      console.log(sessionKey);
       let sessionRef = firebase
         .firestore()
         .collection("sessions")
@@ -331,7 +332,9 @@ function Workspace(props) {
           setInstrumentsLoaded,
           moduleIndex,
           "",
-          setModules
+          setModules,
+          () => {},
+          setNotifications
         ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
@@ -366,6 +369,21 @@ function Workspace(props) {
                 .collection("files")
                 .doc(module.instrument.url)
                 .update({ in: firebase.firestore.FieldValue.increment(1) });
+            })
+            .catch((er) => {
+              setInstrumentsLoaded((prev) => {
+                let a = [...prev];
+                a[moduleIndex] = true;
+                return a;
+              });
+
+              let instrument = new Tone.GrainPlayer().toDestination();
+              setInstruments((prev) => {
+                let a = [...prev];
+                a[moduleIndex] = instrument;
+                return a;
+              });
+              setNotifications((prev) => [...prev, module.instrument.url]);
             });
         } else {
           let instrument = new Tone.GrainPlayer();
@@ -401,7 +419,9 @@ function Workspace(props) {
           loadSamplerFromObject(
             module.instrument,
             setInstrumentsLoaded,
-            moduleIndex
+            moduleIndex,
+            () => {},
+            setNotifications
           ).then((r) =>
             setInstruments((prev) => {
               let a = [...prev];
@@ -445,7 +465,9 @@ function Workspace(props) {
           setInstrumentsLoaded,
           index,
           "",
-          setModules
+          setModules,
+          () => {},
+          setNotifications
         ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
@@ -475,9 +497,24 @@ function Workspace(props) {
               a[index] = instrument;
               return a;
             });
+          })
+          .catch((er) => {
+            setInstrumentsLoaded((prev) => {
+              let a = [...prev];
+              a[index] = true;
+              return a;
+            });
+
+            let instrument = new Tone.GrainPlayer().toDestination();
+            setInstruments((prev) => {
+              let a = [...prev];
+              a[index] = instrument;
+              return a;
+            });
+            setNotifications((prev) => [...prev, module.instrument.url]);
           });
       } else {
-        let instrument = new Tone.GrainPlayer();
+        let instrument = new Tone.GrainPlayer().toDestination();
 
         setInstrumentsLoaded((prev) => {
           let a = [...prev];
@@ -494,7 +531,12 @@ function Workspace(props) {
     }
     //load from patch id
     else if (typeof module.instrument === "string") {
-      patchLoader(module.instrument, setInstrumentsLoaded, index).then((r) =>
+      patchLoader(
+        module.instrument,
+        setInstrumentsLoaded,
+        index,
+        setNotifications
+      ).then((r) =>
         setInstruments((prev) => {
           let a = [...prev];
           a[index] = r;
@@ -507,7 +549,9 @@ function Workspace(props) {
         loadSamplerFromObject(
           module.instrument,
           setInstrumentsLoaded,
-          index
+          index,
+          () => {},
+          setNotifications
         ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
@@ -1061,6 +1105,10 @@ function Workspace(props) {
   }, [instrumentsLoaded, sessionData, instruments]);
 
   useEffect(() => {
+    console.log(notifications);
+  }, [notifications]);
+
+  useEffect(() => {
     //console.log("listener", listener);
   }, [listener]);
 
@@ -1113,6 +1161,10 @@ function Workspace(props) {
 
     props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
+
+  useEffect(() => {
+    //console.log(editorProfiles);
+  }, [editorProfiles]);
 
   /**/
 

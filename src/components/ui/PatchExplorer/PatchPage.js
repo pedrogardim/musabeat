@@ -54,6 +54,8 @@ function PatchPage(props) {
   const [editMode, setEditMode] = useState(false);
   const [drumLabels, setDrumLabels] = useState(false);
 
+  const [notifications, setNotifications] = useState([]);
+
   const patchKey = useParams().key;
 
   const categories = props.isDrum ? drumCategories : instrumentsCategories;
@@ -116,7 +118,8 @@ function PatchPage(props) {
           setIsLoaded(true);
         },
         "",
-        setDrumLabels
+        setDrumLabels,
+        setNotifications
       ).then((instr) => {
         setInstrument(instr);
       });
@@ -127,7 +130,8 @@ function PatchPage(props) {
         0,
         () => {
           setIsLoaded(true);
-        }
+        },
+        setNotifications
       ).then((instr) => {
         setInstrument(instr);
       });

@@ -29,7 +29,7 @@ function AuthDialog(props) {
   const [accountInfo, setAccountInfo] = useState({});
   const [fieldErrors, setFieldErrors] = useState([]);
 
-  const [usernameAvaliable, setUsernameAvaliable] = useState(false);
+  const [usernameAvaliable, setUsernameAvaliable] = useState(null);
 
   const [profileAvatar, setProfileAvatar] = useState("");
 

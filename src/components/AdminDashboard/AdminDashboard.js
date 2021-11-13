@@ -2,8 +2,6 @@ import React, { useState } from "react";
 
 import { Tab, Tabs, AppBar } from "@material-ui/core";
 
-import PatchEditor from "./PatchEditor";
-
 import * as Tone from "tone";
 
 import firebase from "firebase";
@@ -118,6 +116,22 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.delete()));
   };
 
+  const missingFileTest = async () => {
+    let missingFiles = [];
+
+    let urlArray = await Promise.all(
+      ["2MsHeX6Tg2TLzwqLcyQr", "2MsHeX6Tg2TLzwqLcyQr1"].map(async (e, i) => {
+        try {
+          return await firebase.storage().ref(e).getDownloadURL();
+        } catch (er) {
+          missingFiles.push(i);
+        }
+      })
+    );
+
+    console.log(urlArray, missingFiles);
+  };
+
   const convertAudio = (file) => {
     console.log(file);
     file.arrayBuffer().then((r) => {
@@ -164,7 +178,7 @@ function AdminDashboard(props) {
       <Button onClick={updatePremium}>updateSessions</Button>
       <Button onClick={updateLikes}>Update files, patches like</Button>*/}
       <Button onClick={updateSessions}>Update session scale</Button>
-      <Button onClick={resetFilesAndPatchesIn}>resetFilesAndPatchesIn</Button>
+      <Button onClick={missingFileTest}>missingFileTest</Button>
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
   );

@@ -253,22 +253,20 @@ function SessionSettings(props) {
               <Grid item>
                 <Typography variant="overline">{t("Editors")}</Typography>
                 <div style={{ display: "flex", flexDirection: "row" }}>
-                  {props.editorProfiles &&
-                  Object.keys(props.editorProfiles).length > 0 ? (
-                    Object.keys(props.editorProfiles).map(
+                  {props.editorProfiles !== null &&
+                  Object.values(props.editorProfiles).length > 0 ? (
+                    Object.values(props.editorProfiles).map(
                       (e) =>
-                        e !== null && (
-                          <Tooltip
-                            title={props.editorProfiles[e].profile.username}
-                          >
+                        e && (
+                          <Tooltip title={e.profile.username}>
                             <Avatar
-                              src={props.editorProfiles[e].profile.photoURL}
-                              alt={props.editorProfiles[e].profile.username}
+                              src={e.profile.photoURL}
+                              alt={e.profile.username}
                               style={{ marginRight: 8 }}
                               onClick={() =>
                                 props.handlePageNav(
                                   "user",
-                                  props.editorProfiles[e].profile.username,
+                                  e.profile.username,
                                   true
                                 )
                               }

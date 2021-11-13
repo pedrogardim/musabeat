@@ -913,7 +913,12 @@ export const createChordProgression = (scale, root, extentions, length) => {
   return chordIndexes.map((e) => scaleChords[e]);
 };
 
-export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
+export const patchLoader = async (
+  input,
+  setInstrumentsLoaded,
+  moduleIndex,
+  setNotifications
+) => {
   let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
@@ -937,7 +942,8 @@ export const patchLoader = async (input, setInstrumentsLoaded, moduleIndex) => {
     return await loadSamplerFromObject(
       patch,
       setInstrumentsLoaded,
-      moduleIndex
+      moduleIndex,
+      setNotifications
     );
   } else {
     instrumentLoaded(true);
@@ -1009,7 +1015,8 @@ export const loadSamplerFromObject = async (
   obj,
   setInstrumentsLoaded,
   moduleIndex,
-  nowLoaded
+  nowLoaded,
+  setNotifications
 ) => {
   let instrumentLoaded = (isLoaded, sampler) => {
     setInstrumentsLoaded((prev) => {
@@ -1030,22 +1037,28 @@ export const loadSamplerFromObject = async (
   //console.log("Sampler!");
 
   let urlArray = await Promise.all(
-    Object.keys(obj.urls).map(
-      async (e, i) => await firebase.storage().ref(obj.urls[e]).getDownloadURL()
-    )
+    Object.keys(obj.urls).map(async (e, i) => {
+      try {
+        return await firebase.storage().ref(obj.urls[e]).getDownloadURL();
+      } catch (er) {
+        setNotifications((prev) => [...prev, obj.urls[e]]);
+      }
+    })
   );
 
   //console.log(urlArray);
 
   let urls = Object.fromEntries(
-    urlArray.map((e, i) => [Object.keys(obj.urls)[i], e])
+    urlArray
+      .filter((e) => e !== undefined)
+      .map((e, i) => [Object.keys(obj.urls)[i], e])
   );
 
   //console.log(urls);
 
-  let sampler = new Tone.Sampler(urls, () =>
-    instrumentLoaded(true, sampler)
-  ).toDestination();
+  let sampler = new Tone.Sampler(urls, () => {
+    instrumentLoaded(true, sampler);
+  }).toDestination();
 
   //sampler.set(options);
 
@@ -1075,7 +1088,8 @@ export const loadDrumPatch = async (
   moduleIndex,
   onLoad,
   setModules,
-  setLabels
+  setLabels,
+  setNotifications
 ) => {
   //drum patch with stardard configuration
   let patchRef =
@@ -1099,19 +1113,26 @@ export const loadDrumPatch = async (
     return new Tone.Players();
   }
 
+  let missingFiles = [];
+
   //get urls from file ids
 
   let urlArray = await Promise.all(
-    Object.keys(patch.urls).map(
-      async (e, i) =>
-        await firebase.storage().ref(patch.urls[e]).getDownloadURL()
-    )
+    Object.keys(patch.urls).map(async (e, i) => {
+      try {
+        return await firebase.storage().ref(patch.urls[e]).getDownloadURL();
+      } catch (er) {
+        setNotifications((prev) => [...prev, patch.urls[e]]);
+      }
+    })
   );
 
   //console.log(urlArray);
 
   let urls = Object.fromEntries(
-    urlArray.map((e, i) => [Object.keys(patch.urls)[i], e])
+    urlArray
+      .filter((e) => e !== undefined)
+      .map((e, i) => [Object.keys(patch.urls)[i], e])
   );
 
   //console.log(urls);

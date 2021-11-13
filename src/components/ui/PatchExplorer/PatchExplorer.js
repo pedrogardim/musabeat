@@ -88,6 +88,8 @@ function PatchExplorer(props) {
   const [searchTags, setSearchTags] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
+  const [notifications, setNotifications] = useState([]);
+
   const categories = props.isDrum ? drumCategories : instrumentsCategories;
 
   const usersRef = firebase.firestore().collection("users");
@@ -131,7 +133,8 @@ function PatchExplorer(props) {
         loadDrumPatch(
           patchdata[index],
           props.compact ? props.setInstrumentsLoaded : () => {},
-          props.index
+          props.index,
+          setNotifications
         ).then((instr) => {
           props.setInstrument(instr);
         });
@@ -139,7 +142,9 @@ function PatchExplorer(props) {
         loadSamplerFromObject(
           patchdata[index],
           props.compact ? props.setInstrumentsLoaded : () => {},
-          props.index
+          props.index,
+          () => {},
+          setNotifications
         ).then((instr) => {
           props.setInstrument(instr);
         });
@@ -472,7 +477,8 @@ function PatchExplorer(props) {
           (sampler) => {
             playSequence(sampler, index);
             setLoadingPlay(null);
-          }
+          },
+          setNotifications
         ).then((instr) => {
           setInstruments((prev) => {
             let newInstruments = [...prev];
