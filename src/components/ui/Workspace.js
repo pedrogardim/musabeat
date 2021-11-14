@@ -611,7 +611,10 @@ function Workspace(props) {
   const updateFromDatabase = (sessionSnapshot) => {
     setIsLastChangeFromServer(true);
     //console.log("read");
-    setModules(() => {
+    setModules((prev) => {
+      let index = sessionSnapshot.modules.length - 1;
+      if (prev.length < sessionSnapshot.modules.length)
+        loadNewModuleInstrument(sessionSnapshot.modules[index], index);
       //console.log("inside setter");
       return sessionSnapshot.modules;
     });
@@ -1041,8 +1044,12 @@ function Workspace(props) {
     if (isLoaded) {
       savingMode === "simple" && setAreUnsavedChanges(true);
 
-      if (savingMode === "rte" && !isLastChangeFromServer)
-        saveToDatabase(modules, null);
+      if (savingMode === "rte") {
+        if (isLastChangeFromServer) {
+        } else {
+          saveToDatabase(modules, null);
+        }
+      }
 
       modules && handleUndo();
     }
