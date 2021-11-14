@@ -94,9 +94,12 @@ function Sequencer(props) {
   const updateModuleSequence = () => {
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
+        let checker =
+          JSON.stringify(previousModules[props.index].score) !==
+          JSON.stringify(sequencerArray);
         let newModules = [...previousModules];
         newModules[props.index].score = sequencerArray;
-        return newModules;
+        return checker ? newModules : previousModules;
       });
   };
 

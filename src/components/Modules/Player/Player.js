@@ -141,9 +141,11 @@ function Player(props) {
   useEffect(() => {
     props.isSessionLoaded &&
       props.setModules((prev) => {
+        let checker =
+          JSON.stringify(prev[props.index].score) !== JSON.stringify(score);
         let newModules = [...prev];
         newModules[props.index].score = [...score];
-        return newModules;
+        return checker ? newModules : prev;
       });
   }, [score]);
 

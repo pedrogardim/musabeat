@@ -132,9 +132,12 @@ function MelodyGrid(props) {
   const updateModuleSequence = () => {
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
+        let checker =
+          JSON.stringify(previousModules[props.index].score) !==
+          JSON.stringify(melodyArray);
         let newModules = [...previousModules];
         newModules[props.index].score = melodyArray;
-        return newModules;
+        return checker ? newModules : previousModules;
       });
   };
 

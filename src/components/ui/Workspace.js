@@ -112,6 +112,7 @@ function Workspace(props) {
   const [notifications, setNotifications] = useState([]);
 
   const [listener, setListener] = useState(() => () => {});
+  const [isLastChangeFromServer, setIsLastChangeFromServer] = useState(false);
 
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
@@ -576,7 +577,7 @@ function Workspace(props) {
     });
   };
 
-  const saveToDatabase = (mod, data) => {
+  const saveToDatabase = (mod, data, a) => {
     //console.log(DBSessionRef, isLoaded);
     if (DBSessionRef !== null) {
       savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
@@ -599,6 +600,8 @@ function Workspace(props) {
         newSessionData.modules = newModules;
       }
 
+      //console.log("write");
+
       DBSessionRef.update({
         ...newSessionData,
       });
@@ -606,11 +609,11 @@ function Workspace(props) {
   };
 
   const updateFromDatabase = (sessionSnapshot) => {
-    setModules((prev) => {
-      let check =
-        JSON.stringify(prev) !== JSON.stringify(sessionSnapshot.modules);
-      //console.log(check ? "It's different modules" : "It's the same modules");
-      return check ? sessionSnapshot.modules : prev;
+    setIsLastChangeFromServer(true);
+    //console.log("read");
+    setModules(() => {
+      //console.log("inside setter");
+      return sessionSnapshot.modules;
     });
 
     let data = { ...sessionSnapshot };
@@ -695,13 +698,6 @@ function Workspace(props) {
     timelineMode ? getSessionSizeFromTimeline() : adaptSessionSize();
   };
 
-  /*   const changeChecker = (mod, data) => {
-    setAreUnsavedChanges((prev) => {
-      prev && saveToDatabase(mod, data);
-      return prev ? false : prev;
-    });
-  }; */
-
   const updateSavingMode = (input) => {
     //console.log("inin", input);
     if (input === "simple") {
@@ -718,13 +714,14 @@ function Workspace(props) {
     } else {
       //console.log(DBSessionRef);
       if (!props.hidden && DBSessionRef !== null) {
-        //console.log("RTE Activated", DBSessionRef);
+        //console.log("RTE Activated");
         listener();
         setAreUnsavedChanges(false);
         saveToDatabase(modules, sessionData);
         let DBlistener = DBSessionRef.onSnapshot(
           (snapshot) => {
-            updateFromDatabase(snapshot.data());
+            !snapshot.metadata.hasPendingWrites &&
+              updateFromDatabase(snapshot.data());
           },
           (er) => {
             console.log("onSnapshot Error:", er);
@@ -1038,15 +1035,19 @@ function Workspace(props) {
   useEffect(() => {
     !timelineMode && adaptSessionSize();
     //registerSession();
+    //console.log(isLastChangeFromServer ? "server change" : "local change");
     console.log(modules);
     //console.log(modules, instruments, instrumentsLoaded);
     if (isLoaded) {
       savingMode === "simple" && setAreUnsavedChanges(true);
 
-      savingMode === "rte" && saveToDatabase(modules, null);
+      if (savingMode === "rte" && !isLastChangeFromServer)
+        saveToDatabase(modules, null);
 
       modules && handleUndo();
     }
+
+    setIsLastChangeFromServer(false);
   }, [modules]);
 
   useEffect(() => {

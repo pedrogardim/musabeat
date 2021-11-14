@@ -129,10 +129,13 @@ function ChordProgression(props) {
 
   const updateChords = () => {
     props.isSessionLoaded &&
-      props.updateModules((previousModules) => {
+      props.setModules((previousModules) => {
+        let checker =
+          JSON.stringify(previousModules[props.index].score) !==
+          JSON.stringify(chords);
         let newModules = [...previousModules];
         newModules[props.index].score = chords;
-        return newModules;
+        return checker ? newModules : previousModules;
       });
     //update timeline on module size modified
 

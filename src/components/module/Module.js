@@ -436,7 +436,7 @@ function Module(props) {
           sessionSize={props.sessionSize}
           index={props.index}
           module={props.module}
-          updateModules={props.setModules}
+          setModules={props.setModules}
           timeline={props.timeline}
           timelineMode={props.timelineMode}
           setTimeline={props.setTimeline}

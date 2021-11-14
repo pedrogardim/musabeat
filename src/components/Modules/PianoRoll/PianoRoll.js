@@ -246,9 +246,13 @@ function PianoRoll(props) {
     scheduleEvents();
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
+        let checker =
+          JSON.stringify(previousModules[props.index].score) !==
+          JSON.stringify(notes);
+
         let newModules = [...previousModules];
         newModules[props.index].score = notes;
-        return newModules;
+        return checker ? newModules : previousModules;
       });
   }, [notes]);
 
