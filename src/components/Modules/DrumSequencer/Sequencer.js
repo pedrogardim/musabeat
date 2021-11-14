@@ -91,14 +91,17 @@ function Sequencer(props) {
     setCurrentBeat(0);
   };
 
-  const updateModuleSequence = () => {
+  const updateModuleSequence = (a) => {
     props.isSessionLoaded &&
       props.setModules((previousModules) => {
         let checker =
           JSON.stringify(previousModules[props.index].score) !==
           JSON.stringify(sequencerArray);
+        //console.log(checker);
         let newModules = [...previousModules];
-        newModules[props.index].score = sequencerArray;
+        newModules[props.index].score = JSON.parse(
+          JSON.stringify(sequencerArray)
+        );
         return checker ? newModules : previousModules;
       });
   };

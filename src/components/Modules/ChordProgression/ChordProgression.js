@@ -134,7 +134,7 @@ function ChordProgression(props) {
           JSON.stringify(previousModules[props.index].score) !==
           JSON.stringify(chords);
         let newModules = [...previousModules];
-        newModules[props.index].score = chords;
+        newModules[props.index].score = JSON.parse(JSON.stringify(chords));
         return checker ? newModules : previousModules;
       });
     //update timeline on module size modified

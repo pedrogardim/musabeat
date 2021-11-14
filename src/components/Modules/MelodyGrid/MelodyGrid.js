@@ -136,7 +136,7 @@ function MelodyGrid(props) {
           JSON.stringify(previousModules[props.index].score) !==
           JSON.stringify(melodyArray);
         let newModules = [...previousModules];
-        newModules[props.index].score = melodyArray;
+        newModules[props.index].score = JSON.parse(JSON.stringify(melodyArray));
         return checker ? newModules : previousModules;
       });
   };

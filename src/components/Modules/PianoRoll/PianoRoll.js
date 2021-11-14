@@ -251,7 +251,7 @@ function PianoRoll(props) {
           JSON.stringify(notes);
 
         let newModules = [...previousModules];
-        newModules[props.index].score = notes;
+        newModules[props.index].score = JSON.parse(JSON.stringify(notes));
         return checker ? newModules : previousModules;
       });
   }, [notes]);

@@ -144,7 +144,7 @@ function Player(props) {
         let checker =
           JSON.stringify(prev[props.index].score) !== JSON.stringify(score);
         let newModules = [...prev];
-        newModules[props.index].score = [...score];
+        newModules[props.index].score = JSON.parse(JSON.stringify(score));
         return checker ? newModules : prev;
       });
   }, [score]);
