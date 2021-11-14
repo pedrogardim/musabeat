@@ -92,7 +92,11 @@ function WorkspaceTitle(props) {
         <title>
           {props.sessionData &&
             props.editorProfiles !== null &&
-            `${props.sessionData.name} by ${
+            `${
+              props.sessionData.name
+                ? props.sessionData.name
+                : t("WSTitle.untitledSession")
+            } by ${
               props.editorProfiles[props.sessionData.creator].profile.username
             } `}
         </title>

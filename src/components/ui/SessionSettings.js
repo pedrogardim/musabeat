@@ -130,7 +130,7 @@ function SessionSettings(props) {
                 lg={12}
                 xs={12}
               >
-                <Tooltip
+                {/* <Tooltip
                   title={
                     !props.premiumMode
                       ? "Upgrade to Premium to use this feature"
@@ -138,23 +138,28 @@ function SessionSettings(props) {
                   }
                   interactive={!props.premiumMode}
                   placement="top-start"
-                >
-                  <FormControlLabel
-                    className="session-settings-checkbox-lbl"
-                    control={
-                      <Checkbox
-                        color="primary"
-                        checked={newSessionData.hid}
-                        disabled={!props.premiumMode}
-                        onChange={(e) =>
-                          handleInfoChange("hid", e.target.checked)
-                        }
-                      />
-                    }
-                    label="Hidden session"
-                    labelPlacement="end"
-                  />
-                </Tooltip>
+                > */}
+                <FormControlLabel
+                  className="session-settings-checkbox-lbl"
+                  control={
+                    <Checkbox
+                      color="primary"
+                      checked={newSessionData.hid}
+                      /* disabled={!props.premiumMode} */
+                      disabled={true}
+                      onChange={(e) =>
+                        handleInfoChange("hid", e.target.checked)
+                      }
+                    />
+                  }
+                  label={
+                    t("workspace.options.hiddenSession") +
+                    " " +
+                    t("misc.comingSoon")
+                  }
+                  labelPlacement="end"
+                />
+                {/* </Tooltip>
                 <Tooltip
                   title={
                     !props.premiumMode
@@ -163,23 +168,28 @@ function SessionSettings(props) {
                   }
                   interactive={!props.premiumMode}
                   placement="top-start"
-                >
-                  <FormControlLabel
-                    className="session-settings-checkbox-lbl"
-                    control={
-                      <Checkbox
-                        color="primary"
-                        checked={newSessionData.alwcp}
-                        disabled={!props.premiumMode}
-                        onChange={(e) =>
-                          handleInfoChange("alwcp", e.target.checked)
-                        }
-                      />
-                    }
-                    label="Allow Copies"
-                    labelPlacement="end"
-                  />
-                </Tooltip>
+                > */}
+                <FormControlLabel
+                  className="session-settings-checkbox-lbl"
+                  control={
+                    <Checkbox
+                      color="primary"
+                      checked={newSessionData.alwcp}
+                      /* disabled={!props.premiumMode} */
+                      disabled={true}
+                      onChange={(e) =>
+                        handleInfoChange("alwcp", e.target.checked)
+                      }
+                    />
+                  }
+                  label={
+                    t("workspace.options.allowCopies") +
+                    " " +
+                    t("misc.comingSoon")
+                  }
+                  labelPlacement="end"
+                />
+                {/* </Tooltip>
                 <Tooltip
                   title={
                     !props.premiumMode
@@ -188,23 +198,28 @@ function SessionSettings(props) {
                   }
                   interactive={!props.premiumMode}
                   placement="top-start"
-                >
-                  <FormControlLabel
-                    className="session-settings-checkbox-lbl"
-                    control={
-                      <Checkbox
-                        color="primary"
-                        checked={newSessionData.rte}
-                        disabled={!props.premiumMode}
-                        onChange={(e) =>
-                          handleInfoChange("rte", e.target.checked)
-                        }
-                      />
-                    }
-                    label="Real-time Editing"
-                    labelPlacement="end"
-                  />
-                </Tooltip>
+                > */}
+                <FormControlLabel
+                  className="session-settings-checkbox-lbl"
+                  control={
+                    <Checkbox
+                      color="primary"
+                      checked={newSessionData.rte}
+                      /* disabled={!props.premiumMode} */
+                      disabled={true}
+                      onChange={(e) =>
+                        handleInfoChange("rte", e.target.checked)
+                      }
+                    />
+                  }
+                  label={
+                    t("workspace.options.realtimeEdit") +
+                    " " +
+                    t("misc.comingSoon")
+                  }
+                  labelPlacement="end"
+                />
+                {/* </Tooltip> */}
               </Grid>
             </Grid>
 

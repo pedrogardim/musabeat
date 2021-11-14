@@ -167,7 +167,7 @@ function MelodyGrid(props) {
         musicalNotes[moduleRoot] + "" + (props.module.range[1] + 1)
       ).toNote()
     );
-    console.log(newNotes);
+    //console.log(newNotes);
     setGridScale(newNotes.filter((e) => e !== "undefinedNaN"));
     //TODO: Handle Hidden Notes
   };

@@ -127,6 +127,11 @@ function Module(props) {
     });
   };
 
+  const handleHeaderClick = (e) => {
+    console.log(e.target.className);
+    e.target.className === "module-header" && setFullScreen((prev) => !prev);
+  };
+
   //method moved to Workspace
   /* const handleModuleDuplicate = () => {
     props.setModules((prev) => [...prev, { ...prev[props.index] }]);
@@ -562,10 +567,7 @@ function Module(props) {
           props.isFocused && "module-focused"
         }`}
       >
-        <div
-          className="module-header"
-          onDoubleClick={() => setFullScreen((prev) => !prev)}
-        >
+        <div className="module-header" onClick={handleHeaderClick}>
           {modulePage !== null && (
             <IconButton
               className="module-back-button"
@@ -574,7 +576,7 @@ function Module(props) {
               <Icon style={{ fontSize: 20 }}>arrow_back_ios</Icon>
             </IconButton>
           )}
-          <span className="module-title">
+          <span className="module-title" style={{ cursor: "default" }}>
             {props.module.name
               ? props.module.name
               : t(`modulePicker.types.${props.module.type}.name`)}
@@ -666,13 +668,15 @@ function Module(props) {
               <Icon className="module-menu-option-icon">settings</Icon>
               {t("module.options.settings")}
             </MenuItem>
+            {/*COMING_SOON*/}
             <MenuItem
-              onClick={handleEffectButtonMode}
+              /* onClick={handleEffectButtonMode} */
               className="module-menu-option"
               tabIndex={-1}
+              style={{ color: "gray" }}
             >
               <Icon className="module-menu-option-icon">blur_on</Icon>
-              {t("module.options.effects")}
+              {t("module.options.effects") + " " + t("misc.comingSoon")}
             </MenuItem>
             <MenuItem
               onClick={() => props.duplicateModule(props.index)}

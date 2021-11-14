@@ -102,7 +102,13 @@ function SessionGalleryItem(props) {
               className="session-gallery-item-module"
               style={{ backgroundColor: colors[e.color][500], borderRadius: 0 }}
             >
-              <Tooltip title={`"${e.name}"`}>
+              <Tooltip
+                title={
+                  e.name
+                    ? `"${e.name}"`
+                    : t(`modulePicker.types.${e.type}.name`)
+                }
+              >
                 <Icon>
                   {e.type === 0
                     ? "grid_on"

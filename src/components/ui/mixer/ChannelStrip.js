@@ -6,7 +6,11 @@ import "./ChannelStrip.css";
 
 //import { scheduleDrumSequence, scheduleChordProgression } from "../utils/exportUtils";
 
+import { useTranslation } from "react-i18next";
+
 function ChannelStrip(props) {
+  const { t } = useTranslation();
+
   const [volume, setVolume] = useState(props.module.volume.toFixed(2));
 
   const handleSliderMove = (e, v) => {
@@ -41,10 +45,12 @@ function ChannelStrip(props) {
       </IconButton>
       <Typography variant="overline" style={{ textTransform: "none" }}>
         {" "}
-        {props.module.muted ? "MUTED" : volume + " dB"}{" "}
+        {props.module.muted ? "MUTED" : volume + " dB"}
       </Typography>
       <Typography variant="overline" className="mixer-channel-strip-title">
-        {props.module.name}{" "}
+        {props.module.name
+          ? props.module.name
+          : t(`modulePicker.types.${props.module.type}.name`)}
       </Typography>
     </div>
   );

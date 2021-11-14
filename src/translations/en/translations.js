@@ -49,6 +49,11 @@ export const TRANSLATIONS_EN = {
       pasteSuccessChord: "Copied chord pasted on module",
       stepsChange: "Steps on target were changed to",
     },
+    options: {
+      hiddenSession: "Hidden Session",
+      allowCopies: "Allow Copies",
+      realtimeEdit: "Real-time Editing",
+    },
   },
   WSTitle: {
     viewMode:
@@ -119,6 +124,7 @@ export const TRANSLATIONS_EN = {
     offlineAlert:
       "MusaBeat requires a stable connection to the server. Check your internet connetion.",
     initialModules: "Initial Modules",
+    comingSoon: "(Coming Soon)",
   },
   dialogs: {
     cancel: "Cancel",
