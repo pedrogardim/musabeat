@@ -1064,7 +1064,9 @@ function Workspace(props) {
 
   useEffect(() => {
     if (isLoaded) {
-      !timelineMode && adaptSessionSize();
+      timelineMode
+        ? adaptSessionSize()
+        : setSessionSize(sessionData.timeline.size);
       sessionData &&
         timelineMode !== sessionData.timeline.on &&
         setSessionData((prev) => {

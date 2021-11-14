@@ -115,8 +115,6 @@ function WorkspaceTimeline(props) {
       }, 16)
     );
 
-    handleSessionSizeChange({ target: { value: props.sessionSize } });
-
     return () => {
       //console.log("cleared");
       clearInterval(cursorAnimator);

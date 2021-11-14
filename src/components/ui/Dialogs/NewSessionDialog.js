@@ -68,7 +68,7 @@ const sessionTemplate = {
   bpm: 120,
   root: 0,
   scale: 0,
-  timeline: {},
+  timeline: { on: false, size: 1 },
   modules: [],
 };
 
