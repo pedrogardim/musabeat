@@ -380,6 +380,7 @@ function FileExplorer(props) {
       .doc(filedata[index].user)
       .update({
         files: firebase.firestore.FieldValue.arrayRemove(fileId),
+        sp: firebase.firestore.FieldValue.increment(-filedata[index].size),
       });
 
     setFiledata((prev) => prev.filter((e, i) => i !== index));

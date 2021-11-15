@@ -102,18 +102,22 @@ function AdminDashboard(props) {
 
   //DANGER
 
-  const deleteAllSessions = () => {
+  const fixUserSpace = () => {
     firebase
       .firestore()
-      .collection("users")
+      .collection("files")
       .get()
-      .then((r) => r.forEach((e) => e.ref.update({ likes: [], sessions: [] })));
-
-    firebase
-      .firestore()
-      .collection("sessions")
-      .get()
-      .then((r) => r.forEach((e) => e.ref.delete()));
+      .then((r) =>
+        r.forEach((e) =>
+          firebase
+            .firestore()
+            .collection("users")
+            .doc(e.data().user)
+            .update({
+              sp: firebase.firestore.FieldValue.increment(e.data().size),
+            })
+        )
+      );
   };
 
   const missingFileTest = async () => {
@@ -178,7 +182,9 @@ function AdminDashboard(props) {
       <Button onClick={updatePremium}>updateSessions</Button>
       <Button onClick={updateLikes}>Update files, patches like</Button>*/}
       <Button onClick={updateSessions}>Update session scale</Button>
-      <Button onClick={missingFileTest}>missingFileTest</Button>
+      <Button onClick={missingFileTest}>missing File Test</Button>
+      <Button onClick={fixUserSpace}>fix User Space</Button>
+
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
   );
