@@ -39,6 +39,7 @@
 .fet-compact {
   min-height: 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
 }
 
 .fet-cont {
@@ -58,8 +59,8 @@
 }
 
 .file-explorer-compact-bottom-nav {
-  /* position: absolute; */
-
+  position: absolute;
+  bottom: 0;
   width: 100%;
 }
 
@@ -75,6 +76,7 @@
 
 .file-explorer-searchbar-compact {
   margin: 8px !important;
+  max-width: calc(100% - 32px) !important;
 }
 
 .fet-chip-cell {

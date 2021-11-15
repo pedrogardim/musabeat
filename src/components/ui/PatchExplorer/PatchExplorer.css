@@ -38,6 +38,7 @@
 .pet-compact {
   min-height: 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
 }
 
 .pet-cont {
@@ -56,8 +57,8 @@
 }
 
 .patch-explorer-compact-bottom-nav {
-  /* position: absolute; */
-
+  position: absolute;
+  bottom: 0;
   width: 100%;
 }
 
@@ -74,6 +75,7 @@
 
 .patch-explorer-searchbar-compact {
   margin: 8px !important;
+  max-width: calc(100% - 32px) !important;
 }
 
 .pet-chip-cell {
