@@ -18,6 +18,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  LinearProgress,
+  Typography,
 } from "@material-ui/core";
 
 import * as Tone from "tone";
@@ -41,6 +43,10 @@ function FileUploader(props) {
   const [duplicatedFilesInfo, setDuplicatedFilesInfo] = useState([]);
   const [uploadingFileTags, setUploadingFileTags] = useState([]);
 
+  const [userInfo, setUserInfo] = useState(null);
+  const [userStorageUsage, setUserStorageUsage] = useState(0);
+  const [userStorageMax, setUserStorageMax] = useState(0);
+
   const [uploadingFilesBuffer, setUploadingFilesBuffer] = useState([]);
 
   const [labelsOnInstrument, setLabelsOnInstrument] = useState([]);
@@ -52,6 +58,8 @@ function FileUploader(props) {
 
   const user = firebase.auth().currentUser;
 
+  const userRef = firebase.firestore().collection("users").doc(user.uid);
+
   const onClose = () => {
     props.setUploadingFiles([]);
     setUploadingFileTags([]);
@@ -60,6 +68,15 @@ function FileUploader(props) {
     setUploadState([]);
     setLabelsOnInstrument([]);
     setUploadingFilesBuffer([]);
+  };
+
+  const getInitialUserInfo = () => {
+    user &&
+      userRef.get().then((r) => {
+        let checkPr = r.data().pr.seconds > ~~(+new Date() / 1000);
+        setUserStorageMax(checkPr ? 10737418240 : 536870912);
+        setUserStorageUsage(r.data().sp);
+      });
   };
 
   const uploadFiles = () => {
@@ -71,7 +88,7 @@ function FileUploader(props) {
       //file to arraybuffer
       console.log(file);
       file.arrayBuffer().then((arraybuffer) => {
-        console.log(arraybuffer);
+        //console.log(arraybuffer);
 
         //arraybuffer to audiobuffer
         props.instrument.context.rawContext.decodeAudioData(
@@ -195,84 +212,100 @@ function FileUploader(props) {
                       //upload file to storage
                       const storageRef = firebase.storage().ref(ref.id);
 
-                      firebase
-                        .firestore()
-                        .collection("users")
-                        .doc(user.uid)
-                        .get()
-                        .then((r) => {
-                          let checkPr =
-                            r.data().pr.seconds > ~~(+new Date() / 1000);
+                      userRef.get().then((r) => {
+                        let checkPr =
+                          r.data().pr.seconds > ~~(+new Date() / 1000);
 
-                          let finalFile =
-                            file.type !== "audio/mpeg" && !checkPr
-                              ? encodeAudioFile(audiobuffer, "mp3")
-                              : file;
+                        setUserStorageMax(checkPr ? 10487418240 : 536870912);
+                        setUserStorageUsage(r.data().sp);
 
-                          const task = storageRef.put(finalFile);
+                        let finalFile =
+                          file.type !== "audio/mpeg" && !checkPr
+                            ? encodeAudioFile(audiobuffer, "mp3")
+                            : file;
 
-                          setUploadingFileIds((prev) => {
-                            let newFileIds = [...prev];
-                            newFileIds[i] = ref.id;
-                            return newFileIds;
+                        if (
+                          r.data().sp + finalFile.size >
+                          (checkPr ? 10737418240 : 536870912)
+                        ) {
+                          setUploadState((prev) => {
+                            let newState = [...prev];
+                            newState[i] = "noSpace";
+                            return newState;
                           });
 
-                          task.on(
-                            "state_changed",
-                            (snapshot) => {
-                              setUploadState((prev) => {
-                                let newState = [...prev];
-                                newState[i] =
-                                  (snapshot.bytesTransferred /
-                                    snapshot.totalBytes) *
-                                  100;
-                                return newState;
-                              });
-                            },
-                            (error) => {
-                              console.log(error);
-                              filesRef.doc(ref.id).remove();
+                          return;
+                        }
 
-                              setUploadState((prev) => {
-                                let newState = [...prev];
-                                newState[i] = "uploadError";
-                                return newState;
-                              });
+                        const task = storageRef.put(finalFile);
 
-                              return;
-                            },
-                            () => {
-                              /////IF UPLOAD SUCCEDS
-
-                              //update instrument on "modules"
-
-                              Boolean(props.onInstrumentMod) &&
-                                props.onInstrumentMod(
-                                  ref.id,
-                                  labelOnInstrument,
-                                  slotToInsetFile
-                                );
-
-                              props.updateOnFileLoaded &&
-                                props.updateOnFileLoaded();
-
-                              props.module.type !== 3 && props.getFilesName();
-
-                              //add file id to user in db
-
-                              const userRef = firebase
-                                .firestore()
-                                .collection("users")
-                                .doc(user.uid);
-
-                              userRef.update({
-                                files: firebase.firestore.FieldValue.arrayUnion(
-                                  ref.id
-                                ),
-                              });
-                            }
-                          );
+                        setUploadingFileIds((prev) => {
+                          let newFileIds = [...prev];
+                          newFileIds[i] = ref.id;
+                          return newFileIds;
                         });
+
+                        task.on(
+                          "state_changed",
+                          (snapshot) => {
+                            setUploadState((prev) => {
+                              let newState = [...prev];
+                              newState[i] =
+                                (snapshot.bytesTransferred /
+                                  snapshot.totalBytes) *
+                                100;
+                              return newState;
+                            });
+                          },
+                          (error) => {
+                            console.log(error);
+                            filesRef.doc(ref.id).remove();
+
+                            setUploadState((prev) => {
+                              let newState = [...prev];
+                              newState[i] = "uploadError";
+                              return newState;
+                            });
+
+                            return;
+                          },
+                          () => {
+                            /////IF UPLOAD SUCCEDS
+
+                            //update instrument on "modules"
+
+                            Boolean(props.onInstrumentMod) &&
+                              props.onInstrumentMod(
+                                ref.id,
+                                labelOnInstrument,
+                                slotToInsetFile
+                              );
+
+                            props.updateOnFileLoaded &&
+                              props.updateOnFileLoaded();
+
+                            props.module.type !== 3 && props.getFilesName();
+
+                            //add file id to user in db
+
+                            const userRef = firebase
+                              .firestore()
+                              .collection("users")
+                              .doc(user.uid);
+
+                            userRef.update({
+                              files: firebase.firestore.FieldValue.arrayUnion(
+                                ref.id
+                              ),
+                              sp: firebase.firestore.FieldValue.increment(
+                                finalFile.size
+                              ),
+                            });
+
+                            setUserStorageUsage(r.data().sp + finalFile.size);
+                          }
+                        );
+                      });
                     });
                   }
                   //the file is already uploaded to server, get its id
@@ -378,8 +411,8 @@ function FileUploader(props) {
   }, [props.files]);
 
   useEffect(() => {
-    //console.log(uploadState);
-  }, [uploadState]);
+    getInitialUserInfo();
+  }, []);
 
   return (
     <Dialog open={props.open} onClose={onClose} fullWidth maxWidth={"md"}>
@@ -446,7 +479,15 @@ function FileUploader(props) {
                         value={uploadState}
                       />
                     ) : (
-                      <Icon color="primary">
+                      <Icon
+                        color={
+                          typeof uploadState[i] !== "number" &&
+                          uploadState[i] !== "duplicatedFound" &&
+                          uploadState[i] !== "importedLocally"
+                            ? "secondary"
+                            : "primary"
+                        }
+                      >
                         {uploadState[i] === 100
                           ? "done"
                           : uploadState[i] === "uploadError"
@@ -459,6 +500,8 @@ function FileUploader(props) {
                           ? "warning"
                           : uploadState[i] === "importedLocally"
                           ? "offline_pin"
+                          : uploadState[i] === "noSpace"
+                          ? "inventory_2"
                           : uploadState[i]}
                       </Icon>
                     )}
@@ -474,9 +517,21 @@ function FileUploader(props) {
           {t("dialogs.delete")}
         </Button> */}
       </DialogActions>
+
       <IconButton onClick={onClose} className="mp-closebtn" color="primary">
         <Icon>close</Icon>
       </IconButton>
+
+      <div style={{ position: "absolute", bottom: 8, width: "60%", left: 16 }}>
+        <LinearProgress
+          variant="determinate"
+          value={userStorageUsage / userStorageMax}
+        />
+        <Typography variant="overline">{`Space Used: ${formatBytes(
+          userStorageUsage
+        )} / ${formatBytes(userStorageMax)}`}</Typography>
+      </div>
+
       <Menu
         anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
         keepMounted
@@ -503,3 +558,14 @@ function FileUploader(props) {
 }
 
 export default FileUploader;
+
+function formatBytes(a, b = 2) {
+  if (0 === a) return "0 Bytes";
+  const c = 0 > b ? 0 : b,
+    d = Math.floor(Math.log(a) / Math.log(1024));
+  return (
+    parseFloat((a / Math.pow(1024, d)).toFixed(c)) +
+    " " +
+    ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+  );
+}
