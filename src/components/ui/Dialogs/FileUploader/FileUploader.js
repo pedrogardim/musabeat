@@ -216,7 +216,7 @@ function FileUploader(props) {
                         let checkPr =
                           r.data().pr.seconds > ~~(+new Date() / 1000);
 
-                        setUserStorageMax(checkPr ? 10487418240 : 536870912);
+                        setUserStorageMax(checkPr ? 10737418240 : 536870912);
                         setUserStorageUsage(r.data().sp);
 
                         let finalFile =
