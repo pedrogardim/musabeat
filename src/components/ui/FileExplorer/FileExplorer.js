@@ -158,7 +158,7 @@ function FileExplorer(props) {
         rules = rules.where("categ", "array-contains-any", tagsIds);
       }
       if (!clear && !isFirstQuery && lastItem) {
-        console.log("next page");
+        //console.log("next page");
         rules = rules.startAfter(lastItem);
       }
 
@@ -428,7 +428,7 @@ function FileExplorer(props) {
 
   const onAppWrapperScrollTrigger = () => {
     !isQueryEnd && !isLoading && props.explore && getFilesList();
-    props.setBottomScroll(false);
+    !props.compact && props.setBottomScroll(false);
   };
 
   useEffect(() => {

@@ -52,13 +52,10 @@
   overflow-y: scroll;
   overflow-x: hidden !important;
   min-height: 0;
-
   flex: 1;
 }
 
 .patch-explorer-compact-bottom-nav {
-  position: absolute;
-  bottom: 0;
   width: 100%;
 }
 

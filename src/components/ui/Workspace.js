@@ -232,7 +232,7 @@ function Workspace(props) {
       setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
-      console.log("session is null!");
+      //console.log("session is null!");
       setModules([]);
     }
     //
@@ -1122,7 +1122,7 @@ function Workspace(props) {
   }, [instrumentsLoaded, sessionData, instruments]);
 
   useEffect(() => {
-    console.log(notifications);
+    //console.log(notifications);
   }, [notifications]);
 
   useEffect(() => {

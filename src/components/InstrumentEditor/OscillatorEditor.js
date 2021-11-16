@@ -40,7 +40,7 @@ function OscillatorEditor(props) {
     setOscType(oscillatorType);
     setOscPartials(oscillatorPartials);
 
-    console.log(oscillatorWave, oscillatorType, oscillatorPartials);
+    //console.log(oscillatorWave, oscillatorType, oscillatorPartials);
   };
 
   const handleOscWaveSelect = (event) => {

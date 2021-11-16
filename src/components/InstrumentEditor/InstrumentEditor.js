@@ -222,7 +222,7 @@ function InstrumentEditor(props) {
       Tone.Frequency(newNote).toMidi(),
       drumMap.get(Tone.Frequency(note).toMidi())
     );
-    console.log(drumMap.delete(Tone.Frequency(note).toMidi()));
+    //console.log(drumMap.delete(Tone.Frequency(note).toMidi()));
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     if (typeof props.module.instrument === "string") {

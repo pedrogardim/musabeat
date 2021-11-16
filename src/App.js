@@ -304,7 +304,13 @@ function App() {
             />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles user={user} handlePageNav={handlePageNav} />
+            <FileExplorer
+              userFiles
+              user={user}
+              handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
+            />
           </Route>
           <Route exact path="/file/:key">
             <FilePage user={user} handlePageNav={handlePageNav} />
@@ -323,6 +329,8 @@ function App() {
             <PatchExplorer
               userPatches
               user={user}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
               handlePageNav={handlePageNav}
             />
           </Route>
@@ -345,6 +353,8 @@ function App() {
               userPatches
               user={user}
               handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route exact path="/drumset/:key">

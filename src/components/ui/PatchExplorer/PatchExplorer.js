@@ -593,7 +593,7 @@ function PatchExplorer(props) {
 
   const onAppWrapperScrollTrigger = () => {
     !isQueryEnd && !isLoading && props.explore && getPatchesList();
-    props.setBottomScroll(false);
+    !props.compact && props.setBottomScroll(false);
   };
 
   useEffect(() => {
