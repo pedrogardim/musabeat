@@ -51,6 +51,8 @@ function SessionExplorer(props) {
   const getSessionList = () => {
     //console.log(keyword);
 
+    if (props.isUser && props.user === null) return;
+
     let queryRules = () => {
       let rules = firebase.firestore().collection("sessions");
 

@@ -134,6 +134,8 @@ function FileExplorer(props) {
   };
 
   const getFilesList = async (clear) => {
+    //TODO: Scroll load in /files/
+
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
 
@@ -143,7 +145,7 @@ function FileExplorer(props) {
       let rules = firebase.firestore().collection("files");
 
       if (searchValue) {
-        console.log("text");
+        console.log(searchValue);
         rules = rules
           .where("name", ">=", searchValue)
           .where("name", "<=", searchValue + "\uf8ff");
@@ -176,6 +178,11 @@ function FileExplorer(props) {
 
     setFiledata((prev) => [...prev, ...filesData]);
     setFileIdList((prev) => [...prev, ...fileIdList]);
+
+    /*  if (!fileIdList ||fileIdList.length === 0) {
+      setFiledata(undefined);
+      return;
+    } */
 
     setIsLoading(filesData === false);
 
@@ -227,8 +234,8 @@ function FileExplorer(props) {
 
     setIsLoading(false);
 
-    if (fileIdList.length === 0) {
-      setFiledata(null);
+    if (!fileIdList || fileIdList.length === 0) {
+      setFiledata(undefined);
       return;
     }
 
@@ -428,14 +435,17 @@ function FileExplorer(props) {
   }, []);
 
   useEffect(() => {
-    if (filedata === null || filedata.length > 0) setIsLoading(false);
+    if (filedata === null || (filedata && filedata.length > 0))
+      setIsLoading(false);
+    if (filedata && filedata.length === 0) setIsLoading(true);
+
     //console.log(filedata);
   }, [filedata]);
 
   useEffect(() => {
     if (props.userFiles && props.user) {
       clearFiles();
-      setIsLoading(false);
+      //setIsLoading(false);
       getUserFilesList(showingLiked);
     }
   }, [props.userFiles, props.user, showingLiked]);
@@ -446,7 +456,10 @@ function FileExplorer(props) {
 
   useEffect(() => {
     clearFiles();
-    !isLoading && getFilesList("clear");
+    if (!isLoading && ((searchTags && searchTags.length > 0) || searchValue)) {
+      console.log("here");
+      getFilesList("clear");
+    }
 
     //console.log("change triggered");
   }, [searchTags, searchValue]);
@@ -499,7 +512,7 @@ function FileExplorer(props) {
         <div className="break" style={{ height: 32 }} />
       )}
 
-      {filedata !== null ? (
+      {filedata !== undefined ? (
         <TableContainer
           className={props.compact ? "fet-cont-compact" : "fet-cont"}
           onScroll={props.compact && detectScrollToBottom}

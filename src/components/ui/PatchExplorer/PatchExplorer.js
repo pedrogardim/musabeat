@@ -98,7 +98,7 @@ function PatchExplorer(props) {
 
   const usersRef = firebase.firestore().collection("users");
 
-  const itemsPerPage = 25;
+  const itemsPerPage = 10;
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -177,6 +177,8 @@ function PatchExplorer(props) {
   };
 
   const getPatchesList = async (clear) => {
+    //TODO: Scroll load in /instruments/
+
     setIsLoading(true);
 
     let queryRules = () => {
@@ -201,7 +203,7 @@ function PatchExplorer(props) {
         rules = rules.where("categ", "in", tagsIds);
       }
       if (!clear && !isFirstQuery && lastItem) {
-        console.log("next page");
+        //console.log("next page");
         rules = rules.startAfter(lastItem);
       }
 
@@ -223,8 +225,8 @@ function PatchExplorer(props) {
       .filter((e) => e.id !== selectedPatch)
       .map((e) => e.id);
 
-    setPatchdata(patchesData);
-    setPatchIdList(patchIdList);
+    setPatchdata((prev) => [...prev, ...patchesData]);
+    setPatchIdList((prev) => [...prev, ...patchIdList]);
 
     setIsLoading(patchesData === false);
 
@@ -278,7 +280,7 @@ function PatchExplorer(props) {
     //console.log(patchIdList);
 
     if (!patchIdList || patchIdList.length === 0) {
-      setPatchdata(null);
+      setPatchdata(undefined);
       return;
     }
 
@@ -584,15 +586,15 @@ function PatchExplorer(props) {
     setPatchIdList([]);
   };
 
-  //!!only used when compacted!!
-
   const detectScrollToBottom = (e) => {
     if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
       !isQueryEnd && !isLoading && getPatchesList();
   };
 
   useEffect(() => {
-    (props.explore || props.compact) && getPatchesList();
+    if ((props.explore || props.compact) && !props.userPatches) {
+      getPatchesList();
+    }
 
     return () => {
       instruments.forEach((instr) => !!instr && instr.dispose());
@@ -600,15 +602,17 @@ function PatchExplorer(props) {
   }, []);
 
   useEffect(() => {
-    if (patchdata === null || patchdata.length > 0) setIsLoading(false);
+    if (patchdata === undefined || (patchdata && patchdata.length > 0))
+      setIsLoading(false);
+    if (patchdata && patchdata.length === 0) setIsLoading(true);
+
     //console.log(patchdata);
   }, [patchdata]);
 
   useEffect(() => {
     if (props.userPatches && props.user) {
       clearPatches();
-      setIsLoading(false);
-      getUserPatchesList();
+      getUserPatchesList(showingLiked);
     }
   }, [props.userPatches, props.user, showingLiked]);
 
@@ -622,13 +626,19 @@ function PatchExplorer(props) {
 
   useEffect(() => {
     clearPatches();
-    !isLoading && getPatchesList("clear");
+    if (!isLoading && ((searchTags && searchTags.length > 0) || searchValue)) {
+      getPatchesList("clear");
+    }
+
     //console.log("change triggered");
   }, [searchTags, searchValue]);
 
   useEffect(() => {
-    clearPatches();
-    getPatchesList("clear");
+    if (isLoading === false) {
+      clearPatches();
+      getPatchesList("clear");
+    }
+
     //console.log("change triggered");
   }, [props.isDrum]);
 
@@ -683,7 +693,7 @@ function PatchExplorer(props) {
         <div className="break" style={{ height: 32 }} />
       )}
 
-      {patchdata !== null ? (
+      {patchdata !== undefined ? (
         <TableContainer
           className={props.compact ? "pet-cont-compact" : "pet-cont"}
           onScroll={props.compact && detectScrollToBottom}
@@ -695,36 +705,8 @@ function PatchExplorer(props) {
               props.compact ? "pet-compact" : "pet-normal"
             }`}
           >
-            {/* {!props.compact && (
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: 50 }}></TableCell>
-                  <TableCell>Name</TableCell>
-                  <Fragment>
-                    <TableCell>Category</TableCell>
-                    {(props.explore || !!showingLiked) && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Like
-                      </TableCell>
-                    )}
-
-                    {/* <TableCell className="pet-collapsable-column" align="center">
-                    Size
-                  </TableCell>
-                  <TableCell style={{ width: 50 }} align="center">
-                    Download
-                  </TableCell>}
-                    {props.userPatches && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Delete
-                      </TableCell>
-                    )}
-                  </Fragment>
-                </TableRow>
-              </TableHead>
-            )} */}
             <TableBody>
-              {props.compact && (
+              {/* props.compact && (
                 <TableRow component="th" scope="row">
                   <TableCell style={{ width: props.compact ? 20 : 50 }}>
                     {selectedPatchInfo ? (
@@ -802,7 +784,7 @@ function PatchExplorer(props) {
                     )}
                   </TableCell>
                 </TableRow>
-              )}
+              ) */}
 
               {patchdata.map(
                 (patch, index) =>
