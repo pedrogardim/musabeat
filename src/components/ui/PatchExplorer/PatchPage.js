@@ -18,6 +18,7 @@ import {
   Typography,
   Fab,
   CircularProgress,
+  Button,
 } from "@material-ui/core";
 
 import "./PatchPage.css";
@@ -33,7 +34,8 @@ import {
 
 import { colors } from "../../../utils/materialPalette";
 
-const waveColor = colors[2];
+import LoadingScreen from "../../ui/LoadingScreen";
+import NotFoundPage from "../NotFoundPage";
 
 let isSustainPedal = false;
 
@@ -69,6 +71,10 @@ function PatchPage(props) {
 
   const getPatchInfo = () => {
     patchInfoRef.get().then((r) => {
+      if (!r.exists) {
+        setPatchInfo(undefined);
+        return;
+      }
       setPatchInfo(r.data());
       loadInstrument(r.data());
 
@@ -234,25 +240,6 @@ function PatchPage(props) {
     });
   };
 
-  /*   const huehue = () => {
-    firebase
-      .firestore()
-      .collection("files")
-      .get()
-      .then((r) =>
-        r.forEach((e) => {
-          firebase
-            .firestore()
-            .collection("files")
-            .doc(e.id)
-            .update({
-              upOn: firebase.firestore.FieldValue.serverTimestamp(),
-            })
-            .then(console.log("done on file " + e.id));
-        })
-      );
-  }; */
-
   const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
     //setInstrumentLoaded(false);
 
@@ -395,128 +382,118 @@ function PatchPage(props) {
 
   return (
     <div className="file-page">
-      <Typography variant="h4">{patchInfo ? patchInfo.name : "..."}</Typography>
-      {patchInfo && patchInfo.base === "Sampler" && (
-        <Tooltip arrow placement="top" title="Sampler">
-          <Icon style={{ marginLeft: 4 }}>graphic_eq</Icon>
-        </Tooltip>
-      )}
-      <div className="break" />
-      {creatorInfo && (
-        <Tooltip title={creatorInfo.profile.username}>
-          <Avatar
-            alt={creatorInfo.profile.username}
-            src={creatorInfo.profile.photoURL}
-            onClick={() =>
-              props.handlePageNav("user", creatorInfo.profile.username, true)
-            }
-          />
-        </Tooltip>
-      )}
-      <div className="break" />
+      {patchInfo !== undefined ? (
+        <Fragment>
+          <Typography variant="h4">
+            {patchInfo ? patchInfo.name : "..."}
+          </Typography>
+          {patchInfo && patchInfo.base === "Sampler" && (
+            <Tooltip arrow placement="top" title="Sampler">
+              <Icon style={{ marginLeft: 4 }}>graphic_eq</Icon>
+            </Tooltip>
+          )}
+          <div className="break" />
+          {creatorInfo && (
+            <Tooltip title={creatorInfo.profile.username}>
+              <Avatar
+                alt={creatorInfo.profile.username}
+                src={creatorInfo.profile.photoURL}
+                onClick={() =>
+                  props.handlePageNav(
+                    "user",
+                    creatorInfo.profile.username,
+                    true
+                  )
+                }
+              />
+            </Tooltip>
+          )}
+          <div className="break" />
 
-      <Paper elevation={3} className="ie-cont">
-        {isLoaded ? (
-          <InstrumentEditor
-            patchPage
-            module={{
-              type: props.isDrum ? 0 : 1,
-              instrument: { urls: patchInfo.urls, ...patchInfo.options },
-              lbls: patchInfo.lbls,
-            }}
-            instrument={instrument}
-            setInstruments={props.setInstruments}
-            setInstrument={setInstrument}
-            setInstrumentLoaded={setIsLoaded}
-            onInstrumentMod={onInstrumentMod}
-            setLabels={setLabels}
-            handleFileClick={handleFileClick}
-            setPatchInfo={setPatchInfo}
-            handlePageNav={props.handlePageNav}
-          />
-        ) : (
-          <CircularProgress />
-        )}
-      </Paper>
+          <Paper elevation={3} className="ie-cont">
+            {isLoaded ? (
+              <InstrumentEditor
+                patchPage
+                module={{
+                  type: props.isDrum ? 0 : 1,
+                  instrument: { urls: patchInfo.urls, ...patchInfo.options },
+                  lbls: patchInfo.lbls,
+                }}
+                instrument={instrument}
+                setInstruments={props.setInstruments}
+                setInstrument={setInstrument}
+                setInstrumentLoaded={setIsLoaded}
+                onInstrumentMod={onInstrumentMod}
+                setLabels={setLabels}
+                handleFileClick={handleFileClick}
+                setPatchInfo={setPatchInfo}
+                handlePageNav={props.handlePageNav}
+              />
+            ) : (
+              <CircularProgress />
+            )}
+          </Paper>
 
-      <div className="break" />
+          <div className="break" />
 
-      {patchInfo && (
-        <Chip
-          style={{ margin: "0px 4px" }}
-          label={categories[patchInfo.categ]}
-          variant="outlined"
-        />
-      )}
-      <div className="break" />
+          {patchInfo && (
+            <Chip
+              style={{ margin: "0px 4px" }}
+              label={categories[patchInfo.categ]}
+              variant="outlined"
+            />
+          )}
+          <div className="break" />
 
-      <div className="player-controls">
-        <IconButton onClick={isPlaying ? stopSequence : playSequence}>
-          <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
-        </IconButton>
+          <div className="player-controls">
+            <IconButton onClick={isPlaying ? stopSequence : playSequence}>
+              <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
+            </IconButton>
 
-        <Tooltip title={patchInfo && patchInfo.likes}>
-          <IconButton onClick={handleUserLike}>
-            <Icon color={isPatchLiked ? "secondary" : "inherit"}>favorite</Icon>
-            <Typography className="like-btn-label" variant="overline">
-              {patchInfo && patchInfo.likes}
-            </Typography>
-          </IconButton>
-        </Tooltip>
+            <Tooltip title={patchInfo && patchInfo.likes}>
+              <IconButton onClick={handleUserLike}>
+                <Icon color={isPatchLiked ? "secondary" : "inherit"}>
+                  favorite
+                </Icon>
+                <Typography className="like-btn-label" variant="overline">
+                  {patchInfo && patchInfo.likes}
+                </Typography>
+              </IconButton>
+            </Tooltip>
 
-        {/* <IconButton onClick={huehue}>
+            {/* <IconButton onClick={huehue}>
           <Icon>manage_accounts</Icon>
         </IconButton> */}
-      </div>
-      <div className="break" />
+          </div>
+          <div className="break" />
 
-      {/* {patchInfo && (
-        <Grid
-          container
-          spacing={1}
-          style={{ width: "40%" }}
-          className="file-info"
-        >
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline">Grid item 1</Typography>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline">Grid item 2</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline"> Grid item 3</Typography>
-            </Paper>
-          </Grid>
-          <Grid item xs={6} sm={3}>
-            <Paper className="file-info-card">
-              <Typography variant="overline"> Grid item 4</Typography>
-            </Paper>
-          </Grid>
-        </Grid>
-      )} */}
-      {patchInfo && user && user.uid === patchInfo.creator && (
-        <div style={{ position: "absolute", right: 16, bottom: 16 }}>
-          <Tooltip title="Save Changes">
-            <Fab
-              color="primary"
-              onClick={savePatchChanges}
-              style={{ marginRight: 16 }}
-            >
-              <Icon>save</Icon>
-            </Fab>
-          </Tooltip>
-          <Tooltip title="Save as new">
-            <Fab color="primary" onClick={savePatchChanges}>
-              <Icon>add</Icon>
-            </Fab>
-          </Tooltip>
-        </div>
+          {patchInfo && user && user.uid === patchInfo.creator && (
+            <div style={{ position: "absolute", right: 16, bottom: 16 }}>
+              <Tooltip title="Save Changes">
+                <Fab
+                  color="primary"
+                  onClick={savePatchChanges}
+                  style={{ marginRight: 16 }}
+                >
+                  <Icon>save</Icon>
+                </Fab>
+              </Tooltip>
+              <Tooltip title="Save as new">
+                <Fab color="primary" onClick={savePatchChanges}>
+                  <Icon>add</Icon>
+                </Fab>
+              </Tooltip>
+            </div>
+          )}
+          <LoadingScreen open={patchInfo === null} />
+        </Fragment>
+      ) : (
+        <NotFoundPage
+          type="patchPage"
+          handlePageNav={() =>
+            props.handlePageNav(props.isDrum ? "drumsets" : "instruments")
+          }
+        />
       )}
     </div>
   );

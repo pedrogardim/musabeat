@@ -269,7 +269,7 @@ function App() {
           </Route>
           <Route exact path="/explore">
             <SessionExplorer
-              createNewSession={handleCreateNewSession}
+              createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
             />
@@ -277,7 +277,7 @@ function App() {
           <Route exact path="/sessions">
             <SessionExplorer
               isUser
-              createNewSession={handleCreateNewSession}
+              createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
             />

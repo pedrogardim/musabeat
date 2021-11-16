@@ -34,10 +34,12 @@ import { Skeleton, Autocomplete } from "@material-ui/lab";
 import "./PatchExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
 import SavePatch from "../Dialogs/SavePatch";
+import NotFoundPage from "../NotFoundPage";
 
 import {
   fileExtentions,
@@ -51,6 +53,8 @@ import {
 } from "../../../assets/musicutils";
 
 function PatchExplorer(props) {
+  const { t } = useTranslation();
+
   const [patchdata, setPatchdata] = useState([]);
   const [patchIdList, setPatchIdList] = useState([]);
 
@@ -637,7 +641,7 @@ function PatchExplorer(props) {
       className={`patch-explorer ${props.compact && "patch-explorer-compact"}`}
       style={{ marginTop: props.userPatches && 32 }}
     >
-      {(props.compact || props.explore) && (
+      {props.compact || props.explore ? (
         <Fragment>
           <Autocomplete
             multiple
@@ -675,6 +679,8 @@ function PatchExplorer(props) {
           />
           <div className="break" />
         </Fragment>
+      ) : (
+        <div className="break" style={{ height: 32 }} />
       )}
 
       {patchdata !== null ? (
@@ -1021,7 +1027,7 @@ function PatchExplorer(props) {
           </Table>
         </TableContainer>
       ) : (
-        "Nothing Found"
+        <NotFoundPage type="patchExplorer" />
       )}
 
       <div className="break" />

@@ -34,9 +34,11 @@ import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
 import "./FileExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
+import NotFoundPage from "../NotFoundPage";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
 
@@ -44,6 +46,8 @@ const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
 const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
 
 function FileExplorer(props) {
+  const { t } = useTranslation();
+
   const [filedata, setFiledata] = useState([]);
   const [fileIdList, setFileIdList] = useState([]);
   const [filesUrl, setFilesUrl] = useState([]);
@@ -453,7 +457,7 @@ function FileExplorer(props) {
 
   const mainContent = (
     <Fragment>
-      {(props.compact || props.explore) && (
+      {props.compact || props.explore ? (
         <Fragment>
           <Autocomplete
             multiple
@@ -491,6 +495,8 @@ function FileExplorer(props) {
           />
           <div className="break" />
         </Fragment>
+      ) : (
+        <div className="break" style={{ height: 32 }} />
       )}
 
       {filedata !== null ? (
@@ -776,7 +782,7 @@ function FileExplorer(props) {
           </Table>
         </TableContainer>
       ) : (
-        "Nothing Found"
+        <NotFoundPage type="fileExplorer" />
       )}
 
       <div className="break" />

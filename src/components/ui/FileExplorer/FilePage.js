@@ -20,6 +20,7 @@ import {
   List,
   ListItem,
   Typography,
+  Button,
 } from "@material-ui/core";
 
 import "./FilePage.css";
@@ -31,6 +32,10 @@ import {
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
+
+import LoadingScreen from "../../ui/LoadingScreen";
+import NotFoundPage from "../NotFoundPage";
+
 const waveColor = colors[2];
 
 function FilePage(props) {
@@ -127,6 +132,10 @@ function FilePage(props) {
 
   const getFileInfo = () => {
     fileInfoRef.get().then((r) => {
+      if (!r.exists) {
+        setFileInfo(undefined);
+        return;
+      }
       setFileInfo(r.data());
       let date = new Date(r.data().upOn.seconds * 1000);
       let creationDate = `${t("misc.uploadedOn")} ${date.getDate()}/${
@@ -284,127 +293,147 @@ function FilePage(props) {
 
   return (
     <div className="file-page">
-      <Typography variant="h4">
-        {fileInfo ? `${fileInfo.name}.${fileExtentions[fileInfo.type]}` : "..."}
-      </Typography>
-      <div className="break" />
-      {creatorInfo && (
-        <Tooltip title={creatorInfo.profile.username}>
-          <Avatar
-            alt={creatorInfo.profile.username}
-            src={creatorInfo.profile.photoURL}
-            onClick={() =>
-              props.handlePageNav("user", creatorInfo.profile.username, true)
-            }
-          />
-        </Tooltip>
-      )}
-      <div className="break" />
+      {fileInfo !== undefined ? (
+        <Fragment>
+          <Typography variant="h4">
+            {fileInfo
+              ? `${fileInfo.name}.${fileExtentions[fileInfo.type]}`
+              : "..."}
+          </Typography>
+          <div className="break" />
+          {creatorInfo && (
+            <Tooltip title={creatorInfo.profile.username}>
+              <Avatar
+                alt={creatorInfo.profile.username}
+                src={creatorInfo.profile.photoURL}
+                onClick={() =>
+                  props.handlePageNav(
+                    "user",
+                    creatorInfo.profile.username,
+                    true
+                  )
+                }
+              />
+            </Tooltip>
+          )}
+          <div className="break" />
 
-      <Paper
-        elevation={3}
-        className="file-page-waveform"
-        onClick={handleClipClick}
-        ref={waveformWrapper}
-      >
-        <canvas
-          className="sampler-audio-clip-wave"
-          id="file-page-canvas"
-          height={clipHeight}
-          width={clipWidth}
-          style={{ height: clipHeight, width: clipWidth }}
-        />
+          <Paper
+            elevation={3}
+            className="file-page-waveform"
+            onClick={handleClipClick}
+            ref={waveformWrapper}
+          >
+            <canvas
+              className="sampler-audio-clip-wave"
+              id="file-page-canvas"
+              height={clipHeight}
+              width={clipWidth}
+              style={{ height: clipHeight, width: clipWidth }}
+            />
 
-        <Draggable
-          axis="x"
-          onDrag={handleCursorDrag}
-          onStart={handleCursorDragStart}
-          onStop={handleCursorDragStop}
-          position={{ x: cursorPosition, y: 0 }}
-          bounds=".file-page-waveform"
-        >
-          <div
-            className="sampler-cursor"
-            style={{ backgroundColor: waveColor[400] }}
-          />
-        </Draggable>
-      </Paper>
+            <Draggable
+              axis="x"
+              onDrag={handleCursorDrag}
+              onStart={handleCursorDragStart}
+              onStop={handleCursorDragStop}
+              position={{ x: cursorPosition, y: 0 }}
+              bounds=".file-page-waveform"
+            >
+              <div
+                className="sampler-cursor"
+                style={{ backgroundColor: waveColor[400] }}
+              />
+            </Draggable>
+          </Paper>
 
-      <div className="break" />
+          <div className="break" />
 
-      {fileInfo &&
-        fileInfo.categ.map((e, i) => (
-          <Chip
-            style={{ margin: "0px 4px" }}
-            key={`pfcc${i}`}
-            label={fileTags[e]}
-            variant="outlined"
-          />
-        ))}
-      <div className="break" />
+          {fileInfo &&
+            fileInfo.categ.map((e, i) => (
+              <Chip
+                style={{ margin: "0px 4px" }}
+                key={`pfcc${i}`}
+                label={fileTags[e]}
+                variant="outlined"
+              />
+            ))}
+          <div className="break" />
 
-      <div className="player-controls">
-        <IconButton onClick={togglePlaying}>
-          <Icon>
-            {Tone.Transport.state === "started" ? "pause" : "play_arrow"}
-          </Icon>
-        </IconButton>
+          <div className="player-controls">
+            <IconButton onClick={togglePlaying}>
+              <Icon>
+                {Tone.Transport.state === "started" ? "pause" : "play_arrow"}
+              </Icon>
+            </IconButton>
 
-        <IconButton onClick={handleDownload}>
-          <Icon>download</Icon>
-        </IconButton>
+            <IconButton onClick={handleDownload}>
+              <Icon>download</Icon>
+            </IconButton>
 
-        <Tooltip title={fileInfo && fileInfo.likes}>
-          <IconButton onClick={handleUserLike}>
-            <Icon color={isFileLiked ? "secondary" : "inherit"}>favorite</Icon>
-            <Typography className="like-btn-label" variant="overline">
-              {fileInfo && fileInfo.likes}
-            </Typography>
-          </IconButton>
-        </Tooltip>
+            <Tooltip title={fileInfo && fileInfo.likes}>
+              <IconButton onClick={handleUserLike}>
+                <Icon color={isFileLiked ? "secondary" : "inherit"}>
+                  favorite
+                </Icon>
+                <Typography className="like-btn-label" variant="overline">
+                  {fileInfo && fileInfo.likes}
+                </Typography>
+              </IconButton>
+            </Tooltip>
 
-        {/* <IconButton onClick={huehue}>
+            {/* <IconButton onClick={huehue}>
           <Icon>manage_accounts</Icon>
         </IconButton> */}
-      </div>
-      <div className="break" />
-
-      {fileInfo && (
-        <Grid
-          container
-          spacing={1}
-          direction="row"
-          wrap="nowrap"
-          className="file-info"
-          component={Paper}
-        >
-          <div className="file-info-card">
-            <Typography variant="overline">
-              {soundChannels[player._buffer.numberOfChannels] ||
-                player._buffer.numbesrOfChannels ||
-                "Multichannel"}
-              <br />
-              {player._buffer.sampleRate + " Hz"}
-            </Typography>
           </div>
-          <Divider orientation="vertical" flexItem />
+          <div className="break" />
 
-          <div className="file-info-card">
-            <Typography variant="overline">
-              {formatBytes(fileInfo.size)}
-            </Typography>
-          </div>
-          <Divider orientation="vertical" flexItem />
+          {fileInfo && (
+            <Grid
+              container
+              spacing={1}
+              direction="row"
+              wrap="nowrap"
+              className="file-info"
+              component={Paper}
+            >
+              <div className="file-info-card">
+                <Typography variant="overline">
+                  {soundChannels[player._buffer.numberOfChannels] ||
+                    player._buffer.numbesrOfChannels ||
+                    "Multichannel"}
+                  <br />
+                  {player._buffer.sampleRate + " Hz"}
+                </Typography>
+              </div>
+              <Divider orientation="vertical" flexItem />
 
-          <div className="file-info-card">
-            <Typography variant="overline">{fileInfo.dur + " s"}</Typography>
-          </div>
-          <Divider orientation="vertical" flexItem />
+              <div className="file-info-card">
+                <Typography variant="overline">
+                  {formatBytes(fileInfo.size)}
+                </Typography>
+              </div>
+              <Divider orientation="vertical" flexItem />
 
-          <div className="file-info-card">
-            <Typography variant="overline">{uploadDateString}</Typography>
-          </div>
-        </Grid>
+              <div className="file-info-card">
+                <Typography variant="overline">
+                  {fileInfo.dur + " s"}
+                </Typography>
+              </div>
+              <Divider orientation="vertical" flexItem />
+
+              <div className="file-info-card">
+                <Typography variant="overline">{uploadDateString}</Typography>
+              </div>
+            </Grid>
+          )}
+          <LoadingScreen open={fileInfo === null} />
+        </Fragment>
+      ) : (
+        <NotFoundPage
+          type="filePage"
+          handlePageNav={() => props.handlePageNav("files")}
+        />
       )}
     </div>
   );

@@ -40,6 +40,7 @@ export const TRANSLATIONS_EN = {
   workspace: {
     empty: "No Modules!",
     addBtn: "Add New Module",
+    sessionNotFound: "Session Not Found",
     actions: {
       copyPasteIncompatible:
         "The content you are trying to paste belongs to a different type of module",
@@ -111,7 +112,10 @@ export const TRANSLATIONS_EN = {
   patchExplorer: {
     userPatches: "User Patches",
     instrumentEditor: "Instrument Editor",
-    empty: "No patches here..",
+    patchNotFound: "Patch Not Found",
+  },
+  fileExplorer: {
+    fileNotFound: "File Not Found",
   },
   misc: {
     createdOn: "Created on",
@@ -125,6 +129,7 @@ export const TRANSLATIONS_EN = {
       "MusaBeat requires a stable connection to the server. Check your internet connetion.",
     initialModules: "Initial Modules",
     comingSoon: "(Coming Soon)",
+    nothingFound: "Nothing Found",
   },
   dialogs: {
     cancel: "Cancel",
