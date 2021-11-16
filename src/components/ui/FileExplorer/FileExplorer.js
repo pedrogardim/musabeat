@@ -76,7 +76,7 @@ function FileExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const itemsPerPage = 25;
+  const itemsPerPage = 15;
   const user = props.user ? props.user : firebase.auth().currentUser;
 
   //const [userOption, setUserOption] = useState(false);
@@ -426,6 +426,11 @@ function FileExplorer(props) {
       !isQueryEnd && !isLoading && getFilesList();
   };
 
+  const onAppWrapperScrollTrigger = () => {
+    !isQueryEnd && !isLoading && props.explore && getFilesList();
+    props.setBottomScroll(false);
+  };
+
   useEffect(() => {
     //clearFiles();
     (props.explore || props.compact) && getFilesList();
@@ -467,6 +472,8 @@ function FileExplorer(props) {
   useEffect(() => {
     //console.log("isLoading", isLoading);
   }, [isLoading]);
+
+  useEffect(() => onAppWrapperScrollTrigger(), [props.bottomScroll]);
 
   const mainContent = (
     <Fragment>

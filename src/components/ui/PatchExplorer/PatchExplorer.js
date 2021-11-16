@@ -98,7 +98,7 @@ function PatchExplorer(props) {
 
   const usersRef = firebase.firestore().collection("users");
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -591,6 +591,11 @@ function PatchExplorer(props) {
       !isQueryEnd && !isLoading && getPatchesList();
   };
 
+  const onAppWrapperScrollTrigger = () => {
+    !isQueryEnd && !isLoading && props.explore && getPatchesList();
+    props.setBottomScroll(false);
+  };
+
   useEffect(() => {
     if ((props.explore || props.compact) && !props.userPatches) {
       getPatchesList();
@@ -641,6 +646,8 @@ function PatchExplorer(props) {
 
     //console.log("change triggered");
   }, [props.isDrum]);
+
+  useEffect(() => onAppWrapperScrollTrigger(), [props.bottomScroll]);
 
   /* useEffect(() => {
     !isQueryEnd && !isLoading && getPatchesList();
