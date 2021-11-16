@@ -23,16 +23,20 @@ import SessionGalleryItem from "./SessionGalleryItem";
 import PlaceholderSGI from "./PlaceholderSGI";
 import NameInput from "../Dialogs/NameInput";
 import ActionConfirm from "../Dialogs/ActionConfirm";
+import NotFoundPage from "../NotFoundPage";
 
 import Workspace from "../Workspace";
 
 import "./SessionExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import { sessionTags } from "../../../assets/musicutils";
 
 function SessionExplorer(props) {
+  const { t } = useTranslation();
+
   const [sessions, setSessions] = useState([]);
   const [sessionKeys, setSessionKeys] = useState([]);
   const [userLikes, setUserLikes] = useState(null);
@@ -46,6 +50,8 @@ function SessionExplorer(props) {
 
   const getSessionList = () => {
     //console.log(keyword);
+
+    if (props.isUser && props.user === null) return;
 
     let queryRules = () => {
       let rules = firebase.firestore().collection("sessions");
@@ -251,7 +257,7 @@ function SessionExplorer(props) {
         props.compact && "session-explorer-compact"
       }`}
     >
-      {!(props.isUser || props.compact) && (
+      {!(props.isUser || props.compact) ? (
         <Autocomplete
           multiple
           freeSolo
@@ -286,21 +292,16 @@ function SessionExplorer(props) {
             />
           )}
         />
+      ) : (
+        <div className="break" style={{ height: 56 }} />
       )}
       <div className="break" />
 
       {!sessions || !sessionKeys ? (
-        <Fragment>
-          <Typography variant="h1">:p</Typography>
-          <div className="break" />
-          <p>No sessions here...</p>
-          <div className="break" />
-          {props.isUser && (
-            <Button onClick={props.createNewSession} color="primary">
-              Create New Session!
-            </Button>
-          )}
-        </Fragment>
+        <NotFoundPage
+          type={"sessionExplorer"}
+          handlePageNav={props.createNewSession}
+        />
       ) : !!sessions.length ? (
         sessions.map((session, sessionIndex) => (
           <SessionGalleryItem

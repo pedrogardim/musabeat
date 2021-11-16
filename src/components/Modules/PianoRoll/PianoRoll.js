@@ -126,7 +126,7 @@ function PianoRoll(props) {
   };
 
   const changeNote = (note, index) => {
-    console.log("change note", note);
+    //console.log("change note", note);
     setNotes((prev) => {
       let newNotes = [...prev];
       newNotes[index] = Object.assign({}, prev[index], note);
@@ -136,7 +136,7 @@ function PianoRoll(props) {
   };
 
   const handleKeyPress = (e) => {
-    console.log(e.keyName);
+    //console.log(e.keyName);
   };
 
   const handleMouseDown = (e) => {

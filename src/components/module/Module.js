@@ -128,7 +128,7 @@ function Module(props) {
   };
 
   const handleHeaderClick = (e) => {
-    console.log(e.target.className);
+    //console.log(e.target.className);
     e.target.className === "module-header" && setFullScreen((prev) => !prev);
   };
 
@@ -319,7 +319,7 @@ function Module(props) {
         ) {
           slotToInsetFile++;
         }
-        console.log(slotToInsetFile, Object.keys(props.module.instrument.urls));
+        //console.log(slotToInsetFile, Object.keys(props.module.instrument.urls));
 
         props.instrument.add(
           isDrum ? slotToInsetFile : labelOnInstrument,

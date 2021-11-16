@@ -76,12 +76,11 @@ function App() {
   //const [premiumMode, setPremiumMode] = useState(false);
 
   const [openedSession, setOpenedSession] = useState(null);
-
   const [currentRoute, setCurrentRoute] = useState(null);
-
   const [followingRoute, setFollowingRoute] = useState(null);
-
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+
+  const [bottomScroll, setBottomScroll] = useState(false);
 
   const handlePageNav = (route, id, newTab) => {
     if (newTab && !window.cordova) {
@@ -121,6 +120,11 @@ function App() {
     setUserOption(false);
   };
 
+  const detectScrollToBottom = (e) => {
+    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
+      setBottomScroll(true);
+  };
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
     window.addEventListener("online", () => setIsOnline(true));
@@ -139,6 +143,10 @@ function App() {
       return dialogText;
     };
   }, [unsavedChanges]);
+
+  /*  useEffect(() => {
+    console.log(bottomScroll);
+  }, [bottomScroll]); */
 
   /////TESTING
 
@@ -195,7 +203,11 @@ function App() {
           </Helmet>
         )}
       </AppBar>
-      <div className="app-wrapper" onMouseDown={() => Tone.start()}>
+      <div
+        className="app-wrapper"
+        onMouseDown={() => Tone.start()}
+        onScroll={(e) => detectScrollToBottom(e)}
+      >
         {newSessionDialog && (
           <NewSessionDialog
             setNewSessionDialog={setNewSessionDialog}
@@ -269,7 +281,7 @@ function App() {
           </Route>
           <Route exact path="/explore">
             <SessionExplorer
-              createNewSession={handleCreateNewSession}
+              createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
             />
@@ -277,28 +289,48 @@ function App() {
           <Route exact path="/sessions">
             <SessionExplorer
               isUser
-              createNewSession={handleCreateNewSession}
+              createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer explore user={user} handlePageNav={handlePageNav} />
+            <FileExplorer
+              explore
+              user={user}
+              handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
+            />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer userFiles user={user} handlePageNav={handlePageNav} />
+            <FileExplorer
+              userFiles
+              user={user}
+              handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
+            />
           </Route>
           <Route exact path="/file/:key">
             <FilePage user={user} handlePageNav={handlePageNav} />
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer explore user={user} handlePageNav={handlePageNav} />
+            <PatchExplorer
+              explore
+              user={user}
+              handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
+            />
           </Route>
           <Route exact path="/userinstruments">
             <PatchExplorer
               userPatches
               user={user}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
               handlePageNav={handlePageNav}
             />
           </Route>
@@ -311,6 +343,8 @@ function App() {
               explore
               user={user}
               handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route exact path="/userdrumsets">
@@ -319,6 +353,8 @@ function App() {
               userPatches
               user={user}
               handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route exact path="/drumset/:key">

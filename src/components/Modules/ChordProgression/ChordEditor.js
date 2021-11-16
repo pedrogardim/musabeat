@@ -59,7 +59,7 @@ function ChordEditor(props) {
   const changeChordOnInput = (e) => {
     setTextInputValue(e.target.value);
     let chord = chordNametoNotes(e.target.value);
-    console.log(chord);
+    //console.log(chord);
     setNullChord(8);
     !chord && setNullChord(true);
     if (chord) {
@@ -99,7 +99,7 @@ function ChordEditor(props) {
           : parseInt(splited[1]) - 1;
         return splited[0] + newNum;
       });
-      console.log(newChords[props.activeChord].notes);
+      //console.log(newChords[props.activeChord].notes);
       return newChords;
     });
     props.playChordPreview();

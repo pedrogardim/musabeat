@@ -34,9 +34,11 @@ import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
 import "./FileExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
+import NotFoundPage from "../NotFoundPage";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
 
@@ -44,6 +46,8 @@ const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
 const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
 
 function FileExplorer(props) {
+  const { t } = useTranslation();
+
   const [filedata, setFiledata] = useState([]);
   const [fileIdList, setFileIdList] = useState([]);
   const [filesUrl, setFilesUrl] = useState([]);
@@ -72,7 +76,7 @@ function FileExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const itemsPerPage = 25;
+  const itemsPerPage = 15;
   const user = props.user ? props.user : firebase.auth().currentUser;
 
   //const [userOption, setUserOption] = useState(false);
@@ -130,6 +134,8 @@ function FileExplorer(props) {
   };
 
   const getFilesList = async (clear) => {
+    //TODO: Scroll load in /files/
+
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
 
@@ -139,7 +145,7 @@ function FileExplorer(props) {
       let rules = firebase.firestore().collection("files");
 
       if (searchValue) {
-        console.log("text");
+        console.log(searchValue);
         rules = rules
           .where("name", ">=", searchValue)
           .where("name", "<=", searchValue + "\uf8ff");
@@ -152,7 +158,7 @@ function FileExplorer(props) {
         rules = rules.where("categ", "array-contains-any", tagsIds);
       }
       if (!clear && !isFirstQuery && lastItem) {
-        console.log("next page");
+        //console.log("next page");
         rules = rules.startAfter(lastItem);
       }
 
@@ -172,6 +178,11 @@ function FileExplorer(props) {
 
     setFiledata((prev) => [...prev, ...filesData]);
     setFileIdList((prev) => [...prev, ...fileIdList]);
+
+    /*  if (!fileIdList ||fileIdList.length === 0) {
+      setFiledata(undefined);
+      return;
+    } */
 
     setIsLoading(filesData === false);
 
@@ -223,8 +234,8 @@ function FileExplorer(props) {
 
     setIsLoading(false);
 
-    if (fileIdList.length === 0) {
-      setFiledata(null);
+    if (!fileIdList || fileIdList.length === 0) {
+      setFiledata(undefined);
       return;
     }
 
@@ -416,6 +427,11 @@ function FileExplorer(props) {
       !isQueryEnd && !isLoading && getFilesList();
   };
 
+  const onAppWrapperScrollTrigger = () => {
+    !isQueryEnd && !isLoading && props.explore && getFilesList();
+    !props.compact && props.setBottomScroll(false);
+  };
+
   useEffect(() => {
     //clearFiles();
     (props.explore || props.compact) && getFilesList();
@@ -425,14 +441,17 @@ function FileExplorer(props) {
   }, []);
 
   useEffect(() => {
-    if (filedata === null || filedata.length > 0) setIsLoading(false);
+    if (filedata === null || (filedata && filedata.length > 0))
+      setIsLoading(false);
+    if (filedata && filedata.length === 0) setIsLoading(true);
+
     //console.log(filedata);
   }, [filedata]);
 
   useEffect(() => {
     if (props.userFiles && props.user) {
       clearFiles();
-      setIsLoading(false);
+      //setIsLoading(false);
       getUserFilesList(showingLiked);
     }
   }, [props.userFiles, props.user, showingLiked]);
@@ -443,7 +462,10 @@ function FileExplorer(props) {
 
   useEffect(() => {
     clearFiles();
-    !isLoading && getFilesList("clear");
+    if (!isLoading && ((searchTags && searchTags.length > 0) || searchValue)) {
+      console.log("here");
+      getFilesList("clear");
+    }
 
     //console.log("change triggered");
   }, [searchTags, searchValue]);
@@ -452,9 +474,11 @@ function FileExplorer(props) {
     //console.log("isLoading", isLoading);
   }, [isLoading]);
 
+  useEffect(() => onAppWrapperScrollTrigger(), [props.bottomScroll]);
+
   const mainContent = (
     <Fragment>
-      {(props.compact || props.explore) && (
+      {props.compact || props.explore ? (
         <Fragment>
           <Autocomplete
             multiple
@@ -492,9 +516,11 @@ function FileExplorer(props) {
           />
           <div className="break" />
         </Fragment>
+      ) : (
+        <div className="break" style={{ height: 32 }} />
       )}
 
-      {filedata !== null ? (
+      {filedata !== undefined ? (
         <TableContainer
           className={props.compact ? "fet-cont-compact" : "fet-cont"}
           onScroll={props.compact && detectScrollToBottom}
@@ -777,7 +803,7 @@ function FileExplorer(props) {
           </Table>
         </TableContainer>
       ) : (
-        "Nothing Found"
+        <NotFoundPage type="fileExplorer" />
       )}
 
       <div className="break" />

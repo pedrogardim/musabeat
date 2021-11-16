@@ -27,7 +27,7 @@ function SynthParameters(props) {
   let mainContent = "Nothing Here";
 
   const handleChange = (parameter, value) => {
-    console.log(parameter, value);
+    //console.log(parameter, value);
     setInstrumentParamenters((prev) => {
       return { ...prev, [parameter]: value };
     });
@@ -36,7 +36,7 @@ function SynthParameters(props) {
 
   const handleWaveTypeSelect = (parameter, event) => {
     let value = event.target.value;
-    console.log(parameter, value);
+    //console.log(parameter, value);
     setInstrumentParamenters((prev) => {
       return { ...prev, [parameter]: { type: value } };
     });
@@ -52,7 +52,7 @@ function SynthParameters(props) {
       filter: newFilter,
       filterEnvelope: { baseFrequency: newFilter.frequency, octaves: 0 },
     });
-    console.log(newFilter, props.instrument.get());
+    //console.log(newFilter, props.instrument.get());
     props.onInstrumentMod();
   };
   //TODO

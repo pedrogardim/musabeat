@@ -16,6 +16,7 @@ import {
   Input,
   Paper,
   Fade,
+  Button,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -32,8 +33,8 @@ import Mixer from "./mixer/Mixer";
 import SessionProgressBar from "./SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
 import LoadingScreen from "./LoadingScreen";
-
 import ActionConfirm from "./Dialogs/ActionConfirm";
+import NotFoundPage from "../ui/NotFoundPage";
 
 import {
   patchLoader,
@@ -231,7 +232,7 @@ function Workspace(props) {
       setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
-      console.log("session is null!");
+      //console.log("session is null!");
       setModules([]);
     }
     //
@@ -270,6 +271,12 @@ function Workspace(props) {
       setDBSessionRef(!sessionRef ? null : sessionRef);
       //Check for editMmode and get title
       sessionRef.get().then((snapshot) => {
+        if (!snapshot.exists) {
+          setSessionData(undefined);
+          setModules(undefined);
+          return;
+        }
+
         let data = snapshot.data();
         if (!data) {
           console.log(
@@ -1036,7 +1043,7 @@ function Workspace(props) {
   }, [props.user, props.session, sessionKey]);
 
   useEffect(() => {
-    !timelineMode && adaptSessionSize();
+    !timelineMode && modules && adaptSessionSize();
     //registerSession();
     //console.log(isLastChangeFromServer ? "server change" : "local change");
     console.log(modules);
@@ -1115,7 +1122,7 @@ function Workspace(props) {
   }, [instrumentsLoaded, sessionData, instruments]);
 
   useEffect(() => {
-    console.log(notifications);
+    //console.log(notifications);
   }, [notifications]);
 
   useEffect(() => {
@@ -1178,7 +1185,7 @@ function Workspace(props) {
 
   /**/
 
-  return (
+  return modules !== undefined ? (
     <div
       className="workspace"
       tabIndex={0}
@@ -1188,13 +1195,7 @@ function Workspace(props) {
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
     >
-      {/* isPlaying && (
-        <Helmet>
-          <title>{"▶ " + document.title}</title>
-        </Helmet>
-      ) */}
-
-      <LoadingScreen open={!Boolean(modules)} />
+      <LoadingScreen open={modules === null} />
 
       {sessionKey && (
         <WorkspaceTitle
@@ -1433,6 +1434,11 @@ function Workspace(props) {
         action={handleSessionCopy}
       />
     </div>
+  ) : (
+    <NotFoundPage
+      type="workspace"
+      handlePageNav={() => props.handlePageNav("explore")}
+    />
   );
 }
 

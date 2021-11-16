@@ -146,7 +146,7 @@ function ModuleSettings(props) {
   };
 
   const toggleModuleScaleRoot = () => {
-    console.log(props.module.root);
+    //console.log(props.module.root);
     if (props.module.root === undefined) {
       props.setModules((prev) => {
         let newMod = [...prev];

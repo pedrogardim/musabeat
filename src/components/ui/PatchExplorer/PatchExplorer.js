@@ -34,10 +34,12 @@ import { Skeleton, Autocomplete } from "@material-ui/lab";
 import "./PatchExplorer.css";
 
 import firebase from "firebase";
+import { useTranslation } from "react-i18next";
 
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
 import SavePatch from "../Dialogs/SavePatch";
+import NotFoundPage from "../NotFoundPage";
 
 import {
   fileExtentions,
@@ -51,6 +53,8 @@ import {
 } from "../../../assets/musicutils";
 
 function PatchExplorer(props) {
+  const { t } = useTranslation();
+
   const [patchdata, setPatchdata] = useState([]);
   const [patchIdList, setPatchIdList] = useState([]);
 
@@ -94,7 +98,7 @@ function PatchExplorer(props) {
 
   const usersRef = firebase.firestore().collection("users");
 
-  const itemsPerPage = 25;
+  const itemsPerPage = 15;
 
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -173,6 +177,8 @@ function PatchExplorer(props) {
   };
 
   const getPatchesList = async (clear) => {
+    //TODO: Scroll load in /instruments/
+
     setIsLoading(true);
 
     let queryRules = () => {
@@ -197,7 +203,7 @@ function PatchExplorer(props) {
         rules = rules.where("categ", "in", tagsIds);
       }
       if (!clear && !isFirstQuery && lastItem) {
-        console.log("next page");
+        //console.log("next page");
         rules = rules.startAfter(lastItem);
       }
 
@@ -219,8 +225,8 @@ function PatchExplorer(props) {
       .filter((e) => e.id !== selectedPatch)
       .map((e) => e.id);
 
-    setPatchdata(patchesData);
-    setPatchIdList(patchIdList);
+    setPatchdata((prev) => [...prev, ...patchesData]);
+    setPatchIdList((prev) => [...prev, ...patchIdList]);
 
     setIsLoading(patchesData === false);
 
@@ -274,7 +280,7 @@ function PatchExplorer(props) {
     //console.log(patchIdList);
 
     if (!patchIdList || patchIdList.length === 0) {
-      setPatchdata(null);
+      setPatchdata(undefined);
       return;
     }
 
@@ -580,15 +586,20 @@ function PatchExplorer(props) {
     setPatchIdList([]);
   };
 
-  //!!only used when compacted!!
-
   const detectScrollToBottom = (e) => {
     if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
       !isQueryEnd && !isLoading && getPatchesList();
   };
 
+  const onAppWrapperScrollTrigger = () => {
+    !isQueryEnd && !isLoading && props.explore && getPatchesList();
+    !props.compact && props.setBottomScroll(false);
+  };
+
   useEffect(() => {
-    (props.explore || props.compact) && getPatchesList();
+    if ((props.explore || props.compact) && !props.userPatches) {
+      getPatchesList();
+    }
 
     return () => {
       instruments.forEach((instr) => !!instr && instr.dispose());
@@ -596,15 +607,17 @@ function PatchExplorer(props) {
   }, []);
 
   useEffect(() => {
-    if (patchdata === null || patchdata.length > 0) setIsLoading(false);
+    if (patchdata === undefined || (patchdata && patchdata.length > 0))
+      setIsLoading(false);
+    if (patchdata && patchdata.length === 0) setIsLoading(true);
+
     //console.log(patchdata);
   }, [patchdata]);
 
   useEffect(() => {
     if (props.userPatches && props.user) {
       clearPatches();
-      setIsLoading(false);
-      getUserPatchesList();
+      getUserPatchesList(showingLiked);
     }
   }, [props.userPatches, props.user, showingLiked]);
 
@@ -618,15 +631,23 @@ function PatchExplorer(props) {
 
   useEffect(() => {
     clearPatches();
-    !isLoading && getPatchesList("clear");
+    if (!isLoading && ((searchTags && searchTags.length > 0) || searchValue)) {
+      getPatchesList("clear");
+    }
+
     //console.log("change triggered");
   }, [searchTags, searchValue]);
 
   useEffect(() => {
-    clearPatches();
-    getPatchesList("clear");
+    if (isLoading === false) {
+      clearPatches();
+      getPatchesList("clear");
+    }
+
     //console.log("change triggered");
   }, [props.isDrum]);
+
+  useEffect(() => onAppWrapperScrollTrigger(), [props.bottomScroll]);
 
   /* useEffect(() => {
     !isQueryEnd && !isLoading && getPatchesList();
@@ -637,7 +658,7 @@ function PatchExplorer(props) {
       className={`patch-explorer ${props.compact && "patch-explorer-compact"}`}
       style={{ marginTop: props.userPatches && 32 }}
     >
-      {(props.compact || props.explore) && (
+      {props.compact || props.explore ? (
         <Fragment>
           <Autocomplete
             multiple
@@ -675,9 +696,11 @@ function PatchExplorer(props) {
           />
           <div className="break" />
         </Fragment>
+      ) : (
+        <div className="break" style={{ height: 32 }} />
       )}
 
-      {patchdata !== null ? (
+      {patchdata !== undefined ? (
         <TableContainer
           className={props.compact ? "pet-cont-compact" : "pet-cont"}
           onScroll={props.compact && detectScrollToBottom}
@@ -689,36 +712,8 @@ function PatchExplorer(props) {
               props.compact ? "pet-compact" : "pet-normal"
             }`}
           >
-            {/* {!props.compact && (
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: 50 }}></TableCell>
-                  <TableCell>Name</TableCell>
-                  <Fragment>
-                    <TableCell>Category</TableCell>
-                    {(props.explore || !!showingLiked) && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Like
-                      </TableCell>
-                    )}
-
-                    {/* <TableCell className="pet-collapsable-column" align="center">
-                    Size
-                  </TableCell>
-                  <TableCell style={{ width: 50 }} align="center">
-                    Download
-                  </TableCell>}
-                    {props.userPatches && (
-                      <TableCell style={{ width: 50 }} align="center">
-                        Delete
-                      </TableCell>
-                    )}
-                  </Fragment>
-                </TableRow>
-              </TableHead>
-            )} */}
             <TableBody>
-              {props.compact && (
+              {/* props.compact && (
                 <TableRow component="th" scope="row">
                   <TableCell style={{ width: props.compact ? 20 : 50 }}>
                     {selectedPatchInfo ? (
@@ -796,7 +791,7 @@ function PatchExplorer(props) {
                     )}
                   </TableCell>
                 </TableRow>
-              )}
+              ) */}
 
               {patchdata.map(
                 (patch, index) =>
@@ -1021,7 +1016,7 @@ function PatchExplorer(props) {
           </Table>
         </TableContainer>
       ) : (
-        "Nothing Found"
+        <NotFoundPage type="patchExplorer" />
       )}
 
       <div className="break" />

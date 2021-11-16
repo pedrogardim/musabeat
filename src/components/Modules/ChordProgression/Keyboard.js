@@ -8,7 +8,7 @@ import "./Keyboard.css";
 function Keyboard(props) {
   const handleKeyClick = (key) => {
     let note = Tone.Frequency(key + 24, "midi").toNote();
-    console.log(note, props.activeChord);
+    //console.log(note, props.activeChord);
     props.setChords((prev) => {
       let newChords = [...prev];
       let chordNotes = newChords[props.activeChord]
@@ -16,7 +16,7 @@ function Keyboard(props) {
           ? newChords[props.activeChord].notes.filter((e) => e !== note)
           : [...newChords[props.activeChord].notes, note]
         : [note];
-      console.log(chordNotes);
+      //console.log(chordNotes);
       newChords[props.activeChord].notes = chordNotes.sort(
         (a, b) =>
           Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
