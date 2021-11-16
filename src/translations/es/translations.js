@@ -77,6 +77,10 @@ export const TRANSLATIONS_ES = {
       sessionScale: "Sesión",
     },
   },
+  instrumentEditor: {
+    noFiles: "Batería Vacía",
+    addFile: "Añadir archivo",
+  },
   modulePicker: {
     create: "Crear nuevo módulo",
     submit: "Añadir Módulo",

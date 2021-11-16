@@ -410,7 +410,15 @@ function PatchPage(props) {
           )}
           <div className="break" />
 
-          <Paper elevation={3} className="ie-cont">
+          <Paper
+            elevation={3}
+            className="ie-cont"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             {isLoaded ? (
               <InstrumentEditor
                 patchPage

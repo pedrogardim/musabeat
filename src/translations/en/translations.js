@@ -78,6 +78,10 @@ export const TRANSLATIONS_EN = {
       sessionScale: "Session",
     },
   },
+  instrumentEditor: {
+    noFiles: "Empty Drum",
+    addFile: "Add File",
+  },
   modulePicker: {
     create: "Create a new module",
     submit: "Add Module",

@@ -16,6 +16,7 @@ import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
+import NotFoundPage from "../ui/NotFoundPage";
 
 import { FileDrop } from "react-file-drop";
 
@@ -28,8 +29,6 @@ import {
 import { Fab, Icon, Grid, Select } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
-import { colors } from "../../utils/materialPalette";
-import { PortraitSharp } from "@material-ui/icons";
 
 function InstrumentEditor(props) {
   const [draggingOver, setDraggingOver] = useState(false);
@@ -100,10 +99,10 @@ function InstrumentEditor(props) {
       props.setPatchInfo((prev) => {
         let newPatch = { ...prev };
         newPatch.base = newType.replace("Synth", "");
-        newPatch.options = newInstrument.get();
         if (newType === "Sampler") {
-          delete newPatch.options.onerror;
-          delete newPatch.options.onload;
+          newPatch.urls = {};
+        } else {
+          newPatch.options = newInstrument.get();
         }
         return newPatch;
       });
@@ -420,31 +419,34 @@ function InstrumentEditor(props) {
               <option value={e}>{e}</option>
             ))}
           </Select>
-          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-            {bufferObjects.length > 0
-              ? bufferObjects.map((e, i) => (
-                  <Fragment>
-                    <AudioFileItem
-                      key={i}
-                      index={i}
-                      instrument={props.instrument}
-                      handleFileDelete={handleSamplerFileDelete}
-                      buffer={e[0]}
-                      fileLabel={Tone.Frequency(e[1], "midi").toNote()}
-                      fileName={
-                        filesName[Tone.Frequency(e[1], "midi").toNote()]
-                      }
-                      fileId={filesId[i]}
-                      openFilePage={() =>
-                        props.handlePageNav("file", filesId[i], true)
-                      }
-                      setRenamingLabel={setRenamingLabel}
-                    />
-                    <Divider />
-                  </Fragment>
-                ))
-              : "No Files"}
-          </List>
+          {bufferObjects.length > 0 ? (
+            <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+              {bufferObjects.map((e, i) => (
+                <Fragment>
+                  <AudioFileItem
+                    key={i}
+                    index={i}
+                    instrument={props.instrument}
+                    handleFileDelete={handleSamplerFileDelete}
+                    buffer={e[0]}
+                    fileLabel={Tone.Frequency(e[1], "midi").toNote()}
+                    fileName={filesName[Tone.Frequency(e[1], "midi").toNote()]}
+                    fileId={filesId[i]}
+                    openFilePage={() =>
+                      props.handlePageNav("file", filesId[i], true)
+                    }
+                    setRenamingLabel={setRenamingLabel}
+                  />
+                  <Divider />
+                </Fragment>
+              ))}
+            </List>
+          ) : (
+            <NotFoundPage
+              type="emptySequencer"
+              handlePageNav={() => setFileExplorer(true)}
+            />
+          )}
         </div>
       );
     } else {

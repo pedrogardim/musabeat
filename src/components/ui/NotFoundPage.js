@@ -35,6 +35,11 @@ function NotFoundPage(props) {
       text: "misc.nothingFound",
       button: "sidemenu.newSession",
     },
+    emptySequencer: {
+      emoji: "🎛️",
+      text: "instrumentEditor.noFiles",
+      button: "instrumentEditor.addFile",
+    },
   };
 
   return (
