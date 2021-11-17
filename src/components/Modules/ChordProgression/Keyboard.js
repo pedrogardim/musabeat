@@ -8,22 +8,7 @@ import "./Keyboard.css";
 function Keyboard(props) {
   const handleKeyClick = (key) => {
     let note = Tone.Frequency(key + 24, "midi").toNote();
-    //console.log(note, props.activeChord);
-    props.setChords((prev) => {
-      let newChords = [...prev];
-      let chordNotes = newChords[props.activeChord]
-        ? newChords[props.activeChord].notes.includes(note)
-          ? newChords[props.activeChord].notes.filter((e) => e !== note)
-          : [...newChords[props.activeChord].notes, note]
-        : [note];
-      //console.log(chordNotes);
-      newChords[props.activeChord].notes = chordNotes.sort(
-        (a, b) =>
-          Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
-      );
-      return newChords;
-    });
-    props.playChordPreview();
+    props.onKeyClick(note);
   };
   return (
     <div className="keyboard">
@@ -35,8 +20,8 @@ function Keyboard(props) {
             style={{
               left: (i * 100) / 84 + "%",
               backgroundColor:
-                !!props.notes.length &&
-                props.notes
+                !!props.activeNotes.length &&
+                props.activeNotes
                   .map((note) => Tone.Frequency(note).toMidi() - 24)
                   .includes(i)
                   ? colors[props.color]["A700"]
@@ -58,8 +43,8 @@ function Keyboard(props) {
                 ? "keyboard-black-key"
                 : "keyboard-white-key"
             } ${
-              !!props.notes.length &&
-              props.notes
+              !!props.activeNotes.length &&
+              props.activeNotes
                 .map((e) => Tone.Frequency(e).toMidi() - 24)
                 .includes(i) &&
               "keyboard-key-active"

@@ -13,6 +13,8 @@ import {
   ListItemSecondaryAction,
   Typography,
   Tooltip,
+  ListItemButton,
+  Fab,
 } from "@material-ui/core";
 
 function AudioFileItem(props) {
@@ -24,9 +26,7 @@ function AudioFileItem(props) {
       e.target.className.indexOf("filename") !== -1
     )
       return;
-    props.instrument.name === "Sampler"
-      ? props.instrument.triggerAttackRelease(props.fileLabel, "8n")
-      : props.instrument.player(props.fileLabel).start(0);
+    props.instrument.triggerAttackRelease(props.fileLabel, "4n");
   };
 
   /* useEffect(
@@ -36,30 +36,30 @@ function AudioFileItem(props) {
 
   return (
     <ListItem button onClick={handleClick} className={"audio-file-item"}>
-      <ListItemText
-        primary={props.fileLabel}
-        primaryTypographyProps={{
-          variant: "body2",
-          className: "audio-file-item-label",
-          onClick: () => props.setRenamingLabel(props.fileLabel),
-        }}
-        secondary={props.fileName}
-        secondaryTypographyProps={{
-          className: "audio-file-item-filename",
-          variant: "overline",
-          onClick: props.openFilePage,
-        }}
-      />
+      <Fab
+        className="audio-file-item-label"
+        color="primary"
+        onClick={() => props.setRenamingLabel(props.fileLabel)}
+        style={{ height: 48, width: 48 }}
+      >
+        {props.fileLabel}
+      </Fab>
+      <Typography
+        className="audio-file-item-filename"
+        onClick={props.openFilePage}
+        variant="overline"
+        style={{ marginLeft: 16 }}
+      >
+        {props.fileName}
+      </Typography>
 
       <ListItemSecondaryAction>
         <Tooltip title="Remove file from instrument">
           <IconButton
             onClick={() =>
-              props.handleFileDelete(
+              props.handleSamplerFileDelete(
                 props.fileId,
-                props.instrument.name === "Sampler"
-                  ? Tone.Frequency(props.fileLabel).toMidi()
-                  : props.fileLabel
+                Tone.Frequency(props.fileLabel).toMidi()
               )
             }
             edge="end"

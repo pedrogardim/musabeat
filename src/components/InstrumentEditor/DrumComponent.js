@@ -71,13 +71,7 @@ function DrumElement(props) {
         <IconButton
           className="remove-drum-component-button"
           onClick={() =>
-            props.handleFileDelete(
-              props.fileId,
-              props.instrument.name === "Sampler"
-                ? Tone.Frequency(props.fileLabel).toMidi()
-                : props.fileLabel,
-              props.index
-            )
+            props.handleFileDelete(props.fileId, props.fileLabel, props.index)
           }
         >
           <Icon style={{ fontSize: 18 }}>close</Icon>
