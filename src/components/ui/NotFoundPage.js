@@ -40,6 +40,10 @@ function NotFoundPage(props) {
       text: "instrumentEditor.noFiles",
       button: "instrumentEditor.addFile",
     },
+    emptySession: {
+      emoji: "🏝️",
+      text: "workspace.empty",
+    },
   };
 
   return (

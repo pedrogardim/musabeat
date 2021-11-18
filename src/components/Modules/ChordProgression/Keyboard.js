@@ -8,7 +8,9 @@ import "./Keyboard.css";
 import { Typography, IconButton, Icon } from "@material-ui/core";
 
 function Keyboard(props) {
-  const [octave, setOctave] = useState(props.initialOctave);
+  const [octave, setOctave] = useState(
+    props.initialOctave ? props.initialOctave : 0
+  );
 
   const handleKeyClick = (key) => {
     let note = Tone.Frequency(key + 24 + octave * 12, "midi").toNote();

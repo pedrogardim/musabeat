@@ -713,7 +713,7 @@ function PatchExplorer(props) {
             }`}
           >
             <TableBody>
-              {/* props.compact && (
+              {props.compact && (
                 <TableRow component="th" scope="row">
                   <TableCell style={{ width: props.compact ? 20 : 50 }}>
                     {selectedPatchInfo ? (
@@ -791,7 +791,7 @@ function PatchExplorer(props) {
                     )}
                   </TableCell>
                 </TableRow>
-              ) */}
+              )}
 
               {patchdata.map(
                 (patch, index) =>

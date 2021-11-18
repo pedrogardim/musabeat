@@ -429,7 +429,7 @@ function PatchPage(props) {
   }, [isLoaded]); */
 
   useEffect(() => {
-    console.log(patchInfo);
+    //console.log(patchInfo);
   }, [patchInfo]);
 
   useEffect(() => {
