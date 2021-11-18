@@ -6,7 +6,11 @@ import { Typography, Slider, Grid } from "@material-ui/core";
 
 import "./FilterEditor.css";
 
+import { useTranslation } from "react-i18next";
+
 function FilterEditor(props) {
+  const { t } = useTranslation();
+
   //temp
 
   /* const [filterState, setFilterState] = useState(
@@ -91,7 +95,7 @@ function FilterEditor(props) {
         >
           <Icon>power_settings_new</Icon>
         </IconButton>*/}
-          Filter
+          {t("instrumentEditor.synthEditor.parameters.filter")}
         </Typography>
         <div className="break" />
 
@@ -110,7 +114,10 @@ function FilterEditor(props) {
         className="filter-editor-grid filter-editor-grid-parameters"
       >
         <Typography variant="overline" className="filter-editor-labels">
-          {"Frequency:" + Math.floor(frequency) + "Hz"}
+          {t("instrumentEditor.synthEditor.parameters.frequency") +
+            ": " +
+            Math.floor(frequency) +
+            "Hz"}
         </Typography>
         <Slider
           valueLabelDisplay="auto"
@@ -123,7 +130,9 @@ function FilterEditor(props) {
         />
         <div className="break" />
         <Typography variant="overline" className="filter-editor-labels">
-          {"Resonance:" + filterQ}
+          {t("instrumentEditor.synthEditor.parameters.resonance") +
+            ": " +
+            filterQ}
         </Typography>
         <Slider
           valueLabelDisplay="auto"

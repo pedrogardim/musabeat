@@ -82,6 +82,41 @@ export const TRANSLATIONS_ES = {
     addFile: "Añadir archivo",
     removingItemAlert:
       "Este sonido será removido del instrumento. El archivo seguirá a salvo en tu cuenta.",
+    types: {
+      MonoSynth: "Sintetizador + Filtro",
+      FMSynth: "Sintetizador FM",
+      AMSynth: "Sintetizador AM",
+      Sampler: "Sampler",
+    },
+    synthEditor: {
+      parameters: {
+        oscillator: "Oscilador",
+        type: "Tipo",
+        wave: "Onda",
+        harmonicity: "Harmonicidad",
+        modwave: "Onda de Mod.",
+        mod: "Mod.",
+        modulationIndex: "Índice de Mod.",
+        filter: "Filtro",
+        frequency: "Frecuencia",
+        resonance: "Resonancia",
+        envelope: "Envelope",
+      },
+      waveTypes: {
+        sine: "Sinusoidal",
+        square: "Cuadrada",
+        triangle: "Triangular",
+        sawtooth: "Sierra",
+      },
+      oscMode: {
+        basic: "Básico",
+        fm: "FM",
+        am: "AM",
+        fat: "Analógico",
+        pwm: "PWM",
+        pulse: "Pulso",
+      },
+    },
   },
   modulePicker: {
     create: "Crear nuevo módulo",

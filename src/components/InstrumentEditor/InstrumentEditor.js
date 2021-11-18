@@ -23,6 +23,8 @@ import NotFoundPage from "../ui/NotFoundPage";
 
 import { FileDrop } from "react-file-drop";
 
+import { useTranslation } from "react-i18next";
+
 import {
   detectPitch,
   fileTypes,
@@ -34,6 +36,8 @@ import { Fab, Icon, Grid, Select } from "@material-ui/core";
 import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
+  const { t } = useTranslation();
+
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(!props.patchPage);
 
@@ -424,8 +428,8 @@ function InstrumentEditor(props) {
             onChange={changeInstrumentType}
             className="instrument-editor-type-select"
           >
-            {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-              <option value={e}>{e}</option>
+            {["MonoSynth", "Sampler", "FMSynth", "AMSynth"].map((e, i) => (
+              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
             ))}
           </Select>
           {bufferObjects.length > 0 ? (
@@ -478,7 +482,7 @@ function InstrumentEditor(props) {
             className="instrument-editor-type-select"
           >
             {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-              <option value={e}>{e}</option>
+              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
             ))}
           </Select>
           <Grid

@@ -4,16 +4,21 @@ import { Typography, Slider, Icon, IconButton, Grid } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 
+import { useTranslation } from "react-i18next";
+
 function EnvelopeControl(props) {
+  const { t } = useTranslation();
+
   const [envelope, setEnvelope] = useState(
     props.instrument.get()[props.envelopeType]
   );
 
   const handleChange = (element, value) => {
     props.instrument.set({ [props.envelopeType]: { [element]: value } });
-    setEnvelope((prev) => {
+    setEnvelope(props.instrument.get()[props.envelopeType]);
+    /* setEnvelope((prev) => {
       return { ...prev, [element]: value };
-    });
+    }); */
   };
 
   const toggleFilterEnvelope = () => {
@@ -48,8 +53,18 @@ function EnvelopeControl(props) {
         )}
         {props.envelopeType
           .toLowerCase()
-          .replace("envelope", " ADSR")
-          .replace("modulation", "mod")}
+          .replace(
+            "envelope",
+            " " + t("instrumentEditor.synthEditor.parameters.envelope")
+          )
+          .replace(
+            "filter",
+            " " + t("instrumentEditor.synthEditor.parameters.filter")
+          )
+          .replace(
+            "modulation",
+            " " + t("instrumentEditor.synthEditor.parameters.mod")
+          )}
       </Typography>
 
       {Object.keys(envelope).map(
@@ -71,8 +86,16 @@ function EnvelopeControl(props) {
                 orientation="vertical"
                 value={envelope[element]}
                 min={0}
-                step={0.1}
-                max={element === "sustain" ? 1 : 2}
+                step={0.01}
+                max={
+                  element === "sustain"
+                    ? 1
+                    : element === "attack"
+                    ? 4
+                    : element === "decay"
+                    ? 4
+                    : 2
+                }
                 onChangeCommitted={() => props.onInstrumentMod()}
                 onChange={(e, v) => handleChange(element, v)}
                 valueLabelDisplay="auto"
