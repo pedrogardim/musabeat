@@ -328,7 +328,7 @@ function SessionExplorer(props) {
             likedByUser={
               userLikes && userLikes.includes(sessionKeys[sessionIndex])
             }
-            createNewSession={props.createNewSession}
+            setNewSessionDialog={props.setNewSessionDialog}
           />
         ))
       ) : !sessions.length ? (

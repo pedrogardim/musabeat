@@ -204,6 +204,7 @@ function UserPage(props) {
             handlePageNav={props.handlePageNav}
             target={userKey}
             user={props.user}
+            setNewSessionDialog={props.setNewSessionDialog}
             compact
           />
         </div>

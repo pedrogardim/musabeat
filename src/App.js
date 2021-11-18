@@ -71,6 +71,8 @@ function App() {
 
   const [sideMenu, setSideMenu] = useState(false);
 
+  //can be boolean (opened, empty), or object (session to copy)
+
   const [newSessionDialog, setNewSessionDialog] = useState(false);
 
   //const [premiumMode, setPremiumMode] = useState(false);
@@ -208,20 +210,6 @@ function App() {
         onMouseDown={() => Tone.start()}
         onScroll={(e) => detectScrollToBottom(e)}
       >
-        {newSessionDialog && (
-          <NewSessionDialog
-            setNewSessionDialog={setNewSessionDialog}
-            handleCreateNewSession={handleCreateNewSession}
-          />
-        )}
-        {authDialog && (
-          <AuthDialog
-            authDialog={authDialog}
-            setAuthDialog={setAuthDialog}
-            setUser={setUser}
-          />
-        )}
-
         <Menu
           style={{ marginTop: 48 }}
           anchorEl={userOption}
@@ -284,6 +272,7 @@ function App() {
               createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
+              setNewSessionDialog={setNewSessionDialog}
             />
           </Route>
           <Route exact path="/sessions">
@@ -292,6 +281,7 @@ function App() {
               createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
+              setNewSessionDialog={setNewSessionDialog}
             />
           </Route>
           <Route exact path="/files">
@@ -368,11 +358,16 @@ function App() {
               user={user}
               createNewSession={handleCreateNewSession}
               setUnsavedChanges={setUnsavedChanges}
+              setNewSessionDialog={setNewSessionDialog}
               handlePageNav={handlePageNav}
             />
           </Route>
           <Route exact path="/user/:key">
-            <UserPage handlePageNav={handlePageNav} user={user} />
+            <UserPage
+              handlePageNav={handlePageNav}
+              user={user}
+              setNewSessionDialog={setNewSessionDialog}
+            />
           </Route>
 
           <Route exact path="/admin">
@@ -382,6 +377,21 @@ function App() {
           </Route>
         </Switch>
       </div>
+      {newSessionDialog && (
+        <NewSessionDialog
+          newSessionDialog={newSessionDialog}
+          setNewSessionDialog={setNewSessionDialog}
+          handleCreateNewSession={handleCreateNewSession}
+        />
+      )}
+      {authDialog && (
+        <AuthDialog
+          authDialog={authDialog}
+          setAuthDialog={setAuthDialog}
+          setUser={setUser}
+        />
+      )}
+
       <ActionConfirm
         unsavedChanges
         open={Boolean(followingRoute)}

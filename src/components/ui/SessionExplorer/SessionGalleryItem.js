@@ -173,7 +173,7 @@ function SessionGalleryItem(props) {
           >
             <div>
               <IconButton
-                onClick={() => props.createNewSession(props.session)}
+                onClick={() => props.setNewSessionDialog(props.session)}
                 disabled={
                   !props.user ||
                   (props.user.uid !== props.session.creator &&

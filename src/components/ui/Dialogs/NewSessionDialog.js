@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import firebase from "firebase";
 
 import "../SessionSettings.css";
+
+import { colors } from "../../../utils/materialPalette";
 
 import {
   IconButton,
@@ -15,7 +17,7 @@ import {
   BottomNavigationAction,
   Button,
   Select,
-  FormControl,
+  Paper,
   InputLabel,
   TextField,
   Grid,
@@ -75,7 +77,11 @@ const sessionTemplate = {
 function NewSessionDialog(props) {
   const { t } = useTranslation();
 
-  const [session, setSession] = useState(sessionTemplate);
+  const isCopy = typeof props.newSessionDialog === "object";
+
+  const [session, setSession] = useState(
+    isCopy ? props.newSessionDialog : sessionTemplate
+  );
 
   const addModule = (moduleType) => {
     const initialDrumPatch = "8fsbChTqV7aaWNyI1hTC";
@@ -365,28 +371,62 @@ function NewSessionDialog(props) {
               {t("misc.initialModules")}
             </Typography>
             <div className="break" />
-            <ButtonGroup color="primary" style={{ margin: "auto" }}>
-              {moduletypes.map((e, i) => (
-                <Tooltip title={t(`modulePicker.types.${i}.name`)}>
-                  <Button
-                    color="primary"
-                    variant={
-                      session.modules.some((e) => e.type === i)
-                        ? "contained"
-                        : "outlined"
-                    }
-                    onClick={() =>
-                      session.modules.some((e) => e.type === i)
-                        ? removeModule(i)
-                        : addModule(i)
-                    }
-                    key={e.name}
+            {isCopy ? (
+              <div className="session-gallery-item-modules-cont">
+                {session.modules.map((e) => (
+                  <Paper
+                    className="session-gallery-item-module"
+                    style={{
+                      backgroundColor: colors[e.color][500],
+                      borderRadius: 0,
+                    }}
                   >
-                    <Icon>{e.icon}</Icon>
-                  </Button>
-                </Tooltip>
-              ))}
-            </ButtonGroup>
+                    <Tooltip
+                      title={
+                        e.name
+                          ? `"${e.name}"`
+                          : t(`modulePicker.types.${e.type}.name`)
+                      }
+                    >
+                      <Icon>
+                        {e.type === 0
+                          ? "grid_on"
+                          : e.type === 1
+                          ? "music_note"
+                          : e.type === 2
+                          ? "font_download"
+                          : e.type === 3
+                          ? "graphic_eq"
+                          : "piano"}
+                      </Icon>
+                    </Tooltip>
+                  </Paper>
+                ))}
+              </div>
+            ) : (
+              <ButtonGroup color="primary" style={{ margin: "auto" }}>
+                {moduletypes.map((e, i) => (
+                  <Tooltip title={t(`modulePicker.types.${i}.name`)}>
+                    <Button
+                      color="primary"
+                      variant={
+                        session.modules.some((e) => e.type === i)
+                          ? "contained"
+                          : "outlined"
+                      }
+                      onClick={() =>
+                        session.modules.some((e) => e.type === i)
+                          ? removeModule(i)
+                          : addModule(i)
+                      }
+                      key={e.name}
+                    >
+                      <Icon>{e.icon}</Icon>
+                    </Button>
+                  </Tooltip>
+                ))}
+              </ButtonGroup>
+            )}
           </Grid>
         </Grid>
       </Grid>

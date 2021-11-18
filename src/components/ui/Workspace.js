@@ -176,7 +176,7 @@ function Workspace(props) {
   };
 
   const handleSessionCopy = () => {
-    DBSessionRef.get().then((r) => props.createNewSession(r.data()));
+    props.setNewSessionDialog({ ...sessionData, modules: [...modules] });
   };
 
   const getModuleSize = (module, index) => {
