@@ -3,19 +3,27 @@
   height: 56px;
   display: flex;
   position: relative;
+  user-select: none;
 }
 
 .keyboard-key {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
 }
 .keyboard-black-key {
   height: 60%;
   position: absolute;
   width: calc(100% / 78);
+  justify-content: center;
+  color: white !important;
 }
 
 .keyboard-white-key {
   width: calc(100% / 49);
+  justify-content: flex-end;
 }
 
 .keyboard-key-active {

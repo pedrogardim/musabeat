@@ -36,8 +36,29 @@ import { colors } from "../../../utils/materialPalette";
 
 import LoadingScreen from "../../ui/LoadingScreen";
 import NotFoundPage from "../NotFoundPage";
+import Keyboard from "../../Modules/ChordProgression/Keyboard";
 
 let isSustainPedal = false;
+
+const keyboardNoteMapping = [
+  "a",
+  "w",
+  "s",
+  "e",
+  "d",
+  "f",
+  "t",
+  "g",
+  "y",
+  "h",
+  "u",
+  "j",
+  "k",
+  "o",
+  "l",
+  "p",
+  ":",
+];
 
 function PatchPage(props) {
   const { t } = useTranslation();
@@ -52,6 +73,9 @@ function PatchPage(props) {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const [activeNotes, setActiveNotes] = useState([]);
+  const [keyPlayingOctave, setKeyPlayingOctave] = useState(2);
 
   const [editMode, setEditMode] = useState(false);
   const [drumLabels, setDrumLabels] = useState(false);
@@ -306,6 +330,51 @@ function PatchPage(props) {
     );
   };
 
+  const handleKeyDown = (e) => {
+    if (
+      typeof e === "object" &&
+      keyboardNoteMapping.indexOf(
+        e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
+      ) === -1
+    )
+      return;
+
+    let note =
+      typeof e === "object"
+        ? Tone.Frequency(
+            keyboardNoteMapping.indexOf(
+              e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
+            ) +
+              24 +
+              keyPlayingOctave * 12,
+            "midi"
+          ).toNote()
+        : e;
+    if (!activeNotes.includes(note)) {
+      setActiveNotes((prev) => [...prev, note]);
+      instrument.triggerAttack(note);
+    }
+  };
+
+  const handleKeyUp = (e) => {
+    let note =
+      typeof e === "object"
+        ? Tone.Frequency(
+            keyboardNoteMapping.indexOf(
+              e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
+            ) +
+              24 +
+              keyPlayingOctave * 12,
+            "midi"
+          ).toNote()
+        : e;
+
+    if (activeNotes.includes(note)) {
+      setActiveNotes((prev) => prev.filter((e) => e !== note));
+      instrument.triggerRelease(note);
+    }
+  };
+
   const onMIDIMessage = (event) => {
     if (event.data[0] === 176) {
       event.data[2] === 0 && instrument.releaseAll();
@@ -330,7 +399,7 @@ function PatchPage(props) {
       navigator.requestMIDIAccess().then(
         (midiAccess) => {
           midiAccess.inputs.forEach((entry) => {
-            console.log("mididdddd", instrument);
+            //console.log("mididdddd", instrument);
             if (instrument)
               entry.onmidimessage = (e) => {
                 instrument && onMIDIMessage(e);
@@ -355,9 +424,9 @@ function PatchPage(props) {
       );
   };
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (isLoaded) console.log(isLoaded);
-  }, [isLoaded]);
+  }, [isLoaded]); */
 
   useEffect(() => {
     console.log(patchInfo);
@@ -367,9 +436,13 @@ function PatchPage(props) {
     !props.isDrum && initializeMidi();
   }, [instrument]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(isSustainPedal);
-  }, [isSustainPedal]);
+  }, [isSustainPedal]); */
+
+  /*   useEffect(() => {
+    console.log(activeNotes);
+  }, [activeNotes]); */
 
   useEffect(() => {
     getPatchInfo();
@@ -381,7 +454,12 @@ function PatchPage(props) {
   }, []);
 
   return (
-    <div className="file-page">
+    <div
+      className="file-page"
+      tabIndex="0"
+      onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
+    >
       {patchInfo !== undefined ? (
         <Fragment>
           <Typography variant="h4">
@@ -494,6 +572,22 @@ function PatchPage(props) {
             </div>
           )}
           <LoadingScreen open={patchInfo === null} />
+          <Keyboard
+            style={{
+              width: "80vw",
+              minWidth: 400,
+              maxWidth: 1000,
+              height: 72,
+            }}
+            onKeyClick={(note) => handleKeyDown(note)}
+            onKeyUp={(note) => handleKeyUp(note)}
+            activeNotes={activeNotes}
+            initialOctave={2}
+            octaves={1.42}
+            notesLabel={keyboardNoteMapping}
+            setKeyPlayingOctave={setKeyPlayingOctave}
+            variableOctave
+          />
         </Fragment>
       ) : (
         <NotFoundPage

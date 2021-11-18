@@ -538,11 +538,11 @@ function InstrumentEditor(props) {
       );
   }, [props.instrument]);
 
-  useEffect(() => {
+  /*  useEffect(() => {
     //console.log(props.instrument);
 
     console.log(filesId, filesName);
-  }, [filesId, filesName]);
+  }, [filesId, filesName]); */
 
   return (
     <div
