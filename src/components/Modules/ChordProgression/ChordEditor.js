@@ -135,6 +135,25 @@ function ChordEditor(props) {
     props.playChordPreview();
   };
 
+  const onKeyClick = (note) => {
+    //console.log(note, props.activeChord);
+    props.setChords((prev) => {
+      let newChords = [...prev];
+      let chordNotes = newChords[props.activeChord]
+        ? newChords[props.activeChord].notes.includes(note)
+          ? newChords[props.activeChord].notes.filter((e) => e !== note)
+          : [...newChords[props.activeChord].notes, note]
+        : [note];
+      //console.log(chordNotes);
+      newChords[props.activeChord].notes = chordNotes.sort(
+        (a, b) =>
+          Tone.Frequency(a).toFrequency() - Tone.Frequency(b).toFrequency()
+      );
+      return newChords;
+    });
+    props.playChordPreview();
+  };
+
   useEffect(() => {
     setTextInputValue(chordNotestoName(props.chords[props.activeChord].notes));
   }, [props.chords, props.activeChord]);
@@ -201,12 +220,9 @@ function ChordEditor(props) {
         <div className="break" />
 
         <Keyboard
-          index={props.index}
           color={props.module.color}
-          setChords={props.setChords}
-          activeChord={props.activeChord}
-          notes={props.chords[props.activeChord].notes}
-          playChordPreview={props.playChordPreview}
+          onKeyClick={onKeyClick}
+          activeNotes={props.chords[props.activeChord].notes}
         />
       </DialogContent>
       <IconButton

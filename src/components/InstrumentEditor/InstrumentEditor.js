@@ -16,6 +16,9 @@ import FileExplorer from "../ui/FileExplorer/FileExplorer";
 
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
+import NoteInput from "../ui/Dialogs/NoteInput";
+import ActionConfirm from "../ui/Dialogs/ActionConfirm";
+
 import NotFoundPage from "../ui/NotFoundPage";
 
 import { FileDrop } from "react-file-drop";
@@ -43,6 +46,7 @@ function InstrumentEditor(props) {
   const [selectedPatch, setSelectedPatch] = useState(null);
 
   const [renamingLabel, setRenamingLabel] = useState(null);
+  const [deletingItem, setDeletingItem] = useState(null);
 
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
@@ -211,17 +215,22 @@ function InstrumentEditor(props) {
   };
 
   const changeSamplerNote = (note, newNote) => {
-    //console.log(labelName, newName);
+    // let note = Tone.Frequency(noteN).toMidi();
+    // let newNote = Tone.Frequency(newNoteN).toMidi();
+
+    console.log(note, newNote);
 
     let drumMap = props.instrument._buffers._buffers;
     if (drumMap.has(newNote)) return;
 
     //props.instrument.add()
     drumMap.set(
-      Tone.Frequency(newNote).toMidi(),
-      drumMap.get(Tone.Frequency(note).toMidi())
+      JSON.stringify(Tone.Frequency(newNote).toMidi()),
+      JSON.stringify(Tone.Frequency(note).toMidi())
     );
-    //console.log(drumMap.delete(Tone.Frequency(note).toMidi()));
+
+    console.log(drumMap.delete(JSON.stringify(Tone.Frequency(note).toMidi())));
+
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     if (typeof props.module.instrument === "string") {
@@ -377,7 +386,7 @@ function InstrumentEditor(props) {
                   key={i}
                   index={i}
                   instrument={props.instrument}
-                  handleFileDelete={handlePlayersFileDelete}
+                  handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
                   buffer={props.instrument._buffers._buffers.get(
                     JSON.stringify(i)
                   )}
@@ -421,25 +430,31 @@ function InstrumentEditor(props) {
           </Select>
           {bufferObjects.length > 0 ? (
             <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-              {bufferObjects.map((e, i) => (
-                <Fragment>
-                  <AudioFileItem
-                    key={i}
-                    index={i}
-                    instrument={props.instrument}
-                    handleFileDelete={handleSamplerFileDelete}
-                    buffer={e[0]}
-                    fileLabel={Tone.Frequency(e[1], "midi").toNote()}
-                    fileName={filesName[Tone.Frequency(e[1], "midi").toNote()]}
-                    fileId={filesId[i]}
-                    openFilePage={() =>
-                      props.handlePageNav("file", filesId[i], true)
-                    }
-                    setRenamingLabel={setRenamingLabel}
-                  />
-                  <Divider />
-                </Fragment>
-              ))}
+              {bufferObjects
+                .sort((a, b) => a[1] - b[1])
+                .map((e, i) => (
+                  <Fragment>
+                    <AudioFileItem
+                      key={i}
+                      index={i}
+                      instrument={props.instrument}
+                      handleSamplerFileDelete={(a, b) =>
+                        setDeletingItem([a, b])
+                      }
+                      buffer={e[0]}
+                      fileLabel={Tone.Frequency(e[1], "midi").toNote()}
+                      fileName={
+                        filesName[Tone.Frequency(e[1], "midi").toNote()]
+                      }
+                      fileId={filesId[i]}
+                      openFilePage={() =>
+                        props.handlePageNav("file", filesId[i], true)
+                      }
+                      setRenamingLabel={setRenamingLabel}
+                    />
+                    <Divider />
+                  </Fragment>
+                ))}
             </List>
           ) : (
             <NotFoundPage
@@ -518,6 +533,12 @@ function InstrumentEditor(props) {
         filesName
       );
   }, [props.instrument]);
+
+  useEffect(() => {
+    //console.log(props.instrument);
+
+    console.log(filesId, filesName);
+  }, [filesId, filesName]);
 
   return (
     <div
@@ -604,22 +625,36 @@ function InstrumentEditor(props) {
         handlePageNav={props.handlePageNav}
       />
 
-      <NameInput
-        select
-        note={props.module.type !== 0}
-        defaultValue={
-          props.module.type === 0
-            ? props.module.lbls[renamingLabel]
-            : renamingLabel
-        }
-        open={renamingLabel !== null}
-        onClose={() => setRenamingLabel(null)}
-        onSubmit={(i) => {
-          props.module.type === 0
-            ? renamePlayersLabel(renamingLabel, i)
-            : changeSamplerNote(renamingLabel, i);
-        }}
-      />
+      {renamingLabel &&
+        (props.module.type === 0 ? (
+          <NameInput
+            select
+            defaultValue={props.module.lbls[renamingLabel]}
+            open={true}
+            onClose={() => setRenamingLabel(null)}
+            onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}
+          />
+        ) : (
+          <NoteInput
+            open={true}
+            onClose={() => setRenamingLabel(null)}
+            note={renamingLabel}
+            onSubmit={(i) => changeSamplerNote(renamingLabel, i)}
+          />
+        ))}
+
+      {deletingItem && (
+        <ActionConfirm
+          instrumentEditor
+          action={() =>
+            props.instrument.name === "Sampler"
+              ? handleSamplerFileDelete(...deletingItem)
+              : handlePlayersFileDelete(...deletingItem)
+          }
+          open={deletingItem}
+          onClose={() => setDeletingItem(null)}
+        />
+      )}
     </div>
   );
 }

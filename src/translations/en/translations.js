@@ -79,8 +79,10 @@ export const TRANSLATIONS_EN = {
     },
   },
   instrumentEditor: {
-    noFiles: "Empty Drum",
+    noFiles: "Empty Instrument",
     addFile: "Add File",
+    removingItemAlert:
+      "This sound will be removed from the instrument. The file will remain safe in your account.",
   },
   modulePicker: {
     create: "Create a new module",
@@ -143,6 +145,7 @@ export const TRANSLATIONS_EN = {
     areYouSure: "Are you sure?",
     irreversibleAction: "This is an action that can't be undone",
     insertName: "Insert name",
+    insertNote: "Insert note",
     sessionInfo: "Session Info",
     patchName: "Patch Name",
     unsavedChanges: "Are you sure? Any unsaved changes will not be saved",

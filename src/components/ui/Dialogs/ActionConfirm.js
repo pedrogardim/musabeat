@@ -28,6 +28,8 @@ function ActionConfirm(props) {
             ? t("dialogs.dupSession")
             : props.unsavedChanges
             ? t("dialogs.unsavedChanges")
+            : props.instrumentEditor
+            ? t("instrumentEditor.removingItemAlert")
             : ""}
         </DialogContentText>
       </DialogContent>

@@ -78,8 +78,10 @@ export const TRANSLATIONS_ES = {
     },
   },
   instrumentEditor: {
-    noFiles: "Batería Vacía",
+    noFiles: "Instrumento Vacío",
     addFile: "Añadir archivo",
+    removingItemAlert:
+      "Este sonido será removido del instrumento. El archivo seguirá a salvo en tu cuenta.",
   },
   modulePicker: {
     create: "Crear nuevo módulo",
@@ -142,6 +144,7 @@ export const TRANSLATIONS_ES = {
     areYouSure: "¿Estás seguro?",
     irreversibleAction: "Esta medida no se puede deshacer",
     insertName: "Insertar nombre",
+    insertNote: "Insertar nota",
     sessionInfo: "Información de la sessión",
     patchName: "Nombre del Patch",
     unsavedChanges: "¿Estás seguro? Los cambios no guardados se perderán",
