@@ -290,7 +290,7 @@ function ModuleSettings(props) {
           >
             <option value={3}>{t("misc.none")}</option>
             <option value={4}>7ths</option>
-            <option value={5}>7ths + 9ths</option>
+            {/* <option value={5}>7ths + 9ths</option> */}
           </Select>
         </FormControl>
       )}
