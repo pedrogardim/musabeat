@@ -43,6 +43,11 @@ function AuthDialog(props) {
       .then((result) => {
         checkForFistTimeLogin(result.user);
         props.setAuthDialog(false);
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(result.user.uid)
+          .update({ "profile.photoURL": result.user.photoURL });
         //result.user.updateProfile({ displayName: "musabeat" });
       })
       .catch((error) => console.log(error.message));

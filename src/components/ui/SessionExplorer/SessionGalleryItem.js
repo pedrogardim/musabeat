@@ -127,23 +127,25 @@ function SessionGalleryItem(props) {
           </Tooltip>
         </div>
 
-        {props.session.tags && !!props.session.tags.length && (
-          <div className={"session-gallery-item-tags"}>
-            {props.session.tags.map(
-              (e, i) =>
-                i < 2 && (
-                  <Chip
-                    style={{ margin: "0px 4px" }}
-                    key={props.index + e}
-                    label={sessionTags[e]}
-                    onClick={() =>
-                      props.handleTagClick && props.handleTagClick(i)
-                    }
-                  />
-                )
-            )}
-          </div>
-        )}
+        {!props.compact &&
+          props.session.tags &&
+          !!props.session.tags.length && (
+            <div className={"session-gallery-item-tags"}>
+              {props.session.tags.map(
+                (e, i) =>
+                  i < 2 && (
+                    <Chip
+                      style={{ margin: "0px 4px" }}
+                      key={props.index + e}
+                      label={sessionTags[e]}
+                      onClick={() =>
+                        props.handleTagClick && props.handleTagClick(i)
+                      }
+                    />
+                  )
+              )}
+            </div>
+          )}
 
         <div className="session-gallery-item-modules-cont">
           {props.session.modules !== undefined &&

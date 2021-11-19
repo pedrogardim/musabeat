@@ -1,8 +1,9 @@
 .user-page {
   position: absolute;
-  height: 100%;
+  flex: 1;
   width: 100%;
   bottom: 0;
+  top: 0;
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -11,8 +12,9 @@
 
 .user-page-avatar {
   position: absolute !important;
-  top: calc(30% - 48px);
-  left: calc(50% - 48px);
+  margin-top: -48px !important;
+  top: 0;
+  left: calc(50vw - 48px);
 
   height: 96px !important;
   width: 96px !important;
@@ -23,19 +25,16 @@
 .user-page-main-content {
   width: 100%;
   padding: 64px 0;
+  flex: 1;
+  position: relative;
   display: flex;
-  flex: 1 0 1px;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: flex-start;
   background-color: white;
 }
 
 .user-page-background {
   position: relative;
-  flex: 0 0 30%;
   top: 0;
   height: 30% !important;
   width: 100vw !important;
@@ -56,10 +55,10 @@
 
 .user-page-sessions-cont {
   position: relative;
-  height: 362px;
   width: 100%;
   max-width: 680px;
   margin: 16px !important;
+  flex: 1;
 }
 
 .up-fab {

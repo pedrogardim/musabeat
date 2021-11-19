@@ -211,4 +211,8 @@ export const TRANSLATIONS_ES = {
     },
     drumCategories: { 0: "Electrónica", 1: "Acústica", 2: "FX", 3: "Étnico" },
   },
+  user: {
+    followers: "seguidores",
+    userNotFound: "Usuário No Encontrado",
+  },
 };

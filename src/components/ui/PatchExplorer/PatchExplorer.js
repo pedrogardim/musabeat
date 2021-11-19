@@ -767,7 +767,8 @@ function PatchExplorer(props) {
                               onClick={() =>
                                 props.handlePageNav(
                                   "user",
-                                  selectedPatchInfo.creator,
+                                  patchesUserData[selectedPatchInfo.creator]
+                                    .username,
                                   true
                                 )
                               }
@@ -869,7 +870,7 @@ function PatchExplorer(props) {
                                   onClick={() =>
                                     props.handlePageNav(
                                       "user",
-                                      patch.creator,
+                                      patchesUserData[patch.creator].username,
                                       true
                                     )
                                   }

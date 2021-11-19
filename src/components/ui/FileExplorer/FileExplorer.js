@@ -596,7 +596,11 @@ function FileExplorer(props) {
                         variant="overline"
                         className="fe-filename"
                         onClick={() =>
-                          props.handlePageNav("file", fileIdList[index], true)
+                          props.handlePageNav(
+                            "file",
+                            filesUserData[filedata[index].user].username,
+                            true
+                          )
                         }
                       >
                         {row.name}
@@ -639,7 +643,7 @@ function FileExplorer(props) {
                             onClick={() =>
                               props.handlePageNav(
                                 "user",
-                                filedata[index].user,
+                                filesUserData[filedata[index].user].username,
                                 true
                               )
                             }

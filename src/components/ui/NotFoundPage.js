@@ -44,6 +44,10 @@ function NotFoundPage(props) {
       emoji: "🏝️",
       text: "workspace.empty",
     },
+    user: {
+      emoji: "🙈",
+      text: "user.userNotFound",
+    },
   };
 
   return (

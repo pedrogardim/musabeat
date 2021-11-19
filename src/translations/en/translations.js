@@ -207,4 +207,8 @@ export const TRANSLATIONS_EN = {
     instrumentsCategories: { 0: "Keys", 1: "Synth", 2: "Bass", 3: "Pad" },
     drumCategories: { 0: "Electronic", 1: "Acoustic", 2: "FX", 3: "Ethnic" },
   },
+  user: {
+    followers: "followers",
+    userNotFound: "User Not Found",
+  },
 };
