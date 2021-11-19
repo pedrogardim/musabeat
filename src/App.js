@@ -217,7 +217,7 @@ function App() {
           open={!!userOption}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={() => setUserOption(false)}>
+          <MenuItem onClick={() => handlePageNav("user", user.displayName)}>
             {t("avatar.profile")}
           </MenuItem>
           <MenuItem onClick={() => handlePageNav("sessions")}>

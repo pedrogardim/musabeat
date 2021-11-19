@@ -118,6 +118,9 @@ export const TRANSLATIONS_EN = {
         pulse: "Pulse",
       },
     },
+    drumComponent: {
+      emptySlot: "Empty Slot",
+    },
   },
   modulePicker: {
     create: "Create a new module",

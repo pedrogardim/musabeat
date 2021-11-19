@@ -43,6 +43,7 @@ function AuthDialog(props) {
       .then((result) => {
         checkForFistTimeLogin(result.user);
         props.setAuthDialog(false);
+        //result.user.updateProfile({ displayName: "musabeat" });
       })
       .catch((error) => console.log(error.message));
   };
@@ -186,6 +187,7 @@ function AuthDialog(props) {
 
     if (user.metadata.creationTime === user.metadata.lastSignInTime) {
       userProfileRef.set({ profile: userProfile });
+      user.updateProfile({ displayName: userProfile.displayName });
     }
 
     setUsernameNotification(
