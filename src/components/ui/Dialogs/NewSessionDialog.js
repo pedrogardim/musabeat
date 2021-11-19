@@ -230,7 +230,9 @@ function NewSessionDialog(props) {
             <TextField
               style={{ width: "100%" }}
               value={session.name}
-              onChange={(e) => handleInfoChange("name", e.target.value)}
+              onChange={(e) =>
+                handleInfoChange("name", e.target.value.slice(0, 63))
+              }
               label={t("info.name")}
             />
           </Grid>
@@ -241,7 +243,9 @@ function NewSessionDialog(props) {
               rows={2}
               label={t("info.description")}
               maxRows={6}
-              onChange={(e) => handleInfoChange("description", e.target.value)}
+              onChange={(e) =>
+                handleInfoChange("description", e.target.value.slice(0, 255))
+              }
               multiline
             />
           </Grid>

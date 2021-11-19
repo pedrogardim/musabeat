@@ -29,6 +29,7 @@
   white-space: nowrap;
   display: inline-block;
   overflow: hidden;
+  margin: 0 16px;
 }
 .session-gallery-item-subtitle {
   width: 80%;
@@ -57,7 +58,7 @@
 }
 
 .session-gallery-item-title-cont {
-  width: 100%;
+  width: 100% !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,16 +87,21 @@
 .session-gallery-item-sessionInfo {
   position: relative;
   flex: 1 1 1px !important;
+  /* TEMP: avoid letters cutting in half */
+  max-height: 100px;
+
   display: flex;
   justify-content: center !important;
   flex-direction: column !important;
   align-items: center;
   align-content: center;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .session-gallery-item-sessionInfo-text {
   max-height: 100%;
+  text-overflow: ellipsis;
 }
 
 .session-gallery-item-tags {

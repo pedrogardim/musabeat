@@ -173,7 +173,10 @@ function WorkspaceTitle(props) {
 
       {props.sessionData && expanded && (
         <Fragment>
-          <Typography variant="body2">
+          <Typography
+            variant="body2"
+            style={{ maxWidth: 1200, textAlign: "center", margin: "0 32px" }}
+          >
             {props.sessionData.description
               ? `"${props.sessionData.description}"`
               : "No Description"}

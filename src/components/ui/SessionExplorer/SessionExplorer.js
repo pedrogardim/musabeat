@@ -307,7 +307,9 @@ function SessionExplorer(props) {
       ) : (
         <Grid
           className="session-explorer-grid-cont"
-          style={{ marginTop: !props.compact && 56 }}
+          style={{
+            marginTop: !props.compact && 56,
+          }}
           container
           spacing={2}
         >

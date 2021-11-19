@@ -71,7 +71,8 @@ function AuthDialog(props) {
   };
 
   const handleEmailAccCreation = () => {
-    if (!accountInfo.name) setFieldErrors((prev) => [...prev, "name"]);
+    if (!accountInfo.name || accountInfo.name.length > 15)
+      setFieldErrors((prev) => [...prev, "name"]);
 
     if (!accountInfo.email || !/\S+@\S+\.\S+/.test(accountInfo.email))
       setFieldErrors((prev) => [...prev, "email"]);
