@@ -877,6 +877,19 @@ function PatchExplorer(props) {
                                 />
                               </Tooltip>
                             )}
+                          {patch.of && (
+                            <Tooltip arrow placement="top" title="Official">
+                              <Icon
+                                style={{
+                                  fontSize: 16,
+                                  marginLeft: 4,
+                                  color: "#3f51b5",
+                                }}
+                              >
+                                verified
+                              </Icon>
+                            </Tooltip>
+                          )}
                         </div>
                       </TableCell>
 

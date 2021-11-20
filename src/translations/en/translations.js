@@ -188,6 +188,9 @@ export const TRANSLATIONS_EN = {
     patchName: "Patch Name",
     unsavedChanges: "Are you sure? Any unsaved changes will not be saved",
     dupSession: "Create a copy of this session for your account?",
+    limitReached: "Limit reached",
+    filePatchLimit:
+      "File based instruments have a limit of 5 MB for a quicker loading time for all users. Try to pick a smaller file or removing current files.",
   },
   info: {
     name: "Name",

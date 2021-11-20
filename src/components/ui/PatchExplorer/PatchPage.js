@@ -559,35 +559,42 @@ function PatchPage(props) {
                 <Fab
                   color="primary"
                   onClick={savePatchChanges}
-                  style={{ marginRight: 16 }}
+                  style={{ marginRight: 16, zIndex: 99 }}
                 >
                   <Icon>save</Icon>
                 </Fab>
               </Tooltip>
               <Tooltip title="Save as new">
-                <Fab color="primary" onClick={savePatchChanges}>
+                <Fab
+                  color="primary"
+                  onClick={savePatchChanges}
+                  style={{ zIndex: 99 }}
+                >
                   <Icon>add</Icon>
                 </Fab>
               </Tooltip>
             </div>
           )}
           <LoadingScreen open={patchInfo === null} />
-          <Keyboard
-            style={{
-              width: "80vw",
-              minWidth: 400,
-              maxWidth: 1000,
-              height: 72,
-            }}
-            onKeyClick={(note) => handleKeyDown(note)}
-            onKeyUp={(note) => handleKeyUp(note)}
-            activeNotes={activeNotes}
-            initialOctave={2}
-            octaves={1.42}
-            notesLabel={keyboardNoteMapping}
-            setKeyPlayingOctave={setKeyPlayingOctave}
-            variableOctave
-          />
+          {!props.isDrum && (
+            <Keyboard
+              style={{
+                width: "80vw",
+                minWidth: 400,
+                maxWidth: 1000,
+                height: 72,
+                zIndex: 0,
+              }}
+              onKeyClick={(note) => handleKeyDown(note)}
+              onKeyUp={(note) => handleKeyUp(note)}
+              activeNotes={activeNotes}
+              initialOctave={2}
+              octaves={1.42}
+              notesLabel={keyboardNoteMapping}
+              setKeyPlayingOctave={setKeyPlayingOctave}
+              variableOctave
+            />
+          )}
         </Fragment>
       ) : (
         <NotFoundPage

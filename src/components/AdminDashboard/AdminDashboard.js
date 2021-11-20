@@ -8,7 +8,7 @@ import firebase from "firebase";
 
 import "./AdminDashboard.css";
 
-import { encodeAudioFile } from "../../assets/musicutils";
+import { encodeAudioFile, dete } from "../../assets/musicutils";
 
 import { Button, Typography } from "@material-ui/core";
 
@@ -153,6 +153,69 @@ function AdminDashboard(props) {
     });
   };
 
+  const updatePatchesPremium = () => {
+    firebase
+      .firestore()
+      .collection("patches")
+      .where("base", "==", "Sampler")
+      .get()
+      .then((qrry) => {
+        console.log("qrry", qrry.size);
+        qrry.docs.forEach((patch) => {
+          Promise.all(
+            Object.values(patch.data().urls).map(
+              async (url) =>
+                (
+                  await firebase.firestore().collection("files").doc(url).get()
+                ).data().size
+            )
+          ).then((sizeArray) => {
+            /* patchSnap.ref.update({pr}) */
+            let patchSize = sizeArray.reduce((a, b) => a + b, 0);
+            console.log(patch.data().name, formatBytes(patchSize));
+            patch.ref.update({ pr: patchSize >= 5242880 ? true : false });
+          });
+        });
+      });
+
+    firebase
+      .firestore()
+      .collection("drumpatches")
+      .get()
+      .then((qrry) => {
+        console.log("qrry", qrry.size);
+        qrry.docs.forEach((patch) => {
+          Promise.all(
+            Object.values(patch.data().urls).map(
+              async (url) =>
+                (
+                  await firebase.firestore().collection("files").doc(url).get()
+                ).data().size
+            )
+          ).then((sizeArray) => {
+            /* patchSnap.ref.update({pr}) */
+            let patchSize = sizeArray.reduce((a, b) => a + b, 0);
+            console.log(patch.data().name, formatBytes(patchSize));
+            patch.ref.update({ pr: patchSize >= 5242880 ? true : false });
+          });
+        });
+      });
+  };
+
+  const resetPatchesOfficial = () => {
+    firebase
+      .firestore()
+      .collection("drumpatches")
+      .get()
+      .then((r) => r.docs.forEach((e) => e.ref.update({ of: false })));
+
+    firebase
+      .firestore()
+      .collection("patches")
+      .get()
+      .then((r) => r.docs.forEach((e) => e.ref.update({ of: false })));
+  };
+
   return (
     <div
       className="file-page"
@@ -177,12 +240,15 @@ function AdminDashboard(props) {
       <div className={"admin-panel-container"}>
         {value === 0 && <PåatchEditor />}
       </div> */}
-      <Button onClick={updateStats}>Update Stats</Button>
+      <Button onClick={updatePatchesPremium}>Update Patches Premium</Button>
+
+      {/* <Button onClick={resetPatchesOfficial}>Reset Patches Official</Button> */}
+
       {/* 
       <Button onClick={updatePremium}>updateSessions</Button>
       <Button onClick={updateLikes}>Update files, patches like</Button>*/}
-      <Button onClick={updateSessions}>Update session scale</Button>
-      <Button onClick={missingFileTest}>missing File Test</Button>
+      {/* <Button onClick={updateSessions}>Update session scale</Button>
+      <Button onClick={missingFileTest}>missing File Test</Button> */}
       <Button onClick={fixUserSpace}>fix User Space</Button>
 
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
@@ -191,3 +257,14 @@ function AdminDashboard(props) {
 }
 
 export default AdminDashboard;
+
+function formatBytes(a, b = 2) {
+  if (0 === a) return "0 Bytes";
+  const c = 0 > b ? 0 : b,
+    d = Math.floor(Math.log(a) / Math.log(1024));
+  return (
+    parseFloat((a / Math.pow(1024, d)).toFixed(c)) +
+    " " +
+    ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+  );
+}

@@ -60,6 +60,8 @@ function FileUploader(props) {
 
   const userRef = firebase.firestore().collection("users").doc(user.uid);
 
+  const patchSizeLimit = 5242880;
+
   const onClose = () => {
     props.setUploadingFiles([]);
     setUploadingFileTags([]);
@@ -86,7 +88,7 @@ function FileUploader(props) {
       let file = props.files[i];
       let isLastFile = i === props.files.length - 1;
       //file to arraybuffer
-      console.log(file);
+      //console.log(file);
       file.arrayBuffer().then((arraybuffer) => {
         //console.log(arraybuffer);
 
@@ -100,11 +102,11 @@ function FileUploader(props) {
               return newBuffers;
             });
 
-            console.log(audiobuffer);
+            //console.log(audiobuffer);
 
             //skip if audio is too large for sampler/sequencer
             if (
-              audiobuffer.duration > 20 &&
+              audiobuffer.duration > 10 &&
               (props.instrument.name === "Sampler" || props.module.type === 0)
             ) {
               /* alert(
@@ -113,6 +115,21 @@ function FileUploader(props) {
               setUploadState((prev) => {
                 let newState = [...prev];
                 newState[i] = "importSmallerFile";
+                return newState;
+              });
+              return;
+            }
+
+            if (
+              props.patchSize &&
+              props.patchSize + file.size > patchSizeLimit
+            ) {
+              /* alert(
+                `Error on file: "${file.name}" - Try importing a smaller audio file`
+              ); */
+              setUploadState((prev) => {
+                let newState = [...prev];
+                newState[i] = "patchSizeLimit";
                 return newState;
               });
               return;
@@ -502,6 +519,8 @@ function FileUploader(props) {
                           ? "offline_pin"
                           : uploadState[i] === "noSpace"
                           ? "inventory_2"
+                          : uploadState[i] === "patchSizeLimit"
+                          ? "piano_off"
                           : uploadState[i]}
                       </Icon>
                     )}

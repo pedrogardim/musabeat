@@ -38,6 +38,7 @@ import { useTranslation } from "react-i18next";
 
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NameInput from "../Dialogs/NameInput";
+import LimitReachedDialog from "../Dialogs/LimitReachedDialog";
 import NotFoundPage from "../NotFoundPage";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
@@ -76,8 +77,12 @@ function FileExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
+  const [fileLimitDialog, setFileLimitDialog] = useState(false);
+
   const itemsPerPage = 15;
   const user = props.user ? props.user : firebase.auth().currentUser;
+
+  const patchSizeLimit = 5242880;
 
   //const [userOption, setUserOption] = useState(false);
   //const [sideMenu, setSideMenu] = useState(false);
@@ -87,6 +92,15 @@ function FileExplorer(props) {
       if (props.isDrum && filedata[index].dur > 5) {
         props.setSnackbarMessage &&
           props.setSnackbarMessage("Try picking a file shorter than 5 seconds");
+        return;
+      }
+
+      if (
+        props.compact &&
+        filedata[index].size + props.patchSize >= patchSizeLimit
+      ) {
+        setFileLimitDialog(true);
+        console.log("limit");
         return;
       }
 
@@ -568,7 +582,7 @@ function FileExplorer(props) {
               {filedata.map((row, index) => (
                 <TableRow
                   key={row.name + index}
-                  onClick={(e) => handleFileSelect(e, index)}
+                  onClick={(e) => props.compact && handleFileSelect(e, index)}
                 >
                   <TableCell style={{ width: 50 }}>
                     {loadingPlay === index ? (
@@ -595,12 +609,13 @@ function FileExplorer(props) {
                       <Typography
                         variant="overline"
                         className="fe-filename"
+                        style={{
+                          color:
+                            filedata[index].size + props.patchSize >=
+                              patchSizeLimit && "darkgrey",
+                        }}
                         onClick={() =>
-                          props.handlePageNav(
-                            "file",
-                            filesUserData[filedata[index].user].username,
-                            true
-                          )
+                          props.handlePageNav("file", fileIdList[index], true)
                         }
                       >
                         {row.name}
@@ -867,6 +882,13 @@ function FileExplorer(props) {
           open={renamingFile !== null}
           onSubmit={(newValue) => renameFile(newValue)}
           onClose={() => setRenamingFile(null)}
+        />
+      )}
+      {props.compact && fileLimitDialog && (
+        <LimitReachedDialog
+          filePatch
+          open={fileLimitDialog}
+          onClose={() => setFileLimitDialog(false)}
         />
       )}
     </Fragment>

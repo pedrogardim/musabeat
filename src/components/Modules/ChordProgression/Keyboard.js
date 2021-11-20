@@ -23,7 +23,7 @@ function Keyboard(props) {
 
   const color = colors[props.color ? props.color : 2];
 
-  const octaves = props.octaves ? props.octaves : 2;
+  const octaves = props.octaves ? props.octaves : 7;
 
   useEffect(() => {
     props.setKeyPlayingOctave && props.setKeyPlayingOctave(octave);

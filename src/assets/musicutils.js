@@ -1194,10 +1194,20 @@ export const loadEffect = (type, options) => {
 
 export const detectPitch = (audioBuffer, callback) => {
   const detector = PitchDetector.forFloat32Array(audioBuffer.length);
-  return detector.findPitch(
+
+  let result = detector.findPitch(
     audioBuffer.getChannelData(0),
     audioBuffer.sampleRate
   );
+
+  //keep result between C1 and B8
+
+  if (result[0] < 33.5 || result[0] > 7902.13) {
+    //make it C4
+    result[0] = 261.6255653005986;
+  }
+
+  return result;
 };
 
 export const parseMidiFile = (file, setNotes) => {

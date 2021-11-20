@@ -187,6 +187,9 @@ export const TRANSLATIONS_ES = {
     patchName: "Nombre del Patch",
     unsavedChanges: "¿Estás seguro? Los cambios no guardados se perderán",
     dupSession: "¿Crear una copia de esta sesión para tu cuenta?",
+    limitReached: "Límite alcanzado",
+    filePatchLimit:
+      "Los instrumentos basados en archivos de audio tienen un límite de 5 MB para un tiempo de carga más rápido para todos los usuários. Prueba elegir archivos más pequeños o quitar algunos archivos.",
   },
   info: {
     name: "Nombre",
