@@ -22,6 +22,8 @@ import {
 import "./Workspace.css";
 
 import Module from "../../Module/Module";
+import ModuleRow from "../../Module/ModuleRow";
+
 import PlaceholderModule from "../../Module/PlaceholderModule";
 
 import WorkspaceTitle from "./WorkspaceTitle";
@@ -1234,7 +1236,59 @@ function Workspace(props) {
           modules={modules}
           sessionSize={sessionSize}
           setSessionSize={setSessionSize}
-        />
+        >
+          {selectedModule !== null ? (
+            <ModuleRow
+              tabIndex={-1}
+              key={modules[selectedModule].id}
+              index={selectedModule}
+              module={modules[selectedModule]}
+              instrument={instruments[selectedModule]}
+              setInstruments={setInstruments}
+              loaded={instrumentsLoaded[selectedModule]}
+              setInstrumentsLoaded={setInstrumentsLoaded}
+              sessionData={sessionData}
+              sessionSize={sessionSize}
+              setModules={setModules}
+              editMode={editMode}
+              resetUndoHistory={() => handleUndo("RESET")}
+              selection={selection}
+              setSelection={setSelection}
+              duplicateModule={duplicateModule}
+              setSnackbarMessage={setSnackbarMessage}
+              isSessionLoaded={isLoaded}
+              handlePageNav={props.handlePageNav}
+              setAreUnsavedChanges={setAreUnsavedChanges}
+            />
+          ) : (
+            modules &&
+            modules.map((module, moduleIndex) => (
+              <ModuleRow
+                tabIndex={-1}
+                key={module.id}
+                index={moduleIndex}
+                module={module}
+                instrument={instruments[moduleIndex]}
+                setInstruments={setInstruments}
+                loaded={instrumentsLoaded[moduleIndex]}
+                setInstrumentsLoaded={setInstrumentsLoaded}
+                sessionData={sessionData}
+                sessionSize={sessionSize}
+                setModules={setModules}
+                editMode={editMode}
+                resetUndoHistory={() => handleUndo("RESET")}
+                selection={selection}
+                setSelection={setSelection}
+                duplicateModule={duplicateModule}
+                setSnackbarMessage={setSnackbarMessage}
+                isSessionLoaded={isLoaded}
+                handlePageNav={props.handlePageNav}
+                setAreUnsavedChanges={setAreUnsavedChanges}
+              />
+            ))
+          )}
+        </WorkspaceGrid>
+
         <div className="ws-module-selector">
           {modules &&
             modules.map((e, i) => (

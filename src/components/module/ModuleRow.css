@@ -1,0 +1,14 @@
+.module-grid-row {
+  flex: 1 1 100%;
+  width: 100%;
+  transition: all 0.2s;
+  outline: pink 1px solid;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.module-inner-row {
+  flex: 1 1 100%;
+  width: 100%;
+}

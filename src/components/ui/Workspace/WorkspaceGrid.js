@@ -125,13 +125,15 @@ function WorkspaceGrid(props) {
 
   return (
     <div
-      className={`ws-grid`}
+      className="ws-grid"
       ref={TLWrapper}
       onMouseDown={handleMouseDown}
       onMouseUp={() => setDraggingSelect(false)}
       onMouseLeave={() => setDraggingSelect(false)}
     >
       <WorkspaceGridLines gridSize={4} sessionSize={props.sessionSize} />
+
+      {props.children}
 
       <Draggable
         axis="x"
@@ -143,7 +145,7 @@ function WorkspaceGrid(props) {
             TLWrapper.current && cursorPosition * TLWrapper.current.offsetWidth,
           y: 0,
         }}
-        bounds=".ws-timeline"
+        bounds=".ws-grid"
       >
         <div
           className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
