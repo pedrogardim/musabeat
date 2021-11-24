@@ -9,12 +9,15 @@ import {
   Grid,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 import "./OscillatorEditor.css";
 
 const waveForms = ["sine", "square", "triangle", "sawtooth"];
 const oscTypes = ["basic", "fm", "am", "fat", "pwm", "pulse"];
 
 function OscillatorEditor(props) {
+  const { t } = useTranslation();
   const waveSvg = useRef(null);
 
   const [oscillatorWaveForm, setOscillatorWaveForm] = useState("");
@@ -88,7 +91,9 @@ function OscillatorEditor(props) {
   return (
     <Fragment>
       <Grid item xs={6} className="oscillator-editor-grid">
-        <Typography variant="overline">Oscillator</Typography>
+        <Typography variant="overline">
+          {t("instrumentEditor.synthEditor.parameters.oscillator")}
+        </Typography>
         <div className="break" />
         <svg
           width="128px"
@@ -105,17 +110,21 @@ function OscillatorEditor(props) {
         className="oscillator-editor-grid oscillator-editor-grid-parameters"
       >
         <FormControl>
-          <InputLabel>Type</InputLabel>
+          <InputLabel>
+            {t("instrumentEditor.synthEditor.parameters.type")}
+          </InputLabel>
           <Select native value={oscType} onChange={handleOscTypeSelect}>
             {oscTypes.map((e) => (
               <option key={e} value={e}>
-                {e}
+                {t(`instrumentEditor.synthEditor.oscMode.${e}`)}
               </option>
             ))}
           </Select>
         </FormControl>
         <FormControl>
-          <InputLabel>Wave</InputLabel>
+          <InputLabel>
+            {t("instrumentEditor.synthEditor.parameters.wave")}
+          </InputLabel>
           <Select
             disabled={oscType === "pwm" || oscType === "pulse"}
             native
@@ -124,7 +133,7 @@ function OscillatorEditor(props) {
           >
             {waveForms.map((e) => (
               <option key={e} value={e} className="capitalize">
-                {e}
+                {t(`instrumentEditor.synthEditor.waveTypes.${e}`)}
               </option>
             ))}
           </Select>

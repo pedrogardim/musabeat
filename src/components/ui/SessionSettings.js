@@ -88,7 +88,9 @@ function SessionSettings(props) {
                 <TextField
                   style={{ width: "100%" }}
                   value={newSessionData.name}
-                  onChange={(e) => handleInfoChange("name", e.target.value)}
+                  onChange={(e) =>
+                    handleInfoChange("name", e.target.value.slice(0, 63))
+                  }
                   label={t("info.name")}
                 />
               </Grid>
@@ -100,7 +102,10 @@ function SessionSettings(props) {
                   label={t("info.description")}
                   maxRows={6}
                   onChange={(e) =>
-                    handleInfoChange("description", e.target.value)
+                    handleInfoChange(
+                      "description",
+                      e.target.value.slice(0, 255)
+                    )
                   }
                   multiline
                 />
@@ -278,11 +283,11 @@ function SessionSettings(props) {
                               src={e.profile.photoURL}
                               alt={e.profile.username}
                               style={{ marginRight: 8 }}
-                              onClick={() =>
+                              onClick={(ev) =>
                                 props.handlePageNav(
                                   "user",
                                   e.profile.username,
-                                  true
+                                  ev
                                 )
                               }
                             />

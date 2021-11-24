@@ -74,13 +74,13 @@ function PianoRoll(props) {
 
     let delta = [
       84 - Math.ceil(clickedPos[0] / (PRWrapper.current.offsetHeight / 84)),
-      clickedPos[1] / (PRWrapper.current.offsetWidth / (props.module.size * 8)),
+      clickedPos[1] / PRWrapper.current.offsetWidth,
     ];
 
     let newNote = {
       note: Tone.Frequency(delta[0] + 24, "midi").toNote(),
       time: Tone.Time(
-        (Tone.Time("1m").toSeconds() * delta[1]) / (props.module.size * 8)
+        Tone.Time("1m").toSeconds() * delta[1] * props.module.size
       ).toBarsBeatsSixteenths(),
       duration: "8n",
       velocity: 0.7,
@@ -342,23 +342,36 @@ function PianoRoll(props) {
                   </Typography>
                 </div>
               )}
-              {Array(props.module.size * 8)
-                .fill(0)
-                .map((ee, ii) => (
-                  <div
-                    key={"prrt" + ii}
-                    style={{
-                      borderLeft:
-                        "solid 1px " +
-                        (ii % 8 === 0
-                          ? colors[props.module.color][500]
-                          : ii % 2 === 0
-                          ? colors[props.module.color][700]
-                          : colors[props.module.color][800]),
-                    }}
-                    className="piano-roll-row-tile"
-                  />
-                ))}
+            </div>
+          ))}
+        {Array(props.module.size * 8)
+          .fill(0)
+          .map((ee, i) => (
+            <div
+              key={"prrt" + i}
+              style={{
+                borderLeft:
+                  "solid 1px " +
+                  (i % 8 === 0
+                    ? colors[props.module.color][500]
+                    : i % 2 === 0
+                    ? colors[props.module.color][700]
+                    : colors[props.module.color][800]),
+                width: 100 / (props.module.size * 8) + "%",
+                left: (100 / (props.module.size * 8)) * i + "%",
+              }}
+              className="piano-roll-vert-tile"
+            >
+              {i % 8 === 0 && (
+                <span
+                  style={{
+                    color: colors[props.module.color][200],
+                  }}
+                  className="background-grid-item-num"
+                >
+                  {Math.floor(i / 8) + 1}
+                </span>
+              )}
             </div>
           ))}
         {notes.map((e, i) => (

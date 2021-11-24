@@ -24,6 +24,8 @@ import {
 } from "@material-ui/core";
 
 import SessionExplorer from "../SessionExplorer/SessionExplorer";
+import NotFoundPage from "../../ui/NotFoundPage";
+import LoadingScreen from "../../ui/LoadingScreen";
 
 import "./UserPage.css";
 
@@ -34,7 +36,6 @@ import {
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
-import { get } from "jquery";
 const waveColor = colors[2];
 
 function UserPage(props) {
@@ -49,9 +50,9 @@ function UserPage(props) {
 
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const isUser = props.user && userKey === props.user.uid;
-
   const username = useParams().key;
+
+  const isUser = props.user && props.user.displayName === username;
 
   const usersRef = firebase.firestore().collection("users");
   const sessionsRef = firebase.firestore().collection("sessions");
@@ -61,7 +62,15 @@ function UserPage(props) {
       .where("profile.username", "==", username)
       .limit(1)
       .get()
-      .then((r) => setUserInfo(r.docs[0].data()));
+      .then((r) => {
+        if (r.empty) {
+          setUserKey(undefined);
+          return;
+        } else {
+          setUserKey(r.docs[0].id);
+          setUserInfo(r.docs[0].data());
+        }
+      });
 
     //followed by user
     if (props.user) {
@@ -109,30 +118,34 @@ function UserPage(props) {
   };
 
   useEffect(() => {
+    userKey !== null && setUserKey(null);
+    userInfo !== null && setUserInfo(null);
     getUserInfo();
-  }, []);
+  }, [username]);
 
-  return (
+  return userInfo ? (
     <div className="user-page">
       <div className="user-page-background" />
-      {userInfo && (
-        <Tooltip title={userInfo.profile.username}>
-          <Avatar
-            alt={userInfo.profile.username}
-            src={userInfo.profile.photoURL}
-            className="user-page-avatar"
-          />
-        </Tooltip>
-      )}
 
       <Paper elevation={9} className="user-page-main-content">
+        {userInfo && (
+          <Tooltip title={userInfo.profile.username}>
+            <Avatar
+              alt={userInfo.profile.username}
+              src={userInfo.profile.photoURL}
+              className="user-page-avatar"
+            />
+          </Tooltip>
+        )}
         {userInfo && (
           <Typography variant="h3">{userInfo.profile.username}</Typography>
         )}
         <div className="break" />
 
         {userInfo && (
-          <Typography variant="body1">{`${userInfo.fllrs} followers`}</Typography>
+          <Typography variant="body1">{`${userInfo.fllrs} ${t(
+            "user.followers"
+          )}`}</Typography>
         )}
         <div className="break" />
 
@@ -173,7 +186,7 @@ function UserPage(props) {
 
             <div className="file-info-card">
               <Typography variant="overline">
-                Instruments
+                {t("sidemenu.instruments")}
                 <br />
                 {userInfo.patches.length}
               </Typography>
@@ -181,7 +194,8 @@ function UserPage(props) {
             <Divider orientation="vertical" flexItem />
             <div className="file-info-card">
               <Typography variant="overline">
-                Drumsets
+                {t("sidemenu.drumsets")}
+
                 <br />
                 {userInfo.drumPatches.length}
               </Typography>{" "}
@@ -189,7 +203,8 @@ function UserPage(props) {
             <Divider orientation="vertical" flexItem />
             <div className="file-info-card">
               <Typography variant="overline">
-                Files
+                {t("sidemenu.files")}
+
                 <br />
                 {userInfo.files.length}
               </Typography>
@@ -197,13 +212,14 @@ function UserPage(props) {
           </Grid>
         )}
         <div className="break" />
-        <Typography variant="overline">Top Sessions</Typography>
+        <Typography variant="overline"> {t("home.sessions")}</Typography>
         <div className="break" />
         <div className="user-page-sessions-cont">
           <SessionExplorer
             handlePageNav={props.handlePageNav}
             target={userKey}
             user={props.user}
+            setNewSessionDialog={props.setNewSessionDialog}
             compact
           />
         </div>
@@ -218,6 +234,10 @@ function UserPage(props) {
         </Fab>
       )}
     </div>
+  ) : userKey === undefined ? (
+    <NotFoundPage type="user" />
+  ) : (
+    <LoadingScreen open={true} />
   );
 }
 

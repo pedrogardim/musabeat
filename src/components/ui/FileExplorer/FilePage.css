@@ -11,6 +11,7 @@
   justify-content: center;
   align-content: center;
   background-color: white;
+  outline: none;
 }
 
 .file-page > .break {
@@ -20,7 +21,6 @@
 .file-page-waveform {
   position: relative;
   overflow: hidden;
-
   height: 30%;
   width: calc(100% - 32px) !important;
   max-width: 680px;

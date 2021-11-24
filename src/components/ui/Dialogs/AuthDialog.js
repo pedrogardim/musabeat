@@ -43,6 +43,12 @@ function AuthDialog(props) {
       .then((result) => {
         checkForFistTimeLogin(result.user);
         props.setAuthDialog(false);
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(result.user.uid)
+          .update({ "profile.photoURL": result.user.photoURL });
+        //result.user.updateProfile({ displayName: "musabeat" });
       })
       .catch((error) => console.log(error.message));
   };
@@ -70,7 +76,8 @@ function AuthDialog(props) {
   };
 
   const handleEmailAccCreation = () => {
-    if (!accountInfo.name) setFieldErrors((prev) => [...prev, "name"]);
+    if (!accountInfo.name || accountInfo.name.length > 15)
+      setFieldErrors((prev) => [...prev, "name"]);
 
     if (!accountInfo.email || !/\S+@\S+\.\S+/.test(accountInfo.email))
       setFieldErrors((prev) => [...prev, "email"]);
@@ -124,7 +131,7 @@ function AuthDialog(props) {
 
               const userProfile = {
                 profile: {
-                  displayName: accountInfo.name,
+                  username: accountInfo.name,
                   email: accountInfo.email,
                   photoURL: downloadURL,
                 },
@@ -165,7 +172,7 @@ function AuthDialog(props) {
 
     const userProfile = {
       profile: {
-        displayName: (
+        username: (
           user.email.split("@")[0] +
           user.uid.charCodeAt(0) +
           user.uid.charCodeAt(1) +
@@ -186,6 +193,7 @@ function AuthDialog(props) {
 
     if (user.metadata.creationTime === user.metadata.lastSignInTime) {
       userProfileRef.set({ profile: userProfile });
+      user.updateProfile({ displayName: userProfile.username });
     }
 
     setUsernameNotification(

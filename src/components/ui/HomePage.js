@@ -97,7 +97,7 @@ function HomePage(props) {
         >
           <Grid item sm={3}>
             <Typography variant={"h6"}>
-              {userInfo
+              {userInfo && userInfo.session
                 ? userInfo.sessions.length
                 : stats
                 ? stats.sessions
@@ -109,7 +109,7 @@ function HomePage(props) {
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
             <Typography variant={"h6"}>
-              {userInfo
+              {userInfo && userInfo.patches && userInfo.drumPatches
                 ? userInfo.patches.length + userInfo.drumPatches.length
                 : stats
                 ? stats.patches + stats.drumpatches
@@ -123,7 +123,11 @@ function HomePage(props) {
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
             <Typography variant={"h6"}>
-              {userInfo ? userInfo.files.length : stats ? stats.files : "..."}
+              {userInfo && userInfo.files
+                ? userInfo.files.length
+                : stats
+                ? stats.files
+                : "..."}
             </Typography>
 
             <Typography variant={"overline"}>{t("sidemenu.files")}</Typography>

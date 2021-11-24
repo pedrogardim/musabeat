@@ -5,16 +5,11 @@ import { useParams } from "react-router-dom";
 
 import {
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
   Button,
   TextField,
   InputAdornment,
   Icon,
-  OutlinedInput,
+  Grid,
 } from "@material-ui/core";
 
 import { Autocomplete } from "@material-ui/lab";
@@ -63,7 +58,7 @@ function SessionExplorer(props) {
           .where("name", "<=", searchValue + "\uf8ff");
       }
       if (searchTags && searchTags.length > 0) {
-        rules = rules.where("categ", "array-contains-any", searchTags);
+        rules = rules.where("tags", "array-contains-any", searchTags);
       }
       if (props.isUser || props.target) {
         rules = rules.where(
@@ -226,13 +221,17 @@ function SessionExplorer(props) {
     getSessionList(e.target.value);
   };
 
+  /*=============================================================*/
+  //USEEFFECT
+  /*=============================================================*/
+
   useEffect(() => {
     //console.log(playingSession);
     //Tone.Transport.seconds = 0;
     //Tone.Transport.clear();
     if (playingSession !== null) {
       Tone.Transport.pause();
-      console.log("stop");
+      //console.log("stop");
       let sessionRef = firebase
         .firestore()
         .collection("sessions")
@@ -242,6 +241,7 @@ function SessionExplorer(props) {
   }, [playingSession]);
 
   useEffect(() => {
+    //console.log(searchValue, searchTags);
     getSessionList();
   }, [searchValue, searchTags]);
 
@@ -251,13 +251,17 @@ function SessionExplorer(props) {
     props.user && getUserLikes();
   }, [props.isUser, props.user]);
 
+  /*=============================================================*/
+  //JSX
+  /*=============================================================*/
+
   return (
     <div
-      className={`session-explorer ${
+      className={`session-explorer-page ${
         props.compact && "session-explorer-compact"
       }`}
     >
-      {!(props.isUser || props.compact) ? (
+      {!(props.isUser || props.compact) && (
         <Autocomplete
           multiple
           freeSolo
@@ -292,8 +296,6 @@ function SessionExplorer(props) {
             />
           )}
         />
-      ) : (
-        <div className="break" style={{ height: 56 }} />
       )}
       <div className="break" />
 
@@ -302,41 +304,55 @@ function SessionExplorer(props) {
           type={"sessionExplorer"}
           handlePageNav={props.createNewSession}
         />
-      ) : !!sessions.length ? (
-        sessions.map((session, sessionIndex) => (
-          <SessionGalleryItem
-            user={props.user}
-            compact={props.compact}
-            handlePageNav={props.handlePageNav}
-            handleSessionSelect={() =>
-              props.handlePageNav("session", sessionKeys[sessionIndex])
-            }
-            handleUserLike={() => handleUserLike(sessionIndex)}
-            handleSessionDelete={setDeleteDialog}
-            setPlayingSession={() =>
-              setPlayingSession((prev) =>
-                prev === sessionIndex ? null : sessionIndex
-              )
-            }
-            playingLoadingProgress={playingLoadingProgress}
-            setRenameDialog={setRenameDialog}
-            playingSession={playingSession === sessionIndex}
-            key={`sgi${sessionIndex}`}
-            index={sessionIndex}
-            session={session}
-            isUser={props.isUser}
-            likedByUser={
-              userLikes && userLikes.includes(sessionKeys[sessionIndex])
-            }
-            createNewSession={props.createNewSession}
-          />
-        ))
-      ) : !sessions.length ? (
-        Array(props.isUser ? 3 : 15)
-          .fill(1)
-          .map((e) => <PlaceholderSGI />)
       ) : (
-        ""
+        <Grid
+          className="session-explorer-grid-cont"
+          style={{
+            marginTop: !props.compact && 56,
+          }}
+          container
+          spacing={2}
+        >
+          {!!sessions.length
+            ? sessions.map((session, sessionIndex) => (
+                <SessionGalleryItem
+                  user={props.user}
+                  compact={props.compact}
+                  handlePageNav={props.handlePageNav}
+                  handleSessionSelect={(ev) =>
+                    props.handlePageNav(
+                      "session",
+                      sessionKeys[sessionIndex],
+                      ev
+                    )
+                  }
+                  handleUserLike={() => handleUserLike(sessionIndex)}
+                  handleSessionDelete={setDeleteDialog}
+                  setPlayingSession={() =>
+                    setPlayingSession((prev) =>
+                      prev === sessionIndex ? null : sessionIndex
+                    )
+                  }
+                  playingLoadingProgress={playingLoadingProgress}
+                  setRenameDialog={setRenameDialog}
+                  playingSession={playingSession === sessionIndex}
+                  key={`sgi${sessionIndex}`}
+                  index={sessionIndex}
+                  session={session}
+                  isUser={props.isUser}
+                  likedByUser={
+                    userLikes && userLikes.includes(sessionKeys[sessionIndex])
+                  }
+                  setNewSessionDialog={props.setNewSessionDialog}
+                  handleTagClick={(e) =>
+                    (!props.compact || !props.isUser) && setSearchTags([e])
+                  }
+                />
+              ))
+            : Array(props.isUser ? 3 : 15)
+                .fill(1)
+                .map((e) => <PlaceholderSGI />)}
+        </Grid>
       )}
       <ActionConfirm
         delete

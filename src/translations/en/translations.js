@@ -23,6 +23,7 @@ export const TRANSLATIONS_EN = {
   },
 
   sidemenu: {
+    home: "Home",
     newSession: "New Session",
     explore: "Explore",
     instruments: "Instruments",
@@ -83,6 +84,44 @@ export const TRANSLATIONS_EN = {
     addFile: "Add File",
     removingItemAlert:
       "This sound will be removed from the instrument. The file will remain safe in your account.",
+    types: {
+      MonoSynth: "Synth + Filter",
+      FMSynth: "FM Synth",
+      AMSynth: "AM Synth",
+      Sampler: "Sampler",
+    },
+    synthEditor: {
+      parameters: {
+        oscillator: "Oscillator",
+        type: "Type",
+        wave: "Wave",
+        harmonicity: "Harmonicity",
+        modwave: "Mod. Waveform",
+        mod: "Mod.",
+        modulationIndex: "Modulation Index",
+        filter: "Filter",
+        frequency: "Frequency",
+        resonance: "Resonance",
+        envelope: "Envelope",
+      },
+      waveTypes: {
+        sine: "Sine",
+        square: "Square",
+        triangle: "Triangular",
+        sawtooth: "Sawtooth",
+      },
+      oscMode: {
+        basic: "Basic",
+        fm: "FM",
+        am: "AM",
+        fat: "Analog",
+        pwm: "Pulse-width Modulation",
+        pulse: "Pulse",
+      },
+    },
+    drumComponent: {
+      emptySlot: "Empty Slot",
+    },
   },
   modulePicker: {
     create: "Create a new module",
@@ -136,6 +175,7 @@ export const TRANSLATIONS_EN = {
     initialModules: "Initial Modules",
     comingSoon: "(Coming Soon)",
     nothingFound: "Nothing Found",
+    pageNotFound: "Page not found",
   },
   dialogs: {
     cancel: "Cancel",
@@ -150,6 +190,9 @@ export const TRANSLATIONS_EN = {
     patchName: "Patch Name",
     unsavedChanges: "Are you sure? Any unsaved changes will not be saved",
     dupSession: "Create a copy of this session for your account?",
+    limitReached: "Limit reached",
+    filePatchLimit:
+      "File based instruments have a limit of 5 MB for a quicker loading time for all users. Try to pick a smaller file or removing current files.",
   },
   info: {
     name: "Name",
@@ -168,5 +211,9 @@ export const TRANSLATIONS_EN = {
     },
     instrumentsCategories: { 0: "Keys", 1: "Synth", 2: "Bass", 3: "Pad" },
     drumCategories: { 0: "Electronic", 1: "Acoustic", 2: "FX", 3: "Ethnic" },
+  },
+  user: {
+    followers: "followers",
+    userNotFound: "User Not Found",
   },
 };

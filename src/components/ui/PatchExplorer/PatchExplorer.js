@@ -713,7 +713,7 @@ function PatchExplorer(props) {
             }`}
           >
             <TableBody>
-              {/* props.compact && (
+              {props.compact && (
                 <TableRow component="th" scope="row">
                   <TableCell style={{ width: props.compact ? 20 : 50 }}>
                     {selectedPatchInfo ? (
@@ -764,11 +764,12 @@ function PatchExplorer(props) {
                                 patchesUserData[selectedPatchInfo.creator]
                                   .photoURL
                               }
-                              onClick={() =>
+                              onClick={(ev) =>
                                 props.handlePageNav(
                                   "user",
-                                  selectedPatchInfo.creator,
-                                  true
+                                  patchesUserData[selectedPatchInfo.creator]
+                                    .username,
+                                  ev
                                 )
                               }
                             />
@@ -791,7 +792,7 @@ function PatchExplorer(props) {
                     )}
                   </TableCell>
                 </TableRow>
-              ) */}
+              )}
 
               {patchdata.map(
                 (patch, index) =>
@@ -827,11 +828,11 @@ function PatchExplorer(props) {
                           <Typography
                             variant="overline"
                             className="fe-filename"
-                            onClick={() =>
+                            onClick={(ev) =>
                               props.handlePageNav(
                                 props.isDrum ? "drumset" : "instrument",
                                 patchIdList[index],
-                                true
+                                ev
                               )
                             }
                           >
@@ -866,16 +867,29 @@ function PatchExplorer(props) {
                                   }}
                                   alt={patchesUserData[patch.creator].username}
                                   src={patchesUserData[patch.creator].photoURL}
-                                  onClick={() =>
+                                  onClick={(ev) =>
                                     props.handlePageNav(
                                       "user",
-                                      patch.creator,
-                                      true
+                                      patchesUserData[patch.creator].username,
+                                      ev
                                     )
                                   }
                                 />
                               </Tooltip>
                             )}
+                          {patch.of && (
+                            <Tooltip arrow placement="top" title="Official">
+                              <Icon
+                                style={{
+                                  fontSize: 16,
+                                  marginLeft: 4,
+                                  color: "#3f51b5",
+                                }}
+                              >
+                                verified
+                              </Icon>
+                            </Tooltip>
+                          )}
                         </div>
                       </TableCell>
 

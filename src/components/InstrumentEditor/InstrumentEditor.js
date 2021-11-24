@@ -3,7 +3,7 @@ import React, { useState, Fragment, useRef, useEffect } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { List, Divider, Button } from "@material-ui/core";
+import { List, Divider, LinearProgress, Tooltip } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
@@ -23,6 +23,8 @@ import NotFoundPage from "../ui/NotFoundPage";
 
 import { FileDrop } from "react-file-drop";
 
+import { useTranslation } from "react-i18next";
+
 import {
   detectPitch,
   fileTypes,
@@ -34,6 +36,8 @@ import { Fab, Icon, Grid, Select } from "@material-ui/core";
 import "./InstrumentEditor.css";
 
 function InstrumentEditor(props) {
+  const { t } = useTranslation();
+
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(!props.patchPage);
 
@@ -48,10 +52,14 @@ function InstrumentEditor(props) {
   const [renamingLabel, setRenamingLabel] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
 
+  const [patchSize, setPatchSize] = useState(0);
+
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
 
   const isDrum = props.module.type === 0;
+
+  const patchSizeLimit = 5242880;
 
   const changeInstrumentType = async (e) => {
     let newType = e.target.value;
@@ -135,6 +143,13 @@ function InstrumentEditor(props) {
 
     props.setInstrument(newInstrument);
     props.onInstrumentMod(fileId, fileName, soundindex, true);
+
+    firebase
+      .firestore()
+      .collection("files")
+      .doc(fileId)
+      .get()
+      .then((r) => setPatchSize((prev) => prev - r.data().size));
   };
 
   const handleSamplerFileDelete = (fileId, fileName) => {
@@ -154,11 +169,18 @@ function InstrumentEditor(props) {
       "",
       true
     );
+    firebase
+      .firestore()
+      .collection("files")
+      .doc(fileId)
+      .get()
+      .then((r) => setPatchSize((prev) => prev - r.data().size));
   };
 
-  const getFilesName = () => {
+  const getFilesInfo = () => {
     const getFilesNameFromId = (ids) => {
       let labelsWithFilename = { ...ids };
+      let totalSize = 0;
       Promise.all(
         Object.keys(ids).map(async (e, i) => {
           let filedata = (
@@ -166,10 +188,12 @@ function InstrumentEditor(props) {
           ).data();
           labelsWithFilename[e] =
             filedata.name + "." + fileExtentions[parseInt(filedata.type)];
+          totalSize += filedata.size;
           return filedata.name + "." + fileExtentions[parseInt(filedata.type)];
         })
       ).then((values) => {
         setFilesName(labelsWithFilename);
+        setPatchSize(totalSize);
       });
     };
 
@@ -218,7 +242,7 @@ function InstrumentEditor(props) {
     // let note = Tone.Frequency(noteN).toMidi();
     // let newNote = Tone.Frequency(newNoteN).toMidi();
 
-    console.log(note, newNote);
+    //console.log(note, newNote);
 
     let drumMap = props.instrument._buffers._buffers;
     if (drumMap.has(newNote)) return;
@@ -251,6 +275,23 @@ function InstrumentEditor(props) {
           urlsObj[newNote] = urlsObj[note];
           delete urlsObj[note];
 
+          let totalSize = 0;
+          Promise.all(
+            Object.keys(urlsObj).map(async (e, i) => {
+              let filedata = (
+                await firebase
+                  .firestore()
+                  .collection("files")
+                  .doc(urlsObj[e])
+                  .get()
+              ).data();
+              totalSize += filedata.size;
+              return filedata.size;
+            })
+          ).then((values) => {
+            setPatchSize(totalSize);
+          });
+
           !props.patchPage
             ? props.setModules((prev) => {
                 let newModules = [...prev];
@@ -275,6 +316,20 @@ function InstrumentEditor(props) {
       let urlsObj = { ...props.module.instrument.urls };
       urlsObj[newNote] = urlsObj[note];
       delete urlsObj[note];
+
+      let totalSize = 0;
+
+      Promise.all(
+        Object.keys(urlsObj).map(async (e, i) => {
+          let filedata = (
+            await firebase.firestore().collection("files").doc(urlsObj[e]).get()
+          ).data();
+          totalSize += filedata.size;
+          return filedata.size;
+        })
+      ).then((values) => {
+        setPatchSize(totalSize);
+      });
 
       !props.patchPage
         ? props.setModules((prev) => {
@@ -359,6 +414,40 @@ function InstrumentEditor(props) {
 
   //used for
 
+  /* ================================================================ */
+  /* ================================================================ */
+  // USEEFFECTs
+  /* ================================================================ */
+  /* ================================================================ */
+
+  useEffect(() => {
+    //console.log(props.instrument);
+    (props.instrument.name === "Players" ||
+      props.instrument.name === "Sampler") &&
+      getFilesInfo();
+  }, []);
+
+  /*  useEffect(() => {
+    //console.log(props.instrument);
+    props.instrument &&
+      props.instrument.name === "Sampler" &&
+      console.log(
+        props.instrument._buffers._buffers,
+        props.module.instrument.urls,
+        filesName
+      );
+  }, [props.instrument]);
+
+  useEffect(() => {
+    console.log(formatBytes(patchSize));
+  }, [patchSize]); */
+
+  /* ================================================================ */
+  /* ================================================================ */
+  // JSX
+  /* ================================================================ */
+  /* ================================================================ */
+
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
@@ -397,8 +486,8 @@ function InstrumentEditor(props) {
                   }
                   fileName={filesName[i]}
                   setRenamingLabel={setRenamingLabel}
-                  openFilePage={() =>
-                    props.handlePageNav("file", filesId[i], true)
+                  openFilePage={(ev) =>
+                    props.handlePageNav("file", filesId[i], ev)
                   }
                   fileId={filesId[i]}
                 />
@@ -424,8 +513,8 @@ function InstrumentEditor(props) {
             onChange={changeInstrumentType}
             className="instrument-editor-type-select"
           >
-            {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-              <option value={e}>{e}</option>
+            {["MonoSynth", "Sampler", "FMSynth", "AMSynth"].map((e, i) => (
+              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
             ))}
           </Select>
           {bufferObjects.length > 0 ? (
@@ -447,8 +536,8 @@ function InstrumentEditor(props) {
                         filesName[Tone.Frequency(e[1], "midi").toNote()]
                       }
                       fileId={filesId[i]}
-                      openFilePage={() =>
-                        props.handlePageNav("file", filesId[i], true)
+                      openFilePage={(ev) =>
+                        props.handlePageNav("file", filesId[i], ev)
                       }
                       setRenamingLabel={setRenamingLabel}
                     />
@@ -478,7 +567,7 @@ function InstrumentEditor(props) {
             className="instrument-editor-type-select"
           >
             {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-              <option value={e}>{e}</option>
+              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
             ))}
           </Select>
           <Grid
@@ -516,29 +605,11 @@ function InstrumentEditor(props) {
     }
   }
 
-  useEffect(() => {
-    //console.log(props.instrument);
-    (props.instrument.name === "Players" ||
-      props.instrument.name === "Sampler") &&
-      getFilesName();
-  }, []);
-
-  useEffect(() => {
-    //console.log(props.instrument);
-    props.instrument &&
-      props.instrument.name === "Sampler" &&
-      console.log(
-        props.instrument._buffers._buffers,
-        props.module.instrument.urls,
-        filesName
-      );
-  }, [props.instrument]);
-
-  useEffect(() => {
+  /*  useEffect(() => {
     //console.log(props.instrument);
 
     console.log(filesId, filesName);
-  }, [filesId, filesName]);
+  }, [filesId, filesName]); */
 
   return (
     <div
@@ -579,6 +650,8 @@ function InstrumentEditor(props) {
           module={props.module}
           instrument={props.instrument}
           isDrum={isDrum}
+          patchSize={patchSize}
+          setPatchSize={setPatchSize}
         />
       )}
 
@@ -599,13 +672,34 @@ function InstrumentEditor(props) {
       )}
 
       {(props.module.type === 0 || props.instrument.name === "Sampler") && (
-        <Fab
-          style={{ position: "absolute", right: 16, bottom: 16 }}
-          onClick={() => setFileExplorer(true)}
-          color="primary"
-        >
-          <Icon>graphic_eq</Icon>
-        </Fab>
+        <Fragment>
+          <Fab
+            style={{ position: "absolute", right: 16, bottom: 16 }}
+            onClick={() => setFileExplorer(true)}
+            color="primary"
+          >
+            <Icon>graphic_eq</Icon>
+          </Fab>
+
+          {
+            <Tooltip
+              title={`${formatBytes(patchSize)} / ${formatBytes(
+                patchSizeLimit
+              )}`}
+            >
+              <LinearProgress
+                variant="determinate"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  width: "100%",
+                  height: 8,
+                }}
+                value={(patchSize / patchSizeLimit) * 100}
+              />
+            </Tooltip>
+          }
+        </Fragment>
       )}
 
       <FileUploader
@@ -618,11 +712,13 @@ function InstrumentEditor(props) {
         setInstrumentLoaded={props.setInstrumentLoaded}
         setFilesName={setFilesName}
         setFilesId={setFilesId}
-        getFilesName={getFilesName}
+        getFilesName={getFilesInfo}
         renamePlayersLabel={renamePlayersLabel}
         setRenamingLabel={setRenamingLabel}
         setLabels={props.setLabels}
         handlePageNav={props.handlePageNav}
+        patchSize={patchSize}
+        setPatchSize={setPatchSize}
       />
 
       {renamingLabel &&
@@ -660,3 +756,14 @@ function InstrumentEditor(props) {
 }
 
 export default InstrumentEditor;
+
+function formatBytes(a, b = 2) {
+  if (0 === a) return "0 Bytes";
+  const c = 0 > b ? 0 : b,
+    d = Math.floor(Math.log(a) / Math.log(1024));
+  return (
+    parseFloat((a / Math.pow(1024, d)).toFixed(c)) +
+    " " +
+    ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
+  );
+}

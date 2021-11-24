@@ -34,6 +34,7 @@ import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
 import PatchPage from "./components/ui/PatchExplorer/PatchPage";
 import UserPage from "./components/ui/UserPage/UserPage";
 import AppLogo from "./components/ui/AppLogo";
+import NotFoundPage from "./components/ui/NotFoundPage";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/Dialogs/AuthDialog";
@@ -71,6 +72,8 @@ function App() {
 
   const [sideMenu, setSideMenu] = useState(false);
 
+  //can be boolean (opened, empty), or object (session to copy)
+
   const [newSessionDialog, setNewSessionDialog] = useState(false);
 
   //const [premiumMode, setPremiumMode] = useState(false);
@@ -82,13 +85,13 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
-  const handlePageNav = (route, id, newTab) => {
-    if (newTab && !window.cordova) {
+  const handlePageNav = (route, id, e) => {
+    if (e && (e.metaKey || e.ctrlKey) && !window.cordova) {
       const win = window.open(`/#/${route}/${id}`, "_blank");
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
-        setFollowingRoute([route, id, newTab]);
+        setFollowingRoute([route, id]);
         return;
       }
 
@@ -208,20 +211,6 @@ function App() {
         onMouseDown={() => Tone.start()}
         onScroll={(e) => detectScrollToBottom(e)}
       >
-        {newSessionDialog && (
-          <NewSessionDialog
-            setNewSessionDialog={setNewSessionDialog}
-            handleCreateNewSession={handleCreateNewSession}
-          />
-        )}
-        {authDialog && (
-          <AuthDialog
-            authDialog={authDialog}
-            setAuthDialog={setAuthDialog}
-            setUser={setUser}
-          />
-        )}
-
         <Menu
           style={{ marginTop: 48 }}
           anchorEl={userOption}
@@ -229,19 +218,19 @@ function App() {
           open={!!userOption}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={() => setUserOption(false)}>
+          <MenuItem onClick={(e) => handlePageNav("user", user.displayName, e)}>
             {t("avatar.profile")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("sessions")}>
+          <MenuItem onClick={(e) => handlePageNav("sessions", "", e)}>
             {t("avatar.userSessions")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userfiles")}>
+          <MenuItem onClick={(e) => handlePageNav("userfiles", "", e)}>
             {t("avatar.userSamples")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userinstruments")}>
+          <MenuItem onClick={(e) => handlePageNav("userinstruments", "", e)}>
             {t("avatar.userPatches")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userdrumsets")}>
+          <MenuItem onClick={(e) => handlePageNav("userdrumsets", "", e)}>
             {t("avatar.userDrumPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
@@ -284,6 +273,7 @@ function App() {
               createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
+              setNewSessionDialog={setNewSessionDialog}
             />
           </Route>
           <Route exact path="/sessions">
@@ -292,6 +282,7 @@ function App() {
               createNewSession={() => setNewSessionDialog(true)}
               handlePageNav={handlePageNav}
               user={user}
+              setNewSessionDialog={setNewSessionDialog}
             />
           </Route>
           <Route exact path="/files">
@@ -368,11 +359,16 @@ function App() {
               user={user}
               createNewSession={handleCreateNewSession}
               setUnsavedChanges={setUnsavedChanges}
+              setNewSessionDialog={setNewSessionDialog}
               handlePageNav={handlePageNav}
             />
           </Route>
           <Route exact path="/user/:key">
-            <UserPage handlePageNav={handlePageNav} user={user} />
+            <UserPage
+              handlePageNav={handlePageNav}
+              user={user}
+              setNewSessionDialog={setNewSessionDialog}
+            />
           </Route>
 
           <Route exact path="/admin">
@@ -380,8 +376,29 @@ function App() {
               <AdminDashboard />
             )}
           </Route>
+          <Route>
+            <NotFoundPage
+              type="page"
+              handlePageNav={(e) => handlePageNav("", "", e)}
+            />
+          </Route>
         </Switch>
       </div>
+      {newSessionDialog && (
+        <NewSessionDialog
+          newSessionDialog={newSessionDialog}
+          setNewSessionDialog={setNewSessionDialog}
+          handleCreateNewSession={handleCreateNewSession}
+        />
+      )}
+      {authDialog && (
+        <AuthDialog
+          authDialog={authDialog}
+          setAuthDialog={setAuthDialog}
+          setUser={setUser}
+        />
+      )}
+
       <ActionConfirm
         unsavedChanges
         open={Boolean(followingRoute)}

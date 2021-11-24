@@ -220,6 +220,7 @@ function ChordEditor(props) {
         <div className="break" />
 
         <Keyboard
+          octaves={7}
           color={props.module.color}
           onKeyClick={onKeyClick}
           activeNotes={props.chords[props.activeChord].notes}

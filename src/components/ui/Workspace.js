@@ -176,7 +176,7 @@ function Workspace(props) {
   };
 
   const handleSessionCopy = () => {
-    DBSessionRef.get().then((r) => props.createNewSession(r.data()));
+    props.setNewSessionDialog({ ...sessionData, modules: [...modules] });
   };
 
   const getModuleSize = (module, index) => {
@@ -1018,6 +1018,12 @@ function Workspace(props) {
     }
   };
 
+  /*================================================================ */
+  /*================================================================ */
+  /*=========================useEffects============================= */
+  /*================================================================ */
+  /*================================================================ */
+
   useEffect(() => {
     //resetWorkspace();
     Tone.Transport.loop = true;
@@ -1061,6 +1067,8 @@ function Workspace(props) {
       modules && handleUndo();
     }
 
+    if (modules && !modules.length) setTimelineMode(false);
+
     setIsLastChangeFromServer(false);
   }, [modules]);
 
@@ -1070,10 +1078,21 @@ function Workspace(props) {
   }, [isLoaded, editMode, savingMode, DBSessionRef, props.user]);
 
   useEffect(() => {
+    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
+    timelineMode &&
+      setSessionData((prev) => {
+        let newSessionData = { ...prev };
+        newSessionData.timeline.size = sessionSize;
+        return newSessionData;
+      });
+    //console.log("sessionSize", sessionSize);
+  }, [sessionSize]);
+
+  useEffect(() => {
     if (isLoaded) {
       timelineMode
-        ? adaptSessionSize()
-        : setSessionSize(sessionData.timeline.size);
+        ? setSessionSize(sessionData.timeline.size)
+        : adaptSessionSize();
       sessionData &&
         timelineMode !== sessionData.timeline.on &&
         setSessionData((prev) => {
@@ -1153,15 +1172,6 @@ function Workspace(props) {
   }, [instruments]);
 
   useEffect(() => {
-    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
-    //console.log("sessionSize", sessionSize);
-  }, [sessionSize]);
-
-  useEffect(() => {
-    timelineMode && getSessionSizeFromTimeline();
-  }, [timelineMode]);
-
-  useEffect(() => {
     premiumMode && console.log("=====PREMIUM MODE ON=====");
   }, [premiumMode]);
 
@@ -1176,7 +1186,7 @@ function Workspace(props) {
     )
       saveToDatabase(modules, sessionData);
 
-    props.setUnsavedChanges(areUnsavedChanges);
+    props.setUnsavedChanges && props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
 
   useEffect(() => {
@@ -1184,6 +1194,12 @@ function Workspace(props) {
   }, [editorProfiles]);
 
   /**/
+
+  /*================================================================ */
+  /*================================================================ */
+  /*===============================JSX============================== */
+  /*================================================================ */
+  /*================================================================ */
 
   return modules !== undefined ? (
     <div
@@ -1223,7 +1239,7 @@ function Workspace(props) {
       />
 
       <div className="workspace-module-cont">
-        {modules !== null && sessionData ? (
+        {modules !== null && modules.length && sessionData ? (
           modules.map((module, moduleIndex) => (
             <Fragment>
               {/* moduleIndex % 3 === 0 && <div className="break" /> */}
@@ -1259,12 +1275,8 @@ function Workspace(props) {
           ))
         ) : !modules ? (
           [1, 1].map((e, i) => <PlaceholderModule key={"phm-" + i} />)
-        ) : !modules.length && !instrumentsLoaded.length ? (
-          <Fragment>
-            <Typography variant="h1">:v</Typography>
-            <div className="break" />
-            <p>{t("workspace.empty")}</p>
-          </Fragment>
+        ) : modules.length === 0 /* && !instrumentsLoaded.length */ ? (
+          <NotFoundPage type="emptySession" />
         ) : (
           ""
         )}
@@ -1437,7 +1449,7 @@ function Workspace(props) {
   ) : (
     <NotFoundPage
       type="workspace"
-      handlePageNav={() => props.handlePageNav("explore")}
+      handlePageNav={(ev) => props.handlePageNav("explore", "", ev)}
     />
   );
 }

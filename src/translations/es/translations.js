@@ -21,6 +21,7 @@ export const TRANSLATIONS_ES = {
     confirmPassword: "Confirmar contraseña",
   },
   sidemenu: {
+    home: "Home",
     newSession: "Crear sesión",
     explore: "Explorar",
     instruments: "Instrumentos",
@@ -82,6 +83,44 @@ export const TRANSLATIONS_ES = {
     addFile: "Añadir archivo",
     removingItemAlert:
       "Este sonido será removido del instrumento. El archivo seguirá a salvo en tu cuenta.",
+    types: {
+      MonoSynth: "Sintetizador + Filtro",
+      FMSynth: "Sintetizador FM",
+      AMSynth: "Sintetizador AM",
+      Sampler: "Sampler",
+    },
+    synthEditor: {
+      parameters: {
+        oscillator: "Oscilador",
+        type: "Tipo",
+        wave: "Onda",
+        harmonicity: "Harmonicidad",
+        modwave: "Onda de Mod.",
+        mod: "Mod.",
+        modulationIndex: "Índice de Mod.",
+        filter: "Filtro",
+        frequency: "Frecuencia",
+        resonance: "Resonancia",
+        envelope: "Envelope",
+      },
+      waveTypes: {
+        sine: "Sinusoidal",
+        square: "Cuadrada",
+        triangle: "Triangular",
+        sawtooth: "Sierra",
+      },
+      oscMode: {
+        basic: "Básico",
+        fm: "FM",
+        am: "AM",
+        fat: "Analógico",
+        pwm: "PWM",
+        pulse: "Pulso",
+      },
+    },
+    drumComponent: {
+      emptySlot: "Slot Vacío",
+    },
   },
   modulePicker: {
     create: "Crear nuevo módulo",
@@ -134,6 +173,7 @@ export const TRANSLATIONS_ES = {
     initialModules: "Módulos Iniciales",
     comingSoon: "(Próximamente)",
     nothingFound: "No se ha encontrado nada",
+    pageNotFound: "Página no encontrada",
   },
   dialogs: {
     cancel: "Cancelar",
@@ -149,6 +189,9 @@ export const TRANSLATIONS_ES = {
     patchName: "Nombre del Patch",
     unsavedChanges: "¿Estás seguro? Los cambios no guardados se perderán",
     dupSession: "¿Crear una copia de esta sesión para tu cuenta?",
+    limitReached: "Límite alcanzado",
+    filePatchLimit:
+      "Los instrumentos basados en archivos de audio tienen un límite de 5 MB para un tiempo de carga más rápido para todos los usuários. Prueba elegir archivos más pequeños o quitar algunos archivos.",
   },
   info: {
     name: "Nombre",
@@ -172,5 +215,9 @@ export const TRANSLATIONS_ES = {
       3: "Pad",
     },
     drumCategories: { 0: "Electrónica", 1: "Acústica", 2: "FX", 3: "Étnico" },
+  },
+  user: {
+    followers: "seguidores",
+    userNotFound: "Usuário No Encontrado",
   },
 };

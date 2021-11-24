@@ -8,7 +8,9 @@ import {
   InputLabel,
   Grid,
 } from "@material-ui/core";
+
 import { waveTypes } from "../../assets/musicutils";
+import { useTranslation } from "react-i18next";
 
 import FilterEditor from "./FilterEditor";
 
@@ -17,6 +19,10 @@ import "./InstrumentEditor.css";
 //const filterRollOffs = [-12, -24, -48, -96];
 
 function SynthParameters(props) {
+  const { t } = useTranslation();
+
+  const waveForms = ["sine", "square", "triangle", "sawtooth"];
+
   //const [selectedFile, setSelectedFile] = useState(null);
   const [instrumentParamenters, setInstrumentParamenters] = useState(
     props.instrument.get()
@@ -62,6 +68,10 @@ function SynthParameters(props) {
     //console.log(props.instrument.get());
   }, [props.instrument]);
 
+  /* useEffect(() => {
+    console.log(instrumentParamenters);
+  }, [instrumentParamenters]); */
+
   return props.instrument._dummyVoice.name === "MonoSynth" ? (
     <FilterEditor
       instrumentParamenters={instrumentParamenters}
@@ -81,15 +91,18 @@ function SynthParameters(props) {
         flexWrap: "wrap",
       }}
     >
-      {Object.keys(instrumentParamenters).map((parameter, index) =>
-        parameter === "harmonicity" || parameter === "modulationIndex" ? (
+      {Object.keys(instrumentParamenters)
+        .filter((e) => e === "harmonicity" || e === "modulationIndex")
+        .map((parameter, index) => (
           <Fragment>
-            <Typography variant="overline">{parameter}</Typography>
+            <Typography variant="overline">
+              {t(`instrumentEditor.synthEditor.parameters.${parameter}`)}
+            </Typography>
             <div className="break" />
             <Slider
               value={instrumentParamenters[parameter]}
-              min={1}
-              step={1}
+              min={0}
+              step={0.1}
               max={50}
               onChangeCommitted={() => props.onInstrumentMod()}
               onChange={(e, v) => handleChange(parameter, v)}
@@ -97,25 +110,25 @@ function SynthParameters(props) {
             />
             <div className="break" />
           </Fragment>
-        ) : parameter === "modulation" ? (
-          <FormControl>
-            <InputLabel id="fm-wave-selector-label">{parameter}</InputLabel>
-            <Select
-              native
-              labelId="fm-wave-selector-label"
-              value={instrumentParamenters.modulation.type}
-              onChange={(event) => handleWaveTypeSelect(parameter, event)}
-            >
-              {waveTypes.map((e, i) => (
-                <option key={i} value={e}>
-                  {e}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-        ) : (
-          ""
-        )
+        ))}
+      {instrumentParamenters.modulation && (
+        <FormControl>
+          <InputLabel id="fm-wave-selector-label">
+            {t("instrumentEditor.synthEditor.parameters.modwave")}
+          </InputLabel>
+          <Select
+            native
+            labelId="fm-wave-selector-label"
+            value={instrumentParamenters.modulation.type}
+            onChange={(event) => handleWaveTypeSelect("modulation", event)}
+          >
+            {waveForms.map((e, i) => (
+              <option key={i} value={e}>
+                {t(`instrumentEditor.synthEditor.waveTypes.${e}`)}
+              </option>
+            ))}
+          </Select>
+        </FormControl>
       )}
     </Grid>
   );

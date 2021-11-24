@@ -18,7 +18,11 @@ import {
   ButtonBase,
 } from "@material-ui/core";
 
+import { useTranslation } from "react-i18next";
+
 function DrumElement(props) {
+  const { t } = useTranslation();
+
   const [wavePath, setWavePath] = useState("");
 
   const handleClick = (e) => {
@@ -88,7 +92,9 @@ function DrumElement(props) {
       component={Paper}
       className={"drum-component"}
     >
-      <Typography variant="overline">Empty slot</Typography>
+      <Typography variant="overline">
+        {t("instrumentEditor.drumComponent.emptySlot")}
+      </Typography>
       <Typography variant="overline" className="dc-slot-indicator">
         {props.index + 1}
       </Typography>

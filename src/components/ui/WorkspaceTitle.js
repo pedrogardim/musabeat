@@ -158,8 +158,8 @@ function WorkspaceTitle(props) {
                   style={{ marginRight: 8 }}
                   src={e.profile.photoURL}
                   alt={e.profile.username}
-                  onClick={() =>
-                    props.handlePageNav("user", e.profile.username, true)
+                  onClick={(ev) =>
+                    props.handlePageNav("user", e.profile.username, ev)
                   }
                 />
               </Tooltip>
@@ -173,7 +173,10 @@ function WorkspaceTitle(props) {
 
       {props.sessionData && expanded && (
         <Fragment>
-          <Typography variant="body2">
+          <Typography
+            variant="body2"
+            style={{ maxWidth: 1200, textAlign: "center", margin: "0 32px" }}
+          >
             {props.sessionData.description
               ? `"${props.sessionData.description}"`
               : "No Description"}
