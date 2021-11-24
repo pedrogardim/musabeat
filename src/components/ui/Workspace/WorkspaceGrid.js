@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
-import "./WorkspaceTimeline.css";
+import "./WorkspaceGrid.css";
 
 import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
+
+import WorkspaceGridLines from "./WorkspaceGridLines";
 
 import {
   IconButton,
@@ -42,7 +44,7 @@ function WorkspaceGrid(props) {
 
   const handleMouseDown = (event) => {
     if (
-      (compact && event.target.className === "ws-timeline-module-tile") ||
+      (compact && event.target.className === "ws-grid-module-tile") ||
       !props.timelineMode
     ) {
       let newTime =
@@ -58,7 +60,7 @@ function WorkspaceGrid(props) {
           : newTime;
     } else if (
       props.timelineMode &&
-      event.target.className === "ws-timeline-module-tile"
+      event.target.className === "ws-grid-module-tile"
     ) {
       setDraggingSelect(true);
     }
@@ -122,114 +124,35 @@ function WorkspaceGrid(props) {
   }, [props.timelineMode]);
 
   return (
-    <div className="ws-timeline-cont">
-      <Tooltip title={props.timelineMode ? "Loop Mode" : "Timeline Mode"}>
-        <IconButton
-          className="ws-timeline-btn"
-          onClick={() => props.setTimelineMode((prev) => !prev)}
-          tabIndex={-1}
-        >
-          <Icon>{props.timelineMode ? "loop" : "linear_scale"}</Icon>
-        </IconButton>
-      </Tooltip>
+    <div className="ws-grid-cont">
+      <div
+        className={`ws-grid`}
+        ref={TLWrapper}
+        onMouseDown={handleMouseDown}
+        onMouseUp={() => setDraggingSelect(false)}
+        onMouseLeave={() => setDraggingSelect(false)}
+      >
+        <WorkspaceGridLines gridSize={4} sessionSize={props.sessionSize} />
 
-      {props.timelineMode ? (
-        <div
-          className={`ws-timeline ${!props.timelineMode && "ws-timeline-loop"}`}
-          ref={TLWrapper}
-          onMouseDown={handleMouseDown}
-          onMouseUp={() => setDraggingSelect(false)}
-          onMouseLeave={() => setDraggingSelect(false)}
+        <Draggable
+          axis="x"
+          onDrag={handleCursorDrag}
+          onStart={handleCursorDragStart}
+          onStop={handleCursorDragStop}
+          position={{
+            x:
+              TLWrapper.current &&
+              cursorPosition * TLWrapper.current.offsetWidth,
+            y: 0,
+          }}
+          bounds=".ws-timeline"
         >
-          {props.modules.map((module, moduleIndex) => {
-            let moduleSize =
-              module.type === 2
-                ? Math.ceil(
-                    module.score[module.score.length - 1].time +
-                      module.score[module.score.length - 1].duration
-                  )
-                : module.type === 3 || module.type === 4
-                ? module.size
-                : module.score.length;
-            //console.log(moduleSize, props.sessionSize);
-            return (
-              <div
-                className={
-                  !compact ? "ws-timeline-module" : "ws-timeline-module-compact"
-                }
-                style={{
-                  background: colors[module.color][100],
-                }}
-              >
-                {props.sessionSize / moduleSize > 0 &&
-                  Array(Math.floor(props.sessionSize / moduleSize))
-                    .fill(0)
-                    .map((e, i) => (
-                      <div
-                        className="ws-timeline-module-tile"
-                        style={{
-                          backgroundColor: props.timeline[module.id].includes(
-                            i * moduleSize
-                          )
-                            ? colors[module.color][200]
-                            : colors[module.color][50],
-                          outline: "solid 1px " + colors[module.color][800],
-                          width: (moduleSize / props.sessionSize) * 100 + "%",
-                        }}
-                        onMouseEnter={() =>
-                          draggingSelect &&
-                          handleTimelineTileClick(module.id, moduleSize, i)
-                        }
-                        onMouseDown={() =>
-                          handleTimelineTileClick(module.id, moduleSize, i)
-                        }
-                      />
-                    ))}
-              </div>
-            );
-          })}
-          <Draggable
-            axis="x"
-            onDrag={handleCursorDrag}
-            onStart={handleCursorDragStart}
-            onStop={handleCursorDragStop}
-            position={{
-              x:
-                TLWrapper.current &&
-                cursorPosition * TLWrapper.current.offsetWidth,
-              y: 0,
-            }}
-            bounds=".ws-timeline"
-          >
-            <div
-              className={`ws-timeline-cursor ${
-                compact && "ws-timeline-cursor-compact"
-              }`}
-            />
-          </Draggable>
-        </div>
-      ) : (
-        <Slider
-          min={0}
-          max={0.9999}
-          className={"ws-timeline-slider"}
-          step={0.01}
-          value={cursorPosition}
-          onChange={(e, v) =>
-            (Tone.Transport.seconds = v * Tone.Transport.loopEnd)
-          }
-        />
-      )}
+          <div
+            className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
+          />
+        </Draggable>
 
-      {props.timelineMode && (
-        <div>
-          <IconButton
-            className="ws-timeline-btn"
-            onClick={() => setCompact((prev) => !prev)}
-            tabIndex={-1}
-          >
-            <Icon>expand</Icon>
-          </IconButton>
+        <div style={{ position: "absolute", right: -64 }}>
           <TextField
             label="Session Size"
             type="number"
@@ -245,7 +168,7 @@ function WorkspaceGrid(props) {
             onChange={(e) => setTLinputSessionSize(e.target.value)}
           />
         </div>
-      )}
+      </div>
     </div>
   );
 }

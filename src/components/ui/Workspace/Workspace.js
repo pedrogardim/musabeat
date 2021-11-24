@@ -32,6 +32,7 @@ import SessionSettings from "../SessionSettings";
 import Mixer from "../mixer/Mixer";
 import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
+import WorkspaceGrid from "./WorkspaceGrid";
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NotFoundPage from "../NotFoundPage";
@@ -1221,6 +1222,15 @@ function Workspace(props) {
         sessionSize={sessionSize}
         setSessionSize={setSessionSize}
       /> */}
+
+      <WorkspaceGrid
+        modules={modules}
+        timeline={sessionData && sessionData.timeline}
+        setTimeline={setTimeline}
+        modules={modules}
+        sessionSize={sessionSize}
+        setSessionSize={setSessionSize}
+      />
 
       {modulePicker && (
         <ModulePicker
