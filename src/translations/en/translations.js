@@ -23,6 +23,7 @@ export const TRANSLATIONS_EN = {
   },
 
   sidemenu: {
+    home: "Home",
     newSession: "New Session",
     explore: "Explore",
     instruments: "Instruments",
@@ -174,6 +175,7 @@ export const TRANSLATIONS_EN = {
     initialModules: "Initial Modules",
     comingSoon: "(Coming Soon)",
     nothingFound: "Nothing Found",
+    pageNotFound: "Page not found",
   },
   dialogs: {
     cancel: "Cancel",

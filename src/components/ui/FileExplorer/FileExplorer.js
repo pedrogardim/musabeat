@@ -614,8 +614,8 @@ function FileExplorer(props) {
                             filedata[index].size + props.patchSize >=
                               patchSizeLimit && "darkgrey",
                         }}
-                        onClick={() =>
-                          props.handlePageNav("file", fileIdList[index], true)
+                        onClick={(ev) =>
+                          props.handlePageNav("file", fileIdList[index], ev)
                         }
                       >
                         {row.name}
@@ -655,11 +655,11 @@ function FileExplorer(props) {
                             }}
                             alt={filesUserData[filedata[index].user].username}
                             src={filesUserData[filedata[index].user].photoURL}
-                            onClick={() =>
+                            onClick={(ev) =>
                               props.handlePageNav(
                                 "user",
                                 filesUserData[filedata[index].user].username,
-                                true
+                                ev
                               )
                             }
                           />

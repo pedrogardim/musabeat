@@ -455,9 +455,9 @@ function FileUploader(props) {
                       : props.files[i].name
                   }
                   secondaryTypographyProps={{
-                    onClick: () =>
+                    onClick: (ev) =>
                       uploadingFileIds[i] &&
-                      props.handlePageNav("file", uploadingFileIds[i], true),
+                      props.handlePageNav("file", uploadingFileIds[i], ev),
                     variant: "overline",
                     className: uploadingFileIds[i] && "clickable-filename",
                   }}

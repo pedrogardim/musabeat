@@ -21,6 +21,7 @@ export const TRANSLATIONS_ES = {
     confirmPassword: "Confirmar contraseña",
   },
   sidemenu: {
+    home: "Home",
     newSession: "Crear sesión",
     explore: "Explorar",
     instruments: "Instrumentos",
@@ -172,6 +173,7 @@ export const TRANSLATIONS_ES = {
     initialModules: "Módulos Iniciales",
     comingSoon: "(Próximamente)",
     nothingFound: "No se ha encontrado nada",
+    pageNotFound: "Página no encontrada",
   },
   dialogs: {
     cancel: "Cancelar",

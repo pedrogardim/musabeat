@@ -34,6 +34,7 @@ import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
 import PatchPage from "./components/ui/PatchExplorer/PatchPage";
 import UserPage from "./components/ui/UserPage/UserPage";
 import AppLogo from "./components/ui/AppLogo";
+import NotFoundPage from "./components/ui/NotFoundPage";
 
 import SideMenu from "./components/ui/SideMenu";
 import AuthDialog from "./components/ui/Dialogs/AuthDialog";
@@ -84,13 +85,13 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
-  const handlePageNav = (route, id, newTab) => {
-    if (newTab && !window.cordova) {
+  const handlePageNav = (route, id, e) => {
+    if (e && (e.metaKey || e.ctrlKey) && !window.cordova) {
       const win = window.open(`/#/${route}/${id}`, "_blank");
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
-        setFollowingRoute([route, id, newTab]);
+        setFollowingRoute([route, id]);
         return;
       }
 
@@ -217,19 +218,19 @@ function App() {
           open={!!userOption}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={() => handlePageNav("user", user.displayName)}>
+          <MenuItem onClick={(e) => handlePageNav("user", user.displayName, e)}>
             {t("avatar.profile")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("sessions")}>
+          <MenuItem onClick={(e) => handlePageNav("sessions", "", e)}>
             {t("avatar.userSessions")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userfiles")}>
+          <MenuItem onClick={(e) => handlePageNav("userfiles", "", e)}>
             {t("avatar.userSamples")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userinstruments")}>
+          <MenuItem onClick={(e) => handlePageNav("userinstruments", "", e)}>
             {t("avatar.userPatches")}
           </MenuItem>
-          <MenuItem onClick={() => handlePageNav("userdrumsets")}>
+          <MenuItem onClick={(e) => handlePageNav("userdrumsets", "", e)}>
             {t("avatar.userDrumPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
@@ -374,6 +375,12 @@ function App() {
             {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && (
               <AdminDashboard />
             )}
+          </Route>
+          <Route>
+            <NotFoundPage
+              type="page"
+              handlePageNav={(e) => handlePageNav("", "", e)}
+            />
           </Route>
         </Switch>
       </div>

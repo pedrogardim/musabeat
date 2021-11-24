@@ -48,6 +48,11 @@ function NotFoundPage(props) {
       emoji: "🙈",
       text: "user.userNotFound",
     },
+    page: {
+      emoji: "🙈",
+      text: "misc.pageNotFound",
+      button: "sidemenu.home",
+    },
   };
 
   return (

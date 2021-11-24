@@ -33,7 +33,7 @@ function SessionGalleryItem(props) {
       !event.target.className.includes("MuiIcon") &&
       !event.target.className.includes("MuiChip") &&
       !event.target.className.includes("like-btn-label") &&
-      props.handleSessionSelect(props.index);
+      props.handleSessionSelect(event);
   };
 
   const handleHover = (event) => {
@@ -99,8 +99,8 @@ function SessionGalleryItem(props) {
             <Avatar
               className="session-gallery-item-subtitle-avatar"
               src={creatorInfo.photoURL}
-              onClick={() =>
-                props.handlePageNav("user", creatorInfo.username, true)
+              onClick={(ev) =>
+                props.handlePageNav("user", creatorInfo.username, ev)
               }
             />
             <Typography variant="overline">{creatorInfo.username}</Typography>

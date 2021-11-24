@@ -1449,7 +1449,7 @@ function Workspace(props) {
   ) : (
     <NotFoundPage
       type="workspace"
-      handlePageNav={() => props.handlePageNav("explore")}
+      handlePageNav={(ev) => props.handlePageNav("explore", "", ev)}
     />
   );
 }

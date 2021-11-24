@@ -486,8 +486,8 @@ function InstrumentEditor(props) {
                   }
                   fileName={filesName[i]}
                   setRenamingLabel={setRenamingLabel}
-                  openFilePage={() =>
-                    props.handlePageNav("file", filesId[i], true)
+                  openFilePage={(ev) =>
+                    props.handlePageNav("file", filesId[i], ev)
                   }
                   fileId={filesId[i]}
                 />
@@ -536,8 +536,8 @@ function InstrumentEditor(props) {
                         filesName[Tone.Frequency(e[1], "midi").toNote()]
                       }
                       fileId={filesId[i]}
-                      openFilePage={() =>
-                        props.handlePageNav("file", filesId[i], true)
+                      openFilePage={(ev) =>
+                        props.handlePageNav("file", filesId[i], ev)
                       }
                       setRenamingLabel={setRenamingLabel}
                     />

@@ -319,8 +319,12 @@ function SessionExplorer(props) {
                   user={props.user}
                   compact={props.compact}
                   handlePageNav={props.handlePageNav}
-                  handleSessionSelect={() =>
-                    props.handlePageNav("session", sessionKeys[sessionIndex])
+                  handleSessionSelect={(ev) =>
+                    props.handlePageNav(
+                      "session",
+                      sessionKeys[sessionIndex],
+                      ev
+                    )
                   }
                   handleUserLike={() => handleUserLike(sessionIndex)}
                   handleSessionDelete={setDeleteDialog}

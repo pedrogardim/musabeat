@@ -764,12 +764,12 @@ function PatchExplorer(props) {
                                 patchesUserData[selectedPatchInfo.creator]
                                   .photoURL
                               }
-                              onClick={() =>
+                              onClick={(ev) =>
                                 props.handlePageNav(
                                   "user",
                                   patchesUserData[selectedPatchInfo.creator]
                                     .username,
-                                  true
+                                  ev
                                 )
                               }
                             />
@@ -828,11 +828,11 @@ function PatchExplorer(props) {
                           <Typography
                             variant="overline"
                             className="fe-filename"
-                            onClick={() =>
+                            onClick={(ev) =>
                               props.handlePageNav(
                                 props.isDrum ? "drumset" : "instrument",
                                 patchIdList[index],
-                                true
+                                ev
                               )
                             }
                           >
@@ -867,11 +867,11 @@ function PatchExplorer(props) {
                                   }}
                                   alt={patchesUserData[patch.creator].username}
                                   src={patchesUserData[patch.creator].photoURL}
-                                  onClick={() =>
+                                  onClick={(ev) =>
                                     props.handlePageNav(
                                       "user",
                                       patchesUserData[patch.creator].username,
-                                      true
+                                      ev
                                     )
                                   }
                                 />

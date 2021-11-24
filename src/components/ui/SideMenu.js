@@ -21,10 +21,10 @@ function SideMenu(props) {
   const { t } = useTranslation();
   const handleClose = () => props.setSideMenu(false);
 
-  const handleClick = (opt) => {
+  const handleClick = (opt, e) => {
     opt === "newSession"
       ? props.setNewSessionDialog(true)
-      : props.handlePageNav(opt);
+      : props.handlePageNav(opt, "", e);
 
     props.setSideMenu(false);
   };
@@ -50,8 +50,8 @@ function SideMenu(props) {
           (text, index) => (
             <ListItem
               button
-              onClick={() => {
-                handleClick(text);
+              onClick={(e) => {
+                handleClick(text, e);
               }}
               key={text}
             >

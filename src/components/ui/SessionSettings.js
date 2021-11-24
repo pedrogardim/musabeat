@@ -283,11 +283,11 @@ function SessionSettings(props) {
                               src={e.profile.photoURL}
                               alt={e.profile.username}
                               style={{ marginRight: 8 }}
-                              onClick={() =>
+                              onClick={(ev) =>
                                 props.handlePageNav(
                                   "user",
                                   e.profile.username,
-                                  true
+                                  ev
                                 )
                               }
                             />
