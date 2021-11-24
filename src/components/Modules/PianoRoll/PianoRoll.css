@@ -33,14 +33,16 @@
   user-select: none;
 }
 
-.piano-roll-row-tile {
-  flex: 1 1 1px;
+.piano-roll-vert-tile {
+  height: 100% !important;
   pointer-events: none;
+  position: absolute;
 }
 
 .piano-roll-note {
   /* position: absolute; */
   min-height: 30px;
+  user-select: none;
 }
 
 .piano-roll-note {

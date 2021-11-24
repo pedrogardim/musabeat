@@ -10,6 +10,8 @@ import {
   MenuItem,
   CircularProgress,
   Tooltip,
+  Popover,
+  Slider,
 } from "@material-ui/core";
 import { clearEvents } from "../../utils/TransportSchedule";
 import NameInput from "../../components/ui/Dialogs/NameInput";
@@ -42,6 +44,8 @@ function Module(props) {
   const [renameDialog, setRenameDialog] = useState(false);
   const [effects, setEffects] = useState(new Array(4).fill(false));
   const [fullScreen, setFullScreen] = useState(false);
+  const [zoomAnchorEl, setZoomAnchorEl] = useState(null);
+
   //module is disabled in the timeline
   const [TLVisibility, setTLVisibility] = useState(true);
   const [TLVisibilityAnimator, setTLVisibilityAnimator] = useState(null);
@@ -543,9 +547,9 @@ function Module(props) {
     scheduleTLVisibility();
   }, [props.timeline]);
 
-  /*  useEffect(() => {
-    console.log(props.module.id, TLVisibility);
-  }, [TLVisibility]); */
+  useEffect(() => {
+    //console.log(zoomAnchorEl);
+  }, [zoomAnchorEl]);
 
   return (
     <Fragment>
@@ -601,13 +605,37 @@ function Module(props) {
           )}
 
           {(props.module.type === 3 || props.module.type === 4) && (
-            <IconButton
-              className="module-zoom-button"
-              tabIndex={-1}
-              onClick={handleZoom}
-            >
-              <Icon>search</Icon>
-            </IconButton>
+            <Fragment>
+              <IconButton
+                className="module-zoom-button"
+                tabIndex={-1}
+                onMouseEnter={(e) => setZoomAnchorEl(e.target.children[0])}
+              >
+                <Icon>search</Icon>
+              </IconButton>
+              <Popover
+                anchorEl={zoomAnchorEl}
+                open={!!zoomAnchorEl}
+                onClose={() => setZoomAnchorEl(null)}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                PaperProps={{ style: { overflowY: "hidden" } }}
+              >
+                <Slider
+                  min={1}
+                  max={getModuleSize(props.module)}
+                  step={0.1}
+                  value={moduleZoom}
+                  onChange={(e, v) => {
+                    //console.log(v);
+                    setModuleZoom(v);
+                  }}
+                  style={{ width: 120, margin: "0 8px" }}
+                />
+              </Popover>
+            </Fragment>
           )}
           <IconButton
             tabIndex={-1}

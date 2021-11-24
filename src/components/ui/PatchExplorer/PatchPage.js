@@ -322,12 +322,20 @@ function PatchPage(props) {
 
   const savePatchChanges = () => {
     // alert confirmation
-
-    patchInfoRef.update(
-      props.isDrum || instrument.name === "Sampler"
-        ? { urls: patchInfo.urls }
-        : { options: patchInfo.options }
-    );
+    props.isDrum || instrument.name === "Sampler"
+      ? patchInfoRef.update({
+          base:
+            instrument.name === "Sampler"
+              ? "Sampler"
+              : firebase.firestore.FieldValue.delete(),
+          urls: patchInfo.urls,
+          options: firebase.firestore.FieldValue.delete(),
+        })
+      : patchInfoRef.update({
+          base: patchInfo.base,
+          options: patchInfo.options,
+          urls: firebase.firestore.FieldValue.delete(),
+        });
   };
 
   const handleKeyDown = (e) => {
@@ -434,6 +442,7 @@ function PatchPage(props) {
 
   useEffect(() => {
     !props.isDrum && initializeMidi();
+    console.log(instrument);
   }, [instrument]);
 
   /* useEffect(() => {
@@ -460,7 +469,7 @@ function PatchPage(props) {
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
-      {patchInfo !== undefined ? (
+      {instrument && patchInfo !== undefined ? (
         <Fragment>
           <Typography variant="h4">
             {patchInfo ? patchInfo.name : "..."}
@@ -558,7 +567,7 @@ function PatchPage(props) {
               <Tooltip title="Save Changes">
                 <Fab
                   color="primary"
-                  onClick={savePatchChanges}
+                  onClick={() => savePatchChanges()}
                   style={{ marginRight: 16, zIndex: 99 }}
                 >
                   <Icon>save</Icon>
@@ -567,7 +576,7 @@ function PatchPage(props) {
               <Tooltip title="Save as new">
                 <Fab
                   color="primary"
-                  onClick={savePatchChanges}
+                  onClick={() => savePatchChanges()}
                   style={{ zIndex: 99 }}
                 >
                   <Icon>add</Icon>
@@ -575,7 +584,7 @@ function PatchPage(props) {
               </Tooltip>
             </div>
           )}
-          <LoadingScreen open={patchInfo === null} />
+
           {!props.isDrum && (
             <Keyboard
               style={{
@@ -596,6 +605,8 @@ function PatchPage(props) {
             />
           )}
         </Fragment>
+      ) : !instrument ? (
+        <LoadingScreen open={true} />
       ) : (
         <NotFoundPage
           type="patchPage"

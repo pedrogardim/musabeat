@@ -131,7 +131,7 @@ function AuthDialog(props) {
 
               const userProfile = {
                 profile: {
-                  displayName: accountInfo.name,
+                  username: accountInfo.name,
                   email: accountInfo.email,
                   photoURL: downloadURL,
                 },
@@ -172,7 +172,7 @@ function AuthDialog(props) {
 
     const userProfile = {
       profile: {
-        displayName: (
+        username: (
           user.email.split("@")[0] +
           user.uid.charCodeAt(0) +
           user.uid.charCodeAt(1) +
@@ -193,7 +193,7 @@ function AuthDialog(props) {
 
     if (user.metadata.creationTime === user.metadata.lastSignInTime) {
       userProfileRef.set({ profile: userProfile });
-      user.updateProfile({ displayName: userProfile.displayName });
+      user.updateProfile({ displayName: userProfile.username });
     }
 
     setUsernameNotification(

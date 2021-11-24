@@ -187,6 +187,7 @@ function Player(props) {
         <BackgroundGrid
           moduleSize={props.module.size}
           color={colors[props.module.color]}
+          moduleZoom={props.moduleZoom}
         />
         {draggingOver && (
           <FileDrop
