@@ -90,3 +90,19 @@
 .ws-fab-save {
   grid-area: 1/2;
 }
+
+/* lewjfenrigfneorjgoernijtgnritgnotngorngrk */
+
+.ws-module-selector {
+  position: absolute;
+  height: 100%;
+  right: 32px;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.ws-module-selector > button {
+  height: 64px;
+}

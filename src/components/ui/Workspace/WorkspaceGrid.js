@@ -124,50 +124,47 @@ function WorkspaceGrid(props) {
   }, [props.timelineMode]);
 
   return (
-    <div className="ws-grid-cont">
-      <div
-        className={`ws-grid`}
-        ref={TLWrapper}
-        onMouseDown={handleMouseDown}
-        onMouseUp={() => setDraggingSelect(false)}
-        onMouseLeave={() => setDraggingSelect(false)}
+    <div
+      className={`ws-grid`}
+      ref={TLWrapper}
+      onMouseDown={handleMouseDown}
+      onMouseUp={() => setDraggingSelect(false)}
+      onMouseLeave={() => setDraggingSelect(false)}
+    >
+      <WorkspaceGridLines gridSize={4} sessionSize={props.sessionSize} />
+
+      <Draggable
+        axis="x"
+        onDrag={handleCursorDrag}
+        onStart={handleCursorDragStart}
+        onStop={handleCursorDragStop}
+        position={{
+          x:
+            TLWrapper.current && cursorPosition * TLWrapper.current.offsetWidth,
+          y: 0,
+        }}
+        bounds=".ws-timeline"
       >
-        <WorkspaceGridLines gridSize={4} sessionSize={props.sessionSize} />
+        <div
+          className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
+        />
+      </Draggable>
 
-        <Draggable
-          axis="x"
-          onDrag={handleCursorDrag}
-          onStart={handleCursorDragStart}
-          onStop={handleCursorDragStop}
-          position={{
-            x:
-              TLWrapper.current &&
-              cursorPosition * TLWrapper.current.offsetWidth,
-            y: 0,
+      <div style={{ position: "absolute", right: -64 }}>
+        <TextField
+          label="Session Size"
+          type="number"
+          InputLabelProps={{
+            shrink: true,
           }}
-          bounds=".ws-timeline"
-        >
-          <div
-            className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
-          />
-        </Draggable>
-
-        <div style={{ position: "absolute", right: -64 }}>
-          <TextField
-            label="Session Size"
-            type="number"
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputProps={{ min: 1, max: 128 }}
-            defaultValue={props.sessionSize}
-            onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
-            onBlur={(e) => handleSessionSizeChange(e)}
-            onMouseUp={(e) => handleSessionSizeChange(e)}
-            value={TLinputSessionSize}
-            onChange={(e) => setTLinputSessionSize(e.target.value)}
-          />
-        </div>
+          inputProps={{ min: 1, max: 128 }}
+          defaultValue={props.sessionSize}
+          onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
+          onBlur={(e) => handleSessionSizeChange(e)}
+          onMouseUp={(e) => handleSessionSizeChange(e)}
+          value={TLinputSessionSize}
+          onChange={(e) => setTLinputSessionSize(e.target.value)}
+        />
       </div>
     </div>
   );

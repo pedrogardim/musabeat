@@ -14,7 +14,7 @@ function WorkspaceGridLines(props) {
             style={{
               opacity:
                 i % props.gridSize === 0
-                  ? 0.6
+                  ? 0.4
                   : i % props.gridSize === 2
                   ? 0.3
                   : 0.2,

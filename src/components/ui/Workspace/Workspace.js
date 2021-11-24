@@ -45,6 +45,7 @@ import {
   loadSamplerFromObject,
 } from "../../../assets/musicutils";
 
+import { colors } from "../../../utils/materialPalette";
 import { clearEvents } from "../../../utils/TransportSchedule";
 
 Tone.Transport.loopEnd = "1m";
@@ -81,6 +82,8 @@ function Workspace(props) {
   const [modules, setModules] = useState(null);
   const [sessionData, setSessionData] = useState(null);
   const [sessionSize, setSessionSize] = useState(0);
+
+  const [selectedModule, setSelectedModule] = useState(null);
 
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
@@ -1223,14 +1226,42 @@ function Workspace(props) {
         setSessionSize={setSessionSize}
       /> */}
 
-      <WorkspaceGrid
-        modules={modules}
-        timeline={sessionData && sessionData.timeline}
-        setTimeline={setTimeline}
-        modules={modules}
-        sessionSize={sessionSize}
-        setSessionSize={setSessionSize}
-      />
+      <div className="ws-grid-cont">
+        <WorkspaceGrid
+          modules={modules}
+          timeline={sessionData && sessionData.timeline}
+          setTimeline={setTimeline}
+          modules={modules}
+          sessionSize={sessionSize}
+          setSessionSize={setSessionSize}
+        />
+        <div className="ws-module-selector">
+          {modules &&
+            modules.map((e, i) => (
+              <IconButton
+                className={selectedModule === i && "ws-module-selected"}
+                style={{
+                  backgroundColor: selectedModule === i && colors[e.color][300],
+                }}
+                onClick={() =>
+                  setSelectedModule((prev) => (prev !== i ? i : null))
+                }
+              >
+                <Icon>
+                  {e.type === 0
+                    ? "grid_on"
+                    : e.type === 1
+                    ? "music_note"
+                    : e.type === 2
+                    ? "font_download"
+                    : e.type === 3
+                    ? "graphic_eq"
+                    : "piano"}
+                </Icon>
+              </IconButton>
+            ))}
+        </div>
+      </div>
 
       {modulePicker && (
         <ModulePicker
