@@ -21,20 +21,20 @@ import {
 
 import "./Workspace.css";
 
-import Module from "../Module/Module";
-import PlaceholderModule from "../Module/PlaceholderModule";
+import Module from "../../Module/Module";
+import PlaceholderModule from "../../Module/PlaceholderModule";
 
 import WorkspaceTitle from "./WorkspaceTitle";
 
-import ModulePicker from "./ModulePicker";
-import Exporter from "./Exporter";
-import SessionSettings from "./SessionSettings";
-import Mixer from "./mixer/Mixer";
-import SessionProgressBar from "./SessionProgressBar";
+import ModulePicker from "../ModulePicker";
+import Exporter from "../Exporter";
+import SessionSettings from "../SessionSettings";
+import Mixer from "../mixer/Mixer";
+import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
-import LoadingScreen from "./LoadingScreen";
-import ActionConfirm from "./Dialogs/ActionConfirm";
-import NotFoundPage from "../ui/NotFoundPage";
+import LoadingScreen from "../LoadingScreen";
+import ActionConfirm from "../Dialogs/ActionConfirm";
+import NotFoundPage from "../NotFoundPage";
 
 import {
   patchLoader,
@@ -42,9 +42,9 @@ import {
   loadSynthFromGetObject,
   adaptSequencetoSubdiv,
   loadSamplerFromObject,
-} from "../../assets/musicutils";
+} from "../../../assets/musicutils";
 
-import { clearEvents } from "../../utils/TransportSchedule";
+import { clearEvents } from "../../../utils/TransportSchedule";
 
 Tone.Transport.loopEnd = "1m";
 
@@ -1212,7 +1212,7 @@ function Workspace(props) {
         />
       )}
 
-      <WorkspaceTimeline
+      {/* <WorkspaceTimeline
         setTimelineMode={setTimelineMode}
         timelineMode={timelineMode}
         timeline={sessionData && sessionData.timeline}
@@ -1220,68 +1220,7 @@ function Workspace(props) {
         modules={modules}
         sessionSize={sessionSize}
         setSessionSize={setSessionSize}
-      />
-
-      <div className="workspace-module-cont">
-        {modules !== null && sessionData ? (
-          modules.map((module, moduleIndex) => (
-            <Fragment>
-              {/* moduleIndex % 3 === 0 && <div className="break" /> */}
-
-              <Module
-                tabIndex={-1}
-                key={module.id}
-                index={moduleIndex}
-                module={module}
-                instrument={instruments[moduleIndex]}
-                setInstruments={setInstruments}
-                loaded={instrumentsLoaded[moduleIndex]}
-                setInstrumentsLoaded={setInstrumentsLoaded}
-                sessionData={sessionData}
-                sessionSize={sessionSize}
-                setModules={setModules}
-                editMode={editMode}
-                isFocused={focusedModule === moduleIndex}
-                setFocusedModule={setFocusedModule}
-                resetUndoHistory={() => handleUndo("RESET")}
-                timeline={sessionData.timeline}
-                timelineMode={sessionData.timeline.on}
-                setTimeline={setTimeline}
-                selection={selection}
-                setSelection={setSelection}
-                duplicateModule={duplicateModule}
-                setSnackbarMessage={setSnackbarMessage}
-                isSessionLoaded={isLoaded}
-                handlePageNav={props.handlePageNav}
-                setAreUnsavedChanges={setAreUnsavedChanges}
-              />
-            </Fragment>
-          ))
-        ) : !modules ? (
-          [1, 1].map((e, i) => <PlaceholderModule key={"phm-" + i} />)
-        ) : !modules.length && !instrumentsLoaded.length ? (
-          <Fragment>
-            <Typography variant="h1">:v</Typography>
-            <div className="break" />
-            <p>{t("workspace.empty")}</p>
-          </Fragment>
-        ) : (
-          ""
-        )}
-
-        <div className="break" />
-        {editMode && (
-          <Tooltip title={t("workspace.addBtn")}>
-            <IconButton
-              color="primary"
-              style={{ marginTop: 48 }}
-              onClick={() => setModulePicker(true)}
-            >
-              <Icon style={{ fontSize: 40 }}>add_circle_outline</Icon>
-            </IconButton>
-          </Tooltip>
-        )}
-      </div>
+      /> */}
 
       {modulePicker && (
         <ModulePicker

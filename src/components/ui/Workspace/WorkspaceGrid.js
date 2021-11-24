@@ -5,7 +5,7 @@ import "./WorkspaceTimeline.css";
 
 import Draggable from "react-draggable";
 
-import { colors } from "../../utils/materialPalette";
+import { colors } from "../../../utils/materialPalette";
 
 import {
   IconButton,
@@ -15,7 +15,7 @@ import {
   Slider,
 } from "@material-ui/core";
 
-function WorkspaceTimeline(props) {
+function WorkspaceGrid(props) {
   const TLWrapper = useRef(null);
 
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -250,4 +250,4 @@ function WorkspaceTimeline(props) {
   );
 }
 
-export default WorkspaceTimeline;
+export default WorkspaceGrid;

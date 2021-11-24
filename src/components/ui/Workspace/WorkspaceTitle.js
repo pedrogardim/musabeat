@@ -19,7 +19,7 @@ import {
 
 import { Skeleton } from "@material-ui/lab";
 
-import { sessionTags } from "../../assets/musicutils";
+import { sessionTags } from "../../../assets/musicutils";
 
 import "./Workspace.css";
 
@@ -87,7 +87,7 @@ function WorkspaceTitle(props) {
   }, [props.editorProfiles]); */
 
   return (
-    <div className="app-title">
+    <div className="workspace-title">
       <Helmet>
         <title>
           {props.sessionData &&
@@ -133,21 +133,6 @@ function WorkspaceTitle(props) {
         </Tooltip>
       )}
 
-      <div className="break" style={{ margin: 0 }} />
-
-      <Typography variant="overline" style={{ fontSize: 10 }}>
-        {`${props.sessionData ? props.sessionData.bpm : "-"} BPM - ${Math.floor(
-          (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) / 60
-        )}:${(
-          "0" +
-          Math.floor(
-            (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
-          )
-        ).slice(-2)} s ${creationDateString && "- " + creationDateString}`}
-      </Typography>
-
-      <div className="break" />
-
       {props.editorProfiles !== null &&
       Object.values(props.editorProfiles).length > 0 ? (
         Object.values(props.editorProfiles).map(
@@ -169,10 +154,24 @@ function WorkspaceTitle(props) {
         <Avatar />
       )}
 
-      <div className="break" />
+      <div className="break" style={{ margin: 0 }} />
 
       {props.sessionData && expanded && (
         <Fragment>
+          <Typography variant="overline" style={{ fontSize: 10 }}>
+            {`${
+              props.sessionData ? props.sessionData.bpm : "-"
+            } BPM - ${Math.floor(
+              (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) / 60
+            )}:${(
+              "0" +
+              Math.floor(
+                (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
+              )
+            ).slice(-2)} s ${creationDateString && "- " + creationDateString}`}
+          </Typography>
+
+          <div className="break" />
           <Typography variant="body2">
             {props.sessionData.description
               ? `"${props.sessionData.description}"`

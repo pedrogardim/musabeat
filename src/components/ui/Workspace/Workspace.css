@@ -13,6 +13,18 @@
   outline: none;
 }
 
+.workspace-title {
+  position: absolute;
+  margin: 36px 36px;
+  top: 0px;
+  left: 0px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
 .workspace-module-cont {
   position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
