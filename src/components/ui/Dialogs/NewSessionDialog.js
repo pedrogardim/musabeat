@@ -89,17 +89,13 @@ function NewSessionDialog(props) {
       name: "",
       type: moduleType,
       score:
-        moduleType === 0 || moduleType === 1
-          ? [{ ...new Array(8).fill(0) }]
-          : moduleType === 2
-          ? createChordProgression(session.scale, session.root, 3, 2).map(
+        moduleType !== 2
+          ? []
+          : createChordProgression(session.scale, session.root, 3, 2).map(
               (e, i) => {
                 return { notes: e, time: i, duration: 1, rhythm: [true] };
               }
-            )
-          : moduleType === 3
-          ? [{ time: 0, duration: 0 }]
-          : [],
+            ),
       volume: 0,
       muted: false,
       instrument:

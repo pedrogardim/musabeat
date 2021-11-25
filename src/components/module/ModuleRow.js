@@ -14,6 +14,8 @@ import {
   Typography,
 } from "@material-ui/core";
 
+import { scheduleSampler, clearEvents } from "../../utils/TransportSchedule";
+
 function ModuleRow(props) {
   const rowRef = useRef(null);
 
@@ -60,22 +62,81 @@ function ModuleRow(props) {
     setGridPos(gridPos);
   };
 
+  const handleClick = () => {
+    console.log(props.instrument);
+    let newNote = {
+      note: gridPos[0],
+      duration: /* props.instrument._buffers._buffers.get(gridPos[0]).duration ||  */ 0.2,
+      time: Tone.Time(
+        (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
+      ).toBarsBeatsSixteenths(),
+    };
+
+    console.log(newNote.time);
+
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      newModules[props.index].score = [
+        ...newModules[props.index].score,
+        { ...newNote },
+      ];
+      return newModules;
+    });
+  };
+
+  const scheduleNotes = () => {
+    !props.module.muted
+      ? scheduleSampler(
+          props.module.score,
+          props.instrument,
+          Tone.Transport,
+          props.module.id
+        )
+      : clearEvents(props.module.id);
+  };
+
   useEffect(() => {
     loadModuleRows();
-  }, [props.instrument, props.module]);
+    scheduleNotes();
+  }, [props.instrument, props.module, props.module.score]);
 
   useEffect(() => {
     console.log(moduleRows);
   }, [moduleRows]);
 
   return (
-    <div className="module-grid-row" ref={rowRef} onMouseOver={handleHover}>
+    <div
+      className="module-grid-row"
+      ref={rowRef}
+      onMouseOver={handleHover}
+      onMouseDown={handleClick}
+    >
       {moduleRows.map((row, rowIndex) => (
         <div className="module-inner-row">
           <span className="module-inner-row-label">{row}</span>
           <div className="module-inner-row-line" />
         </div>
       ))}
+      {rowRef.current &&
+        props.module.score.map((note, noteIndex) => (
+          <div
+            className="module-score-ghost"
+            style={{
+              height: rowRef.current.offsetHeight / moduleRows.length,
+              width:
+                Tone.Time(note.duration).toSeconds() *
+                (rowRef.current.offsetWidth /
+                  (props.sessionSize * Tone.Time("1m").toSeconds())),
+              top:
+                note.note * (rowRef.current.offsetHeight / moduleRows.length),
+              left:
+                Tone.Time(note.time).toSeconds() *
+                (rowRef.current.offsetWidth /
+                  (props.sessionSize * Tone.Time("1m").toSeconds())),
+              backgroundColor: colors[props.module.color][300],
+            }}
+          />
+        ))}
       {rowRef.current && props.cursorMode === "edit" && (
         <div
           className="module-score-ghost"
