@@ -133,6 +133,7 @@ function WorkspaceGrid(props) {
       >
         <div
           className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
+          style={{ backgroundColor: props.isRecording && "#f50057" }}
         />
       </Draggable>
 

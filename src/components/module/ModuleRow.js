@@ -50,7 +50,9 @@ function ModuleRow(props) {
   const handleHover = (event) => {
     let hoveredPos = [
       event.pageY - rowRef.current.getBoundingClientRect().top,
-      event.pageX - rowRef.current.getBoundingClientRect().left,
+      event.pageX -
+        rowRef.current.getBoundingClientRect().left +
+        rowRef.current.offsetWidth / (props.sessionSize * props.gridSize * 2),
     ];
 
     let gridPos = [
@@ -71,7 +73,7 @@ function ModuleRow(props) {
     setGridPos(gridPos);
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
     if (!props.cursorMode) return;
 
     let newNote = {
@@ -82,14 +84,18 @@ function ModuleRow(props) {
       ).toBarsBeatsSixteenths(),
     };
 
-    console.log(newNote);
-
     props.setModules((prev) => {
       let newModules = [...prev];
-      newModules[props.index].score = [
-        ...newModules[props.index].score,
-        { ...newNote },
-      ];
+      let find = newModules[props.index].score.findIndex(
+        (e) => e.note === newNote.note && e.time === newNote.time
+      );
+      newModules[props.index].score =
+        find === -1
+          ? [...newModules[props.index].score, { ...newNote }]
+          : newModules[props.index].score.filter(
+              (e) => e.note !== newNote.note || e.time !== newNote.time
+            );
+
       return newModules;
     });
   };
@@ -121,7 +127,7 @@ function ModuleRow(props) {
     <div
       className="module-grid-row"
       ref={rowRef}
-      onMouseOver={handleHover}
+      onMouseMove={handleHover}
       onMouseDown={handleClick}
       disabled
     >
@@ -132,59 +138,83 @@ function ModuleRow(props) {
         </div>
       ))}
       {rowRef.current &&
-        props.module.score.map((note, noteIndex) => (
-          <div
-            className="module-score-ghost"
-            style={{
-              height: rowRef.current.offsetHeight / moduleRows.length,
-              width:
-                Tone.Time(note.duration).toSeconds() *
-                (rowRef.current.offsetWidth /
-                  (props.sessionSize * Tone.Time("1m").toSeconds())),
-              transform: `translate(${
-                Tone.Time(note.time).toSeconds() *
-                (rowRef.current.offsetWidth /
-                  (props.sessionSize * Tone.Time("1m").toSeconds()))
-              }px,${
-                note.note * (rowRef.current.offsetHeight / moduleRows.length)
-              }px)`,
-              backgroundColor:
-                props.cursorMode === "edit"
-                  ? colors[props.module.color][300]
-                  : "transparent",
-            }}
-          >
-            <svg
-              viewBox="0 0 64 32"
-              preserveAspectRatio="none"
-              width="64px"
-              height="32px"
-              style={{ width: "100%", height: "100%", viewBox: "auto" }}
+        props.module.score
+          .filter((e) => e.time.split(":")[0] < props.sessionSize)
+          .map((note, noteIndex) => (
+            <div
+              className="module-score-ghost"
+              style={{
+                height: rowRef.current.offsetHeight / moduleRows.length,
+                width:
+                  rowRef.current.offsetWidth /
+                  (props.sessionSize * props.gridSize),
+                transform: `translate(${
+                  Tone.Time(note.time).toSeconds() *
+                  (rowRef.current.offsetWidth /
+                    (props.sessionSize * Tone.Time("1m").toSeconds()))
+                }px,${
+                  note.note * (rowRef.current.offsetHeight / moduleRows.length)
+                }px)`,
+                /* backgroundColor:
+                  props.cursorMode === "edit"
+                    ? colors[props.module.color][300]
+                    : "transparent", */
+              }}
             >
-              {moduleRows[note.note] && (
-                <path
-                  d={moduleRows[note.note].wavepath}
-                  stroke={
+              <div
+                style={{
+                  position: "absolute",
+                  height: rowRef.current.offsetHeight / moduleRows.length / 3,
+                  top: "33.3%",
+                  width: rowRef.current.offsetHeight / 3 / moduleRows.length,
+                  left: -rowRef.current.offsetHeight / 6 / moduleRows.length,
+                  backgroundColor:
                     props.cursorMode === "edit"
-                      ? "#ffffff"
-                      : colors[props.module.color][300]
-                  }
-                  strokeWidth={1}
-                  fill="none"
-                />
+                      ? colors[props.module.color][300]
+                      : "transparent",
+                  /*  border:
+                    props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
+                  transform: "rotate(45deg)",
+                }}
+              />
+              {props.cursorMode !== "edit" && (
+                <svg
+                  viewBox="0 0 64 32"
+                  preserveAspectRatio="none"
+                  width="64px"
+                  height="32px"
+                  style={{
+                    width:
+                      Tone.Time(note.duration).toSeconds() *
+                      (rowRef.current.offsetWidth /
+                        (props.sessionSize * Tone.Time("1m").toSeconds())),
+                    height: "100%",
+                    viewBox: "auto",
+                  }}
+                >
+                  {moduleRows[note.note] && (
+                    <path
+                      d={moduleRows[note.note].wavepath}
+                      stroke={
+                        props.cursorMode === "edit"
+                          ? "rgba(0,0,0,0.5)"
+                          : colors[props.module.color][300]
+                      }
+                      strokeWidth={1}
+                      fill="none"
+                    />
+                  )}
+                </svg>
               )}
-            </svg>
-          </div>
-        ))}
+            </div>
+          ))}
       {rowRef.current && props.cursorMode === "edit" && (
         <div
           className="module-score-ghost"
           style={{
             height: rowRef.current.offsetHeight / moduleRows.length,
             width:
-              (moduleRows[gridPos[0]].player.buffer.duration *
-                rowRef.current.offsetWidth) /
-              (props.sessionSize * Tone.Time("1m").toSeconds()),
+              rowRef.current.offsetWidth / (props.sessionSize * props.gridSize),
             transform: `translate(${
               gridPos[1] *
               (rowRef.current.offsetWidth /
@@ -193,9 +223,27 @@ function ModuleRow(props) {
               gridPos[0] * (rowRef.current.offsetHeight / moduleRows.length)
             }px)`,
             opacity: 0.5,
-            backgroundColor: colors[props.module.color][300],
+            /* backgroundColor: colors[props.module.color][300], */
+            pointerEvents: "none",
           }}
-        />
+        >
+          <div
+            style={{
+              position: "absolute",
+              height: rowRef.current.offsetHeight / moduleRows.length / 3,
+              top: "33.3%",
+              width: rowRef.current.offsetHeight / 3 / moduleRows.length,
+              left: -rowRef.current.offsetHeight / 6 / moduleRows.length,
+              transform: "rotate(45deg)",
+              backgroundColor:
+                props.cursorMode === "edit"
+                  ? colors[props.module.color][300]
+                  : "transparent",
+              /* border:
+                props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
+            }}
+          />
+        </div>
       )}
     </div>
   );

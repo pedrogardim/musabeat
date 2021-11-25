@@ -101,7 +101,14 @@ function WorkspaceTitle(props) {
             } `}
         </title>
       </Helmet>
-      <Typography variant="h4">
+      <Typography
+        variant="h4"
+        style={{
+          maxWidth: "20vw",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+        }}
+      >
         {props.sessionData
           ? props.sessionData.name
             ? props.sessionData.name
