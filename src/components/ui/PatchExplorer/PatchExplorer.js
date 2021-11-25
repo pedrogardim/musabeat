@@ -138,6 +138,9 @@ function PatchExplorer(props) {
           patchdata[index],
           props.compact ? props.setInstrumentsLoaded : () => {},
           props.index,
+          () => {},
+          () => {},
+          () => {},
           setNotifications
         ).then((instr) => {
           props.setInstrument(instr);

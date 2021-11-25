@@ -79,16 +79,6 @@ function WorkspaceGrid(props) {
       newSize = newValue;
     }
     props.setSessionSize(parseInt(newSize));
-
-    let newTimeline = { ...props.timeline, size: parseInt(newSize) };
-
-    //filter modules greater than new value
-    Object.keys(newTimeline)
-      .filter((e) => !isNaN(e))
-      .forEach((id) => {
-        newTimeline[id] = newTimeline[id].filter((e) => e < newSize);
-      });
-    props.setTimeline(newTimeline);
   };
 
   useEffect(() => {
@@ -116,6 +106,7 @@ function WorkspaceGrid(props) {
   return (
     <div
       className="ws-grid"
+      disabled
       ref={TLWrapper}
       onMouseDown={handleMouseDown}
       onMouseUp={() => setDraggingSelect(false)}

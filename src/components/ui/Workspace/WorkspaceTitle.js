@@ -32,7 +32,7 @@ function WorkspaceTitle(props) {
   const history = useHistory();
 
   const getSessionTitleInfo = async () => {
-    let date = props.sessionData.createdOn.toDate
+    let date = props.sessionData.createdOn
       ? props.sessionData.createdOn.toDate()
       : new Date();
 

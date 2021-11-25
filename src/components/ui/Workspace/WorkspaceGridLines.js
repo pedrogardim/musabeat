@@ -19,7 +19,13 @@ function WorkspaceGridLines(props) {
                   ? 0.3
                   : 0.2,
             }}
-          />
+          >
+            {i % props.gridSize === 0 && (
+              <span className="ws-grid-line-mesure-num">
+                {i / props.gridSize + 1}
+              </span>
+            )}
+          </div>
         ))}
 
       <div className="ws-grid-line" />
