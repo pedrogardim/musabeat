@@ -43,6 +43,7 @@ function WorkspaceGrid(props) {
   const handleCursorDragStop = (event, element) => {};
 
   const handleMouseDown = (event) => {
+    return;
     if (
       (compact && event.target.className === "ws-grid-module-tile") ||
       !props.timelineMode
@@ -64,17 +65,6 @@ function WorkspaceGrid(props) {
     ) {
       setDraggingSelect(true);
     }
-  };
-
-  const handleTimelineTileClick = (moduleId, moduleSize, tile) => {
-    if (compact) return;
-    let newTimeline = { ...props.timeline };
-    let tlModule = newTimeline[moduleId];
-    let timeToEdit = tile * moduleSize;
-    newTimeline[moduleId] = tlModule.includes(timeToEdit)
-      ? tlModule.filter((e) => e !== timeToEdit)
-      : [...tlModule, timeToEdit];
-    props.setTimeline(newTimeline);
   };
 
   const handleSessionSizeChange = (e) => {
@@ -131,7 +121,10 @@ function WorkspaceGrid(props) {
       onMouseUp={() => setDraggingSelect(false)}
       onMouseLeave={() => setDraggingSelect(false)}
     >
-      <WorkspaceGridLines gridSize={4} sessionSize={props.sessionSize} />
+      <WorkspaceGridLines
+        gridSize={props.gridSize}
+        sessionSize={props.sessionSize}
+      />
 
       {props.children}
 

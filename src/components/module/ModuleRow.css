@@ -1,8 +1,8 @@
 .module-grid-row {
+  position: relative;
   flex: 1 1 100%;
   width: 100%;
   transition: all 0.2s;
-  outline: pink 1px solid;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -11,4 +11,28 @@
 .module-inner-row {
   flex: 1 1 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.module-inner-row-label {
+  position: absolute !important;
+  left: -80px !important;
+  width: 72px;
+  text-align: right !important;
+  opacity: 0.5;
+}
+
+.module-inner-row-line {
+  width: 100%;
+  height: 1px;
+  background-color: black;
+  opacity: 0.5;
+}
+
+.module-score-ghost {
+  position: absolute;
+  background-color: black;
+  opacity: 0.5;
 }

@@ -92,6 +92,9 @@ function Workspace(props) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [editMode, setEditMode] = useState(false);
+  const [cursorMode, setCursorMode] = useState(null);
+  const [gridSize, setGridSize] = useState(4);
+
   const [premiumMode, setPremiumMode] = useState(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -1019,9 +1022,28 @@ function Workspace(props) {
       case 40:
         handleArrowKey(e);
         break;
+      case 90:
+        setCursorMode((prev) => (prev ? null : "edit"));
+        break;
       default:
         break;
     }
+  };
+
+  const handleKeyUp = (e) => {
+    Tone.start();
+    /* console.log(e);
+    if (e.ctrlKey || e.metaKey) {
+      setCursorMode(null);
+    } */
+    /*  switch (e.keyCode) {
+      
+      case 40:
+        handleArrowKey(e);
+        break;
+      default:
+        break;
+    } */
   };
 
   useEffect(() => {
@@ -1104,9 +1126,9 @@ function Workspace(props) {
     }
   }, [sessionData]); */
 
-  /*   useEffect(() => {
-    console.log(sessionHistory);
-  }, [sessionHistory]); */
+  useEffect(() => {
+    console.log(cursorMode);
+  }, [cursorMode]);
 
   useEffect(() => {
     Tone.Transport.pause();
@@ -1197,9 +1219,14 @@ function Workspace(props) {
       tabIndex={0}
       style={{
         display: props.hidden ? "none" : "flex",
+        cursor:
+          cursorMode !== null
+            ? "url('edit_black_24dp.svg'),pointer"
+            : "default",
       }}
       onClick={unfocusModules}
       onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
     >
       <LoadingScreen open={modules === null} />
 
@@ -1228,7 +1255,7 @@ function Workspace(props) {
         setSessionSize={setSessionSize}
       /> */}
 
-      <div className="ws-grid-cont">
+      <div className="ws-grid-cont" tabIndex="-1">
         <WorkspaceGrid
           modules={modules}
           timeline={sessionData && sessionData.timeline}
@@ -1236,6 +1263,7 @@ function Workspace(props) {
           modules={modules}
           sessionSize={sessionSize}
           setSessionSize={setSessionSize}
+          gridSize={gridSize}
         >
           {selectedModule !== null ? (
             <ModuleRow
@@ -1259,6 +1287,8 @@ function Workspace(props) {
               isSessionLoaded={isLoaded}
               handlePageNav={props.handlePageNav}
               setAreUnsavedChanges={setAreUnsavedChanges}
+              cursorMode={cursorMode}
+              gridSize={gridSize}
             />
           ) : (
             modules &&
@@ -1284,6 +1314,8 @@ function Workspace(props) {
                 isSessionLoaded={isLoaded}
                 handlePageNav={props.handlePageNav}
                 setAreUnsavedChanges={setAreUnsavedChanges}
+                cursorMode={cursorMode}
+                gridSize={gridSize}
               />
             ))
           )}
