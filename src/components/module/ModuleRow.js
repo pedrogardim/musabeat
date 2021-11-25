@@ -168,16 +168,12 @@ function ModuleRow(props) {
                   top: "33.3%",
                   width: rowRef.current.offsetHeight / 3 / moduleRows.length,
                   left: -rowRef.current.offsetHeight / 6 / moduleRows.length,
-                  backgroundColor:
-                    props.cursorMode === "edit"
-                      ? colors[props.module.color][300]
-                      : "transparent",
-                  /*  border:
-                    props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
+                  backgroundColor: colors[props.module.color][300] /*  border:
+                    props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */,
                   transform: "rotate(45deg)",
                 }}
               />
-              {props.cursorMode !== "edit" && (
+              {/* props.cursorMode !== "edit" && (
                 <svg
                   viewBox="0 0 64 32"
                   preserveAspectRatio="none"
@@ -205,7 +201,7 @@ function ModuleRow(props) {
                     />
                   )}
                 </svg>
-              )}
+              ) */}
             </div>
           ))}
       {rowRef.current && props.cursorMode === "edit" && (
@@ -262,12 +258,14 @@ const drawWave = (wavearray, setWavePath) => {
   let yZoom = 2;
 
   for (let x = 0; x < 64; x++) {
-    pathstring +=
-      "L " +
-      x +
-      " " +
-      (wave[Math.floor(x * scale)] * 16 + 16 / yZoom) * yZoom +
-      " ";
+    if (Math.abs(wave[Math.floor(x * scale)]) > 0.02) {
+      pathstring +=
+        "L " +
+        x +
+        " " +
+        (wave[Math.floor(x * scale)] * 16 + 16 / yZoom) * yZoom +
+        " ";
+    }
   }
 
   return pathstring;

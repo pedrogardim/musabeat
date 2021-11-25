@@ -38,6 +38,7 @@ import WorkspaceGrid from "./WorkspaceGrid";
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NotFoundPage from "../NotFoundPage";
+import NotesInput from "./NotesInput";
 
 import {
   patchLoader,
@@ -94,6 +95,8 @@ function Workspace(props) {
   const [metronome, setMetronome] = useState(null);
   const [metronomeState, setMetronomeState] = useState(false);
   const [metronomeEvent, setMetronomeEvent] = useState(null);
+
+  const [pressedKeys, setPressedKeys] = useState([]);
 
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
@@ -825,6 +828,8 @@ function Workspace(props) {
 
     if (sampleIndex === undefined || selectedModule === null) return;
 
+    setPressedKeys((prev) => [...prev, sampleIndex]);
+
     //console.log(sampleIndex);
 
     if (!instruments[selectedModule].has(sampleIndex)) return;
@@ -926,18 +931,12 @@ function Workspace(props) {
 
   const handleKeyUp = (e) => {
     Tone.start();
-    /* console.log(e);
-    if (e.ctrlKey || e.metaKey) {
-      setCursorMode(null);
-    } */
-    /*  switch (e.keyCode) {
-      
-      case 40:
-        handleArrowKey(e);
-        break;
-      default:
-        break;
-    } */
+
+    let sampleIndex = keySamplerMapping[e.code];
+
+    if (sampleIndex === undefined) return;
+
+    setPressedKeys((prev) => prev.filter((e) => e !== sampleIndex));
   };
 
   useEffect(() => {
@@ -1266,12 +1265,21 @@ function Workspace(props) {
         </div>
       </div>
 
+      <NotesInput
+        keyMapping={keySamplerMapping}
+        module={modules[selectedModule]}
+        instrument={instruments[selectedModule]}
+        pressedKeys={pressedKeys}
+        setPressedKeys={setPressedKeys}
+        handlePageNav={props.handlePageNav}
+      />
+
       {modulePicker && (
         <ModulePicker
           tabIndex={-1}
           open={modulePicker}
           onClose={() => setModulePicker(false)}
-          setModulePicker={setModulePicker}
+          setsModulePicker={setModulePicker}
           setModules={setModules}
           loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}

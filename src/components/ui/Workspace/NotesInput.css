@@ -1,0 +1,26 @@
+.ws-note-input {
+  position: relative;
+  width: 70vw;
+  height: 96px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 64px;
+  user-select: none;
+}
+
+.ws-note-input > * {
+  line-height: 1 !important;
+}
+
+.ws-note-input-key {
+  position: relative;
+  height: 100%;
+  flex: 1 1 1px;
+  outline: 1px solid rgba(0, 0, 0, 0.377);
+  margin: 0 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

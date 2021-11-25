@@ -82,13 +82,14 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
-  const handlePageNav = (route, id, newTab) => {
-    if (newTab && !window.cordova) {
+  const handlePageNav = (route, id, e) => {
+    console.log(e);
+    if (e && (e.metaKey || e.ctrlKey)) {
       const win = window.open(`/#/${route}/${id}`, "_blank");
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
-        setFollowingRoute([route, id, newTab]);
+        setFollowingRoute([route, id, e]);
         return;
       }
 
