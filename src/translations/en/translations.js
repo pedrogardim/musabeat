@@ -89,28 +89,22 @@ export const TRANSLATIONS_EN = {
     submit: "Add Module",
     types: {
       0: {
-        name: "Drum Sequencer",
+        name: "Sampler",
         description:
-          "Rhythm sequencer that controls a drum pack, with a custom subdivision",
+          "Rhythm sequencer that controls a drum pack (or play sounds)",
       },
       1: {
-        name: "Melody Grid",
-        description:
-          "Makes melody with a grid similar to a sequencer, but with pitches",
+        name: "Melody Track",
+        description: "Crea melodías",
       },
       2: {
+        name: "Audio Track",
+        description: "Play audio files imported by the user",
+      },
+      3: {
         name: "Chord Progression",
         description:
           "Create chord progressions, or generate random ones based on scales",
-      },
-      3: {
-        name: "Player",
-        description:
-          "Drag audio files to play, and manipulate them on time and pitch",
-      },
-      4: {
-        name: "Piano Roll",
-        description: "Classic DAW form of making music!",
       },
     },
   },

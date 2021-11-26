@@ -521,7 +521,9 @@ function InstrumentEditor(props) {
         >
           {selectedPatch === "Custom"
             ? "Custom"
-            : props.instrumentInfo.patch.name}
+            : props.instrumentInfo &&
+              props.instrumentInfo.patch &&
+              props.instrumentInfo.patch.name}
         </MenuItem>
       </Select>
       <IconButton>

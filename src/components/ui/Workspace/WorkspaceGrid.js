@@ -196,7 +196,7 @@ function WorkspaceGrid(props) {
         />
       )}
 
-      <div style={{ position: "absolute", right: -64 }}>
+      {/* <div style={{ position: "absolute", right: -64 }}>
         <TextField
           label="Session Size"
           type="number"
@@ -211,7 +211,7 @@ function WorkspaceGrid(props) {
           value={TLinputSessionSize}
           onChange={(e) => setTLinputSessionSize(e.target.value)}
         />
-      </div>
+      </div> */}
     </div>
   );
 }

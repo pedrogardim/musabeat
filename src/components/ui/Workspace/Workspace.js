@@ -1277,6 +1277,9 @@ function Workspace(props) {
                 </Icon>
               </IconButton>
             ))}
+          <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
+            <Icon>add</Icon>
+          </IconButton>
         </div>
       </div>
 
@@ -1313,7 +1316,7 @@ function Workspace(props) {
           tabIndex={-1}
           open={modulePicker}
           onClose={() => setModulePicker(false)}
-          setsModulePicker={setModulePicker}
+          setModulePicker={setModulePicker}
           setModules={setModules}
           loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}
