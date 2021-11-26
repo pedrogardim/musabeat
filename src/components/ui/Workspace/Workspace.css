@@ -14,13 +14,21 @@
   outline: none;
 }
 
-.workspace-title {
-  position: absolute;
-  margin: 36px 36px;
-  top: 0px;
-  left: 0px;
+.ws-header {
+  position: fixed;
+  width: calc(100% - 264px);
+  left: 136px;
+  top: 0;
+  height: 64px;
+  z-index: 9999999;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workspace-title {
+  display: flex;
+  align-items: center;
   justify-content: flex-start;
   flex-direction: row;
   flex-wrap: wrap;
@@ -64,15 +72,11 @@
 }
 
 .ws-commands {
-  position: absolute !important;
-  top: 0;
-  height: 40px;
-  width: 256px;
-  left: calc(50% - 128px);
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  margin: 36px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .ws-fab {
@@ -108,7 +112,7 @@
 .ws-module-selector {
   position: absolute;
   height: 100%;
-  right: 32px;
+  right: 16px;
   width: 64px;
   display: flex;
   flex-direction: column;

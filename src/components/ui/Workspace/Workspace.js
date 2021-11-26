@@ -1118,20 +1118,37 @@ function Workspace(props) {
     >
       <LoadingScreen open={modules === null} />
 
-      {sessionKey && (
-        <WorkspaceTitle
-          sessionData={sessionData}
-          setSessionData={setSessionData}
-          sessionKey={sessionKey}
-          editMode={editMode}
-          user={props.user}
-          sessionSize={sessionSize}
-          setPremiumMode={setPremiumMode}
-          handlePageNav={props.handlePageNav}
-          editorProfiles={editorProfiles}
-          setEditorProfiles={setEditorProfiles}
-        />
-      )}
+      <div className="ws-header">
+        {sessionKey && (
+          <WorkspaceTitle
+            sessionData={sessionData}
+            setSessionData={setSessionData}
+            sessionKey={sessionKey}
+            editMode={editMode}
+            user={props.user}
+            sessionSize={sessionSize}
+            setPremiumMode={setPremiumMode}
+            handlePageNav={props.handlePageNav}
+            editorProfiles={editorProfiles}
+            setEditorProfiles={setEditorProfiles}
+          />
+        )}
+        <div className="ws-commands" tabIndex="-1">
+          <IconButton size="large" tabIndex="-1" onClick={togglePlaying}>
+            <Icon style={{ color: "white", fontSize: 36 }}>
+              {isPlaying ? "pause" : "play_arrow"}
+            </Icon>
+          </IconButton>
+          <IconButton
+            size="large"
+            tabIndex="-1"
+            color="secondary"
+            onClick={toggleRecording}
+          >
+            <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
+          </IconButton>
+        </div>
+      </div>
 
       {/* <WorkspaceTimeline
         setTimeline={setTimeline}
@@ -1140,49 +1157,23 @@ function Workspace(props) {
         setSessionSize={setSessionSize}
       /> */}
 
-      <div className="ws-commands" tabIndex="-1">
-        <IconButton
-          size="large"
-          tabIndex="-1"
-          color="primary"
-          onClick={togglePlaying}
-        >
-          <Icon style={{ fontSize: 36 }}>
-            {isPlaying ? "pause" : "play_arrow"}
-          </Icon>
-        </IconButton>
-        <IconButton
-          size="large"
-          tabIndex="-1"
-          color="secondary"
-          onClick={toggleRecording}
-        >
-          <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
-        </IconButton>
-        <IconButton
-          size="large"
-          tabIndex="-1"
-          color={metronomeState ? "primary" : "default"}
-          onClick={() => setMetronomeState((prev) => !prev)}
-        >
-          <Icon style={{ fontSize: 36 }}>schedule</Icon>
-        </IconButton>
-      </div>
-
       <div className="ws-grid-cont" tabIndex="-1">
         <WorkspaceGrid
-          modules={modules}
           modules={modules}
           sessionSize={sessionSize}
           setSessionSize={setSessionSize}
           gridSize={gridSize}
           isRecording={isRecording}
+          selection={selection}
+          setSelection={setSelection}
+          cursorMode={cursorMode}
         >
           {selectedModule !== null ? (
             <ModuleRow
               tabIndex={-1}
               key={modules[selectedModule].id}
               index={selectedModule}
+              selectedModule={selectedModule}
               module={modules[selectedModule]}
               instrument={instruments[selectedModule]}
               setInstruments={setInstruments}
@@ -1211,6 +1202,7 @@ function Workspace(props) {
                 tabIndex={-1}
                 key={module.id}
                 index={moduleIndex}
+                selectedModule={selectedModule}
                 module={module}
                 instrument={instruments[moduleIndex]}
                 setInstruments={setInstruments}
@@ -1267,7 +1259,7 @@ function Workspace(props) {
 
       <NotesInput
         keyMapping={keySamplerMapping}
-        module={modules[selectedModule]}
+        module={modules && modules[selectedModule]}
         instrument={instruments[selectedModule]}
         pressedKeys={pressedKeys}
         setPressedKeys={setPressedKeys}

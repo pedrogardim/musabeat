@@ -18,10 +18,11 @@
 
 .module-inner-row-label {
   position: absolute !important;
-  left: -80px !important;
+  left: -96px !important;
   width: 72px;
   text-align: right !important;
   opacity: 0.5;
+  user-select: none !important;
 }
 
 .module-inner-row-line {

@@ -18,7 +18,7 @@ import {
 } from "@material-ui/core";
 
 function WorkspaceGrid(props) {
-  const TLWrapper = useRef(null);
+  const gridRef = useRef(null);
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
@@ -28,9 +28,12 @@ function WorkspaceGrid(props) {
     props.sessionSize
   );
 
+  const [gridPos, setGridPos] = useState(null);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
-      (element.x / TLWrapper.current.offsetWidth) *
+      (element.x / gridRef.current.offsetWidth) *
       Tone.Time(Tone.Transport.loopEnd).toSeconds();
 
     setCursorPosition(element.x);
@@ -43,27 +46,55 @@ function WorkspaceGrid(props) {
   const handleCursorDragStop = (event, element) => {};
 
   const handleMouseDown = (event) => {
-    return;
-    if (
-      (compact && event.target.className === "ws-grid-module-tile") ||
-      !props.timelineMode
-    ) {
-      let newTime =
-        ((event.pageX - TLWrapper.current.offsetLeft) /
-          TLWrapper.current.offsetWidth) *
-        Tone.Transport.loopEnd;
+    setIsMouseDown(true);
+    props.setSelection([]);
 
+    if (!props.cursorMode) {
       Tone.Transport.seconds =
-        newTime < 0
-          ? 0
-          : newTime > Tone.Transport.loopEnd
-          ? Tone.Transport.loopEnd
-          : newTime;
-    } else if (
-      props.timelineMode &&
-      event.target.className === "ws-grid-module-tile"
-    ) {
-      setDraggingSelect(true);
+        (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
+
+      props.setSelection([
+        (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize,
+        null,
+      ]);
+    }
+  };
+
+  const handleHover = (event) => {
+    let hoveredPos =
+      event.pageX -
+      gridRef.current.getBoundingClientRect().left +
+      gridRef.current.offsetWidth / (props.sessionSize * props.gridSize * 2);
+
+    let gridPos = Math.floor(
+      Math.abs(
+        (hoveredPos / gridRef.current.offsetWidth) *
+          props.sessionSize *
+          props.gridSize
+      )
+    );
+
+    setGridPos((prev) =>
+      JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
+    );
+  };
+
+  const handleMouseUp = () => {
+    setIsMouseDown(false);
+    //props.setSelection([]);
+  };
+
+  const onGridPosChange = () => {
+    //drag note input
+    if (isMouseDown) {
+      if (props.cursorMode === "edit") {
+        //handleMouseDown();
+      } else {
+        props.setSelection((prev) => [
+          prev[0],
+          (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize,
+        ]);
+      }
     }
   };
 
@@ -103,14 +134,20 @@ function WorkspaceGrid(props) {
     };
   }, [props.timelineMode]);
 
+  useEffect(() => {
+    onGridPosChange();
+  }, [gridPos]);
+
   return (
     <div
       className="ws-grid"
       disabled
-      ref={TLWrapper}
+      ref={gridRef}
       onMouseDown={handleMouseDown}
-      onMouseUp={() => setDraggingSelect(false)}
-      onMouseLeave={() => setDraggingSelect(false)}
+      onMouseMove={handleHover}
+      onMouseLeave={handleMouseUp}
+      onClick={handleMouseUp}
+      onMouseUp={handleMouseUp}
     >
       <WorkspaceGridLines
         gridSize={props.gridSize}
@@ -124,9 +161,9 @@ function WorkspaceGrid(props) {
         onDrag={handleCursorDrag}
         onStart={handleCursorDragStart}
         onStop={handleCursorDragStop}
+        onMouseDown={handleMouseDown}
         position={{
-          x:
-            TLWrapper.current && cursorPosition * TLWrapper.current.offsetWidth,
+          x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
           y: 0,
         }}
         bounds=".ws-grid"
@@ -136,6 +173,28 @@ function WorkspaceGrid(props) {
           style={{ backgroundColor: props.isRecording && "#f50057" }}
         />
       </Draggable>
+
+      {props.selection.length > 0 && !props.selection.includes(null) && (
+        <div
+          style={{
+            position: "absolute",
+            height: "100%",
+            transform: `translateX(${
+              (props.selection[0] / Tone.Transport.loopEnd) *
+              gridRef.current.offsetWidth
+            }px)`,
+            width:
+              (props.selection[1] / Tone.Transport.loopEnd) *
+                gridRef.current.offsetWidth -
+              (props.selection[0] / Tone.Transport.loopEnd) *
+                gridRef.current.offsetWidth,
+            backgroundColor: "lightgray",
+            opacity: 0.4,
+            /* border:
+                props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
+          }}
+        />
+      )}
 
       <div style={{ position: "absolute", right: -64 }}>
         <TextField

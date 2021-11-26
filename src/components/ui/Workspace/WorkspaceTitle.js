@@ -102,11 +102,15 @@ function WorkspaceTitle(props) {
         </title>
       </Helmet>
       <Typography
-        variant="h4"
+        /* onClick={() => setExpanded((prev) => !prev)} */
+        variant="overline"
         style={{
           maxWidth: "20vw",
           textOverflow: "ellipsis",
           overflow: "hidden",
+          color: "white",
+          fontSize: "2rem",
+          lineHeight: 1,
         }}
       >
         {props.sessionData
@@ -114,9 +118,11 @@ function WorkspaceTitle(props) {
             ? props.sessionData.name
             : t("WSTitle.untitledSession")
           : "..."}
+      </Typography>
 
-        {!(props.editMode && !props.user) && (
-          <IconButton onClick={() => setExpanded((prev) => !prev)}>
+      {/*
+        !(props.editMode && !props.user) && (
+          <IconButton>
             <Icon
               style={{
                 transition: "0.2s",
@@ -127,8 +133,7 @@ function WorkspaceTitle(props) {
             </Icon>
           </IconButton>
         )}
-      </Typography>
-
+      
       {!props.editMode && (
         <Tooltip title={t("WSTitle.viewMode")}>
           <Icon className="app-title-alert">visibility</Icon>
@@ -139,6 +144,8 @@ function WorkspaceTitle(props) {
           <Icon className="app-title-alert">no_accounts</Icon>
         </Tooltip>
       )}
+
+      */}
 
       {props.editorProfiles !== null &&
       Object.values(props.editorProfiles).length > 0 ? (
