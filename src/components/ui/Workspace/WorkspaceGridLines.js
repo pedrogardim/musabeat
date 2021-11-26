@@ -3,34 +3,6 @@ import * as Tone from "tone";
 
 import "./WorkspaceGridLines.css";
 
-function WorkspaceGridLines(props) {
-  return (
-    <div className="ws-grid-line-cont">
-      {Array(props.sessionSize * props.gridSize)
-        .fill(0)
-        .map((e, i) => (
-          <div
-            className="ws-grid-line"
-            style={{
-              opacity:
-                i % props.gridSize === 0
-                  ? 0.4
-                  : i % props.gridSize === props.gridSize / 2
-                  ? 0.3
-                  : 0.2,
-            }}
-          >
-            {i % props.gridSize === 0 && (
-              <span className="ws-grid-line-mesure-num">
-                {i / props.gridSize + 1}
-              </span>
-            )}
-          </div>
-        ))}
-
-      <div className="ws-grid-line" />
-    </div>
-  );
-}
+function WorkspaceGridLines(props) {}
 
 export default WorkspaceGridLines;

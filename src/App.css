@@ -23,7 +23,7 @@ body *::-webkit-scrollbar-track {
 
 body *::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.356); /* color of the scroll thumb */
-  border-radius: 4px; /* roundness of the scroll thumb */
+  border-radius: 0px; /* roundness of the scroll thumb */
   /* border: 3px solid orange;  */
 }
 
@@ -88,13 +88,12 @@ body *::-webkit-scrollbar-thumb {
 
 .app-wrapper {
   flex: 1;
-  height: 100vh;
   width: 100vw;
   top: 0 !important;
   left: 0 !important;
   overflow-y: overlay;
   overflow-x: hidden;
-  position: absolute;
+  position: relative;
 }
 
 .disabled {

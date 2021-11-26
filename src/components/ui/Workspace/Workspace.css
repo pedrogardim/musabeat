@@ -110,10 +110,9 @@
 /* lewjfenrigfneorjgoernijtgnritgnotngorngrk */
 
 .ws-module-selector {
-  position: absolute;
   height: 100%;
-  right: 16px;
   width: 64px;
+  margin: 0 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;

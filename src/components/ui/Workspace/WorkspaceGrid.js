@@ -142,19 +142,37 @@ function WorkspaceGrid(props) {
     <div
       className="ws-grid"
       disabled
-      ref={gridRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleHover}
       onMouseLeave={handleMouseUp}
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
     >
-      <WorkspaceGridLines
-        gridSize={props.gridSize}
-        sessionSize={props.sessionSize}
-      />
+      <div ref={gridRef} className="ws-grid-line-cont">
+        {Array(props.sessionSize * props.gridSize)
+          .fill(0)
+          .map((e, i) => (
+            <div
+              className="ws-grid-line"
+              style={{
+                opacity:
+                  i % props.gridSize === 0
+                    ? 0.4
+                    : i % props.gridSize === props.gridSize / 2
+                    ? 0.3
+                    : 0.2,
+              }}
+            >
+              {i % props.gridSize === 0 && (
+                <span className="ws-grid-line-mesure-num">
+                  {i / props.gridSize + 1}
+                </span>
+              )}
+            </div>
+          ))}
 
-      {props.children}
+        <div className="ws-grid-line" />
+      </div>
 
       <Draggable
         axis="x"
@@ -166,13 +184,15 @@ function WorkspaceGrid(props) {
           x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
           y: 0,
         }}
-        bounds=".ws-grid"
+        bounds=".ws-grid-line-cont"
       >
         <div
-          className={`ws-grid-cursor ${compact && "ws-grid-cursor-compact"}`}
+          className={"ws-grid-cursor"}
           style={{ backgroundColor: props.isRecording && "#f50057" }}
         />
       </Draggable>
+
+      {props.children}
 
       {props.selection.length > 0 && !props.selection.includes(null) && (
         <div
@@ -181,7 +201,8 @@ function WorkspaceGrid(props) {
             height: "100%",
             transform: `translateX(${
               (props.selection[0] / Tone.Transport.loopEnd) *
-              gridRef.current.offsetWidth
+                gridRef.current.offsetWidth +
+              72
             }px)`,
             width:
               (props.selection[1] / Tone.Transport.loopEnd) *

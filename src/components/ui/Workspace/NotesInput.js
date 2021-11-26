@@ -43,39 +43,6 @@ function NotesInput(props) {
     props.setPressedKeys((prev) => [...prev, i]);
   };
 
-  const getFilesName = () => {
-    const getFilesNameFromId = (ids) => {
-      let labelsWithFilename = { ...ids };
-      Promise.all(
-        Object.keys(ids).map(async (e, i) => {
-          let filedata = (
-            await firebase.firestore().collection("files").doc(ids[e]).get()
-          ).data();
-          labelsWithFilename[e] =
-            filedata.name + "." + fileExtentions[parseInt(filedata.type)];
-          return filedata.name + "." + fileExtentions[parseInt(filedata.type)];
-        })
-      ).then((values) => {
-        setFilesName(labelsWithFilename);
-      });
-    };
-
-    if (typeof props.module.instrument === "string") {
-      firebase
-        .firestore()
-        .collection(props.module.type === 0 ? "drumpatches" : "patches")
-        .doc(props.module.instrument)
-        .get()
-        .then((r) => {
-          getFilesNameFromId(r.get("urls"));
-          setFilesId(Object.values(r.get("urls")));
-        });
-    } else {
-      getFilesNameFromId(props.module.instrument.urls);
-      setFilesId(Object.values(props.module.instrument.urls));
-    }
-  };
-
   useEffect(() => {
     //getFilesName();
     /* setFilesLine(
@@ -90,6 +57,7 @@ function NotesInput(props) {
   return (
     <div className="ws-note-input-key-cont">
       {props.module &&
+        props.module.type === 0 &&
         props.instrument &&
         /* Array(props.instrument._buffers._buffers.size) */
         Object.keys(props.keyMapping)

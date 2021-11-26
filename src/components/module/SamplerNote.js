@@ -8,7 +8,7 @@ function SamplerNote(props) {
     <div
       className="module-score-ghost"
       style={{
-        height: props.rowRef.current.offsetHeight / props.moduleRows.length,
+        height: props.rowRef.current.scrollHeight / props.moduleRows.length,
         width:
           props.rowRef.current.offsetWidth /
           (props.sessionSize * props.gridSize),
@@ -19,7 +19,7 @@ function SamplerNote(props) {
                 (props.sessionSize * props.gridSize))
             }px,${
               props.gridPos[0] *
-              (props.rowRef.current.offsetHeight / props.moduleRows.length)
+              (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
@@ -27,7 +27,7 @@ function SamplerNote(props) {
                 (props.sessionSize * Tone.Time("1m").toSeconds()))
             }px,${
               props.moduleRows.findIndex((e) => e.note === props.note.note) *
-              (props.rowRef.current.offsetHeight / props.moduleRows.length)
+              (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
         /* backgroundColor:

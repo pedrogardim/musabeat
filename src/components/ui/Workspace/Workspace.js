@@ -837,32 +837,45 @@ function Workspace(props) {
 
     //console.log(sampleIndex);
 
-    if (!instruments[selectedModule].has(sampleIndex)) return;
-
-    instruments[selectedModule].player(sampleIndex).start();
+    if (modules[selectedModule].type === 0) {
+      if (!instruments[selectedModule].has(sampleIndex)) return;
+      instruments[selectedModule].player(sampleIndex).start();
+    } else {
+      instruments[selectedModule].triggerAttackRelease(sampleIndex, "8n");
+    }
 
     //console.log(e.code);
 
     if (!isRecording) return;
 
-    let newNote = {
-      note: sampleIndex,
-      duration: instruments[selectedModule].player(sampleIndex).buffer.duration,
-      time: Tone.Time(
-        Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
-      ).toBarsBeatsSixteenths(),
-    };
+    if (modules[selectedModule].type === 0) {
+      let newNote = {
+        note: sampleIndex,
+        time: Tone.Time(
+          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
+        ).toBarsBeatsSixteenths(),
+      };
 
-    setModules((prev) => {
-      let newModules = [...prev];
-      let find = newModules[selectedModule].score.findIndex(
-        (e) => e.note === newNote.note && e.time === newNote.time
-      );
-      //console.log(find);
-      if (find !== -1) return newModules;
-      newModules[selectedModule].score = [...newModules[0].score, newNote];
-      return newModules;
-    });
+      setModules((prev) => {
+        let newModules = [...prev];
+        let find = newModules[selectedModule].score.findIndex(
+          (e) => e.note === newNote.note && e.time === newNote.time
+        );
+        //console.log(find);
+        if (find !== -1) return newModules;
+        newModules[selectedModule].score = [...newModules[0].score, newNote];
+        return newModules;
+      });
+    } else {
+      let drawingNote = {
+        note: sampleIndex,
+        time: Tone.Time(
+          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
+        ).toBarsBeatsSixteenths(),
+      };
+
+      //setDrawingNote(drawingNote);
+    }
   };
 
   const handleCopy = () => {

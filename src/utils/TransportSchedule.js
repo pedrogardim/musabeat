@@ -399,7 +399,32 @@ export const scheduleSampler = (score, instrument, transport, moduleId) => {
           .stop(time)
           .start(time)
           .stop(time + Tone.Time(e.duration).toSeconds());
-    }, Tone.Time(e.time).toSeconds());
+    }, e.time);
+    scheduledNotes.push(event);
+  });
+
+  scheduledEvents[moduleId] = scheduledNotes;
+};
+
+/* ================================================================= */
+
+export const scheduleMelody = (score, instrument, transport, moduleId) => {
+  moduleId !== undefined && clearEvents(moduleId);
+
+  //console.log("instrument", instrument);
+
+  let scheduledNotes = [];
+
+  //console.log("scheduled", moduleId);
+
+  score.forEach((e, i) => {
+    let event = transport.schedule((time) => {
+      instrument.triggerAttackRelease(
+        Tone.Frequency(e.note, "midi").toNote(),
+        e.duration,
+        time
+      );
+    }, e.time);
     scheduledNotes.push(event);
   });
 
