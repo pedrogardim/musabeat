@@ -1099,6 +1099,7 @@ export const loadDrumPatch = async (
   onLoad,
   setModules,
   setLabels,
+  setInstrumentsInfo,
   setNotifications
 ) => {
   //drum patch with stardard configuration
@@ -1140,6 +1141,31 @@ export const loadDrumPatch = async (
       }
     })
   );
+
+  let filesInfo = await Promise.all(
+    Object.keys(patch.urls).map(async (e, i) => {
+      try {
+        return (
+          await firebase
+            .firestore()
+            .collection("files")
+            .doc(patch.urls[e])
+            .get()
+        ).data();
+      } catch (er) {
+        setNotifications((prev) => [
+          ...prev,
+          ["fileInfo", patch.urls[e], moduleIndex],
+        ]);
+      }
+    })
+  );
+
+  setInstrumentsInfo((prev) => {
+    let newInfo = [...prev];
+    newInfo[moduleIndex] = { patch: patch, filesInfo: filesInfo };
+    return newInfo;
+  });
 
   //console.log(urlArray);
 

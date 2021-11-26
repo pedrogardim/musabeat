@@ -29,6 +29,8 @@ import PlaceholderModule from "../../Module/PlaceholderModule";
 import WorkspaceTitle from "./WorkspaceTitle";
 
 import ModulePicker from "../ModulePicker";
+import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
+
 import Exporter from "../Exporter";
 import SessionSettings from "../SessionSettings";
 import Mixer from "../mixer/Mixer";
@@ -90,6 +92,7 @@ function Workspace(props) {
 
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
+  const [instrumentsInfo, setInstrumentsInfo] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [metronome, setMetronome] = useState(null);
@@ -337,6 +340,7 @@ function Workspace(props) {
           "",
           setModules,
           () => {},
+          setInstrumentsInfo,
           setNotifications
         ).then((r) =>
           setInstruments((prev) => {
@@ -517,6 +521,7 @@ function Workspace(props) {
           "",
           setModules,
           () => {},
+          setInstrumentsInfo,
           setNotifications
         ).then((r) =>
           setInstruments((prev) => {
@@ -939,6 +944,14 @@ function Workspace(props) {
     setPressedKeys((prev) => prev.filter((e) => e !== sampleIndex));
   };
 
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*=====================================USEEFFECTS=========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+
   useEffect(() => {
     //resetWorkspace();
     Tone.Transport.loop = true;
@@ -1063,6 +1076,10 @@ function Workspace(props) {
   }, [instruments]);
 
   useEffect(() => {
+    console.log(instrumentsInfo);
+  }, [instrumentsInfo]);
+
+  useEffect(() => {
     Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
 
     setSessionData((prev) => {
@@ -1100,7 +1117,13 @@ function Workspace(props) {
     if (metronome) metronome.volume.value = metronomeState ? 0 : -999;
   }, [metronomeState]);
 
-  /**/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*=====================================JSX================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   return modules !== undefined ? (
     <div
@@ -1257,14 +1280,33 @@ function Workspace(props) {
         </div>
       </div>
 
-      <NotesInput
-        keyMapping={keySamplerMapping}
-        module={modules && modules[selectedModule]}
-        instrument={instruments[selectedModule]}
-        pressedKeys={pressedKeys}
-        setPressedKeys={setPressedKeys}
-        handlePageNav={props.handlePageNav}
-      />
+      <div className="ws-note-input">
+        <NotesInput
+          keyMapping={keySamplerMapping}
+          module={modules && modules[selectedModule]}
+          instrument={instruments[selectedModule]}
+          pressedKeys={pressedKeys}
+          setPressedKeys={setPressedKeys}
+          handlePageNav={props.handlePageNav}
+        />
+
+        {modules && modules[selectedModule] && (
+          <InstrumentEditor
+            index={selectedModule}
+            module={modules && modules[selectedModule]}
+            setModules={setModules}
+            instrument={instruments[selectedModule]}
+            instrumentInfo={instrumentsInfo[selectedModule]}
+            setInstruments={setInstruments}
+            setInstrumentsLoaded={setInstrumentsLoaded}
+            setSnackbarMessage={setSnackbarMessage}
+            /* handleFileClick={handleFileClick} 
+          setLabels={setLabels}
+          updateFilesStatsOnChange={updateFilesStatsOnChange}*/
+            handlePageNav={props.handlePageNav}
+          />
+        )}
+      </div>
 
       {modulePicker && (
         <ModulePicker

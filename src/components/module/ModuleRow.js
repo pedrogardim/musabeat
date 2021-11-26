@@ -35,7 +35,9 @@ function ModuleRow(props) {
           ? Object.keys(
               Array(props.instrument._buffers._buffers.size).fill(0)
             ).map((e) => parseInt(e))
-          : [...new Set(props.module.score.map((item) => item.note))];
+          : [...new Set(props.module.score.map((item) => item.note))].sort(
+              (a, b) => a - b
+            );
 
       console.log(array);
 
