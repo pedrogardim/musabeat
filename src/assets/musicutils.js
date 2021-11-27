@@ -598,6 +598,49 @@ export const sessionTags = {
   191: "Psybient",
 };
 
+export const keySamplerMapping = {
+  KeyQ: 0,
+  KeyW: 1,
+  KeyE: 2,
+  KeyR: 3,
+  KeyT: 4,
+  KeyY: 5,
+  KeyU: 6,
+  KeyI: 7,
+  KeyO: 8,
+  KeyP: 9,
+  KeyA: 10,
+  KeyS: 11,
+  KeyD: 12,
+  KeyF: 13,
+  KeyG: 14,
+  KeyH: 15,
+  KeyJ: 16,
+  KeyK: 17,
+  KeyL: 18,
+  Semicolon: 19,
+};
+
+export const keyboardMapping = {
+  KeyA: 24,
+  KeyW: 25,
+  KeyS: 26,
+  KeyE: 27,
+  KeyD: 28,
+  KeyF: 29,
+  KeyT: 30,
+  KeyG: 31,
+  KeyY: 32,
+  KeyH: 33,
+  KeyU: 34,
+  KeyJ: 35,
+  KeyK: 36,
+  KeyO: 37,
+  KeyL: 37,
+  KeyP: 38,
+  Semicolon: 39,
+};
+
 ////////////////////////////////////////////////////////////////
 //Functions
 ////////////////////////////////////////////////////////////////

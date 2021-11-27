@@ -31,21 +31,22 @@ function ModuleRow(props) {
   const [drawingNote, setDrawingNote] = useState(null);
 
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [deletableNote, setDeletableNote] = useState(false);
 
   const trackType = props.module.type;
+  const isSelected = props.selectedModule === props.index;
 
   const loadModuleRows = () => {
     let rows = [];
     if (!props.instrument) return;
     if (trackType === 0) {
-      let array =
-        props.selectedModule === props.index
-          ? Object.keys(
-              Array(props.instrument._buffers._buffers.size).fill(0)
-            ).map((e) => parseInt(e))
-          : [...new Set(props.module.score.map((item) => item.note))].sort(
-              (a, b) => a - b
-            );
+      let array = isSelected
+        ? Object.keys(
+            Array(props.instrument._buffers._buffers.size).fill(0)
+          ).map((e) => parseInt(e))
+        : [...new Set(props.module.score.map((item) => item.note))].sort(
+            (a, b) => a - b
+          );
 
       rows = array.map((e, i) => {
         return {
@@ -57,9 +58,13 @@ function ModuleRow(props) {
       });
     }
     if (trackType === 1) {
-      let array = Array(88)
-        .fill(0)
-        .map((e, i) => 108 - i);
+      let array = isSelected
+        ? Array(88)
+            .fill(0)
+            .map((e, i) => 108 - i)
+        : [...new Set(props.module.score.map((item) => item.note))].sort(
+            (a, b) => a - b
+          );
 
       rows = array.map((e, i) => {
         return {
@@ -71,6 +76,80 @@ function ModuleRow(props) {
     }
     setModuleRows(rows);
   };
+
+  const scheduleNotes = () => {
+    !props.module.muted
+      ? trackType === 0
+        ? scheduleSampler(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+        : scheduleMelody(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+      : clearEvents(props.module.id);
+  };
+
+  const playNote = (note) => {
+    console.log(note, props.playingOctave);
+
+    if (props.module.type === 0) {
+      if (!props.instrument.has(note)) return;
+      props.instrument.player(note).start();
+    } else {
+      props.instrument.triggerAttackRelease(
+        Tone.Frequency(note + props.playingOctave * 12, "midi"),
+        "8n"
+      );
+    }
+
+    //console.log(e.code);
+
+    if (!props.isRecording) return;
+
+    if (props.module.type === 0) {
+      let newNote = {
+        note: note,
+        time: Tone.Time(
+          Tone.Time(Tone.Transport.seconds).quantize(`${props.gridSize}n`)
+        ).toBarsBeatsSixteenths(),
+      };
+
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        let find = newModules[props.selectedModule].score.findIndex(
+          (e) => e.note === newNote.note && e.time === newNote.time
+        );
+        //console.log(find);
+        if (find !== -1) return newModules;
+        newModules[props.selectedModule].score = [
+          ...newModules[0].score,
+          newNote,
+        ];
+        return newModules;
+      });
+    } else {
+      let drawingNote = {
+        note: note + props.playingOctave * 12,
+        time: Tone.Time(Tone.Transport.seconds).quantize(`${props.gridSize}n`),
+      };
+
+      //setDrawingNote(drawingNote);
+    }
+  };
+
+  const releaseNote = () => {};
+
+  /* ================================================================================== */
+  /* ================================================================================== */
+  /* =============================MOUSE EVENTS========================================= */
+  /* ================================================================================== */
+  /* ================================================================================== */
 
   const handleHover = (event) => {
     let hoveredPos = [
@@ -101,6 +180,18 @@ function ModuleRow(props) {
     setGridPos((prev) =>
       JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
     );
+
+    let find =
+      props.module.score.findIndex(
+        (e) =>
+          (e.note === gridPos[0] || e.note === 108 - gridPos[0]) &&
+          e.time ===
+            Tone.Time(
+              (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
+            ).toBarsBeatsSixteenths()
+      ) !== -1;
+
+    setDeletableNote((prev) => (prev === find ? prev : find));
   };
 
   const handleMouseDown = (e) => {
@@ -125,15 +216,12 @@ function ModuleRow(props) {
 
         props.setModules((prev) => {
           let newModules = [...prev];
-          let find = newModules[props.index].score.findIndex(
-            (e) => e.note === newNote.note && e.time === newNote.time
-          );
-          newModules[props.index].score =
-            find === -1
-              ? [...newModules[props.index].score, { ...newNote }]
-              : newModules[props.index].score.filter(
-                  (e) => e.note !== newNote.note || e.time !== newNote.time
-                );
+
+          newModules[props.index].score = deletableNote
+            ? newModules[props.index].score.filter(
+                (e) => e.note !== newNote.note || e.time !== newNote.time
+              )
+            : [...newModules[props.index].score, { ...newNote }];
 
           return newModules;
         });
@@ -196,24 +284,6 @@ function ModuleRow(props) {
     }
   };
 
-  const scheduleNotes = () => {
-    !props.module.muted
-      ? trackType === 0
-        ? scheduleSampler(
-            props.module.score,
-            props.instrument,
-            Tone.Transport,
-            props.module.id
-          )
-        : scheduleMelody(
-            props.module.score,
-            props.instrument,
-            Tone.Transport,
-            props.module.id
-          )
-      : clearEvents(props.module.id);
-  };
-
   /* ================================================================================== */
   /* ================================================================================== */
   /* ================================USEEFFECTS======================================== */
@@ -235,6 +305,11 @@ function ModuleRow(props) {
   useEffect(() => {
     //console.log(moduleRows[0], moduleRows.length);
   }, [moduleRows]);
+
+  useEffect(() => {
+    props.setPlayNoteFunction &&
+      props.setPlayNoteFunction([playNote, releaseNote]);
+  }, []);
   /* 
   useEffect(() => {
     console.log(drawingNote && drawingNote.time);
@@ -249,7 +324,11 @@ function ModuleRow(props) {
   return (
     <div
       className="module-grid-row-wrapper"
-      style={{ overflowY: trackType === 1 && "overlay" }}
+      style={{
+        overflowY: trackType === 1 && isSelected && "overlay",
+        maxHeight: !isSelected && "10%",
+        cursor: deletableNote && "not-allowed",
+      }}
     >
       <div
         className="module-grid-row"
@@ -262,7 +341,8 @@ function ModuleRow(props) {
         disabled
         style={{
           //overflowY: trackType === 1 && "overlay",
-          border: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
+          border:
+            trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
         }}
       >
         {moduleRows.map((row, rowIndex) => (
@@ -270,10 +350,12 @@ function ModuleRow(props) {
             className="module-inner-row"
             style={{
               //borderTop: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
-              borderBottom: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
+              borderBottom:
+                trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
               minHeight: trackType === 1 && "6.66666%",
               background:
                 trackType === 1 &&
+                isSelected &&
                 (rowIndex % 12 === 2 ||
                   rowIndex % 12 === 4 ||
                   rowIndex % 12 === 6 ||
@@ -306,6 +388,7 @@ function ModuleRow(props) {
                   module={props.module}
                   sessionSize={props.sessionSize}
                   gridSize={props.gridSize}
+                  deletableNote={deletableNote}
                 />
               ) : (
                 <MelodyNote
@@ -316,6 +399,8 @@ function ModuleRow(props) {
                   module={props.module}
                   sessionSize={props.sessionSize}
                   gridSize={props.gridSize}
+                  deletableNote={deletableNote}
+                  setDrawingNote={setDrawingNote}
                 />
               )
             )}

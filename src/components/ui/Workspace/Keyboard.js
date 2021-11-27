@@ -26,7 +26,8 @@ function Keyboard(props) {
   const octaves = props.octaves ? props.octaves : 7;
 
   useEffect(() => {
-    props.setKeyPlayingOctave && props.setKeyPlayingOctave(octave);
+    console.log(props.setPlayingOctave);
+    if (props.setPlayingOctave) props.setPlayingOctave(octave);
   }, [octave]);
 
   return (
@@ -43,7 +44,7 @@ function Keyboard(props) {
               backgroundColor:
                 !!props.activeNotes.length &&
                 props.activeNotes
-                  .map((note) => Tone.Frequency(note).toMidi() - 24)
+                  .map((note) => Tone.Frequency(note, "midi").toMidi() - 24)
                   .includes(i + octave * 12)
                   ? color["A700"]
                   : i % 12 === 1 ||

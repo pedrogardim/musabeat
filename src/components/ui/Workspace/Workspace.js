@@ -21,10 +21,7 @@ import {
 
 import "./Workspace.css";
 
-import Module from "../../Module/Module";
 import ModuleRow from "../../Module/ModuleRow";
-
-import PlaceholderModule from "../../Module/PlaceholderModule";
 
 import WorkspaceTitle from "./WorkspaceTitle";
 
@@ -35,7 +32,6 @@ import Exporter from "../Exporter";
 import SessionSettings from "../SessionSettings";
 import Mixer from "../mixer/Mixer";
 import SessionProgressBar from "../SessionProgressBar";
-import WorkspaceTimeline from "./WorkspaceTimeline";
 import WorkspaceGrid from "./WorkspaceGrid";
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
@@ -48,6 +44,8 @@ import {
   loadSynthFromGetObject,
   adaptSequencetoSubdiv,
   loadSamplerFromObject,
+  keySamplerMapping,
+  keyboardMapping,
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
@@ -100,6 +98,11 @@ function Workspace(props) {
   const [metronomeEvent, setMetronomeEvent] = useState(null);
 
   const [pressedKeys, setPressedKeys] = useState([]);
+  const [playingOctave, setPlayingOctave] = useState(null);
+  const [playNoteFunction, setPlayNoteFunction] = useState([
+    () => {},
+    () => {},
+  ]);
 
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
@@ -136,28 +139,10 @@ function Workspace(props) {
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
 
-  const keySamplerMapping = {
-    KeyQ: 0,
-    KeyW: 1,
-    KeyE: 2,
-    KeyR: 3,
-    KeyT: 4,
-    KeyY: 5,
-    KeyU: 6,
-    KeyI: 7,
-    KeyO: 8,
-    KeyP: 9,
-    KeyA: 10,
-    KeyS: 11,
-    KeyD: 12,
-    KeyF: 13,
-    KeyG: 14,
-    KeyH: 15,
-    KeyJ: 16,
-    KeyK: 17,
-    KeyL: 18,
-    Semicolon: 19,
-  };
+  const keyMapping =
+    selectedModule !== null && modules[selectedModule].type === 0
+      ? keySamplerMapping
+      : keyboardMapping;
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -797,53 +782,13 @@ function Workspace(props) {
   };
 
   const playNote = (e) => {
-    let sampleIndex = keySamplerMapping[e.code];
+    let sampleIndex = keyMapping[e.code];
 
     if (sampleIndex === undefined || selectedModule === null) return;
 
     setPressedKeys((prev) => [...prev, sampleIndex]);
 
-    //console.log(sampleIndex);
-
-    if (modules[selectedModule].type === 0) {
-      if (!instruments[selectedModule].has(sampleIndex)) return;
-      instruments[selectedModule].player(sampleIndex).start();
-    } else {
-      instruments[selectedModule].triggerAttackRelease(sampleIndex, "8n");
-    }
-
-    //console.log(e.code);
-
-    if (!isRecording) return;
-
-    if (modules[selectedModule].type === 0) {
-      let newNote = {
-        note: sampleIndex,
-        time: Tone.Time(
-          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
-        ).toBarsBeatsSixteenths(),
-      };
-
-      setModules((prev) => {
-        let newModules = [...prev];
-        let find = newModules[selectedModule].score.findIndex(
-          (e) => e.note === newNote.note && e.time === newNote.time
-        );
-        //console.log(find);
-        if (find !== -1) return newModules;
-        newModules[selectedModule].score = [...newModules[0].score, newNote];
-        return newModules;
-      });
-    } else {
-      let drawingNote = {
-        note: sampleIndex,
-        time: Tone.Time(
-          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
-        ).toBarsBeatsSixteenths(),
-      };
-
-      //setDrawingNote(drawingNote);
-    }
+    playNoteFunction[0](sampleIndex);
   };
 
   const handleCopy = () => {
@@ -918,7 +863,7 @@ function Workspace(props) {
   const handleKeyUp = (e) => {
     Tone.start();
 
-    let sampleIndex = keySamplerMapping[e.code];
+    let sampleIndex = keyMapping[e.code];
 
     if (sampleIndex === undefined) return;
 
@@ -994,6 +939,16 @@ function Workspace(props) {
         sessionData.size === prev ? prev : sessionData.size
       );
   }, [sessionData]);
+
+  useEffect(() => {
+    if (
+      props.user &&
+      sessionData &&
+      sessionData.editors &&
+      sessionData.editors.includes(props.user.uid)
+    )
+      setEditMode(true);
+  }, [sessionData, props.user]);
 
   /*  useEffect(() => {
     console.log("sessiondata triggered", sessionData);
@@ -1204,6 +1159,8 @@ function Workspace(props) {
               cursorMode={cursorMode}
               gridSize={gridSize}
               isRecording={isRecording}
+              playingOctave={playingOctave}
+              setPlayNoteFunction={setPlayNoteFunction}
             />
           ) : (
             modules &&
@@ -1273,12 +1230,14 @@ function Workspace(props) {
       {selectedModule !== null && (
         <div className="ws-note-input">
           <NotesInput
-            keyMapping={keySamplerMapping}
+            keyMapping={keyMapping}
             module={modules && modules[selectedModule]}
             instrument={instruments[selectedModule]}
             pressedKeys={pressedKeys}
             setPressedKeys={setPressedKeys}
             handlePageNav={props.handlePageNav}
+            playNoteFunction={playNoteFunction}
+            setPlayingOctave={setPlayingOctave}
           />
 
           {modules && modules[selectedModule] && (

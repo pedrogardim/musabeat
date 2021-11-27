@@ -13,7 +13,7 @@ import {
 import { labels } from "../../../assets/drumkits";
 import { useTranslation } from "react-i18next";
 
-import Keyboard from "../../Modules/ChordProgression/Keyboard";
+import Keyboard from "../Workspace/Keyboard";
 
 function NoteInput(props) {
   const { t } = useTranslation();

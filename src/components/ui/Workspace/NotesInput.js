@@ -31,12 +31,9 @@ import {
 
 import "./NotesInput.css";
 
-function NotesInput(props) {
-  const [keyPage, setKeyPage] = useState(0);
-  const [filesName, setFilesName] = useState(null);
-  const [filesId, setFilesId] = useState(null);
-  const [filesLine, setFilesLine] = useState([]);
+import Keyboard from "./Keyboard";
 
+function NotesInput(props) {
   const handleClick = (event, i) => {
     if (!props.instrument.has(i)) return;
     props.instrument.player(i).start();
@@ -54,11 +51,11 @@ function NotesInput(props) {
     ); */
   }, [props.module, props.instrument]);
 
+  useEffect(() => {}, [props.pressedKeys]);
+
   return (
     <div className="ws-note-input-key-cont">
-      {props.module &&
-        props.module.type === 0 &&
-        props.instrument &&
+      {props.module && props.instrument && props.module.type === 0 ? (
         /* Array(props.instrument._buffers._buffers.size) */
         Object.keys(props.keyMapping)
           //.filter((e, i) => (!keyPage ? i < 10 : i >= 10))
@@ -129,7 +126,27 @@ function NotesInput(props) {
               </div>
               {i === 9 && <div className="break" />}
             </Fragment>
-          ))}
+          ))
+      ) : (
+        <Keyboard
+          activeNotes={props.pressedKeys}
+          style={{
+            width: "80vw",
+            minWidth: 400,
+            maxWidth: 1000,
+            height: 72,
+            zIndex: 0,
+          }}
+          color={props.module.color}
+          initialOctave={3}
+          octaves={1.42}
+          notesLabel={Object.keys(props.keyMapping).map((e) =>
+            e.replace("Key", "").replace("Semicolon", ":")
+          )}
+          setPlayingOctave={props.setPlayingOctave}
+          variableOctave
+        />
+      )}
     </div>
   );
 }

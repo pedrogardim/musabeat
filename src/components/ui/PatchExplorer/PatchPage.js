@@ -3,8 +3,6 @@ import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
 
-import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
-
 import { useParams } from "react-router-dom";
 
 import {
@@ -34,9 +32,10 @@ import {
 
 import { colors } from "../../../utils/materialPalette";
 
+import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
 import LoadingScreen from "../../ui/LoadingScreen";
 import NotFoundPage from "../NotFoundPage";
-import Keyboard from "../../Modules/ChordProgression/Keyboard";
+import Keyboard from "../Workspace/Keyboard";
 
 let isSustainPedal = false;
 

@@ -6,7 +6,7 @@ import { colors } from "../../utils/materialPalette";
 function SamplerNote(props) {
   return (
     <div
-      className="module-score-ghost"
+      className="module-score-note"
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length,
         width:

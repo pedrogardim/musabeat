@@ -49,8 +49,10 @@
   opacity: 0.5;
 }
 
-.module-score-ghost {
+.module-score-note {
   position: absolute;
-  transition: background-color 0.2s;
-  opacity: 1;
+}
+
+.module-score-note-ghost {
+  pointer-events: none;
 }
