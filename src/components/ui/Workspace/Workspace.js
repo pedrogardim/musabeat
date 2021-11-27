@@ -1296,33 +1296,35 @@ function Workspace(props) {
         </div>
       </div>
 
-      <div className="ws-note-input">
-        <NotesInput
-          keyMapping={keySamplerMapping}
-          module={modules && modules[selectedModule]}
-          instrument={instruments[selectedModule]}
-          pressedKeys={pressedKeys}
-          setPressedKeys={setPressedKeys}
-          handlePageNav={props.handlePageNav}
-        />
-
-        {modules && modules[selectedModule] && (
-          <InstrumentEditor
-            index={selectedModule}
+      {selectedModule !== null && (
+        <div className="ws-note-input">
+          <NotesInput
+            keyMapping={keySamplerMapping}
             module={modules && modules[selectedModule]}
-            setModules={setModules}
             instrument={instruments[selectedModule]}
-            instrumentInfo={instrumentsInfo[selectedModule]}
-            setInstruments={setInstruments}
-            setInstrumentsLoaded={setInstrumentsLoaded}
-            setSnackbarMessage={setSnackbarMessage}
-            /* handleFileClick={handleFileClick} 
-          setLabels={setLabels}
-          updateFilesStatsOnChange={updateFilesStatsOnChange}*/
+            pressedKeys={pressedKeys}
+            setPressedKeys={setPressedKeys}
             handlePageNav={props.handlePageNav}
           />
-        )}
-      </div>
+
+          {modules && modules[selectedModule] && (
+            <InstrumentEditor
+              index={selectedModule}
+              module={modules && modules[selectedModule]}
+              setModules={setModules}
+              instrument={instruments[selectedModule]}
+              instrumentInfo={instrumentsInfo[selectedModule]}
+              setInstruments={setInstruments}
+              setInstrumentsLoaded={setInstrumentsLoaded}
+              setSnackbarMessage={setSnackbarMessage}
+              /* handleFileClick={handleFileClick} 
+          setLabels={setLabels}
+          updateFilesStatsOnChange={updateFilesStatsOnChange}*/
+              handlePageNav={props.handlePageNav}
+            />
+          )}
+        </div>
+      )}
 
       {modulePicker && (
         <ModulePicker

@@ -10,16 +10,27 @@ function MelodyNote(props) {
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length,
         width: props.ghost
-          ? props.rowRef.current.offsetWidth /
-            (props.sessionSize * props.gridSize)
+          ? props.drawingNote
+            ? props.gridPos[1] *
+                (props.rowRef.current.offsetWidth /
+                  (props.sessionSize * props.gridSize)) -
+              Tone.Time(props.drawingNote.time).toSeconds() *
+                (props.rowRef.current.offsetWidth /
+                  (props.sessionSize * Tone.Time("1m").toSeconds()))
+            : props.rowRef.current.offsetWidth /
+              (props.sessionSize * props.gridSize)
           : (Tone.Time(props.note.duration).toSeconds() /
               Tone.Time("1m").toSeconds()) *
             (props.rowRef.current.offsetWidth / props.sessionSize),
         transform: props.ghost
           ? `translate(${
-              props.gridPos[1] *
-              (props.rowRef.current.offsetWidth /
-                (props.sessionSize * props.gridSize))
+              props.drawingNote
+                ? Tone.Time(props.drawingNote.time).toSeconds() *
+                  (props.rowRef.current.offsetWidth /
+                    (props.sessionSize * Tone.Time("1m").toSeconds()))
+                : props.gridPos[1] *
+                  (props.rowRef.current.offsetWidth /
+                    (props.sessionSize * props.gridSize))
             }px,${
               props.gridPos[0] *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)

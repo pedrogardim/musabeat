@@ -7,8 +7,6 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
 
-import WorkspaceGridLines from "./WorkspaceGridLines";
-
 import {
   IconButton,
   Icon,

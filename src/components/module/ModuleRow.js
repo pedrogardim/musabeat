@@ -303,6 +303,7 @@ function ModuleRow(props) {
                   rowRef={rowRef}
                   moduleRows={moduleRows}
                   note={note}
+                  drawingNote={drawingNote}
                   module={props.module}
                   sessionSize={props.sessionSize}
                   gridSize={props.gridSize}
