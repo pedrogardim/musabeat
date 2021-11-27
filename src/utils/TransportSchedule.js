@@ -424,7 +424,6 @@ export const scheduleMelody = (score, instrument, transport, moduleId) => {
         e.duration,
         time
       );
-      console.log(e, "scheduled");
     }, e.time);
     scheduledNotes.push(event);
   });

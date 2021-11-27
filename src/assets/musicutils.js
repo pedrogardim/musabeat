@@ -1102,6 +1102,17 @@ export const loadDrumPatch = async (
   setInstrumentsInfo,
   setNotifications
 ) => {
+  let instrumentLoaded = (isLoaded, players) => {
+    //console.log("ITS LOADED ITS LOADED ITS LOADED ITS LOADED ITS LOADED");
+    setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[moduleIndex] = isLoaded;
+      return a;
+    });
+    if (onLoad !== undefined && isLoaded && players) onLoad(players);
+  };
+
+  console.log("Loading sampler patch");
   //drum patch with stardard configuration
   let patchRef =
     typeof input === "string"
@@ -1124,7 +1135,7 @@ export const loadDrumPatch = async (
       a[moduleIndex] = true;
       return a;
     });
-    return new Tone.Players();
+    return new Tone.Players().toDestination();
   }
 
   //get urls from file ids
@@ -1184,15 +1195,9 @@ export const loadDrumPatch = async (
     return a;
   });
 
-  let drumPlayers = new Tone.Players(urls, () => {
-    setInstrumentsLoaded((prev) => {
-      //console.log("======LOADED=======")
-      let a = [...prev];
-      a[moduleIndex] = true;
-      return a;
-    });
-    onLoad !== undefined && onLoad(drumPlayers);
-  }).toDestination();
+  let drumPlayers = new Tone.Players(urls, () =>
+    instrumentLoaded(true, drumPlayers)
+  ).toDestination();
 
   setModules &&
     setModules((prev) => {

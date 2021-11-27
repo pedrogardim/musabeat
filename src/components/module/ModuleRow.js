@@ -47,8 +47,6 @@ function ModuleRow(props) {
               (a, b) => a - b
             );
 
-      console.log(array);
-
       rows = array.map((e, i) => {
         return {
           note: e,
@@ -62,8 +60,6 @@ function ModuleRow(props) {
       let array = Array(88)
         .fill(0)
         .map((e, i) => 108 - i);
-
-      console.log(array);
 
       rows = array.map((e, i) => {
         return {
@@ -218,6 +214,12 @@ function ModuleRow(props) {
       : clearEvents(props.module.id);
   };
 
+  /* ================================================================================== */
+  /* ================================================================================== */
+  /* ================================USEEFFECTS======================================== */
+  /* ================================================================================== */
+  /* ================================================================================== */
+
   useEffect(() => {
     scheduleNotes();
   }, [props.instrument, props.module, props.module.score, props.isLoaded]);
@@ -231,12 +233,18 @@ function ModuleRow(props) {
   }, [gridPos]);
 
   useEffect(() => {
-    console.log(moduleRows);
+    //console.log(moduleRows[0], moduleRows.length);
   }, [moduleRows]);
   /* 
   useEffect(() => {
     console.log(drawingNote && drawingNote.time);
   }, [drawingNote]); */
+
+  /* ================================================================================== */
+  /* ================================================================================== */
+  /* ================================JSX=============================================== */
+  /* ================================================================================== */
+  /* ================================================================================== */
 
   return (
     <div
@@ -271,7 +279,8 @@ function ModuleRow(props) {
                   rowIndex % 12 === 6 ||
                   rowIndex % 12 === 9 ||
                   rowIndex % 12 === 11) &&
-                "rgba(0, 0, 0,0.1)",
+                "#0000001a",
+              //colors[props.module.color][900] + "3a",
             }}
           >
             <Typography

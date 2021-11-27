@@ -11,7 +11,7 @@ function MelodyNote(props) {
         height: props.rowRef.current.scrollHeight / props.moduleRows.length,
         width: props.ghost
           ? props.drawingNote
-            ? props.gridPos[1] *
+            ? (props.gridPos[1] + 1) *
                 (props.rowRef.current.offsetWidth /
                   (props.sessionSize * props.gridSize)) -
               Tone.Time(props.drawingNote.time).toSeconds() *

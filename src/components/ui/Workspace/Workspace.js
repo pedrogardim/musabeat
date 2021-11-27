@@ -236,32 +236,6 @@ function Workspace(props) {
       setModules([]);
     }
     //
-    else if (sessionKey === "newSession") {
-      if (props.session === null) {
-        props.createNewSession(null);
-        return;
-      }
-      let data = { ...props.session };
-      delete data.modules;
-      setSessionData(data);
-      setModules(props.session.modules);
-      Tone.Transport.bpm.value = props.session.bpm;
-      if (
-        (!props.hidden &&
-          props.user &&
-          props.session.editors.includes(props.user.uid)) ||
-        !props.session.creator
-      ) {
-        setEditMode(true);
-      }
-
-      let array = Array(props.session.modules.length).fill(false);
-      //console.log(array);
-      setInstrumentsLoaded(array);
-
-      loadSessionInstruments(props.session.modules);
-    }
-    //
     else if (typeof sessionKey === "string") {
       let sessionRef = firebase
         .firestore()
@@ -497,12 +471,6 @@ function Workspace(props) {
   const loadNewModuleInstrument = (module, index, buffers) => {
     let instrument;
 
-    setInstrumentsLoaded((prev) => {
-      console.log("======MODULE_NOT=======", index);
-      let a = [...prev];
-      a[index] = false;
-      return a;
-    });
     //console.log("inserting new instrument on" + index);
     if (module.type === 0) {
       if (buffers) {
@@ -801,11 +769,11 @@ function Workspace(props) {
     //console.log(Tone.Transport.state);
     Tone.start();
     e.preventDefault();
-    console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
+    //console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
     if (
-      Tone.Transport.state !== "started" /* &&
+      Tone.Transport.state !== "started" &&
       isLoaded &&
-      !instrumentsLoaded.includes(false) */
+      !instrumentsLoaded.includes(false)
     ) {
       Tone.Transport.start();
       setIsPlaying(true);
@@ -987,7 +955,7 @@ function Workspace(props) {
 
     loadSession();
     //!props.session.length && Tone.Transport.start()
-  }, [props.user, props.session, sessionKey]);
+  }, [props.session, sessionKey]);
 
   useEffect(() => {
     //registerSession();
@@ -1035,7 +1003,7 @@ function Workspace(props) {
   }, [sessionData]); */
 
   useEffect(() => {
-    console.log(cursorMode);
+    //console.log(cursorMode);
   }, [cursorMode]);
 
   useEffect(() => {
@@ -1075,7 +1043,7 @@ function Workspace(props) {
   }, []);
 
   useEffect(() => {
-    console.log(instruments);
+    //console.log(instruments);
 
     instruments.forEach((e, i) => {
       if (modules && modules[i] && e) {
@@ -1089,7 +1057,7 @@ function Workspace(props) {
   }, [instruments]);
 
   useEffect(() => {
-    console.log(instrumentsInfo);
+    //console.log(instrumentsInfo);
   }, [instrumentsInfo]);
 
   useEffect(() => {

@@ -100,6 +100,17 @@ function AdminDashboard(props) {
       .then((r) => r.forEach((e) => e.ref.update({ in: 0, ld: 0 })));
   };
 
+  const duplicateDrumPatch = () => {
+    firebase
+      .firestore()
+      .collection("drumpatches")
+      .doc("8fsbChTqV7aaWNyI1hTC")
+      .get()
+      .then((r) =>
+        firebase.firestore().collection("drumpatches").add(r.data())
+      );
+  };
+
   //DANGER
 
   const fixUserSpace = () => {
@@ -249,7 +260,7 @@ function AdminDashboard(props) {
       <Button onClick={updateLikes}>Update files, patches like</Button>*/}
       {/* <Button onClick={updateSessions}>Update session scale</Button>
       <Button onClick={missingFileTest}>missing File Test</Button> */}
-      <Button onClick={fixUserSpace}>fix User Space</Button>
+      <Button onClick={duplicateDrumPatch}>duplicateDrumPatch</Button>
 
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>
