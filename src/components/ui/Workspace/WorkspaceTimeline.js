@@ -5,7 +5,7 @@ import "./WorkspaceTimeline.css";
 
 import Draggable from "react-draggable";
 
-import { colors } from "../../utils/materialPalette";
+import { colors } from "../../../utils/materialPalette";
 
 import {
   IconButton,

@@ -12,6 +12,7 @@ export const clearEvents = (moduleId) => {
     scheduledEvents[moduleId].length > 0 &&
     scheduledEvents[moduleId].forEach((event) => Tone.Transport.clear(event));
   delete scheduledEvents[moduleId];
+  //console.log("events cleared", moduleId);
 };
 
 export const scheduleDrumSequence = (
@@ -375,6 +376,58 @@ export const schedulePianoRoll = (
       });
     });
   }
+
+  scheduledEvents[moduleId] = scheduledNotes;
+};
+
+/* ================================================================= */
+
+export const scheduleSampler = (score, instrument, transport, moduleId) => {
+  moduleId !== undefined && clearEvents(moduleId);
+
+  //console.log("instrument", instrument);
+
+  let scheduledNotes = [];
+
+  //console.log("scheduled", moduleId);
+
+  score.forEach((e, i) => {
+    let event = transport.schedule((time) => {
+      instrument.has(e.note) &&
+        instrument
+          .player(e.note)
+          .stop(time)
+          .start(time)
+          .stop(time + Tone.Time(e.duration).toSeconds());
+    }, e.time);
+    scheduledNotes.push(event);
+  });
+
+  scheduledEvents[moduleId] = scheduledNotes;
+};
+
+/* ================================================================= */
+
+export const scheduleMelody = (score, instrument, transport, moduleId) => {
+  moduleId !== undefined && clearEvents(moduleId);
+
+  //console.log("instrument", instrument);
+
+  let scheduledNotes = [];
+
+  //console.log("scheduled", moduleId);
+
+  score.forEach((e, i) => {
+    let event = transport.schedule((time) => {
+      instrument.triggerAttackRelease(
+        Tone.Frequency(e.note, "midi").toNote(),
+        e.duration,
+        time
+      );
+      console.log(e, "scheduled");
+    }, e.time);
+    scheduledNotes.push(event);
+  });
 
   scheduledEvents[moduleId] = scheduledNotes;
 };

@@ -7,10 +7,31 @@
   flex-direction: column;
   flex-wrap: wrap;
   flex: 1 0;
+  height: 100%;
 
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   outline: none;
+}
+
+.ws-header {
+  position: fixed;
+  width: calc(100% - 264px);
+  left: 136px;
+  top: 0;
+  height: 64px;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workspace-title {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .workspace-module-cont {
@@ -50,6 +71,14 @@
   transition: height 0.2s !important;
 }
 
+.ws-commands {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .ws-fab {
   place-self: center;
 }
@@ -76,4 +105,19 @@
 
 .ws-fab-save {
   grid-area: 1/2;
+}
+
+/* lewjfenrigfneorjgoernijtgnritgnotngorngrk */
+
+.ws-module-selector {
+  height: 100%;
+  width: 64px;
+  margin: 0 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ws-module-selector > button {
+  height: 64px;
 }

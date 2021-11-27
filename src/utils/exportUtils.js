@@ -3,6 +3,7 @@ import {
   scheduleChordProgression,
   scheduleMelodyGrid,
   scheduleSamples,
+  scheduleSampler,
   schedulePianoRoll,
 } from "./TransportSchedule";
 import { audioBufferToWav } from "audiobuffer-to-wav";
@@ -69,7 +70,7 @@ export const bounceSessionExport = async (
               instrumentBuffers[moduleIndex];
             offlineInstruments[moduleIndex].volume.value = module.volume;
 
-            scheduleDrumSequence(
+            scheduleSampler(
               module.score,
               offlineInstruments[moduleIndex],
               transport,

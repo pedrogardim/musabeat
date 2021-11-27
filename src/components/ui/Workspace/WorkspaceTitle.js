@@ -19,7 +19,7 @@ import {
 
 import { Skeleton } from "@material-ui/lab";
 
-import { sessionTags } from "../../assets/musicutils";
+import { sessionTags } from "../../../assets/musicutils";
 
 import "./Workspace.css";
 
@@ -32,7 +32,7 @@ function WorkspaceTitle(props) {
   const history = useHistory();
 
   const getSessionTitleInfo = async () => {
-    let date = props.sessionData.createdOn.toDate
+    let date = props.sessionData.createdOn
       ? props.sessionData.createdOn.toDate()
       : new Date();
 
@@ -87,7 +87,7 @@ function WorkspaceTitle(props) {
   }, [props.editorProfiles]); */
 
   return (
-    <div className="app-title">
+    <div className="workspace-title">
       <Helmet>
         <title>
           {props.sessionData &&
@@ -101,15 +101,28 @@ function WorkspaceTitle(props) {
             } `}
         </title>
       </Helmet>
-      <Typography variant="h4">
+      <Typography
+        /* onClick={() => setExpanded((prev) => !prev)} */
+        variant="overline"
+        style={{
+          maxWidth: "20vw",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          color: "white",
+          fontSize: "2rem",
+          lineHeight: 1,
+        }}
+      >
         {props.sessionData
           ? props.sessionData.name
             ? props.sessionData.name
             : t("WSTitle.untitledSession")
           : "..."}
+      </Typography>
 
-        {!(props.editMode && !props.user) && (
-          <IconButton onClick={() => setExpanded((prev) => !prev)}>
+      {/*
+        !(props.editMode && !props.user) && (
+          <IconButton>
             <Icon
               style={{
                 transition: "0.2s",
@@ -120,8 +133,7 @@ function WorkspaceTitle(props) {
             </Icon>
           </IconButton>
         )}
-      </Typography>
-
+      
       {!props.editMode && (
         <Tooltip title={t("WSTitle.viewMode")}>
           <Icon className="app-title-alert">visibility</Icon>
@@ -133,20 +145,7 @@ function WorkspaceTitle(props) {
         </Tooltip>
       )}
 
-      <div className="break" style={{ margin: 0 }} />
-
-      <Typography variant="overline" style={{ fontSize: 10 }}>
-        {`${props.sessionData ? props.sessionData.bpm : "-"} BPM - ${Math.floor(
-          (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) / 60
-        )}:${(
-          "0" +
-          Math.floor(
-            (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
-          )
-        ).slice(-2)} s ${creationDateString && "- " + creationDateString}`}
-      </Typography>
-
-      <div className="break" />
+      */}
 
       {props.editorProfiles !== null &&
       Object.values(props.editorProfiles).length > 0 ? (
@@ -169,14 +168,32 @@ function WorkspaceTitle(props) {
         <Avatar />
       )}
 
-      <div className="break" />
+      <div className="break" style={{ margin: 0 }} />
 
       {props.sessionData && expanded && (
         <Fragment>
+<<<<<<< HEAD:src/components/ui/WorkspaceTitle.js
           <Typography
             variant="body2"
             style={{ maxWidth: 1200, textAlign: "center", margin: "0 32px" }}
           >
+=======
+          <Typography variant="overline" style={{ fontSize: 10 }}>
+            {`${
+              props.sessionData ? props.sessionData.bpm : "-"
+            } BPM - ${Math.floor(
+              (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) / 60
+            )}:${(
+              "0" +
+              Math.floor(
+                (Tone.Time("1m").toSeconds() * (props.sessionSize || 0)) % 60
+              )
+            ).slice(-2)} s ${creationDateString && "- " + creationDateString}`}
+          </Typography>
+
+          <div className="break" />
+          <Typography variant="body2">
+>>>>>>> feature/workspace-remodelation:src/components/ui/Workspace/WorkspaceTitle.js
             {props.sessionData.description
               ? `"${props.sessionData.description}"`
               : "No Description"}

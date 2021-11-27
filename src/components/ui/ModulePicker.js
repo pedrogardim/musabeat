@@ -22,34 +22,23 @@ import { createChordProgression } from "../../assets/musicutils";
 
 const moduletypes = [
   {
-    name: "Drum Sequencer",
-    description:
-      "Rhythm sequencer that controls a drum pack, with a custom subdivision",
+    name: "Sampler",
     icon: "grid_on",
   },
   {
-    name: "Melody Grid",
-    description:
-      "Makes melody with a grid similar to a sequencer, but with pitches",
-    icon: "music_note",
+    name: "Piano Roll",
+    icon: "piano",
   },
   {
+    name: "Audio Track",
+    icon: "graphic_eq",
+  },
+  /* {
     name: "Chord Progression",
     description:
       "Create chord progressions, or generate random ones based on scales",
     icon: "font_download",
-  },
-  {
-    name: "Player",
-    description:
-      "Drag audio files to play, and manipulate them on time and pitch",
-    icon: "graphic_eq",
-  },
-  {
-    name: "Piano Roll",
-    description: "Classic DAW form of making music!",
-    icon: "piano",
-  },
+  }, */
 ];
 
 const stepValues = [4, 8, 12, 16, 24, 32];
@@ -77,50 +66,18 @@ function ModulePicker(props) {
           : Math.max(...props.modules.map((e) => e.id)) + 1,
       name: "",
       type: selectedType,
-      score:
-        selectedType === 0 || selectedType === 1
-          ? [{ ...Object.values(...new Array(selectedSteps).fill(0)) }]
-          : selectedType === 2
-          ? createChordProgression(
-              props.sessionData.scale,
-              props.sessionData.root,
-              3,
-              selectedSize
-            ).map((e, i) => {
-              return { notes: e, time: i, duration: 1, rhythm: [true] };
-            })
-          : selectedType === 3
-          ? [{ time: 0, duration: 0 }]
-          : [],
+      score: [],
       volume: 0,
       muted: false,
       instrument:
         selectedType === 0
           ? "8fsbChTqV7aaWNyI1hTC"
-          : selectedType === 3
-          ? {
-              url: "",
-            }
+          : selectedType === 2
+          ? []
           : "jSjo9Rzv3eg1vTkkEj1s",
       color: Math.floor(Math.random() * 14.99),
       fx: [],
     };
-
-    if (selectedType === 1) {
-      //newModule.root = selectedRoot;
-      //newModule.scale = selectedScale;
-      newModule.range = selectedRange;
-    }
-
-    if (selectedType === 2) {
-      //newModule.root = selectedRoot;
-      //newModule.scale = selectedScale;
-      newModule.complexity = 3;
-    }
-
-    if (selectedType === 3 || selectedType === 4) {
-      newModule.size = 1;
-    }
 
     if (typeof newModule.instrument === "string") {
       firebase
@@ -160,10 +117,6 @@ function ModulePicker(props) {
       return newModules;
     });
 
-    let newTimeline = { ...props.timeline };
-    newTimeline[newModule.id] = [...Array(props.sessionSize).keys()];
-    props.setTimeline(newTimeline);
-
     props.setModulePicker(false);
     props.loadNewModuleInstrument(newModule, newModules.length - 1);
   };
@@ -199,36 +152,9 @@ function ModulePicker(props) {
         ))}
       </BottomNavigation>
 
-      <p variant="overline">
+      <Typography variant="overline">
         {t(`modulePicker.types.${selectedType}.description`)}
-      </p>
-
-      <div className="module-picker-select-cont">
-        {
-          <FormControl>
-            <InputLabel>{t("module.settings.length")}</InputLabel>
-            <Select native value={selectedSize} onChange={handleSizeSelect}>
-              {lengthValues.map((e) => (
-                <option key={`mpl${e}`} value={e}>
-                  {e}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-        }
-        {(selectedType === 0 || selectedType === 1) && (
-          <FormControl>
-            <InputLabel>{t("module.settings.steps")}</InputLabel>
-            <Select native value={selectedSteps} onChange={handleStepSelect}>
-              {stepValues.map((e) => (
-                <option key={`mps${e}`} value={e}>
-                  {e}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-      </div>
+      </Typography>
 
       <Button onClick={addModule}>{t("modulePicker.submit")}</Button>
 

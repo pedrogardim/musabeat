@@ -1,0 +1,45 @@
+.ws-note-input {
+  position: relative;
+  width: 70vw;
+  display: flex;
+  flex-direction: row;
+  margin: 64px;
+  user-select: none;
+  flex-wrap: wrap;
+}
+
+.ws-note-input-key-cont {
+  position: relative;
+  width: 100%;
+  height: 128px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ws-note-input > * {
+  line-height: 1 !important;
+}
+
+.ws-note-input-key {
+  position: relative;
+  height: calc(50% - 8px);
+  flex: 1 1 1px;
+  outline: 1px solid rgba(0, 0, 0, 0.377);
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.ws-note-input-options {
+  position: relative;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

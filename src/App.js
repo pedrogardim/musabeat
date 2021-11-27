@@ -25,7 +25,7 @@ import { useTranslation } from "react-i18next";
 import logo from "./assets/img/logo.svg";
 
 import HomePage from "./components/ui/HomePage";
-import Workspace from "./components/ui/Workspace";
+import Workspace from "./components/ui/Workspace/Workspace";
 
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
@@ -86,7 +86,7 @@ function App() {
   const [bottomScroll, setBottomScroll] = useState(false);
 
   const handlePageNav = (route, id, e) => {
-    if (e && (e.metaKey || e.ctrlKey) && !window.cordova) {
+    if (e && (e.metaKey || e.ctrlKey)) {
       const win = window.open(`/#/${route}/${id}`, "_blank");
       win.focus();
     } else {

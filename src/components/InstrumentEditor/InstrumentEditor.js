@@ -3,7 +3,7 @@ import React, { useState, Fragment, useRef, useEffect } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { List, Divider, LinearProgress, Tooltip } from "@material-ui/core";
+import { List, Divider, IconButton, MenuItem } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
@@ -47,7 +47,11 @@ function InstrumentEditor(props) {
 
   const [fileExplorer, setFileExplorer] = useState(false);
 
-  const [selectedPatch, setSelectedPatch] = useState(null);
+  const [selectedPatch, setSelectedPatch] = useState(
+    typeof props.module.instrument === "string"
+      ? props.module.instrument
+      : "Custom"
+  );
 
   const [renamingLabel, setRenamingLabel] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
@@ -175,42 +179,6 @@ function InstrumentEditor(props) {
       .doc(fileId)
       .get()
       .then((r) => setPatchSize((prev) => prev - r.data().size));
-  };
-
-  const getFilesInfo = () => {
-    const getFilesNameFromId = (ids) => {
-      let labelsWithFilename = { ...ids };
-      let totalSize = 0;
-      Promise.all(
-        Object.keys(ids).map(async (e, i) => {
-          let filedata = (
-            await firebase.firestore().collection("files").doc(ids[e]).get()
-          ).data();
-          labelsWithFilename[e] =
-            filedata.name + "." + fileExtentions[parseInt(filedata.type)];
-          totalSize += filedata.size;
-          return filedata.name + "." + fileExtentions[parseInt(filedata.type)];
-        })
-      ).then((values) => {
-        setFilesName(labelsWithFilename);
-        setPatchSize(totalSize);
-      });
-    };
-
-    if (typeof props.module.instrument === "string") {
-      firebase
-        .firestore()
-        .collection(props.module.type === 0 ? "drumpatches" : "patches")
-        .doc(props.module.instrument)
-        .get()
-        .then((r) => {
-          getFilesNameFromId(r.get("urls"));
-          setFilesId(Object.values(r.get("urls")));
-        });
-    } else {
-      getFilesNameFromId(props.module.instrument.urls);
-      setFilesId(Object.values(props.module.instrument.urls));
-    }
   };
 
   const renamePlayersLabel = (index, newName) => {
@@ -613,14 +581,36 @@ function InstrumentEditor(props) {
 
   return (
     <div
-      className="instrument-editor"
+      className="ws-note-input-options"
       onDragEnter={() => {
         setDraggingOver(true);
         ieWrapper.current.scrollTop = 0;
       }}
       ref={ieWrapper}
     >
-      {patchExplorer && (
+      <Select value={selectedPatch}>
+        <MenuItem
+          value={
+            selectedPatch === "Custom" ? "Custom" : props.module.instrument
+          }
+        >
+          {selectedPatch === "Custom"
+            ? "Custom"
+            : props.instrumentInfo &&
+              props.instrumentInfo.patch &&
+              props.instrumentInfo.patch.name}
+        </MenuItem>
+      </Select>
+      <IconButton>
+        <Icon>tune</Icon>
+      </IconButton>
+      {selectedPatch === "Custom" && (
+        <IconButton>
+          <Icon>save</Icon>
+        </IconButton>
+      )}
+
+      {/* patchExplorer && (
         <PatchExplorer
           compact
           patchExplorer={patchExplorer}
@@ -638,7 +628,7 @@ function InstrumentEditor(props) {
           isDrum={isDrum}
           updateFilesStatsOnChange={props.updateFilesStatsOnChange}
         />
-      )}
+      ) */}
 
       {fileExplorer && (
         <FileExplorer
@@ -712,7 +702,6 @@ function InstrumentEditor(props) {
         setInstrumentLoaded={props.setInstrumentLoaded}
         setFilesName={setFilesName}
         setFilesId={setFilesId}
-        getFilesName={getFilesInfo}
         renamePlayersLabel={renamePlayersLabel}
         setRenamingLabel={setRenamingLabel}
         setLabels={props.setLabels}

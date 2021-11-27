@@ -956,19 +956,19 @@ export const patchLoader = async (
     instrumentLoaded(true);
   }
   if (patch.base === "FM") {
-    instr = new Tone.PolySynth(Tone.FMSynth, options);
+    instr = new Tone.PolySynth(Tone.FMSynth, options).toDestination();
   }
   if (patch.base === "AM") {
-    instr = new Tone.PolySynth(Tone.AMSynth, options);
+    instr = new Tone.PolySynth(Tone.AMSynth, options).toDestination();
   }
   if (patch.base === "Mono") {
-    instr = new Tone.PolySynth(Tone.MonoSynth, options);
+    instr = new Tone.PolySynth(Tone.MonoSynth, options).toDestination();
   }
   if (patch.base === "Synth") {
-    instr = new Tone.PolySynth(Tone.Synth, options);
+    instr = new Tone.PolySynth(Tone.Synth, options).toDestination();
   }
   if (patch.base === undefined) {
-    instr = new Tone.PolySynth(patch);
+    instr = new Tone.PolySynth(patch).toDestination();
     instr.set(patch);
     //console.log(instr);
   }
@@ -1099,6 +1099,7 @@ export const loadDrumPatch = async (
   onLoad,
   setModules,
   setLabels,
+  setInstrumentsInfo,
   setNotifications
 ) => {
   //drum patch with stardard configuration
@@ -1140,6 +1141,31 @@ export const loadDrumPatch = async (
       }
     })
   );
+
+  let filesInfo = await Promise.all(
+    Object.keys(patch.urls).map(async (e, i) => {
+      try {
+        return (
+          await firebase
+            .firestore()
+            .collection("files")
+            .doc(patch.urls[e])
+            .get()
+        ).data();
+      } catch (er) {
+        setNotifications((prev) => [
+          ...prev,
+          ["fileInfo", patch.urls[e], moduleIndex],
+        ]);
+      }
+    })
+  );
+
+  setInstrumentsInfo((prev) => {
+    let newInfo = [...prev];
+    newInfo[moduleIndex] = { patch: patch, filesInfo: filesInfo };
+    return newInfo;
+  });
 
   //console.log(urlArray);
 

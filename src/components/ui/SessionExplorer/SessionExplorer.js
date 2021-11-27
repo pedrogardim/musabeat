@@ -20,7 +20,7 @@ import NameInput from "../Dialogs/NameInput";
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NotFoundPage from "../NotFoundPage";
 
-import Workspace from "../Workspace";
+import Workspace from "../Workspace/Workspace";
 
 import "./SessionExplorer.css";
 

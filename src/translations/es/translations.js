@@ -127,28 +127,24 @@ export const TRANSLATIONS_ES = {
     submit: "Añadir Módulo",
     types: {
       0: {
-        name: "Secuenciador",
+        name: "Sampler",
         description:
-          "Un sequenciador de ritmos que controla sonidos de una batería",
+          "Un sequenciador de ritmos que controla una batería (o reproduce sonidos)",
       },
       1: {
-        name: "Cuadrícula de melodía",
-        description:
-          "Genera melodías con una cuadrícula similar a un secuenciador, pero con notas",
+        name: "Pista de Melodía",
+        description: "Crea melodías",
       },
+
       2: {
+        name: "Audio Track",
+        description: "Reproduce archivos de audios importados por el usuário",
+      },
+
+      3: {
         name: "Progresión de acordes",
         description:
           "Crea una progresión de acores, con el control sobre sus notas y rítmos",
-      },
-      3: {
-        name: "Player",
-        description:
-          "Modulo que posibilita tanto la reproducción de archivos de audio, cuanto la manipulación de su velocidad de reproducción y cambio de tono",
-      },
-      4: {
-        name: "Piano Roll",
-        description: "La forma clásica de hacer musica en una DAW!",
       },
     },
   },

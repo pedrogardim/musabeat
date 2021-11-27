@@ -21,20 +21,26 @@ import {
 
 import "./Workspace.css";
 
-import Module from "../Module/Module";
-import PlaceholderModule from "../Module/PlaceholderModule";
+import Module from "../../Module/Module";
+import ModuleRow from "../../Module/ModuleRow";
+
+import PlaceholderModule from "../../Module/PlaceholderModule";
 
 import WorkspaceTitle from "./WorkspaceTitle";
 
-import ModulePicker from "./ModulePicker";
-import Exporter from "./Exporter";
-import SessionSettings from "./SessionSettings";
-import Mixer from "./mixer/Mixer";
-import SessionProgressBar from "./SessionProgressBar";
+import ModulePicker from "../ModulePicker";
+import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
+
+import Exporter from "../Exporter";
+import SessionSettings from "../SessionSettings";
+import Mixer from "../mixer/Mixer";
+import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceTimeline from "./WorkspaceTimeline";
-import LoadingScreen from "./LoadingScreen";
-import ActionConfirm from "./Dialogs/ActionConfirm";
-import NotFoundPage from "../ui/NotFoundPage";
+import WorkspaceGrid from "./WorkspaceGrid";
+import LoadingScreen from "../LoadingScreen";
+import ActionConfirm from "../Dialogs/ActionConfirm";
+import NotFoundPage from "../NotFoundPage";
+import NotesInput from "./NotesInput";
 
 import {
   patchLoader,
@@ -42,9 +48,10 @@ import {
   loadSynthFromGetObject,
   adaptSequencetoSubdiv,
   loadSamplerFromObject,
-} from "../../assets/musicutils";
+} from "../../../assets/musicutils";
 
-import { clearEvents } from "../../utils/TransportSchedule";
+import { colors } from "../../../utils/materialPalette";
+import { clearEvents } from "../../../utils/TransportSchedule";
 
 Tone.Transport.loopEnd = "1m";
 
@@ -81,21 +88,32 @@ function Workspace(props) {
   const [sessionData, setSessionData] = useState(null);
   const [sessionSize, setSessionSize] = useState(0);
 
+  const [selectedModule, setSelectedModule] = useState(null);
+
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
+  const [instrumentsInfo, setInstrumentsInfo] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const [metronome, setMetronome] = useState(null);
+  const [metronomeState, setMetronomeState] = useState(false);
+  const [metronomeEvent, setMetronomeEvent] = useState(null);
+
+  const [pressedKeys, setPressedKeys] = useState([]);
+
   const [editMode, setEditMode] = useState(false);
+  const [cursorMode, setCursorMode] = useState(null);
+  const [gridSize, setGridSize] = useState(4);
+
   const [premiumMode, setPremiumMode] = useState(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const [modulePicker, setModulePicker] = useState(false);
   const [mixerOpened, setMixerOpened] = useState(false);
   const [sessionDupDialog, setSessionDupDialog] = useState(false);
 
-  //true: timeline ; false: loopmode
-  const [timelineMode, setTimelineMode] = useState(false);
   const [focusedModule, setFocusedModule] = useState(null);
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
@@ -117,6 +135,29 @@ function Workspace(props) {
 
   const sessionKey = useParams().key;
   const autoSaverTime = 5 * 60 * 1000; //5min
+
+  const keySamplerMapping = {
+    KeyQ: 0,
+    KeyW: 1,
+    KeyE: 2,
+    KeyR: 3,
+    KeyT: 4,
+    KeyY: 5,
+    KeyU: 6,
+    KeyI: 7,
+    KeyO: 8,
+    KeyP: 9,
+    KeyA: 10,
+    KeyS: 11,
+    KeyD: 12,
+    KeyF: 13,
+    KeyG: 14,
+    KeyH: 15,
+    KeyJ: 16,
+    KeyK: 17,
+    KeyL: 18,
+    Semicolon: 19,
+  };
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -179,46 +220,6 @@ function Workspace(props) {
     props.setNewSessionDialog({ ...sessionData, modules: [...modules] });
   };
 
-  const getModuleSize = (module, index) => {
-    let thisModule = module ? module : modules[index];
-    return thisModule.type === 2
-      ? Math.ceil(
-          thisModule.score[thisModule.score.length - 1].time +
-            thisModule.score[thisModule.score.length - 1].duration
-        )
-      : /* : thisModule.type === 3
-      ? Math.ceil(
-          (thisModule.score[0].duration +
-            thisModule.score[0].time +
-            Tone.Time("1m").toSeconds() * 0.5) /
-            Tone.Time("1m").toSeconds()
-        ) */
-      thisModule.type === 3 || thisModule.type === 4
-      ? thisModule.size
-      : /* Math.ceil(
-              Math.max(
-                ...module.score
-                  .sort((a, b) => a.time + a.duration - (b.time + b.duration))
-                  .map((e) => e.time + e.duration)
-              )
-            ) */
-        thisModule.score.length;
-  };
-
-  const adaptSessionSize = () => {
-    //console.log("checked");
-    if (modules === null) return;
-    let lengths = modules.map((module) => getModuleSize(module));
-    let longestModule = Math.max(...lengths);
-    let newSessionSize = 2 << (31 - Math.clz32(longestModule - 1));
-
-    if (newSessionSize === 0) newSessionSize = 1;
-
-    if (newSessionSize !== sessionSize) {
-      setSessionSize(newSessionSize);
-    }
-  };
-
   const loadSession = () => {
     //TODO: optimize this, avoid call from server for each session load
     console.log("loading session: ", sessionKey);
@@ -228,7 +229,6 @@ function Workspace(props) {
       setSessionData(thisSessionData);
       setModules(props.session.modules);
       Tone.Transport.bpm.value = props.session.bpm;
-      setTimelineMode(thisSessionData.timeline.on);
       setEditMode(true);
       loadSessionInstruments(props.session.modules);
     } else if (sessionKey === null) {
@@ -295,8 +295,6 @@ function Workspace(props) {
           setModules(data.modules);
         }
 
-        setTimelineMode(data.timeline.on);
-
         Tone.Transport.bpm.value = data.bpm;
 
         let editors = data.editors;
@@ -325,7 +323,7 @@ function Workspace(props) {
   };
 
   const loadSessionInstruments = (sessionModules) => {
-    //console.log("session instr loading");
+    console.log("session instr loading");
     let array = Array(sessionModules.length).fill(false);
 
     setInstruments(array);
@@ -342,6 +340,7 @@ function Workspace(props) {
           "",
           setModules,
           () => {},
+          setInstrumentsInfo,
           setNotifications
         ).then((r) =>
           setInstruments((prev) => {
@@ -453,10 +452,57 @@ function Workspace(props) {
         }
       }
     });
+
+    //loadMetromome
+
+    if (!props.compact) {
+      let metro = new Tone.FMSynth({
+        envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.2 },
+        oscillator: { type: "sine" },
+        modulationIndex: 10,
+        harmonicity: 10,
+        modulationEnvelope: {
+          attack: 0.001,
+          decay: 0.3,
+          sustain: 0,
+          release: 0.01,
+        },
+      }).toDestination();
+
+      metro.volume.value = -9999;
+
+      setMetronome((prev) => {
+        prev && prev.dispose();
+        return metro;
+      });
+
+      metronomeEvent && metronomeEvent.forEach((e) => Tone.Transport.clear(e));
+
+      let events = [];
+
+      for (let mse = -1; mse < 128; mse++) {
+        for (let qtr = 0; qtr < 4; qtr++) {
+          events.push(
+            Tone.Transport.schedule((time) => {
+              metro.triggerAttackRelease(qtr === 0 ? "C5" : "C4", "4n", time);
+            }, `${mse}:${qtr}:0`)
+          );
+        }
+      }
+
+      setMetronomeEvent(events);
+    }
   };
 
   const loadNewModuleInstrument = (module, index, buffers) => {
     let instrument;
+
+    setInstrumentsLoaded((prev) => {
+      console.log("======MODULE_NOT=======", index);
+      let a = [...prev];
+      a[index] = false;
+      return a;
+    });
     //console.log("inserting new instrument on" + index);
     if (module.type === 0) {
       if (buffers) {
@@ -475,6 +521,7 @@ function Workspace(props) {
           "",
           setModules,
           () => {},
+          setInstrumentsInfo,
           setNotifications
         ).then((r) =>
           setInstruments((prev) => {
@@ -689,23 +736,6 @@ function Workspace(props) {
     setMixerOpened(false);
 
     //true: timeline ; false: loopmode
-    setTimelineMode(false);
-  };
-
-  const setTimeline = (newTimeline) => {
-    setSessionData((prev) => {
-      return { ...prev, timeline: newTimeline };
-    });
-  };
-
-  const getSessionSizeFromTimeline = () => {
-    setSessionSize(sessionData.timeline.size);
-  };
-
-  const forceReschedule = () => {
-    //console.log("forceReschedule");
-    //setSessionSize(0);
-    timelineMode ? getSessionSizeFromTimeline() : adaptSessionSize();
   };
 
   const updateSavingMode = (input) => {
@@ -743,19 +773,9 @@ function Workspace(props) {
     }
   };
 
-  const unfocusModules = (e) => {
-    e.target.classList &&
-      e.target.classList.contains("workspace") &&
-      setFocusedModule(null);
-  };
-
   const duplicateModule = (index) => {
     let newModuleId = parseInt(Math.max(...modules.map((e) => e.id))) + 1;
     let moduleToCopy = modules[modules.length - 1];
-    setTimeline({
-      ...sessionData.timeline,
-      [newModuleId]: [...sessionData.timeline[index]],
-    });
     setInstrumentsLoaded((prev) => [...prev, false]);
     let instrumentBuffers = moduleToCopy.type === 0 && moduleToCopy._buffers;
     loadNewModuleInstrument(
@@ -778,206 +798,107 @@ function Workspace(props) {
   };
 
   const togglePlaying = (e) => {
+    //console.log(Tone.Transport.state);
+    Tone.start();
     e.preventDefault();
+    console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
     if (
-      Tone.Transport.state !== "started" &&
+      Tone.Transport.state !== "started" /* &&
       isLoaded &&
-      !instrumentsLoaded.includes(false)
+      !instrumentsLoaded.includes(false) */
     ) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
       Tone.Transport.pause();
+      setIsRecording(false);
       setIsPlaying(false);
     }
   };
 
-  const handleCopy = () => {
-    if (focusedModule == null) return;
-    let currentMeasure = Tone.Transport.position.split(":")[0];
-    let module = modules[focusedModule];
+  const toggleRecording = (e) => {
+    Tone.Transport.pause();
+    Tone.Transport.seconds = `${
+      Tone.Time(Tone.Transport.seconds).toBarsBeatsSixteenths().split(":")[0] -
+      1
+    }:0:0`;
 
-    if (module.type === 0 || module.type === 1 || module.type === 2) {
-      let copiedData =
-        module.type === 0 || module.type === 1
-          ? { ...module.score[currentMeasure] }
-          : module.type === 2
-          ? { ...module.score[selection] }
-          : null;
-      setClipboard([module.type, copiedData]);
-      setSnackbarMessage(
-        `${t("workspace.actions.copySuccess")} ${focusedModule + 1} "${
-          module.name
-            ? module.name
-            : t(`modulePicker.types.${module.type}.name`)
-        }"`
-      );
+    Tone.Transport.start();
+    setIsPlaying(true);
+    setIsRecording(true);
+  };
+
+  const playNote = (e) => {
+    let sampleIndex = keySamplerMapping[e.code];
+
+    if (sampleIndex === undefined || selectedModule === null) return;
+
+    setPressedKeys((prev) => [...prev, sampleIndex]);
+
+    //console.log(sampleIndex);
+
+    if (modules[selectedModule].type === 0) {
+      if (!instruments[selectedModule].has(sampleIndex)) return;
+      instruments[selectedModule].player(sampleIndex).start();
+    } else {
+      instruments[selectedModule].triggerAttackRelease(sampleIndex, "8n");
     }
+
+    //console.log(e.code);
+
+    if (!isRecording) return;
+
+    if (modules[selectedModule].type === 0) {
+      let newNote = {
+        note: sampleIndex,
+        time: Tone.Time(
+          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
+        ).toBarsBeatsSixteenths(),
+      };
+
+      setModules((prev) => {
+        let newModules = [...prev];
+        let find = newModules[selectedModule].score.findIndex(
+          (e) => e.note === newNote.note && e.time === newNote.time
+        );
+        //console.log(find);
+        if (find !== -1) return newModules;
+        newModules[selectedModule].score = [...newModules[0].score, newNote];
+        return newModules;
+      });
+    } else {
+      let drawingNote = {
+        note: sampleIndex,
+        time: Tone.Time(
+          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
+        ).toBarsBeatsSixteenths(),
+      };
+
+      //setDrawingNote(drawingNote);
+    }
+  };
+
+  const handleCopy = () => {
     //console.log("copied", copiedData);
   };
 
-  const handlePaste = () => {
-    if (focusedModule == null) return;
-    if (!clipboard) {
-      setSnackbarMessage(t("workspace.actions.copyPasteEmptyClipboard"));
-      return;
-    }
+  const handlePaste = () => {};
 
-    let currentMeasure = Tone.Transport.position.split(":")[0];
-    let module = modules[focusedModule];
-
-    if (clipboard[0] !== module.type) {
-      setSnackbarMessage(t("workspace.actions.copyPasteIncompatible"));
-      return;
-    }
-
-    if (module.type === 0 || module.type === 1) {
-      let subdivisionChanged = false;
-
-      setModules((prev) => {
-        let newModules = [...prev];
-
-        if (
-          Object.keys(clipboard).length !==
-          Object.keys(newModules[focusedModule].score[currentMeasure]).length
-        ) {
-          newModules[focusedModule].score = newModules[focusedModule].score.map(
-            (e) =>
-              Object.assign(
-                {},
-                adaptSequencetoSubdiv(
-                  Object.values(e),
-                  Object.keys(clipboard).length
-                )
-              )
-          );
-          subdivisionChanged = true;
-        }
-
-        newModules[focusedModule].score[currentMeasure] = { ...clipboard[1] };
-
-        return newModules;
-      });
-      setSnackbarMessage(
-        `${t("workspace.actions.pasteSuccessMeasure")} ${focusedModule + 1} "${
-          module.name
-            ? module.name
-            : t(`modulePicker.types.${module.type}.name`)
-        }" ${
-          subdivisionChanged
-            ? `${t("workspace.actions.stepsChange")} ${clipboard.length}`
-            : ""
-        }`
-      );
-    } else if (module.type === 2) {
-      setModules((prev) => {
-        let newModules = [...prev];
-        newModules[focusedModule].score[selection].notes = [
-          ...clipboard[1].notes,
-        ];
-        newModules[focusedModule].score[selection].rhythm = [
-          ...clipboard[1].rhythm,
-        ];
-        return newModules;
-      });
-      setSnackbarMessage(
-        `${t("workspace.actions.pasteSuccessChord")} ${focusedModule + 1} "${
-          module.name
-            ? module.name
-            : t(`modulePicker.types.${module.type}.name`)
-        }"`
-      );
-    }
-    //console.log("paste", [...clipboard]);
-  };
-
-  const handleBackspace = () => {
-    if (focusedModule == null) return;
-    let currentMeasure = Tone.Transport.position.split(":")[0];
-    let module = modules[focusedModule];
-
-    if (module.type === 0 && module.type === 1) {
-      let measureLength = Object.keys(
-        modules[focusedModule].score[currentMeasure]
-      ).length;
-      setModules((prev) => {
-        let newModules = [...prev];
-        newModules[focusedModule].score[currentMeasure] = Object.assign(
-          {},
-          Array(measureLength).fill(0)
-        );
-
-        return newModules;
-      });
-      setSnackbarMessage(
-        `Measure ${currentMeasure + 1} cleared, from module ${
-          focusedModule + 1
-        } "${
-          module.name
-            ? module.name
-            : t(`modulePicker.types.${module.type}.name`)
-        }"`
-      );
-    }
-    if (module.type === 4) {
-      setModules((prev) => {
-        let newModules = [...prev];
-        newModules[focusedModule].score = newModules[
-          focusedModule
-        ].score.filter((e, i) => selection.indexOf(i) === -1);
-        return newModules;
-      });
-      setSelection([]);
-    }
-  };
+  const handleBackspace = () => {};
 
   const handleArrowKey = (event) => {
     event.preventDefault();
-    if (typeof focusedModule === "number") {
-      if (modules[focusedModule].type === 4) {
-        if (event.keyCode === 38) {
-          for (let x = 0; x < selection.length; x++) {
-            let midiNote = Tone.Frequency(
-              modules[focusedModule].score[x].note
-            ).toMidi();
-            if (midiNote >= 107) return;
-          }
-          setModules((prev) => {
-            let newModules = [...prev];
-            selection.forEach(
-              (e, i) =>
-                (newModules[focusedModule].score[e].note = Tone.Frequency(
-                  newModules[focusedModule].score[e].note
-                )
-                  .transpose(event.shiftKey ? 12 : 1)
-                  .toNote())
-            );
-
-            return newModules;
-          });
-        }
-        if (event.keyCode === 40) {
-          for (let x = 0; x < selection.length; x++) {
-            let midiNote = Tone.Frequency(
-              modules[focusedModule].score[x].note
-            ).toMidi();
-            if (midiNote <= 24) return;
-          }
-          setModules((prev) => {
-            let newModules = [...prev];
-            selection.forEach(
-              (e, i) =>
-                (newModules[focusedModule].score[e].note = Tone.Frequency(
-                  newModules[focusedModule].score[e].note
-                )
-                  .transpose(event.shiftKey ? -12 : -1)
-                  .toNote())
-            );
-
-            return newModules;
-          });
-        }
-      }
+    if (event.keyCode === 38) {
+      setSessionSize((prev) => (prev === 128 ? prev : prev + 1));
+    }
+    if (event.keyCode === 40) {
+      setSessionSize((prev) => (prev === 1 ? prev : prev - 1));
+    }
+    if (event.keyCode === 37) {
+      setGridSize((prev) => (prev === 1 ? prev : prev / 2));
+    }
+    if (event.keyCode === 39) {
+      setGridSize((prev) => (prev === 32 ? prev : prev * 2));
     }
   };
 
@@ -1000,12 +921,17 @@ function Workspace(props) {
           break;
       }
     }
+
+    playNote(e);
+
     switch (e.keyCode) {
       case 32:
-        e.target.classList[0] === "workspace" && togglePlaying(e);
+        togglePlaying(e);
         break;
       case 8:
         handleBackspace();
+        break;
+      case 65:
         break;
       case 37:
       case 38:
@@ -1013,23 +939,38 @@ function Workspace(props) {
       case 40:
         handleArrowKey(e);
         break;
+      case 90:
+        setCursorMode((prev) => (prev ? null : "edit"));
+        break;
       default:
         break;
     }
   };
 
-  /*================================================================ */
-  /*================================================================ */
-  /*=========================useEffects============================= */
-  /*================================================================ */
-  /*================================================================ */
+  const handleKeyUp = (e) => {
+    Tone.start();
+
+    let sampleIndex = keySamplerMapping[e.code];
+
+    if (sampleIndex === undefined) return;
+
+    setPressedKeys((prev) => prev.filter((e) => e !== sampleIndex));
+  };
+
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*=====================================USEEFFECTS=========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   useEffect(() => {
     //resetWorkspace();
     Tone.Transport.loop = true;
     Tone.Transport.loopStart = 0;
     instruments.forEach((e) => e.dispose());
-    clearEvents("all");
+    //clearEvents("all");
     console.log("transport cleared");
 
     let session = {
@@ -1049,7 +990,6 @@ function Workspace(props) {
   }, [props.user, props.session, sessionKey]);
 
   useEffect(() => {
-    !timelineMode && modules && adaptSessionSize();
     //registerSession();
     //console.log(isLastChangeFromServer ? "server change" : "local change");
     console.log(modules);
@@ -1078,36 +1018,15 @@ function Workspace(props) {
   }, [isLoaded, editMode, savingMode, DBSessionRef, props.user]);
 
   useEffect(() => {
-    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
-    timelineMode &&
-      setSessionData((prev) => {
-        let newSessionData = { ...prev };
-        newSessionData.timeline.size = sessionSize;
-        return newSessionData;
-      });
-    //console.log("sessionSize", sessionSize);
-  }, [sessionSize]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      timelineMode
-        ? setSessionSize(sessionData.timeline.size)
-        : adaptSessionSize();
-      sessionData &&
-        timelineMode !== sessionData.timeline.on &&
-        setSessionData((prev) => {
-          return { ...prev, timeline: { ...prev.timeline, on: timelineMode } };
-        });
-    }
-  }, [timelineMode]);
-
-  useEffect(() => {
-    //sessionData && console.log(sessionData.timeline);
     sessionData && setSavingMode(sessionData.rte ? "rte" : "simple");
     if (isLoaded) {
       savingMode === "simple" && setAreUnsavedChanges(true);
       savingMode === "rte" && saveToDatabase(null, sessionData);
     }
+    sessionData &&
+      setSessionSize((prev) =>
+        sessionData.size === prev ? prev : sessionData.size
+      );
   }, [sessionData]);
 
   /*  useEffect(() => {
@@ -1117,9 +1036,9 @@ function Workspace(props) {
     }
   }, [sessionData]); */
 
-  /*   useEffect(() => {
-    console.log(sessionHistory);
-  }, [sessionHistory]); */
+  useEffect(() => {
+    console.log(cursorMode);
+  }, [cursorMode]);
 
   useEffect(() => {
     Tone.Transport.pause();
@@ -1131,12 +1050,12 @@ function Workspace(props) {
       !instruments.includes(undefined) &&
       instrumentsLoaded.every((val) => val === true) &&
       !instrumentsLoaded.includes(undefined) &&
-      sessionSize > 0 &&
       !isLoaded
     ) {
       //console.log(instrumentsLoaded, sessionData, instruments);
       onSessionReady();
     }
+
     //temp
   }, [instrumentsLoaded, sessionData, instruments]);
 
@@ -1152,13 +1071,13 @@ function Workspace(props) {
     //TODO: Completely clear Tone instance, disposing context
     return () => {
       instruments.forEach((e) => e.dispose());
-      clearEvents("all");
+      //clearEvents("all");
       console.log("transport cleared");
     };
   }, []);
 
   useEffect(() => {
-    //console.log(instruments);
+    console.log(instruments);
 
     instruments.forEach((e, i) => {
       if (modules && modules[i] && e) {
@@ -1170,6 +1089,22 @@ function Workspace(props) {
       //console.log(modules[i].name, 2, e.volume.value);
     });
   }, [instruments]);
+
+  useEffect(() => {
+    console.log(instrumentsInfo);
+  }, [instrumentsInfo]);
+
+  useEffect(() => {
+    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
+
+    setSessionData((prev) => {
+      let newSesData = { ...prev };
+      newSesData.size = sessionSize;
+      return newSesData;
+    });
+
+    //console.log("sessionSize", sessionSize);
+  }, [sessionSize]);
 
   useEffect(() => {
     premiumMode && console.log("=====PREMIUM MODE ON=====");
@@ -1193,7 +1128,17 @@ function Workspace(props) {
     //console.log(editorProfiles);
   }, [editorProfiles]);
 
-  /**/
+  useEffect(() => {
+    if (metronome) metronome.volume.value = metronomeState ? 0 : -999;
+  }, [metronomeState]);
+
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*=====================================JSX================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   /*================================================================ */
   /*================================================================ */
@@ -1207,47 +1152,101 @@ function Workspace(props) {
       tabIndex={0}
       style={{
         display: props.hidden ? "none" : "flex",
+        cursor:
+          cursorMode !== null
+            ? "url('edit_black_24dp.svg'),pointer"
+            : "default",
       }}
-      onClick={unfocusModules}
       onKeyDown={handleKeyDown}
+      onKeyUp={handleKeyUp}
     >
       <LoadingScreen open={modules === null} />
 
-      {sessionKey && (
-        <WorkspaceTitle
-          sessionData={sessionData}
-          setSessionData={setSessionData}
-          sessionKey={sessionKey}
-          editMode={editMode}
-          user={props.user}
-          sessionSize={sessionSize}
-          setPremiumMode={setPremiumMode}
-          handlePageNav={props.handlePageNav}
-          editorProfiles={editorProfiles}
-          setEditorProfiles={setEditorProfiles}
-        />
-      )}
+      <div className="ws-header">
+        {sessionKey && (
+          <WorkspaceTitle
+            sessionData={sessionData}
+            setSessionData={setSessionData}
+            sessionKey={sessionKey}
+            editMode={editMode}
+            user={props.user}
+            sessionSize={sessionSize}
+            setPremiumMode={setPremiumMode}
+            handlePageNav={props.handlePageNav}
+            editorProfiles={editorProfiles}
+            setEditorProfiles={setEditorProfiles}
+          />
+        )}
+        <div className="ws-commands" tabIndex="-1">
+          <IconButton size="large" tabIndex="-1" onClick={togglePlaying}>
+            <Icon style={{ color: "white", fontSize: 36 }}>
+              {isPlaying ? "pause" : "play_arrow"}
+            </Icon>
+          </IconButton>
+          <IconButton
+            size="large"
+            tabIndex="-1"
+            color="secondary"
+            onClick={toggleRecording}
+          >
+            <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
+          </IconButton>
+        </div>
+      </div>
 
-      <WorkspaceTimeline
-        setTimelineMode={setTimelineMode}
-        timelineMode={timelineMode}
-        timeline={sessionData && sessionData.timeline}
+      {/* <WorkspaceTimeline
         setTimeline={setTimeline}
         modules={modules}
         sessionSize={sessionSize}
         setSessionSize={setSessionSize}
-      />
+      /> */}
 
-      <div className="workspace-module-cont">
-        {modules !== null && modules.length && sessionData ? (
-          modules.map((module, moduleIndex) => (
-            <Fragment>
-              {/* moduleIndex % 3 === 0 && <div className="break" /> */}
-
-              <Module
+      <div className="ws-grid-cont" tabIndex="-1">
+        <WorkspaceGrid
+          modules={modules}
+          sessionSize={sessionSize}
+          setSessionSize={setSessionSize}
+          gridSize={gridSize}
+          isRecording={isRecording}
+          selection={selection}
+          setSelection={setSelection}
+          cursorMode={cursorMode}
+        >
+          {selectedModule !== null ? (
+            <ModuleRow
+              tabIndex={-1}
+              key={modules[selectedModule].id}
+              index={selectedModule}
+              selectedModule={selectedModule}
+              module={modules[selectedModule]}
+              instrument={instruments[selectedModule]}
+              setInstruments={setInstruments}
+              loaded={instrumentsLoaded[selectedModule]}
+              setInstrumentsLoaded={setInstrumentsLoaded}
+              sessionData={sessionData}
+              sessionSize={sessionSize}
+              setModules={setModules}
+              editMode={editMode}
+              resetUndoHistory={() => handleUndo("RESET")}
+              selection={selection}
+              setSelection={setSelection}
+              duplicateModule={duplicateModule}
+              setSnackbarMessage={setSnackbarMessage}
+              isLoaded={isLoaded}
+              handlePageNav={props.handlePageNav}
+              setAreUnsavedChanges={setAreUnsavedChanges}
+              cursorMode={cursorMode}
+              gridSize={gridSize}
+              isRecording={isRecording}
+            />
+          ) : (
+            modules &&
+            modules.map((module, moduleIndex) => (
+              <ModuleRow
                 tabIndex={-1}
                 key={module.id}
                 index={moduleIndex}
+                selectedModule={selectedModule}
                 module={module}
                 instrument={instruments[moduleIndex]}
                 setInstruments={setInstruments}
@@ -1257,43 +1256,83 @@ function Workspace(props) {
                 sessionSize={sessionSize}
                 setModules={setModules}
                 editMode={editMode}
-                isFocused={focusedModule === moduleIndex}
-                setFocusedModule={setFocusedModule}
                 resetUndoHistory={() => handleUndo("RESET")}
-                timeline={sessionData.timeline}
-                timelineMode={sessionData.timeline.on}
-                setTimeline={setTimeline}
                 selection={selection}
                 setSelection={setSelection}
                 duplicateModule={duplicateModule}
                 setSnackbarMessage={setSnackbarMessage}
-                isSessionLoaded={isLoaded}
+                isLoaded={isLoaded}
                 handlePageNav={props.handlePageNav}
                 setAreUnsavedChanges={setAreUnsavedChanges}
+                cursorMode={cursorMode}
+                gridSize={gridSize}
+                isRecording={isRecording}
               />
-            </Fragment>
-          ))
-        ) : !modules ? (
-          [1, 1].map((e, i) => <PlaceholderModule key={"phm-" + i} />)
-        ) : modules.length === 0 /* && !instrumentsLoaded.length */ ? (
-          <NotFoundPage type="emptySession" />
-        ) : (
-          ""
-        )}
+            ))
+          )}
+        </WorkspaceGrid>
 
-        <div className="break" />
-        {editMode && (
-          <Tooltip title={t("workspace.addBtn")}>
-            <IconButton
-              color="primary"
-              style={{ marginTop: 48 }}
-              onClick={() => setModulePicker(true)}
-            >
-              <Icon style={{ fontSize: 40 }}>add_circle_outline</Icon>
-            </IconButton>
-          </Tooltip>
-        )}
+        <div className="ws-module-selector" tabIndex="-1">
+          {modules &&
+            modules.map((e, i) => (
+              <IconButton
+                tabIndex="-1"
+                className={selectedModule === i && "ws-module-selected"}
+                style={{
+                  backgroundColor: selectedModule === i && colors[e.color][300],
+                }}
+                onClick={() =>
+                  setSelectedModule((prev) => (prev !== i ? i : null))
+                }
+              >
+                <Icon>
+                  {e.type === 0
+                    ? "grid_on"
+                    : e.type === 1
+                    ? "music_note"
+                    : e.type === 2
+                    ? "font_download"
+                    : e.type === 3
+                    ? "graphic_eq"
+                    : "piano"}
+                </Icon>
+              </IconButton>
+            ))}
+          <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
+            <Icon>add</Icon>
+          </IconButton>
+        </div>
       </div>
+
+      {selectedModule !== null && (
+        <div className="ws-note-input">
+          <NotesInput
+            keyMapping={keySamplerMapping}
+            module={modules && modules[selectedModule]}
+            instrument={instruments[selectedModule]}
+            pressedKeys={pressedKeys}
+            setPressedKeys={setPressedKeys}
+            handlePageNav={props.handlePageNav}
+          />
+
+          {modules && modules[selectedModule] && (
+            <InstrumentEditor
+              index={selectedModule}
+              module={modules && modules[selectedModule]}
+              setModules={setModules}
+              instrument={instruments[selectedModule]}
+              instrumentInfo={instrumentsInfo[selectedModule]}
+              setInstruments={setInstruments}
+              setInstrumentsLoaded={setInstrumentsLoaded}
+              setSnackbarMessage={setSnackbarMessage}
+              /* handleFileClick={handleFileClick} 
+          setLabels={setLabels}
+          updateFilesStatsOnChange={updateFilesStatsOnChange}*/
+              handlePageNav={props.handlePageNav}
+            />
+          )}
+        </div>
+      )}
 
       {modulePicker && (
         <ModulePicker
@@ -1306,8 +1345,6 @@ function Workspace(props) {
           modules={modules}
           sessionSize={sessionSize}
           sessionData={sessionData}
-          timeline={sessionData.timeline}
-          setTimeline={setTimeline}
         />
       )}
 
@@ -1382,9 +1419,6 @@ function Workspace(props) {
             sessionData={sessionData}
             modules={modules}
             modulesInstruments={instruments}
-            timeline={sessionData.timeline}
-            timelineMode={timelineMode}
-            forceReschedule={forceReschedule}
           />
         )}
 

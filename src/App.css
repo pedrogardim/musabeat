@@ -23,7 +23,7 @@ body *::-webkit-scrollbar-track {
 
 body *::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.356); /* color of the scroll thumb */
-  border-radius: 4px; /* roundness of the scroll thumb */
+  border-radius: 0px; /* roundness of the scroll thumb */
   /* border: 3px solid orange;  */
 }
 
@@ -41,8 +41,8 @@ body *::-webkit-scrollbar-thumb {
 } */
 
 .app-bar {
-  height: 56px !important;
-  min-height: 56px !important;
+  height: 64px !important;
+  min-height: 64px !important;
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-left: env(safe-area-inset-left);
@@ -53,8 +53,8 @@ body *::-webkit-scrollbar-thumb {
   margin: 24px 0;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   flex-direction: row;
   flex-wrap: wrap;
 }
@@ -88,7 +88,9 @@ body *::-webkit-scrollbar-thumb {
 
 .app-wrapper {
   flex: 1;
-  height: 100vh;
+  width: 100vw;
+  top: 0 !important;
+  left: 0 !important;
   overflow-y: overlay;
   overflow-x: hidden;
   position: relative;
