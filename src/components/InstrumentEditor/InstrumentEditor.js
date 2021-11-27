@@ -3,7 +3,14 @@ import React, { useState, Fragment, useRef, useEffect } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import { List, Divider, IconButton, MenuItem } from "@material-ui/core";
+import {
+  List,
+  Divider,
+  IconButton,
+  MenuItem,
+  Tooltip,
+  LinearProgress,
+} from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
@@ -388,13 +395,6 @@ function InstrumentEditor(props) {
   /* ================================================================ */
   /* ================================================================ */
 
-  useEffect(() => {
-    //console.log(props.instrument);
-    (props.instrument.name === "Players" ||
-      props.instrument.name === "Sampler") &&
-      getFilesInfo();
-  }, []);
-
   /*  useEffect(() => {
     //console.log(props.instrument);
     props.instrument &&
@@ -630,7 +630,7 @@ function InstrumentEditor(props) {
         />
       ) */}
 
-      {fileExplorer && (
+      {/* {fileExplorer && (
         <FileExplorer
           compact
           setInstrumentLoaded={props.setInstrumentLoaded}
@@ -643,7 +643,7 @@ function InstrumentEditor(props) {
           patchSize={patchSize}
           setPatchSize={setPatchSize}
         />
-      )}
+      )} */}
 
       {!patchExplorer && mainContent}
       {draggingOver && props.instrument.name !== "PolySynth" && (
@@ -661,7 +661,7 @@ function InstrumentEditor(props) {
         </FileDrop>
       )}
 
-      {(props.module.type === 0 || props.instrument.name === "Sampler") && (
+      {/* (props.module.type === 0 || props.instrument.name === "Sampler") && (
         <Fragment>
           <Fab
             style={{ position: "absolute", right: 16, bottom: 16 }}
@@ -690,9 +690,9 @@ function InstrumentEditor(props) {
             </Tooltip>
           }
         </Fragment>
-      )}
+      ) */}
 
-      <FileUploader
+      {/* <FileUploader
         open={uploadingFiles.length > 0}
         files={uploadingFiles}
         setUploadingFiles={setUploadingFiles}
@@ -708,7 +708,7 @@ function InstrumentEditor(props) {
         handlePageNav={props.handlePageNav}
         patchSize={patchSize}
         setPatchSize={setPatchSize}
-      />
+      /> */}
 
       {renamingLabel &&
         (props.module.type === 0 ? (

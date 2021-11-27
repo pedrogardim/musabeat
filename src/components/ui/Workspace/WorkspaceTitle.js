@@ -172,12 +172,6 @@ function WorkspaceTitle(props) {
 
       {props.sessionData && expanded && (
         <Fragment>
-<<<<<<< HEAD:src/components/ui/WorkspaceTitle.js
-          <Typography
-            variant="body2"
-            style={{ maxWidth: 1200, textAlign: "center", margin: "0 32px" }}
-          >
-=======
           <Typography variant="overline" style={{ fontSize: 10 }}>
             {`${
               props.sessionData ? props.sessionData.bpm : "-"
@@ -193,7 +187,6 @@ function WorkspaceTitle(props) {
 
           <div className="break" />
           <Typography variant="body2">
->>>>>>> feature/workspace-remodelation:src/components/ui/Workspace/WorkspaceTitle.js
             {props.sessionData.description
               ? `"${props.sessionData.description}"`
               : "No Description"}

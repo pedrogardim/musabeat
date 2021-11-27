@@ -1007,8 +1007,6 @@ function Workspace(props) {
       modules && handleUndo();
     }
 
-    if (modules && !modules.length) setTimelineMode(false);
-
     setIsLastChangeFromServer(false);
   }, [modules]);
 
