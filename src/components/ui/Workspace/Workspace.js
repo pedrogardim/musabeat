@@ -756,9 +756,9 @@ function Workspace(props) {
     e.preventDefault();
     //console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
     if (
-      Tone.Transport.state !== "started" &&
-      isLoaded &&
-      !instrumentsLoaded.includes(false)
+      Tone.Transport.state !== "started" //&&
+      //isLoaded &&
+      //!instrumentsLoaded.includes(false)
     ) {
       Tone.Transport.start();
       setIsPlaying(true);
@@ -1227,8 +1227,8 @@ function Workspace(props) {
         </div>
       </div>
 
-      {selectedModule !== null && (
-        <div className="ws-note-input">
+      <div className="ws-note-input">
+        {selectedModule !== null && (
           <NotesInput
             keyMapping={keyMapping}
             module={modules && modules[selectedModule]}
@@ -1239,25 +1239,25 @@ function Workspace(props) {
             playNoteFunction={playNoteFunction}
             setPlayingOctave={setPlayingOctave}
           />
+        )}
 
-          {modules && modules[selectedModule] && (
-            <InstrumentEditor
-              index={selectedModule}
-              module={modules && modules[selectedModule]}
-              setModules={setModules}
-              instrument={instruments[selectedModule]}
-              instrumentInfo={instrumentsInfo[selectedModule]}
-              setInstruments={setInstruments}
-              setInstrumentsLoaded={setInstrumentsLoaded}
-              setSnackbarMessage={setSnackbarMessage}
-              /* handleFileClick={handleFileClick} 
+        {modules && modules[selectedModule] && (
+          <InstrumentEditor
+            index={selectedModule}
+            module={modules && modules[selectedModule]}
+            setModules={setModules}
+            instrument={instruments[selectedModule]}
+            instrumentInfo={instrumentsInfo[selectedModule]}
+            setInstruments={setInstruments}
+            setInstrumentsLoaded={setInstrumentsLoaded}
+            setSnackbarMessage={setSnackbarMessage}
+            /* handleFileClick={handleFileClick} 
           setLabels={setLabels}
           updateFilesStatsOnChange={updateFilesStatsOnChange}*/
-              handlePageNav={props.handlePageNav}
-            />
-          )}
-        </div>
-      )}
+            handlePageNav={props.handlePageNav}
+          />
+        )}
+      </div>
 
       {modulePicker && (
         <ModulePicker
