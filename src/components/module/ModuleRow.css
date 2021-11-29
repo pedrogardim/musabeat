@@ -70,4 +70,9 @@
 .module-score-note-deletable:hover {
   background-color: rgb(149, 149, 149) !important;
   outline: solid 1px rgb(108, 108, 108) !important;
+  cursor: solid 1px rgb(108, 108, 108) !important;
+}
+
+.module-score-note {
+  cursor: move;
 }

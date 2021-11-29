@@ -26,7 +26,7 @@ function Keyboard(props) {
   const octaves = props.octaves ? props.octaves : 7;
 
   useEffect(() => {
-    console.log(props.setPlayingOctave);
+    //console.log(props.setPlayingOctave);
     if (props.setPlayingOctave) props.setPlayingOctave(octave);
   }, [octave]);
 

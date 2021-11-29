@@ -25,6 +25,7 @@ import MelodyNote from "./MelodyNote";
 
 function ModuleRow(props) {
   const rowRef = useRef(null);
+  const rowWrapperRef = useRef(null);
 
   const [moduleRows, setModuleRows] = useState([]);
   const [gridPos, setGridPos] = useState([]);
@@ -357,6 +358,16 @@ function ModuleRow(props) {
     setDeletableNote(false);
   }, [props.cursorMode]);
 
+  useEffect(() => {
+    setDeletableNote(false);
+  }, [props.cursorMode]);
+
+  useEffect(() => {
+    rowWrapperRef.current.scrollTop =
+      rowWrapperRef.current.scrollHeight / 2 -
+      rowWrapperRef.current.offsetHeight / 2;
+  }, [props.selectedModule, rowWrapperRef.current]);
+
   /* ================================================================================== */
   /* ================================================================================== */
   /* ================================JSX=============================================== */
@@ -366,6 +377,7 @@ function ModuleRow(props) {
   return (
     <div
       className="module-grid-row-wrapper"
+      ref={rowWrapperRef}
       style={{
         overflowY: trackType === 1 && isSelected && "overlay",
         maxHeight: !isSelected && "10%",

@@ -5,9 +5,19 @@ import { colors } from "../../utils/materialPalette";
 
 function MelodyNote(props) {
   const [isResizing, setIsResizing] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
 
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
+    if (!e.target.className.includes("module-score-note-handle")) {
+      setIsMoving(
+        props.gridPos[1] -
+          (Tone.Time(props.note.time).toSeconds() /
+            (props.sessionSize * Tone.Time("1m").toSeconds())) *
+            props.gridSize *
+            props.sessionSize
+      );
+    }
 
     /*  props.setDrawingNote((note) => {
       let newNote = { ...note };
@@ -42,18 +52,52 @@ function MelodyNote(props) {
     });
   };
 
+  const handleMove = () => {
+    if (props.ghost) return;
+
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      let newTime = Tone.Time(
+        ((props.gridPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
+          props.gridSize
+      ).toBarsBeatsSixteenths();
+      let newNote = 108 - props.gridPos[0];
+
+      if (true) {
+        newModules[props.selectedModule].score[props.index].time = newTime;
+        newModules[props.selectedModule].score[props.index].note = newNote;
+
+        return newModules;
+      }
+      return prev;
+    });
+  };
+
   useEffect(() => {
     if (isResizing) handleResize();
+    if (isMoving !== false) handleMove();
   }, [props.gridPos]);
 
   useEffect(() => {
     //console.log(props.isMouseDown);
-    if (props.isMouseDown === false) setIsResizing(false);
+    if (props.isMouseDown === false) {
+      setIsResizing(false);
+      setIsMoving(false);
+    }
   }, [props.isMouseDown]);
+
+  /* 
 
   useEffect(() => {
     console.log("isResizing", isResizing);
   }, [isResizing]);
+
+  useEffect(() => {
+    console.log("isMoving", isMoving);
+  }, [isMoving]);
+
+
+ */
 
   return (
     <div
