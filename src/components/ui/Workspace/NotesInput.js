@@ -1,39 +1,15 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { Helmet } from "react-helmet";
-
-import firebase from "firebase";
-import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
 
 import * as Tone from "tone";
 
-import {
-  Icon,
-  IconButton,
-  Typography,
-  Tooltip,
-  Avatar,
-  Chip,
-  Button,
-  MenuItem,
-  Select,
-} from "@material-ui/core";
-
-import { Skeleton } from "@material-ui/lab";
-
-import { colors } from "../../../utils/materialPalette";
-
-import {
-  detectPitch,
-  fileTypes,
-  fileExtentions,
-} from "../../../assets/musicutils";
+import { Paper, IconButton, Typography } from "@material-ui/core";
 
 import "./NotesInput.css";
 
 import Keyboard from "./Keyboard";
 
 function NotesInput(props) {
+  const [keyPage, setKeyPage] = useState(0);
   const handleClick = (event, i) => {
     if (!props.instrument.has(i)) return;
     props.instrument.player(i).start();
@@ -58,11 +34,11 @@ function NotesInput(props) {
       {props.module && props.instrument && props.module.type === 0 ? (
         /* Array(props.instrument._buffers._buffers.size) */
         Object.keys(props.keyMapping)
-          //.filter((e, i) => (!keyPage ? i < 10 : i >= 10))
+          .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
           .map((e) => e.replace("Key", "").replace("Semicolon", ":"))
           .map((e, i) => (
             <Fragment>
-              <div
+              <Paper
                 className="ws-note-input-key"
                 onMouseDown={(event) => handleClick(event, i)}
                 onMouseOut={() =>
@@ -109,7 +85,7 @@ function NotesInput(props) {
                   )}
                 </svg> 
               </Tooltip> */}
-                <Typography
+                <span
                   variant="overline"
                   style={{
                     position: "absolute",
@@ -119,11 +95,11 @@ function NotesInput(props) {
                   }}
                 >
                   {e}
-                </Typography>
-                <Typography variant="overline" style={{ lineHeight: 1.3 }}>
+                </span>
+                <span variant="overline" style={{ lineHeight: 1.3 }}>
                   {props.module.lbls && props.module.lbls[i]}
-                </Typography>
-              </div>
+                </span>
+              </Paper>
               {i === 9 && <div className="break" />}
             </Fragment>
           ))

@@ -80,9 +80,7 @@ function Keyboard(props) {
               "keyboard-key-active"
             }`}
           >
-            <Typography variant="overline">
-              {props.notesLabel && props.notesLabel[i]}
-            </Typography>
+            <span>{props.notesLabel && props.notesLabel[i]}</span>
           </div>
         ))}
       {props.variableOctave && (

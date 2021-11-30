@@ -1,14 +1,19 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
+import { IconButton, Icon } from "@material-ui/core";
+
 import { colors } from "../../utils/materialPalette";
 
 function MelodyNote(props) {
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
 
+  const isSelected = props.selectedNotes.includes(props.index);
+
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
+
     if (!e.target.className.includes("module-score-note-handle")) {
       setIsMoving(
         props.gridPos[1] -
@@ -17,6 +22,7 @@ function MelodyNote(props) {
             props.gridSize *
             props.sessionSize
       );
+      props.setSelectedNotes([props.index]);
     }
 
     /*  props.setDrawingNote((note) => {
@@ -27,9 +33,21 @@ function MelodyNote(props) {
     }); */
   };
 
+  const deleteNote = () => {
+    props.setModules((prev) => {
+      console.log(props.index);
+      let newModules = [...prev];
+      newModules[props.selectedModule].score = newModules[
+        props.selectedModule
+      ].score.filter((e, i) => i !== props.index);
+      return newModules;
+    });
+  };
+
   const handleResize = () => {
     if (props.ghost) return;
 
+    props.setDrawingNote(null);
     props.setModules((prev) => {
       let newModules = [...prev];
       let newDuration = Tone.Time(
@@ -145,7 +163,7 @@ function MelodyNote(props) {
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
-        backgroundColor: colors[props.module.color][600],
+        backgroundColor: colors[props.module.color][isSelected ? 900 : 600],
         outline: `solid 1px ${colors[props.module.color][800]}`,
         //borderRadius: 4,
         //margin: "-2px -2px 0 0",
@@ -156,6 +174,36 @@ function MelodyNote(props) {
           className="module-score-note-handle"
           onMouseDown={() => setIsResizing(true)}
         />
+      )}
+
+      {isSelected && props.selectedNotes.length === 1 && (
+        <Fragment>
+          <IconButton
+            onMouseDown={deleteNote}
+            style={{
+              position: "absolute",
+              top: -48,
+              left: "50%",
+              marginLeft: -24,
+            }}
+          >
+            <Icon>delete</Icon>
+          </IconButton>
+          <Icon
+            color="inherit"
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginLeft: -12,
+              marginTop: -12,
+              pointerEvents: "none",
+              opacity: 0.4,
+            }}
+          >
+            open_with
+          </Icon>
+        </Fragment>
       )}
     </div>
   );

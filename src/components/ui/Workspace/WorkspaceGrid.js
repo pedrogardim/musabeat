@@ -43,11 +43,18 @@ function WorkspaceGrid(props) {
 
   const handleCursorDragStop = (event, element) => {};
 
-  const handleMouseDown = (event) => {
-    setIsMouseDown(true);
+  const handleMouseDown = (e) => {
     props.setSelection([]);
 
-    if (!props.cursorMode) {
+    console.log(e.target.className);
+
+    let isClickOnNote = e.target.className.includes("note");
+
+    if (isClickOnNote) return;
+
+    setIsMouseDown(true);
+
+    if (!props.cursorMode && !isClickOnNote) {
       Tone.Transport.seconds =
         (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
 

@@ -4,6 +4,7 @@
   display: flex;
   position: relative;
   user-select: none;
+  font-family: "Barlow Semi Condensed", sans-serif;
 }
 
 .keyboard-key {

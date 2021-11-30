@@ -6,7 +6,6 @@
   max-width: 1200px;
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
   flex: 1 0;
   height: 100%;
   margin: 0 auto;
@@ -21,7 +20,7 @@
   left: 136px;
   top: 0;
   height: 64px;
-  z-index: 9999999;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -52,7 +51,7 @@
   justify-content: flex-start;
   flex-direction: column;
   flex-wrap: wrap;
-  height: 16px;
+  min-height: 16px;
   width: 100%;
 }
 
@@ -61,6 +60,7 @@
   justify-content: space-evenly;
   margin: 32px;
   width: 60%;
+  min-height: 30px;
 }
 
 .ws-transport > div {
@@ -142,32 +142,19 @@
   margin-left: auto;
 }
 
-.ws-fab {
-  place-self: center;
+.ws-fab-main {
+  position: fixed !important;
+  z-index: 1111111;
+  right: 16px;
+  bottom: 16px;
 }
 
-.ws-fab-copy {
-  grid-area: 1/1;
+.ws-fab-v {
+  margin: 8px 0px;
 }
 
-.ws-fab-play {
-  margin-top: 16px !important;
-}
-
-.ws-fab-mix {
-  grid-area: 1/13;
-}
-
-.ws-fab-export {
-  grid-area: 1/14;
-}
-
-.ws-fab-settings {
-  grid-area: 1/15;
-}
-
-.ws-fab-save {
-  grid-area: 1/2;
+.ws-fab-h {
+  margin: 0px 8px;
 }
 
 /* lewjfenrigfneorjgoernijtgnritgnotngorngrk */
@@ -183,4 +170,10 @@
 
 .ws-module-selector > button {
   height: 64px;
+}
+
+@media only screen and (max-height: 800px) {
+  .ws-transport {
+    margin: 8px !important;
+  }
 }

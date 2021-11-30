@@ -34,6 +34,9 @@ function ModuleRow(props) {
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [deletableNote, setDeletableNote] = useState(false);
 
+  const [selection, setSelection] = useState([]);
+  const [selectedNotes, setSelectedNotes] = useState([]);
+
   const trackType = props.module.type;
   const isSelected = props.selectedModule === props.index;
 
@@ -97,7 +100,7 @@ function ModuleRow(props) {
   };
 
   const playNote = (note) => {
-    console.log(note, props.playingOctave);
+    //console.log(note, props.playingOctave);
 
     if (props.module.type === 0) {
       if (!props.instrument.has(note)) return;
@@ -113,7 +116,7 @@ function ModuleRow(props) {
 
     if (!props.isRecording) return;
 
-    if (props.module.type === 0) {
+    if (trackType === 0) {
       let newNote = {
         note: note,
         time: Tone.Time(
@@ -127,7 +130,7 @@ function ModuleRow(props) {
           (e) => e.note === newNote.note && e.time === newNote.time
         );
         //console.log(find);
-        if (find !== -1) return newModules;
+        if (find !== -1) return prev;
         newModules[props.selectedModule].score = [
           ...newModules[0].score,
           newNote,
@@ -182,7 +185,7 @@ function ModuleRow(props) {
       JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
     );
 
-    if (props.cursorMode === "edit") {
+    if (props.cursorMode === "edit" && trackType === 0) {
       let find =
         props.module.score.findIndex(
           (e) =>
@@ -204,6 +207,10 @@ function ModuleRow(props) {
 
     let isClickOnNote = e && e.target.className.includes("module-score-note");
 
+    if (!isClickOnNote) {
+      setSelectedNotes([]);
+    }
+
     if (e && e.target.className.includes("module-score-note-handle")) return;
 
     //console.log("mousedown triggered");
@@ -211,11 +218,12 @@ function ModuleRow(props) {
     if (!props.cursorMode) {
       Tone.Transport.seconds =
         (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize;
-
+      /* 
       props.setSelection([
         (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize,
         null,
       ]);
+       */
     } else {
       if (trackType === 0) {
         let newNote = {
@@ -241,13 +249,13 @@ function ModuleRow(props) {
           note: 108 - gridPos[0],
           time: (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize,
         };
-        if (isClickOnNote && deletableNote) {
-          /* console.log(
+        /* if (isClickOnNote && deletableNote) {
+           console.log(
             "isClickOnNote",
             isClickOnNote,
             "deletableNote",
             deletableNote
-          ); */
+          ); 
 
           props.setModules((prev) => {
             let newModules = [...prev];
@@ -262,7 +270,8 @@ function ModuleRow(props) {
 
             return newModules;
           });
-        } else if (!isClickOnNote) {
+        } else  */
+        if (!isClickOnNote) {
           //console.log("drawingNote");
           setDrawingNote(newNote);
         }
@@ -411,19 +420,21 @@ function ModuleRow(props) {
                   rowIndex % 12 === 6 ||
                   rowIndex % 12 === 9 ||
                   rowIndex % 12 === 11) &&
-                "#0000001a",
-              //colors[props.module.color][900] + "3a",
+                //"#0000001a",
+                colors[props.module.color][800] + "3a",
             }}
           >
             <span
               className="module-inner-row-label"
               style={{ color: colors[props.module.color][900] }}
             >
-              {row.lbl
-                .match(/[^aeiou., ]/gi)
-                .slice(0, 3)
-                .join()
-                .replaceAll(",", "")}
+              {trackType === 0
+                ? row.lbl
+                    .match(/[^aeiou., ]/gi)
+                    .slice(0, 3)
+                    .join()
+                    .replaceAll(",", "")
+                : row.lbl}
             </span>
             {trackType === 0 && <div className="module-inner-row-line" />}
           </div>
@@ -461,6 +472,8 @@ function ModuleRow(props) {
                   setModules={props.setModules}
                   isMouseDown={isMouseDown}
                   selectedModule={props.selectedModule}
+                  selectedNotes={selectedNotes}
+                  setSelectedNotes={setSelectedNotes}
                 />
               )
             )}
@@ -491,7 +504,9 @@ function ModuleRow(props) {
               gridPos={gridPos}
               gridSize={props.gridSize}
               setModules={props.setModules}
+              selectedNotes={[]}
               selectedModule={props.selectedModule}
+              setDrawingNote={setDrawingNote}
             />
           ))}
       </div>

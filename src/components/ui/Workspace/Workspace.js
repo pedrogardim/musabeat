@@ -10,13 +10,14 @@ import {
   Fab,
   Icon,
   IconButton,
-  Typography,
+  Backdrop,
   Tooltip,
   Snackbar,
   Input,
   Paper,
   Fade,
   Button,
+  Modal,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -108,6 +109,7 @@ function Workspace(props) {
     () => {},
   ]);
 
+  const [menuOpen, setMenuOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
   const [gridSize, setGridSize] = useState(4);
@@ -1283,24 +1285,71 @@ function Workspace(props) {
       )}
       {/*setModulesVolume={setModulesVolume}*/}
 
-      <div className="ws-fab-cont">
-        <Fab
-          tabIndex={-1}
-          onClick={() => setOptionsMenu((prev) => (prev ? false : true))}
-        >
-          <Icon>{!optionsMenu ? "list" : "close"}</Icon>
-        </Fab>
-        <Fab
-          tabIndex={-1}
-          color="primary"
-          className="ws-fab ws-fab-play"
-          onClick={togglePlaying}
-        >
-          <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
-        </Fab>
-      </div>
+      <Fab
+        tabIndex={-1}
+        color="primary"
+        className="ws-fab-main"
+        onClick={() => setMenuOpen((prev) => !prev)}
+      >
+        <Icon>{menuOpen ? "close" : "menu"}</Icon>
+      </Fab>
 
-      <Paper
+      <Modal
+        BackdropProps={{
+          timeout: 500,
+        }}
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+      >
+        <Fade in={menuOpen}>
+          <Fragment>
+            <div
+              style={{
+                width: 56,
+                right: 16,
+                position: "fixed",
+                bottom: 80,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Fab color="primary" className="ws-fab-v">
+                <Icon>settings</Icon>
+              </Fab>
+
+              <Fab color="primary" className="ws-fab-v">
+                <Icon>download</Icon>
+              </Fab>
+
+              <Fab color="primary" className="ws-fab-v">
+                <Icon>save</Icon>
+              </Fab>
+            </div>
+            <div
+              style={{
+                right: 80,
+                position: "fixed",
+                bottom: 16,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+              }}
+            >
+              <Fab
+                className="ws-fab-h"
+                onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
+              >
+                <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
+                  {cursorMode ? "edit" : "navigation"}
+                </Icon>
+              </Fab>
+            </div>
+          </Fragment>
+        </Fade>
+      </Modal>
+
+      {/* <Paper
         className="ws-opt-btn-cont"
         style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
       >
@@ -1375,7 +1424,7 @@ function Workspace(props) {
             </div>
           </Tooltip>
         )}
-      </Paper>
+      </Paper> */}
 
       <Snackbar
         open={!!snackbarMessage}

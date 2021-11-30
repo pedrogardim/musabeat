@@ -42,22 +42,33 @@ function ClosedTrackNote(props) {
           props.moduleRows.findIndex((e) => e.note === props.note.note) *
           (props.rowRef.current.scrollHeight / props.moduleRows.length)
         }px)`,
-        backgroundColor: trackType === 1 ? "white" : "transparent",
+        backgroundColor: "transparent",
         //borderRadius: 4,
         //margin: "-2px -2px 0 0",
       }}
     >
-      {trackType === 0 && (
+      {trackType === 0 ? (
         <div
           style={{
             position: "absolute",
             height: 8,
             top: "calc(50% - 4px)",
             width: 8,
-            left: -4,
-            backgroundColor: "white" /*  border:
-      props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */,
+            left: 1,
+            backgroundColor: colors[props.module.color][900],
             transform: "rotate(45deg)",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            position: "absolute",
+            maxHeight: 8,
+            height: "50%",
+            top: "calc(50% - 4px)",
+            width: "100%",
+            left: 1,
+            backgroundColor: colors[props.module.color][900],
           }}
         />
       )}
