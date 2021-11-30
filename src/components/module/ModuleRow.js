@@ -202,13 +202,9 @@ function ModuleRow(props) {
 
     setIsMouseDown(true);
 
-    let isClickOnNote = e.target.className.includes("module-score-note");
+    let isClickOnNote = e && e.target.className.includes("module-score-note");
 
-    if (
-      e === undefined ||
-      (e && e.target.className.includes("module-score-note-handle"))
-    )
-      return;
+    if (e && e.target.className.includes("module-score-note-handle")) return;
 
     //console.log("mousedown triggered");
 
@@ -312,8 +308,8 @@ function ModuleRow(props) {
   const onGridPosChange = () => {
     //drag note input
     if (isMouseDown) {
-      if (props.cursorMode === "edit" && trackType === 0) {
-        handleMouseDown();
+      if (props.cursorMode === "edit") {
+        trackType === 0 && handleMouseDown();
       } else {
         //props.setSelection((prev) => [
         //  prev[0],
@@ -359,10 +355,6 @@ function ModuleRow(props) {
   }, [props.cursorMode]);
 
   useEffect(() => {
-    setDeletableNote(false);
-  }, [props.cursorMode]);
-
-  useEffect(() => {
     rowWrapperRef.current.scrollTop =
       rowWrapperRef.current.scrollHeight / 2 -
       rowWrapperRef.current.offsetHeight / 2;
@@ -394,7 +386,10 @@ function ModuleRow(props) {
         onMouseUp={handleMouseUp}
         disabled
         style={{
-          //overflowY: trackType === 1 && "overlay",
+          width: `${
+            (props.sessionSize * 100) /
+            (props.zoomPosition[1] - props.zoomPosition[0] + 1)
+          }%`,
           border:
             trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
         }}
@@ -420,13 +415,16 @@ function ModuleRow(props) {
               //colors[props.module.color][900] + "3a",
             }}
           >
-            <Typography
-              variant="overline"
+            <span
               className="module-inner-row-label"
-              style={{ color: colors[props.module.color][500] }}
+              style={{ color: colors[props.module.color][900] }}
             >
-              {row.lbl}
-            </Typography>
+              {row.lbl
+                .match(/[^aeiou., ]/gi)
+                .slice(0, 3)
+                .join()
+                .replaceAll(",", "")}
+            </span>
             {trackType === 0 && <div className="module-inner-row-line" />}
           </div>
         ))}

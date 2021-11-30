@@ -17,7 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: calc(100% - 16px);
+  width: 100%;
   min-height: 50%;
   max-height: 80%;
   flex: 1;
@@ -74,7 +74,7 @@
   transition: width 0.3s;
   border-radius: 99px;
   z-index: 2;
-  left: 70px;
+  left: 62px;
 }
 
 .ws-grid-cursor-compact {
@@ -94,8 +94,8 @@
 .ws-grid-line-cont {
   position: absolute;
   height: 100%;
-  width: calc(100% - 72px);
-  left: 72px;
+  width: calc(100% - 48px);
+  left: 48px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;

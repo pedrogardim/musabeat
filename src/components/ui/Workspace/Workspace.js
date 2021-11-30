@@ -22,8 +22,10 @@ import {
 import "./Workspace.css";
 
 import ModuleRow from "../../Module/ModuleRow";
+import ClosedTrack from "../../Module/ClosedTrack";
 
 import WorkspaceTitle from "./WorkspaceTitle";
+import WorkspaceTransport from "./WorkspaceTransport";
 
 import ModulePicker from "../ModulePicker";
 import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
@@ -33,6 +35,8 @@ import SessionSettings from "../SessionSettings";
 import Mixer from "../mixer/Mixer";
 import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceGrid from "./WorkspaceGrid";
+import WorkspaceRuler from "./WorkspaceRuler";
+
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NotFoundPage from "../NotFoundPage";
@@ -107,6 +111,7 @@ function Workspace(props) {
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
   const [gridSize, setGridSize] = useState(4);
+  const [zoomPosition, setZoomPosition] = useState([0, 3]);
 
   const [premiumMode, setPremiumMode] = useState(false);
 
@@ -1053,13 +1058,9 @@ function Workspace(props) {
     if (metronome) metronome.volume.value = metronomeState ? 0 : -999;
   }, [metronomeState]);
 
-  /*========================================================================================*/
-  /*========================================================================================*/
-  /*========================================================================================*/
-  /*=====================================JSX================================================*/
-  /*========================================================================================*/
-  /*========================================================================================*/
-  /*========================================================================================*/
+  useEffect(() => {
+    console.log(selection);
+  }, [selection]);
 
   /*================================================================ */
   /*================================================================ */
@@ -1078,6 +1079,9 @@ function Workspace(props) {
             ? "url('edit_black_24dp.svg'),pointer"
             : "default",
       }}
+      onClick={(e) =>
+        e.target.className === "workspace" && setSelectedModule(null)
+      }
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
@@ -1099,6 +1103,15 @@ function Workspace(props) {
           />
         )}
         <div className="ws-commands" tabIndex="-1">
+          <IconButton
+            size="large"
+            tabIndex="-1"
+            onClick={() => {
+              Tone.Transport.seconds = 0;
+            }}
+          >
+            <Icon style={{ color: "white", fontSize: 36 }}>skip_previous</Icon>
+          </IconButton>
           <IconButton size="large" tabIndex="-1" onClick={togglePlaying}>
             <Icon style={{ color: "white", fontSize: 36 }}>
               {isPlaying ? "pause" : "play_arrow"}
@@ -1115,12 +1128,20 @@ function Workspace(props) {
         </div>
       </div>
 
-      {/* <WorkspaceTimeline
-        setTimeline={setTimeline}
+      <WorkspaceTransport
         modules={modules}
         sessionSize={sessionSize}
         setSessionSize={setSessionSize}
-      /> */}
+        gridSize={gridSize}
+        setGridSize={setGridSize}
+      />
+
+      <WorkspaceRuler
+        modules={modules}
+        sessionSize={sessionSize}
+        zoomPosition={zoomPosition}
+        setZoomPosition={setZoomPosition}
+      />
 
       <div className="ws-grid-cont" tabIndex="-1">
         <WorkspaceGrid
@@ -1132,6 +1153,8 @@ function Workspace(props) {
           selection={selection}
           setSelection={setSelection}
           cursorMode={cursorMode}
+          zoomPosition={zoomPosition}
+          selectedModule={selectedModule}
         >
           {selectedModule !== null ? (
             <ModuleRow
@@ -1161,70 +1184,47 @@ function Workspace(props) {
               isRecording={isRecording}
               playingOctave={playingOctave}
               setPlayNoteFunction={setPlayNoteFunction}
+              zoomPosition={zoomPosition}
             />
           ) : (
-            modules &&
-            modules.map((module, moduleIndex) => (
-              <ModuleRow
-                tabIndex={-1}
-                key={module.id}
-                index={moduleIndex}
-                selectedModule={selectedModule}
-                module={module}
-                instrument={instruments[moduleIndex]}
-                setInstruments={setInstruments}
-                loaded={instrumentsLoaded[moduleIndex]}
-                setInstrumentsLoaded={setInstrumentsLoaded}
-                sessionData={sessionData}
-                sessionSize={sessionSize}
-                setModules={setModules}
-                editMode={editMode}
-                resetUndoHistory={() => handleUndo("RESET")}
-                selection={selection}
-                setSelection={setSelection}
-                duplicateModule={duplicateModule}
-                setSnackbarMessage={setSnackbarMessage}
-                isLoaded={isLoaded}
-                handlePageNav={props.handlePageNav}
-                setAreUnsavedChanges={setAreUnsavedChanges}
-                cursorMode={cursorMode}
-                gridSize={gridSize}
-                isRecording={isRecording}
-              />
-            ))
+            <Fragment>
+              {modules &&
+                modules.map((module, moduleIndex) => (
+                  <ClosedTrack
+                    tabIndex={-1}
+                    key={module.id}
+                    index={moduleIndex}
+                    selectedModule={selectedModule}
+                    setSelectedModule={setSelectedModule}
+                    module={module}
+                    instrument={instruments[moduleIndex]}
+                    setInstruments={setInstruments}
+                    loaded={instrumentsLoaded[moduleIndex]}
+                    setInstrumentsLoaded={setInstrumentsLoaded}
+                    sessionData={sessionData}
+                    sessionSize={sessionSize}
+                    setModules={setModules}
+                    editMode={editMode}
+                    resetUndoHistory={() => handleUndo("RESET")}
+                    selection={selection}
+                    setSelection={setSelection}
+                    duplicateModule={duplicateModule}
+                    setSnackbarMessage={setSnackbarMessage}
+                    isLoaded={isLoaded}
+                    handlePageNav={props.handlePageNav}
+                    setAreUnsavedChanges={setAreUnsavedChanges}
+                    cursorMode={cursorMode}
+                    gridSize={gridSize}
+                    isRecording={isRecording}
+                    zoomPosition={zoomPosition}
+                  />
+                ))}
+              <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
+                <Icon>add</Icon>
+              </IconButton>
+            </Fragment>
           )}
         </WorkspaceGrid>
-
-        <div className="ws-module-selector" tabIndex="-1">
-          {modules &&
-            modules.map((e, i) => (
-              <IconButton
-                tabIndex="-1"
-                className={selectedModule === i && "ws-module-selected"}
-                style={{
-                  backgroundColor: selectedModule === i && colors[e.color][300],
-                }}
-                onClick={() =>
-                  setSelectedModule((prev) => (prev !== i ? i : null))
-                }
-              >
-                <Icon>
-                  {e.type === 0
-                    ? "grid_on"
-                    : e.type === 1
-                    ? "music_note"
-                    : e.type === 2
-                    ? "font_download"
-                    : e.type === 3
-                    ? "graphic_eq"
-                    : "piano"}
-                </Icon>
-              </IconButton>
-            ))}
-          <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
-            <Icon>add</Icon>
-          </IconButton>
-        </div>
       </div>
 
       <div className="ws-note-input">

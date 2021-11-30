@@ -2,13 +2,14 @@
   position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
   background: white;
-  width: 100%;
+  width: calc(100% - 16px);
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   flex: 1 0;
   height: 100%;
-
+  margin: 0 auto;
   align-items: center;
   justify-content: center;
   outline: none;
@@ -27,11 +28,73 @@
 }
 
 .workspace-title {
+  font-family: "Barlow Semi Condensed", sans-serif;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   flex-direction: row;
   flex-wrap: wrap;
+  text-transform: uppercase;
+}
+
+.ws-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.ws-ruler {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 16px;
+  width: 100%;
+}
+
+.ws-transport {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 32px;
+  width: 60%;
+}
+
+.ws-transport > div {
+  display: block;
+  font-family: "Barlow Semi Condensed", sans-serif;
+  font-size: 1.5rem;
+  flex: 1;
+  text-align: center;
+}
+
+.ws-ruler-zoom-cont {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  position: absolute;
+  -webkit-user-drag: none;
+}
+
+.ws-ruler-zoom-cont-handle {
+  position: absolute;
+  height: 100%;
+  background: rgb(83, 83, 83);
+  width: 4px;
+  cursor: ew-resize;
+  -webkit-user-drag: none;
+}
+
+.ws-ruler-track {
+  width: 100%;
+  flex: 1 1 1px;
 }
 
 .workspace-module-cont {

@@ -101,9 +101,8 @@ function WorkspaceTitle(props) {
             } `}
         </title>
       </Helmet>
-      <Typography
+      <span
         /* onClick={() => setExpanded((prev) => !prev)} */
-        variant="overline"
         style={{
           maxWidth: "20vw",
           textOverflow: "ellipsis",
@@ -118,7 +117,7 @@ function WorkspaceTitle(props) {
             ? props.sessionData.name
             : t("WSTitle.untitledSession")
           : "..."}
-      </Typography>
+      </span>
 
       {/*
         !(props.editMode && !props.user) && (

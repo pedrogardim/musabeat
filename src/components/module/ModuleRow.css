@@ -14,10 +14,10 @@
 
 .module-grid-row {
   position: relative;
-  width: calc(100% - 72px);
+  width: calc(100% - 48px);
   flex: 1;
   height: 100%;
-  margin-left: 72px;
+  margin-left: 48px;
   right: 0;
   transition: all 0.2s;
   display: flex;
@@ -34,12 +34,28 @@
   justify-content: center;
 }
 
+.closed-track {
+  position: relative;
+  width: calc(100% - 48px);
+  height: 10%;
+  margin: 8px 0 8px 48px;
+  right: 0;
+  transition: all 0.2s;
+}
+.closed-track-button {
+  position: absolute;
+  top: calc(50% - 24px);
+  left: -48px;
+}
+
 .module-inner-row-label {
+  font-family: "Barlow Semi Condensed", sans-serif;
   position: absolute !important;
-  left: -96px !important;
-  width: 80px;
-  text-align: right !important;
+  left: -48px !important;
+  width: 48px;
+  text-align: left !important;
   user-select: none !important;
+  font-size: 18px;
 }
 
 .module-inner-row-line {
@@ -70,9 +86,8 @@
 .module-score-note-deletable:hover {
   background-color: rgb(149, 149, 149) !important;
   outline: solid 1px rgb(108, 108, 108) !important;
-  cursor: solid 1px rgb(108, 108, 108) !important;
 }
 
-.module-score-note {
+.module-score-note-melody {
   cursor: move;
 }

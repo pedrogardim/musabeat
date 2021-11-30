@@ -149,25 +149,29 @@ function WorkspaceGrid(props) {
       <div ref={gridRef} className="ws-grid-line-cont">
         {Array(props.sessionSize * props.gridSize)
           .fill(0)
-          .map((e, i) => (
-            <div
-              className="ws-grid-line"
-              style={{
-                opacity:
-                  i % props.gridSize === 0
-                    ? 0.4
-                    : i % props.gridSize === props.gridSize / 2
-                    ? 0.3
-                    : 0.2,
-              }}
-            >
-              {i % props.gridSize === 0 && (
-                <span className="ws-grid-line-mesure-num">
-                  {i / props.gridSize + 1}
-                </span>
-              )}
-            </div>
-          ))}
+          .map((e, i) =>
+            i % props.gridSize !== 0 && props.selectedModule === null ? (
+              ""
+            ) : (
+              <div
+                className="ws-grid-line"
+                style={{
+                  opacity:
+                    i % props.gridSize === 0
+                      ? 0.4
+                      : i % props.gridSize === props.gridSize / 2
+                      ? 0.3
+                      : 0.2,
+                }}
+              >
+                {i % props.gridSize === 0 && (
+                  <span className="ws-grid-line-mesure-num">
+                    {i / props.gridSize + 1}
+                  </span>
+                )}
+              </div>
+            )
+          )}
 
         <div className="ws-grid-line" />
       </div>
@@ -198,17 +202,21 @@ function WorkspaceGrid(props) {
             position: "absolute",
             height: "100%",
             transform: `translateX(${
-              (props.selection[0] / Tone.Transport.loopEnd) *
+              (props.selection.sort((a, b) => a - b)[0] /
+                Tone.Transport.loopEnd) *
                 gridRef.current.offsetWidth +
-              72
+              48
             }px)`,
-            width:
-              (props.selection[1] / Tone.Transport.loopEnd) *
+            width: Math.abs(
+              (props.selection.sort((a, b) => a - b)[1] /
+                Tone.Transport.loopEnd) *
                 gridRef.current.offsetWidth -
-              (props.selection[0] / Tone.Transport.loopEnd) *
-                gridRef.current.offsetWidth,
-            backgroundColor: "lightgray",
-            opacity: 0.4,
+                (props.selection.sort((a, b) => a - b)[0] /
+                  Tone.Transport.loopEnd) *
+                  gridRef.current.offsetWidth
+            ),
+            backgroundColor: "black",
+            opacity: 0.2,
             /* border:
                 props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
           }}

@@ -103,7 +103,9 @@ function MelodyNote(props) {
     <div
       className={`module-score-note ${
         props.ghost && "module-score-note-ghost"
-      } ${props.deletableNote && "module-score-note-deletable"}`}
+      } ${props.deletableNote && "module-score-note-deletable"} ${
+        props.module.type === 1 && "module-score-note-melody"
+      }`}
       onMouseDown={handleMouseDown}
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length - 1,
