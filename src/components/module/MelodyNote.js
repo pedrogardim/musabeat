@@ -11,6 +11,8 @@ function MelodyNote(props) {
 
   const isSelected = props.selectedNotes.includes(props.index);
 
+  let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
 
@@ -20,7 +22,7 @@ function MelodyNote(props) {
           (Tone.Time(props.note.time).toSeconds() /
             (props.sessionSize * Tone.Time("1m").toSeconds())) *
             props.gridSize *
-            props.sessionSize
+            zoomSize
       );
       props.setSelectedNotes([props.index]);
     }
@@ -132,24 +134,23 @@ function MelodyNote(props) {
             ? props.drawingNote
               ? (props.gridPos[1] + 1) *
                   (props.rowRef.current.offsetWidth /
-                    (props.sessionSize * props.gridSize)) -
+                    (zoomSize * props.gridSize)) -
                 Tone.Time(props.drawingNote.time).toSeconds() *
                   (props.rowRef.current.offsetWidth /
-                    (props.sessionSize * Tone.Time("1m").toSeconds()))
-              : props.rowRef.current.offsetWidth /
-                (props.sessionSize * props.gridSize)
+                    (zoomSize * Tone.Time("1m").toSeconds()))
+              : props.rowRef.current.offsetWidth / (zoomSize * props.gridSize)
             : (Tone.Time(props.note.duration).toSeconds() /
                 Tone.Time("1m").toSeconds()) *
-              (props.rowRef.current.offsetWidth / props.sessionSize)) - 2,
+              (props.rowRef.current.offsetWidth / zoomSize)) - 2,
         transform: props.ghost
           ? `translate(${
               props.drawingNote
                 ? Tone.Time(props.drawingNote.time).toSeconds() *
                   (props.rowRef.current.offsetWidth /
-                    (props.sessionSize * Tone.Time("1m").toSeconds()))
+                    (zoomSize * Tone.Time("1m").toSeconds()))
                 : props.gridPos[1] *
                   (props.rowRef.current.offsetWidth /
-                    (props.sessionSize * props.gridSize))
+                    (zoomSize * props.gridSize))
             }px,${
               props.gridPos[0] *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
@@ -157,7 +158,7 @@ function MelodyNote(props) {
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
               (props.rowRef.current.offsetWidth /
-                (props.sessionSize * Tone.Time("1m").toSeconds()))
+                (zoomSize * Tone.Time("1m").toSeconds()))
             }px,${
               props.moduleRows.findIndex((e) => e.note === props.note.note) *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)

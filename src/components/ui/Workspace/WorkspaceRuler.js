@@ -20,7 +20,8 @@ function WorkspaceRuler(props) {
 
   const [isMoving, setIsMoving] = useState(false);
   const [gridPos, setGridPos] = useState(null);
-  const [resizingHandle, setResizingHandle] = useState(null);
+  const [resizingHandle, setResizingHandle] = useState(false);
+  const [handlePosition, setHandlePosition] = useState(props.zoomPosition);
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
@@ -50,30 +51,18 @@ function WorkspaceRuler(props) {
   };
 
   const handleMouseDown = (e) => {
-    setIsMouseDown(true);
+    /* setIsMouseDown(true);
 
     if (!e.target.className.includes("zoom")) {
       props.setZoomPosition((prev) => {
         let difference = prev[0] - gridPos;
         return prev.map((e) => e - difference);
       });
-    }
+    } */
   };
 
-  const onGridPosChange = () => {
+  /* const onGridPosChange = () => {
     if (resizingHandle) {
-      props.setZoomPosition((prev) => {
-        let newSessionZoom = [...prev];
-        if (
-          (resizingHandle === "left" && gridPos < 0) ||
-          (resizingHandle === "right" && gridPos + 1 > props.sessionSize)
-        )
-          return prev;
-        newSessionZoom[resizingHandle === "left" ? 0 : 1] = gridPos;
-        if (newSessionZoom[0] - newSessionZoom[1] < 0)
-          newSessionZoom = newSessionZoom.sort((a, b) => a - b);
-        return newSessionZoom;
-      });
     }
     if (isMoving !== false) {
       props.setZoomPosition((prev) => {
@@ -89,12 +78,59 @@ function WorkspaceRuler(props) {
       });
     }
     console.log(gridPos);
-  };
+  }; */
 
   const handleHover = (event) => {
     let hoveredPos =
       (event.pageX - rulerRef.current.getBoundingClientRect().left) /
       rulerRef.current.offsetWidth;
+
+    if (resizingHandle) {
+      setHandlePosition((prev) => {
+        let newHandlePos = [...prev];
+        let handleSide = resizingHandle === "left";
+        if (
+          (resizingHandle === "left" && hoveredPos < 0) ||
+          (resizingHandle === "right" && hoveredPos + 1 > props.sessionSize)
+        )
+          return prev;
+        newHandlePos[handleSide ? 0 : 1] =
+          hoveredPos * props.sessionSize - (handleSide ? 0 : 1);
+
+        props.setZoomPosition((prev) => {
+          let newSessionZoom = [...prev];
+          newSessionZoom[handleSide ? 0 : 1] = parseInt(
+            hoveredPos * props.sessionSize + (handleSide ? 0.5 : -0.5)
+          );
+          if (newSessionZoom[0] > newSessionZoom[1]) {
+            //console.log("isBigger");
+            return prev;
+          }
+          return newSessionZoom;
+        });
+
+        return newHandlePos;
+      });
+    }
+    if (isMoving) {
+      setHandlePosition((prev) => {
+        let newHandlePos = [...prev];
+        /* 
+        
+        //TODO
+        props.setZoomPosition((prev) => {
+          let newSessionZoom = [...prev];
+          newSessionZoom[handleSide ? 0 : 1] = parseInt(
+            hoveredPos * props.sessionSize + (handleSide ? 0.5 : -0.5)
+          );
+          console.log("setZoomPos triggered");
+
+          return newSessionZoom;
+        });*/
+
+        return newHandlePos;
+      });
+    }
 
     let gridPos = Math.floor(Math.abs(hoveredPos * props.sessionSize));
 
@@ -103,13 +139,16 @@ function WorkspaceRuler(props) {
     );
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
+    //console.log(e);
     setResizingHandle(null);
     setIsMoving(false);
+    if (resizingHandle)
+      setHandlePosition([props.zoomPosition[0], props.zoomPosition[1]]);
   };
 
   useEffect(() => {
-    onGridPosChange();
+    //onGridPosChange();
   }, [gridPos]);
 
   useEffect(() => {
@@ -136,17 +175,15 @@ function WorkspaceRuler(props) {
           className="ws-ruler-zoom-cont"
           handleMouseDown={handleZoomContMouseDown}
           style={{
-            height: "100%",
             width:
-              (props.zoomPosition[1] - props.zoomPosition[0] + 1) *
+              (handlePosition[1] - handlePosition[0] + 1) *
               (rulerRef.current.offsetWidth / props.sessionSize),
 
             transform: `translateX(${
-              props.zoomPosition[0] *
+              handlePosition[0] *
               (rulerRef.current.offsetWidth / props.sessionSize)
             }px`,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            outline: `solid 1px black`,
+
             //borderRadius: 4,
             //margin: "-2px -2px 0 0",
           }}
@@ -180,6 +217,21 @@ function WorkspaceRuler(props) {
           style={{ backgroundColor: props.isRecording && "#f50057" }}
         />
       </Draggable> */}
+
+      {Array(props.sessionSize)
+        .fill(0)
+        .map((e, i) => (
+          <div
+            style={{
+              position: "absolute",
+              height: "100%",
+              left: (1 / props.sessionSize) * i * 100 + "%",
+              width: 2,
+              backgroundColor: "black",
+              opacity: 0.4,
+            }}
+          />
+        ))}
 
       {props.modules &&
         props.modules.map((module, moduleIndex) => (

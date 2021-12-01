@@ -9,6 +9,8 @@ function ClosedTrackNote(props) {
 
   const trackType = props.module.type;
 
+  let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+
   /* 
 
   useEffect(() => {
@@ -32,12 +34,12 @@ function ClosedTrackNote(props) {
         width:
           (Tone.Time(props.note.duration).toSeconds() /
             Tone.Time("1m").toSeconds()) *
-            (props.rowRef.current.offsetWidth / props.sessionSize) -
+            (props.rowRef.current.offsetWidth / zoomSize) -
           2,
         transform: `translate(${
           Tone.Time(props.note.time).toSeconds() *
           (props.rowRef.current.offsetWidth /
-            (props.sessionSize * Tone.Time("1m").toSeconds()))
+            (zoomSize * Tone.Time("1m").toSeconds()))
         }px,${
           props.moduleRows.findIndex((e) => e.note === props.note.note) *
           (props.rowRef.current.scrollHeight / props.moduleRows.length)

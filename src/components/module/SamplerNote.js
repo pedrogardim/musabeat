@@ -4,27 +4,30 @@ import * as Tone from "tone";
 import { colors } from "../../utils/materialPalette";
 
 function SamplerNote(props) {
+  let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
   return (
     <div
       className="module-score-note"
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length,
-        width:
-          props.rowRef.current.offsetWidth /
-          (props.sessionSize * props.gridSize),
+        width: props.rowRef.current.offsetWidth / (zoomSize * props.gridSize),
         transform: props.ghost
           ? `translate(${
               props.gridPos[1] *
-              (props.rowRef.current.offsetWidth /
-                (props.sessionSize * props.gridSize))
+                (props.rowRef.current.offsetWidth /
+                  (zoomSize * props.gridSize)) -
+              props.zoomPosition[0] *
+                (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.gridPos[0] *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
-              (props.rowRef.current.offsetWidth /
-                (props.sessionSize * Tone.Time("1m").toSeconds()))
+                (props.rowRef.current.offsetWidth /
+                  (zoomSize * Tone.Time("1m").toSeconds())) -
+              props.zoomPosition[0] *
+                (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.moduleRows.findIndex((e) => e.note === props.note.note) *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)

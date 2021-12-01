@@ -29,6 +29,8 @@ function WorkspaceGrid(props) {
   const [gridPos, setGridPos] = useState(null);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
+  const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
       (element.x / gridRef.current.offsetWidth) *
@@ -103,41 +105,27 @@ function WorkspaceGrid(props) {
     }
   };
 
-  const handleSessionSizeChange = (e) => {
-    let newValue = e.target.value;
-    let newSize;
-    if (props.sessionSize === e.target.value) return;
-    if (newValue <= 1) {
-      newSize = 1;
-    } else if (newValue >= 128) {
-      newSize = 128;
-    } else if (newValue > 1 && newValue < 128) {
-      newSize = newValue;
-    }
-    props.setSessionSize(parseInt(newSize));
-  };
-
   useEffect(() => {
     setTLinputSessionSize(props.sessionSize);
   }, [props.sessionSize]);
 
   useEffect(() => {
     //toggleCursor(Tone.Transport.state);
+    clearInterval(cursorAnimator);
     setCursorAnimator(
       setInterval(() => {
         //temp fix
 
         Tone.Transport.seconds <= Tone.Transport.loopEnd &&
           Tone.Transport.seconds >= 0 &&
-          setCursorPosition(Tone.Transport.seconds / Tone.Transport.loopEnd);
+          setCursorPosition(
+            (Tone.Transport.seconds -
+              props.zoomPosition[0] * Tone.Time("1m").toSeconds()) /
+              (zoomSize * Tone.Time("1m").toSeconds())
+          );
       }, 16)
     );
-
-    return () => {
-      //console.log("cleared");
-      clearInterval(cursorAnimator);
-    };
-  }, [props.timelineMode]);
+  }, [props.zoomPosition]);
 
   useEffect(() => {
     onGridPosChange();
@@ -154,7 +142,9 @@ function WorkspaceGrid(props) {
       onMouseUp={handleMouseUp}
     >
       <div ref={gridRef} className="ws-grid-line-cont">
-        {Array(props.sessionSize * props.gridSize)
+        {Array(
+          (props.zoomPosition[1] - props.zoomPosition[0] + 1) * props.gridSize
+        )
           .fill(0)
           .map((e, i) =>
             i % props.gridSize !== 0 && props.selectedModule === null ? (
@@ -173,7 +163,7 @@ function WorkspaceGrid(props) {
               >
                 {i % props.gridSize === 0 && (
                   <span className="ws-grid-line-mesure-num">
-                    {i / props.gridSize + 1}
+                    {i / props.gridSize + 1 + props.zoomPosition[0]}
                   </span>
                 )}
               </div>

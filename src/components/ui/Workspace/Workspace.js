@@ -1064,6 +1064,19 @@ function Workspace(props) {
     console.log(selection);
   }, [selection]);
 
+  useEffect(() => {
+    let begin = zoomPosition[0] * Tone.Time("1m").toSeconds();
+    Tone.Transport.setLoopPoints(
+      begin,
+
+      (zoomPosition[1] + 1) * Tone.Time("1m").toSeconds()
+    );
+
+    if (Tone.Transport.seconds < begin) {
+      Tone.Transport.seconds = begin;
+    }
+  }, [zoomPosition]);
+
   /*================================================================ */
   /*================================================================ */
   /*===============================JSX============================== */

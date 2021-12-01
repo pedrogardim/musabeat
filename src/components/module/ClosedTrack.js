@@ -110,7 +110,11 @@ function ClosedTrack(props) {
       {rowRef.current &&
         props.module.score.length > 0 &&
         props.module.score
-          .filter((e) => e.time.split(":")[0] < props.sessionSize)
+          .filter(
+            (e) =>
+              e.time.split(":")[0] < props.zoomPosition[1] &&
+              e.time.split(":")[0] > props.zoomPosition[0]
+          )
           .map((note, noteIndex) => (
             <ClosedTrackNote
               rowRef={rowRef}
@@ -127,6 +131,7 @@ function ClosedTrack(props) {
               setModules={props.setModules}
               isMouseDown={isMouseDown}
               selectedModule={props.selectedModule}
+              zoomPosition={props.zoomPosition}
             />
           ))}
       <IconButton className={"closed-track-button"}>

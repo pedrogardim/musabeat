@@ -40,6 +40,8 @@ function ModuleRow(props) {
   const trackType = props.module.type;
   const isSelected = props.selectedModule === props.index;
 
+  const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+
   const loadModuleRows = () => {
     let rows = [];
     if (!props.instrument) return;
@@ -161,8 +163,7 @@ function ModuleRow(props) {
       event.pageX -
         rowRef.current.getBoundingClientRect().left +
         (trackType === 0
-          ? rowRef.current.offsetWidth /
-            (props.sessionSize * props.gridSize * 2)
+          ? rowRef.current.offsetWidth / (zoomSize * props.gridSize * 2)
           : 0),
     ];
 
@@ -175,10 +176,11 @@ function ModuleRow(props) {
       Math.floor(
         Math.abs(
           (hoveredPos[1] / rowRef.current.offsetWidth) *
-            props.sessionSize *
+            zoomSize *
             props.gridSize
         )
-      ),
+      ) +
+        props.zoomPosition[0] * props.gridSize,
     ];
 
     setGridPos((prev) =>
@@ -215,41 +217,31 @@ function ModuleRow(props) {
 
     //console.log("mousedown triggered");
 
-    if (!props.cursorMode) {
-      Tone.Transport.seconds =
-        (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize;
-      /* 
-      props.setSelection([
-        (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize,
-        null,
-      ]);
-       */
+    if (trackType === 0) {
+      let newNote = {
+        note: gridPos[0],
+        time: Tone.Time(
+          (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
+        ).toBarsBeatsSixteenths(),
+      };
+
+      props.setModules((prev) => {
+        let newModules = [...prev];
+
+        newModules[props.index].score = deletableNote
+          ? newModules[props.index].score.filter(
+              (e) => e.note !== newNote.note || e.time !== newNote.time
+            )
+          : [...newModules[props.index].score, { ...newNote }];
+
+        return newModules;
+      });
     } else {
-      if (trackType === 0) {
-        let newNote = {
-          note: gridPos[0],
-          time: Tone.Time(
-            (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
-          ).toBarsBeatsSixteenths(),
-        };
-
-        props.setModules((prev) => {
-          let newModules = [...prev];
-
-          newModules[props.index].score = deletableNote
-            ? newModules[props.index].score.filter(
-                (e) => e.note !== newNote.note || e.time !== newNote.time
-              )
-            : [...newModules[props.index].score, { ...newNote }];
-
-          return newModules;
-        });
-      } else {
-        let newNote = {
-          note: 108 - gridPos[0],
-          time: (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize,
-        };
-        /* if (isClickOnNote && deletableNote) {
+      let newNote = {
+        note: 108 - gridPos[0],
+        time: (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize,
+      };
+      /* if (isClickOnNote && deletableNote) {
            console.log(
             "isClickOnNote",
             isClickOnNote,
@@ -271,10 +263,9 @@ function ModuleRow(props) {
             return newModules;
           });
         } else  */
-        if (!isClickOnNote) {
-          //console.log("drawingNote");
-          setDrawingNote(newNote);
-        }
+      if (!isClickOnNote) {
+        //console.log("drawingNote");
+        setDrawingNote(newNote);
       }
     }
   };
@@ -395,10 +386,12 @@ function ModuleRow(props) {
         onMouseUp={handleMouseUp}
         disabled
         style={{
+          /* 
           width: `${
             (props.sessionSize * 100) /
             (props.zoomPosition[1] - props.zoomPosition[0] + 1)
           }%`,
+           */
           border:
             trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
         }}
@@ -455,6 +448,7 @@ function ModuleRow(props) {
                   deletableNote={deletableNote}
                   index={noteIndex}
                   selectedModule={props.selectedModule}
+                  zoomPosition={props.zoomPosition}
                 />
               ) : (
                 <MelodyNote
@@ -474,6 +468,7 @@ function ModuleRow(props) {
                   selectedModule={props.selectedModule}
                   selectedNotes={selectedNotes}
                   setSelectedNotes={setSelectedNotes}
+                  zoomPosition={props.zoomPosition}
                 />
               )
             )}
@@ -491,6 +486,7 @@ function ModuleRow(props) {
               sessionSize={props.sessionSize}
               gridSize={props.gridSize}
               selectedModule={props.selectedModule}
+              zoomPosition={props.zoomPosition}
             />
           ) : (
             <MelodyNote
@@ -507,6 +503,7 @@ function ModuleRow(props) {
               selectedNotes={[]}
               selectedModule={props.selectedModule}
               setDrawingNote={setDrawingNote}
+              zoomPosition={props.zoomPosition}
             />
           ))}
       </div>
