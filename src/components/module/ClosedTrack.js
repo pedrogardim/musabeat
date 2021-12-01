@@ -76,6 +76,24 @@ function ClosedTrack(props) {
     setModuleRows(rows);
   };
 
+  const scheduleNotes = () => {
+    !props.module.muted
+      ? trackType === 0
+        ? scheduleSampler(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+        : scheduleMelody(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+      : clearEvents(props.module.id);
+  };
+
   /* ================================================================================== */
   /* ================================================================================== */
   /* ================================USEEFFECTS======================================== */
@@ -85,6 +103,10 @@ function ClosedTrack(props) {
   useEffect(() => {
     loadModuleRows();
   }, [props.instrument, props.module, props.isLoaded, props.selectedModule]);
+
+  useEffect(() => {
+    scheduleNotes();
+  }, [props.instrument, props.module, props.module.score, props.isLoaded]);
 
   /* ================================================================================== */
   /* ================================================================================== */
@@ -107,33 +129,43 @@ function ClosedTrack(props) {
         backgroundColor: colors[props.module.color][400],
       }}
     >
-      {rowRef.current &&
-        props.module.score.length > 0 &&
-        props.module.score
-          .filter(
-            (e) =>
-              e.time.split(":")[0] < props.zoomPosition[1] &&
-              e.time.split(":")[0] > props.zoomPosition[0]
-          )
-          .map((note, noteIndex) => (
-            <ClosedTrackNote
-              rowRef={rowRef}
-              moduleRows={moduleRows}
-              note={note}
-              drawingNote={drawingNote}
-              module={props.module}
-              sessionSize={props.sessionSize}
-              gridSize={props.gridSize}
-              gridPos={gridPos}
-              deletableNote={deletableNote}
-              setDrawingNote={setDrawingNote}
-              index={noteIndex}
-              setModules={props.setModules}
-              isMouseDown={isMouseDown}
-              selectedModule={props.selectedModule}
-              zoomPosition={props.zoomPosition}
-            />
-          ))}
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          padding: 0,
+          position: "absolute",
+          overflow: "hidden",
+        }}
+      >
+        {rowRef.current &&
+          props.module.score.length > 0 &&
+          props.module.score
+            .filter(
+              (e) =>
+                e.time.split(":")[0] < props.zoomPosition[1] + 1 &&
+                e.time.split(":")[0] >= props.zoomPosition[0]
+            )
+            .map((note, noteIndex) => (
+              <ClosedTrackNote
+                rowRef={rowRef}
+                moduleRows={moduleRows}
+                note={note}
+                drawingNote={drawingNote}
+                module={props.module}
+                sessionSize={props.sessionSize}
+                gridSize={props.gridSize}
+                gridPos={gridPos}
+                deletableNote={deletableNote}
+                setDrawingNote={setDrawingNote}
+                index={noteIndex}
+                setModules={props.setModules}
+                isMouseDown={isMouseDown}
+                selectedModule={props.selectedModule}
+                zoomPosition={props.zoomPosition}
+              />
+            ))}
+      </div>
       <IconButton className={"closed-track-button"}>
         <Icon style={{ color: colors[props.module.color][900] }}>
           {props.module.type === 0

@@ -31,15 +31,17 @@ function ClosedTrackNote(props) {
       }`}
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length - 1,
-        width:
-          (Tone.Time(props.note.duration).toSeconds() /
-            Tone.Time("1m").toSeconds()) *
-            (props.rowRef.current.offsetWidth / zoomSize) -
-          2,
+        width: props.note.duration
+          ? (Tone.Time(props.note.duration).toSeconds() /
+              Tone.Time("1m").toSeconds()) *
+              (props.rowRef.current.offsetWidth / zoomSize) -
+            2
+          : 0,
         transform: `translate(${
           Tone.Time(props.note.time).toSeconds() *
-          (props.rowRef.current.offsetWidth /
-            (zoomSize * Tone.Time("1m").toSeconds()))
+            (props.rowRef.current.offsetWidth /
+              (zoomSize * Tone.Time("1m").toSeconds())) -
+          props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
         }px,${
           props.moduleRows.findIndex((e) => e.note === props.note.note) *
           (props.rowRef.current.scrollHeight / props.moduleRows.length)
@@ -56,7 +58,7 @@ function ClosedTrackNote(props) {
             height: 8,
             top: "calc(50% - 4px)",
             width: 8,
-            left: 1,
+            left: -3,
             backgroundColor: colors[props.module.color][900],
             transform: "rotate(45deg)",
           }}

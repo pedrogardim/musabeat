@@ -41,6 +41,7 @@
   margin: 8px 0 8px 48px;
   right: 0;
   transition: all 0.2s;
+  opacity: 0.9;
 }
 .closed-track-button {
   position: absolute;
