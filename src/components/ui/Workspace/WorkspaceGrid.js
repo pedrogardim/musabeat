@@ -143,9 +143,7 @@ function WorkspaceGrid(props) {
       onMouseUp={handleMouseUp}
     >
       <div ref={gridRef} className="ws-grid-line-cont">
-        {Array(
-          (props.zoomPosition[1] - props.zoomPosition[0] + 1) * props.gridSize
-        )
+        {Array(zoomSize * props.gridSize)
           .fill(0)
           .map((e, i) =>
             i % props.gridSize !== 0 && props.selectedModule === null ? (

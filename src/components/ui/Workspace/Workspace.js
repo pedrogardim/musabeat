@@ -18,6 +18,8 @@ import {
   Fade,
   Button,
   Modal,
+  Select,
+  MenuItem,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -103,7 +105,7 @@ function Workspace(props) {
   const [metronomeEvent, setMetronomeEvent] = useState(null);
 
   const [pressedKeys, setPressedKeys] = useState([]);
-  const [playingOctave, setPlayingOctave] = useState(null);
+  const [playingOctave, setPlayingOctave] = useState(3);
   const [playNoteFunction, setPlayNoteFunction] = useState([
     () => {},
     () => {},
@@ -114,6 +116,8 @@ function Workspace(props) {
   const [cursorMode, setCursorMode] = useState(null);
   const [gridSize, setGridSize] = useState(4);
   const [zoomPosition, setZoomPosition] = useState([0, 3]);
+
+  const [IEOpen, setIEOpen] = useState(false);
 
   const [premiumMode, setPremiumMode] = useState(false);
 
@@ -150,6 +154,9 @@ function Workspace(props) {
     selectedModule !== null && modules[selectedModule].type === 0
       ? keySamplerMapping
       : keyboardMapping;
+
+  const checkCustomPatch =
+    selectedModule && typeof modules[selectedModule].instrument !== "string";
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -793,9 +800,15 @@ function Workspace(props) {
 
     if (sampleIndex === undefined || selectedModule === null) return;
 
-    setPressedKeys((prev) => [...prev, sampleIndex]);
+    let note =
+      sampleIndex +
+      (modules[selectedModule].type === 1 ? playingOctave * 12 : 0);
 
-    playNoteFunction[0](sampleIndex);
+    if (pressedKeys.includes(note)) return;
+
+    setPressedKeys((prev) => [...prev, note]);
+
+    playNoteFunction[0](note);
   };
 
   const handleCopy = () => {
@@ -872,9 +885,17 @@ function Workspace(props) {
 
     let sampleIndex = keyMapping[e.code];
 
-    if (sampleIndex === undefined) return;
+    if (sampleIndex === undefined || selectedModule === null) return;
 
-    setPressedKeys((prev) => prev.filter((e) => e !== sampleIndex));
+    let note =
+      sampleIndex +
+      (modules[selectedModule].type === 1 ? playingOctave * 12 : 0);
+
+    if (!pressedKeys.includes(note)) return;
+
+    setPressedKeys((prev) => prev.filter((e) => e !== note));
+
+    playNoteFunction[1](note);
   };
 
   /*========================================================================================*/
@@ -1242,23 +1263,7 @@ function Workspace(props) {
             </Fragment>
           )}
         </WorkspaceGrid>
-      </div>
-
-      <div className="ws-note-input">
-        {selectedModule !== null && (
-          <NotesInput
-            keyMapping={keyMapping}
-            module={modules && modules[selectedModule]}
-            instrument={instruments[selectedModule]}
-            pressedKeys={pressedKeys}
-            setPressedKeys={setPressedKeys}
-            handlePageNav={props.handlePageNav}
-            playNoteFunction={playNoteFunction}
-            setPlayingOctave={setPlayingOctave}
-          />
-        )}
-
-        {modules && modules[selectedModule] && (
+        {IEOpen && modules && modules[selectedModule] && (
           <InstrumentEditor
             index={selectedModule}
             module={modules && modules[selectedModule]}
@@ -1273,6 +1278,72 @@ function Workspace(props) {
           updateFilesStatsOnChange={updateFilesStatsOnChange}*/
             handlePageNav={props.handlePageNav}
           />
+        )}
+      </div>
+
+      <div className="ws-note-input">
+        {selectedModule !== null && (
+          <Fragment>
+            <NotesInput
+              keyMapping={keyMapping}
+              module={modules && modules[selectedModule]}
+              instrument={instruments[selectedModule]}
+              pressedKeys={pressedKeys}
+              setPressedKeys={setPressedKeys}
+              handlePageNav={props.handlePageNav}
+              playNoteFunction={playNoteFunction}
+              playingOctave={playingOctave}
+              setPlayingOctave={setPlayingOctave}
+            />
+            <div className="ws-note-input-options">
+              <Select
+                value={
+                  checkCustomPatch
+                    ? "Custom"
+                    : modules[selectedModule].instrument
+                }
+              >
+                <MenuItem
+                  value={
+                    checkCustomPatch
+                      ? "Custom"
+                      : modules[selectedModule].instrument
+                  }
+                >
+                  {checkCustomPatch
+                    ? "Custom"
+                    : props.instrumentInfo &&
+                      props.instrumentInfo.patch &&
+                      props.instrumentInfo.patch.name}
+                </MenuItem>
+              </Select>
+              <IconButton>
+                <Icon>tune</Icon>
+              </IconButton>
+              {checkCustomPatch && (
+                <IconButton>
+                  <Icon>save</Icon>
+                </IconButton>
+              )}
+              <div style={{ marginLeft: "auto" }}>
+                Octave {playingOctave + 1}
+                <IconButton
+                  onClick={() =>
+                    setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
+                  }
+                >
+                  <Icon>navigate_before</Icon>
+                </IconButton>
+                <IconButton
+                  onClick={() =>
+                    setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
+                  }
+                >
+                  <Icon>navigate_next</Icon>
+                </IconButton>
+              </div>
+            </div>
+          </Fragment>
         )}
       </div>
 

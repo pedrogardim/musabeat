@@ -22,6 +22,7 @@ import {
 
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
+import { ContactPhoneSharp } from "@material-ui/icons";
 
 function ModuleRow(props) {
   const rowRef = useRef(null);
@@ -102,19 +103,13 @@ function ModuleRow(props) {
   };
 
   const playNote = (note) => {
-    //console.log(note, props.playingOctave);
-
+    console.log(Tone.Frequency(note, "midi").toNote());
     if (props.module.type === 0) {
       if (!props.instrument.has(note)) return;
       props.instrument.player(note).start();
     } else {
-      props.instrument.triggerAttackRelease(
-        Tone.Frequency(note + props.playingOctave * 12, "midi"),
-        "8n"
-      );
+      props.instrument.triggerAttack(Tone.Frequency(note, "midi"));
     }
-
-    //console.log(e.code);
 
     if (!props.isRecording) return;
 
@@ -141,7 +136,7 @@ function ModuleRow(props) {
       });
     } else {
       let drawingNote = {
-        note: note + props.playingOctave * 12,
+        note: note,
         time: Tone.Time(Tone.Transport.seconds).quantize(`${props.gridSize}n`),
       };
 
@@ -149,7 +144,11 @@ function ModuleRow(props) {
     }
   };
 
-  const releaseNote = () => {};
+  const releaseNote = (note) => {
+    if (trackType === 1) {
+      props.instrument.triggerRelease(Tone.Frequency(note, "midi"));
+    }
+  };
 
   /* ================================================================================== */
   /* ================================================================================== */

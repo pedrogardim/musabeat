@@ -8,8 +8,8 @@ import "./Keyboard.css";
 import { Typography, IconButton, Icon } from "@material-ui/core";
 
 function Keyboard(props) {
-  const [octave, setOctave] = useState(
-    props.initialOctave ? props.initialOctave : 0
+  const [octaveState, setOctaveState] = useState(
+    props.initialOctave ? props.initialOctave : props.octave ? props.octave : 0
   );
 
   const handleKeyClick = (key) => {
@@ -25,10 +25,12 @@ function Keyboard(props) {
 
   const octaves = props.octaves ? props.octaves : 7;
 
+  const octave = props.octave !== undefined ? props.octave : octaveState;
+
   useEffect(() => {
     //console.log(props.setPlayingOctave);
     if (props.setPlayingOctave) props.setPlayingOctave(octave);
-  }, [octave]);
+  }, [octaveState]);
 
   return (
     <div className="keyboard" style={{ ...props.style }}>
@@ -94,7 +96,7 @@ function Keyboard(props) {
                 top: "50%",
                 marginTop: -24,
               }}
-              onClick={() => setOctave((prev) => prev + 1)}
+              onClick={() => setOctaveState((prev) => prev + 1)}
             >
               <Icon>chevron_right</Icon>
             </IconButton>
@@ -108,7 +110,7 @@ function Keyboard(props) {
                 top: "50%",
                 marginTop: -24,
               }}
-              onClick={() => setOctave((prev) => prev - 1)}
+              onClick={() => setOctaveState((prev) => prev - 1)}
             >
               <Icon>chevron_left</Icon>
             </IconButton>

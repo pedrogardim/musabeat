@@ -107,20 +107,17 @@ function NotesInput(props) {
         <Keyboard
           activeNotes={props.pressedKeys}
           style={{
-            width: "80vw",
             minWidth: 400,
-            maxWidth: 1000,
             height: 72,
             zIndex: 0,
           }}
           color={props.module.color}
-          initialOctave={3}
           octaves={1.42}
           notesLabel={Object.keys(props.keyMapping).map((e) =>
             e.replace("Key", "").replace("Semicolon", ":")
           )}
           setPlayingOctave={props.setPlayingOctave}
-          variableOctave
+          octave={props.playingOctave}
         />
       )}
     </div>

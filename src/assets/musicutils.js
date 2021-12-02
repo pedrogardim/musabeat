@@ -636,9 +636,9 @@ export const keyboardMapping = {
   KeyJ: 35,
   KeyK: 36,
   KeyO: 37,
-  KeyL: 37,
-  KeyP: 38,
-  Semicolon: 39,
+  KeyL: 38,
+  KeyP: 39,
+  Semicolon: 40,
 };
 
 ////////////////////////////////////////////////////////////////

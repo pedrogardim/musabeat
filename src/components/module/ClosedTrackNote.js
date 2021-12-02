@@ -26,9 +26,7 @@ function ClosedTrackNote(props) {
 
   return (
     <div
-      className={`module-score-note ${
-        props.module.type === 1 && "module-score-note-melody"
-      }`}
+      className={`module-score-note`}
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length - 1,
         width: props.note.duration

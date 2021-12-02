@@ -18,6 +18,7 @@
   flex-direction: row;
   align-items: stretch;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .ws-note-input > * {
