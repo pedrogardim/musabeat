@@ -74,14 +74,13 @@ function WorkspaceGrid(props) {
     let hoveredPos =
       event.pageX -
       gridRef.current.getBoundingClientRect().left +
-      gridRef.current.offsetWidth / (props.sessionSize * props.gridSize * 2);
+      gridRef.current.offsetWidth / (zoomSize * props.gridSize * 2);
 
     let gridPos = Math.floor(
       Math.abs(
-        (hoveredPos / gridRef.current.offsetWidth) *
-          props.sessionSize *
-          props.gridSize
-      )
+        (hoveredPos / gridRef.current.offsetWidth) * zoomSize * props.gridSize
+      ) +
+        props.zoomPosition[0] * props.gridSize
     );
 
     setGridPos((prev) =>
@@ -221,7 +220,8 @@ function WorkspaceGrid(props) {
             position: "absolute",
             height: "100%",
             transform: `translateX(${
-              (props.selection.sort((a, b) => a - b)[0] /
+              ((props.selection.sort((a, b) => a - b)[0] -
+                props.zoomPosition[0] * props.gridSize) /
                 (zoomSize * props.gridSize)) *
                 gridRef.current.offsetWidth +
               48

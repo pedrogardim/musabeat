@@ -841,29 +841,44 @@ function Workspace(props) {
     playNoteFunction[0](note);
   };
 
+  const releaseNote = (e) => {
+    let sampleIndex = keyMapping[e.code];
+
+    if (sampleIndex === undefined || selectedModule === null) return;
+
+    let note =
+      sampleIndex +
+      (modules[selectedModule].type === 1 ? playingOctave * 12 : 0);
+
+    if (!pressedKeys.includes(note)) return;
+
+    setPressedKeys((prev) => prev.filter((e) => e !== note));
+
+    playNoteFunction[1](note);
+  };
+
+  const selectionAction = (action) => {
+    if (!selection || selection.length < 0) return;
+    if (action === "delete") {
+      setModules((prev) =>
+        prev.map((mod, modIndex) => {
+          let newModule = { ...mod };
+          let notesToRemove = selectedNotes[modIndex];
+          newModule.score = newModule.score.filter(
+            (note, noteIndex) => !notesToRemove.includes(noteIndex)
+          );
+          return newModule;
+        })
+      );
+      setSelectedNotes([]);
+    }
+  };
+
   const handleCopy = () => {
     //console.log("copied", copiedData);
   };
 
   const handlePaste = () => {};
-
-  const handleBackspace = () => {};
-
-  const handleArrowKey = (event) => {
-    event.preventDefault();
-    if (event.keyCode === 38) {
-      setSessionSize((prev) => (prev === 128 ? prev : prev + 1));
-    }
-    if (event.keyCode === 40) {
-      setSessionSize((prev) => (prev === 1 ? prev : prev - 1));
-    }
-    if (event.keyCode === 37) {
-      setGridSize((prev) => (prev === 1 ? prev : prev / 2));
-    }
-    if (event.keyCode === 39) {
-      setGridSize((prev) => (prev === 32 ? prev : prev * 2));
-    }
-  };
 
   const handleKeyDown = (e) => {
     Tone.start();
@@ -892,7 +907,7 @@ function Workspace(props) {
         togglePlaying(e);
         break;
       case 8:
-        handleBackspace();
+        selectionAction("delete");
         break;
       case 65:
         break;
@@ -912,20 +927,23 @@ function Workspace(props) {
 
   const handleKeyUp = (e) => {
     Tone.start();
+    releaseNote(e);
+  };
 
-    let sampleIndex = keyMapping[e.code];
-
-    if (sampleIndex === undefined || selectedModule === null) return;
-
-    let note =
-      sampleIndex +
-      (modules[selectedModule].type === 1 ? playingOctave * 12 : 0);
-
-    if (!pressedKeys.includes(note)) return;
-
-    setPressedKeys((prev) => prev.filter((e) => e !== note));
-
-    playNoteFunction[1](note);
+  const handleArrowKey = (event) => {
+    event.preventDefault();
+    if (event.keyCode === 38) {
+      setSessionSize((prev) => (prev === 128 ? prev : prev + 1));
+    }
+    if (event.keyCode === 40) {
+      setSessionSize((prev) => (prev === 1 ? prev : prev - 1));
+    }
+    if (event.keyCode === 37) {
+      setGridSize((prev) => (prev === 1 ? prev : prev / 2));
+    }
+    if (event.keyCode === 39) {
+      setGridSize((prev) => (prev === 32 ? prev : prev * 2));
+    }
   };
 
   /*========================================================================================*/
