@@ -144,21 +144,25 @@ function MelodyNote(props) {
               (props.rowRef.current.offsetWidth / zoomSize)) - 2,
         transform: props.ghost
           ? `translate(${
-              props.drawingNote
+              (props.drawingNote
                 ? Tone.Time(props.drawingNote.time).toSeconds() *
                   (props.rowRef.current.offsetWidth /
                     (zoomSize * Tone.Time("1m").toSeconds()))
                 : props.gridPos[1] *
                   (props.rowRef.current.offsetWidth /
-                    (zoomSize * props.gridSize))
+                    (zoomSize * props.gridSize))) -
+              props.zoomPosition[0] *
+                (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.gridPos[0] *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
-              (props.rowRef.current.offsetWidth /
-                (zoomSize * Tone.Time("1m").toSeconds()))
+                (props.rowRef.current.offsetWidth /
+                  (zoomSize * Tone.Time("1m").toSeconds())) -
+              props.zoomPosition[0] *
+                (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.moduleRows.findIndex((e) => e.note === props.note.note) *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)

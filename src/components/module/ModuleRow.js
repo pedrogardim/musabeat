@@ -213,7 +213,11 @@ function ModuleRow(props) {
       setSelectedNotes([]);
     }
 
-    if (e && e.target.className.includes("module-score-note-handle")) return;
+    if (
+      (e && e.target.className.includes("module-score-note-handle")) ||
+      props.cursorMode !== "edit"
+    )
+      return;
 
     //console.log("mousedown triggered");
 
@@ -272,7 +276,7 @@ function ModuleRow(props) {
 
   const handleMouseUp = (e) => {
     setIsMouseDown(false);
-    if (trackType === 1 && drawingNote) {
+    if (trackType === 1 && drawingNote && props.cursorMode === "edit") {
       let newNote = { ...drawingNote };
 
       let duration =
@@ -416,6 +420,7 @@ function ModuleRow(props) {
                 //"#0000001a",
                 colors[props.module.color][800] + "3a",
             }}
+            key={rowIndex + "ri"}
           >
             <span
               className="module-inner-row-label"
@@ -439,6 +444,7 @@ function ModuleRow(props) {
             .map((note, noteIndex) =>
               trackType === 0 ? (
                 <SamplerNote
+                  key={noteIndex}
                   rowRef={rowRef}
                   moduleRows={moduleRows}
                   note={note}
@@ -449,9 +455,11 @@ function ModuleRow(props) {
                   index={noteIndex}
                   selectedModule={props.selectedModule}
                   zoomPosition={props.zoomPosition}
+                  a={rowRef.current}
                 />
               ) : (
                 <MelodyNote
+                  key={noteIndex}
                   rowRef={rowRef}
                   moduleRows={moduleRows}
                   note={note}
@@ -469,6 +477,7 @@ function ModuleRow(props) {
                   selectedNotes={selectedNotes}
                   setSelectedNotes={setSelectedNotes}
                   zoomPosition={props.zoomPosition}
+                  a={rowRef.current}
                 />
               )
             )}

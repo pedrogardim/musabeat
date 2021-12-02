@@ -1030,6 +1030,9 @@ function Workspace(props) {
       newSesData.size = sessionSize;
       return newSesData;
     });
+    if (sessionSize < zoomPosition[1] + 1 && sessionSize > 0) {
+      setZoomPosition((prev) => [prev[0], sessionSize - 1]);
+    }
 
     //console.log("sessionSize", sessionSize);
   }, [sessionSize]);
@@ -1094,9 +1097,6 @@ function Workspace(props) {
             ? "url('edit_black_24dp.svg'),pointer"
             : "default",
       }}
-      onClick={(e) =>
-        e.target.className === "workspace" && setSelectedModule(null)
-      }
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
@@ -1149,6 +1149,8 @@ function Workspace(props) {
         setSessionSize={setSessionSize}
         gridSize={gridSize}
         setGridSize={setGridSize}
+        selectedModule={selectedModule}
+        setSelectedModule={setSelectedModule}
       />
 
       <WorkspaceRuler

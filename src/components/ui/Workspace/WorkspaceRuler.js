@@ -173,6 +173,7 @@ function WorkspaceRuler(props) {
 
   useEffect(() => {
     console.log(props.zoomPosition);
+    setHandlePosition([props.zoomPosition[0], props.zoomPosition[1]]);
   }, [props.zoomPosition]);
 
   return (

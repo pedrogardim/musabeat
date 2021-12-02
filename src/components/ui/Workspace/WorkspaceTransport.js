@@ -43,8 +43,7 @@ function WorkspaceTransport(props) {
           Tone.Transport.position
             .split(".")[0]
             .split(":")
-            .map((e) => parseInt(e) + 1)
-            .join("|"),
+            .map((e) => parseInt(e) + 1),
         ]);
       }, 16)
     );
@@ -65,11 +64,31 @@ function WorkspaceTransport(props) {
       onClick={() => setExpanded(true)}
       tabIndex="-1"
     >
-      <div>{time[0]}</div>
+      <div style={{ width: 88 }}>
+        {props.selectedModule !== null && (
+          <IconButton onClick={() => props.setSelectedModule(null)}>
+            <Icon>arrow_back</Icon>
+          </IconButton>
+        )}
+      </div>
 
-      <div>{time[1]}</div>
-      <div>{props.sessionSize}</div>
-      <div>1/{props.gridSize}</div>
+      <div style={{ margin: "auto", fontSize: 40 }}>
+        <span style={{ width: 24 }}>{time[1] && time[1][0]}</span>
+        <span>|</span>
+        <span style={{ width: 24 }}>{time[1] && time[1][1]}</span>
+        <span>|</span>
+        <span style={{ width: 24 }}>{time[1] && time[1][2]}</span>
+      </div>
+      <div className="ws-transport-info">
+        <div>
+          <Icon style={{ opacity: 0.5 }}>timer</Icon>
+          <span>{props.sessionSize}</span>
+        </div>
+        <div>
+          <Icon style={{ opacity: 0.5 }}>calendar_view_week</Icon>
+          <span>{"1 / " + props.gridSize}</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -46,18 +46,34 @@
 
 .ws-transport {
   display: flex;
-  justify-content: space-evenly;
-  margin: 32px;
-  width: 60%;
-  min-height: 30px;
+  justify-content: space-between;
+  margin: 32px 0;
+  width: 100%;
+  max-height: 48px;
 }
 
 .ws-transport > div {
   display: block;
   font-family: "Barlow Semi Condensed", sans-serif;
   font-size: 1.5rem;
-  flex: 1;
   text-align: center;
+  display: flex;
+  justify-content: center;
+}
+
+.ws-transport-info {
+  flex-direction: column;
+  width: 88px;
+}
+
+.ws-transport-info > div {
+  height: 24px;
+  align-items: center;
+  display: flex;
+}
+
+.ws-transport-info span {
+  margin-right: 8px;
 }
 
 .ws-ruler {
@@ -92,6 +108,7 @@
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
   user-select: none;
+  cursor: move;
 
   /*  border-right: solid 4px black;
   border-left: solid 4px black;
@@ -103,7 +120,7 @@
   height: 100%;
   background: rgb(83, 83, 83);
   width: 4px;
-  cursor: ew-resize;
+  cursor: ew-resize !important;
   -webkit-user-drag: none;
 }
 

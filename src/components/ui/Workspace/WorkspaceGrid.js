@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
+
 import * as Tone from "tone";
 
 import "./WorkspaceGrid.css";
@@ -151,6 +152,7 @@ function WorkspaceGrid(props) {
               ""
             ) : (
               <div
+                key={i + "gd"}
                 className="ws-grid-line"
                 style={{
                   opacity:

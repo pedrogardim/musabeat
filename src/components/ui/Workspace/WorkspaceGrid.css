@@ -112,8 +112,10 @@
 }
 
 .ws-grid-line-mesure-num {
+  font-family: "Barlow Semi Condensed", sans-serif;
   position: absolute;
   top: -24px;
   left: 0px;
   pointer-events: none;
+  color: black;
 }
