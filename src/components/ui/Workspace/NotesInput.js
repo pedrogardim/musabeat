@@ -116,8 +116,10 @@ function NotesInput(props) {
           notesLabel={Object.keys(props.keyMapping).map((e) =>
             e.replace("Key", "").replace("Semicolon", ":")
           )}
-          setPlayingOctave={props.setPlayingOctave}
           octave={props.playingOctave}
+          onKeyClick={props.playNoteFunction[0]}
+          onKeyUp={props.playNoteFunction[1]}
+          setPressedKeys={props.setPressedKeys}
         />
       )}
     </div>

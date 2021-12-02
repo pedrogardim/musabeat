@@ -156,7 +156,8 @@ function Workspace(props) {
       : keyboardMapping;
 
   const checkCustomPatch =
-    selectedModule && typeof modules[selectedModule].instrument !== "string";
+    selectedModule !== null &&
+    typeof modules[selectedModule].instrument !== "string";
 
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
@@ -383,13 +384,18 @@ function Workspace(props) {
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
-        patchLoader(module.instrument, setInstrumentsLoaded, moduleIndex).then(
-          (r) =>
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[moduleIndex] = r;
-              return a;
-            })
+        patchLoader(
+          module.instrument,
+          setInstrumentsLoaded,
+          moduleIndex,
+          setNotifications,
+          setInstrumentsInfo
+        ).then((r) =>
+          setInstruments((prev) => {
+            let a = [...prev];
+            a[moduleIndex] = r;
+            return a;
+          })
         );
       } //load from obj
       else if (typeof module.instrument === "object") {
@@ -557,7 +563,8 @@ function Workspace(props) {
         module.instrument,
         setInstrumentsLoaded,
         index,
-        setNotifications
+        setNotifications,
+        setInstrumentsInfo
       ).then((r) =>
         setInstruments((prev) => {
           let a = [...prev];
@@ -1312,9 +1319,9 @@ function Workspace(props) {
                 >
                   {checkCustomPatch
                     ? "Custom"
-                    : props.instrumentInfo &&
-                      props.instrumentInfo.patch &&
-                      props.instrumentInfo.patch.name}
+                    : instrumentsInfo[selectedModule] &&
+                      instrumentsInfo[selectedModule].patch &&
+                      instrumentsInfo[selectedModule].patch.name}
                 </MenuItem>
               </Select>
               <IconButton>
@@ -1325,23 +1332,25 @@ function Workspace(props) {
                   <Icon>save</Icon>
                 </IconButton>
               )}
-              <div style={{ marginLeft: "auto" }}>
-                Octave {playingOctave + 1}
-                <IconButton
-                  onClick={() =>
-                    setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
-                  }
-                >
-                  <Icon>navigate_before</Icon>
-                </IconButton>
-                <IconButton
-                  onClick={() =>
-                    setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
-                  }
-                >
-                  <Icon>navigate_next</Icon>
-                </IconButton>
-              </div>
+              {modules[selectedModule].type === 1 && (
+                <div style={{ marginLeft: "auto" }}>
+                  Octave {playingOctave + 1}
+                  <IconButton
+                    onClick={() =>
+                      setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
+                    }
+                  >
+                    <Icon>navigate_before</Icon>
+                  </IconButton>
+                  <IconButton
+                    onClick={() =>
+                      setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
+                    }
+                  >
+                    <Icon>navigate_next</Icon>
+                  </IconButton>
+                </div>
+              )}
             </div>
           </Fragment>
         )}

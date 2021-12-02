@@ -13,12 +13,20 @@ function Keyboard(props) {
   );
 
   const handleKeyClick = (key) => {
-    let note = Tone.Frequency(key + 24 + octave * 12, "midi").toNote();
+    let note = key + 24 + octave * 12;
     props.onKeyClick && props.onKeyClick(note);
+    props.setPressedKeys &&
+      props.setPressedKeys((prev) =>
+        !prev.includes(note) ? [...prev, note] : prev
+      );
   };
   const handleKeyUp = (key) => {
-    let note = Tone.Frequency(key + 24 + octave * 12, "midi").toNote();
+    let note = key + 24 + octave * 12;
     props.onKeyUp && props.onKeyUp(note);
+    props.setPressedKeys &&
+      props.setPressedKeys((prev) =>
+        prev.includes(note) ? prev.filter((e) => e !== note) : prev
+      );
   };
 
   const color = colors[props.color ? props.color : 2];

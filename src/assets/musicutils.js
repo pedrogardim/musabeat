@@ -960,7 +960,8 @@ export const patchLoader = async (
   input,
   setInstrumentsLoaded,
   moduleIndex,
-  setNotifications
+  setNotifications,
+  setInstrumentsInfo
 ) => {
   let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
@@ -997,6 +998,11 @@ export const patchLoader = async (
     );
   } else {
     instrumentLoaded(true);
+    setInstrumentsInfo((prev) => {
+      let newInfo = [...prev];
+      newInfo[moduleIndex] = { patch: patch };
+      return newInfo;
+    });
   }
   if (patch.base === "FM") {
     instr = new Tone.PolySynth(Tone.FMSynth, options).toDestination();

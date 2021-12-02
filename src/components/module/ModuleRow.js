@@ -103,7 +103,7 @@ function ModuleRow(props) {
   };
 
   const playNote = (note) => {
-    console.log(Tone.Frequency(note, "midi").toNote());
+    //console.log(Tone.Frequency(note, "midi").toNote());
     if (props.module.type === 0) {
       if (!props.instrument.has(note)) return;
       props.instrument.player(note).start();
