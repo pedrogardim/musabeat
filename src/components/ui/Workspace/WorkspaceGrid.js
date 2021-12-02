@@ -28,6 +28,7 @@ function WorkspaceGrid(props) {
   );
 
   const [gridPos, setGridPos] = useState(null);
+  const [resizingHandle, setResizingHandle] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
@@ -47,13 +48,15 @@ function WorkspaceGrid(props) {
   const handleCursorDragStop = (event, element) => {};
 
   const handleMouseDown = (e) => {
-    props.setSelection([]);
-
-    console.log(e.target.className);
+    if (e.target.className.includes("handle")) {
+      return;
+    }
 
     let isClickOnNote = e.target.className.includes("note");
 
     if (isClickOnNote) return;
+
+    props.setSelection([]);
 
     setIsMouseDown(true);
 
@@ -61,10 +64,7 @@ function WorkspaceGrid(props) {
       Tone.Transport.seconds =
         (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
 
-      props.setSelection([
-        (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize,
-        null,
-      ]);
+      props.setSelection([gridPos, null]);
     }
   };
 
@@ -89,6 +89,7 @@ function WorkspaceGrid(props) {
 
   const handleMouseUp = () => {
     setIsMouseDown(false);
+    setResizingHandle(null);
     //props.setSelection([]);
   };
 
@@ -98,11 +99,22 @@ function WorkspaceGrid(props) {
       if (props.cursorMode === "edit") {
         //handleMouseDown();
       } else {
-        props.setSelection((prev) => [
-          prev[0],
-          (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize,
-        ]);
+        props.setSelection((prev) => [prev[0], gridPos]);
       }
+    }
+    if (resizingHandle) {
+      props.setSelection((prev) => {
+        let newSelection = [...prev];
+        let handleSide = resizingHandle === "left";
+        if (
+          (resizingHandle === "left" && newSelection < 0) ||
+          (resizingHandle === "right" && newSelection + 1 > props.sessionSize)
+        )
+          return prev;
+        newSelection[handleSide ? 0 : 1] = gridPos;
+
+        return newSelection;
+      });
     }
   };
 
@@ -130,6 +142,7 @@ function WorkspaceGrid(props) {
 
   useEffect(() => {
     onGridPosChange();
+    //console.log(gridPos);
   }, [gridPos]);
 
   return (
@@ -173,23 +186,27 @@ function WorkspaceGrid(props) {
         <div className="ws-grid-line" />
       </div>
 
-      <Draggable
-        axis="x"
-        onDrag={handleCursorDrag}
-        onStart={handleCursorDragStart}
-        onStop={handleCursorDragStop}
-        onMouseDown={handleMouseDown}
-        position={{
-          x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
-          y: 0,
-        }}
-        bounds=".ws-grid-line-cont"
-      >
-        <div
-          className={"ws-grid-cursor"}
-          style={{ backgroundColor: props.isRecording && "#f50057" }}
-        />
-      </Draggable>
+      {props.selection.length === 0 ||
+        (props.selection.includes(null) && (
+          <Draggable
+            axis="x"
+            onDrag={handleCursorDrag}
+            onStart={handleCursorDragStart}
+            onStop={handleCursorDragStop}
+            onMouseDown={handleMouseDown}
+            position={{
+              x:
+                gridRef.current && cursorPosition * gridRef.current.offsetWidth,
+              y: 0,
+            }}
+            bounds=".ws-grid-line-cont"
+          >
+            <div
+              className={"ws-grid-cursor"}
+              style={{ backgroundColor: props.isRecording && "#f50057" }}
+            />
+          </Draggable>
+        ))}
 
       {props.children}
 
@@ -200,24 +217,35 @@ function WorkspaceGrid(props) {
             height: "100%",
             transform: `translateX(${
               (props.selection.sort((a, b) => a - b)[0] /
-                Tone.Transport.loopEnd) *
+                (zoomSize * props.gridSize)) *
                 gridRef.current.offsetWidth +
               48
             }px)`,
             width: Math.abs(
               (props.selection.sort((a, b) => a - b)[1] /
-                Tone.Transport.loopEnd) *
+                (zoomSize * props.gridSize)) *
                 gridRef.current.offsetWidth -
                 (props.selection.sort((a, b) => a - b)[0] /
-                  Tone.Transport.loopEnd) *
+                  (zoomSize * props.gridSize)) *
                   gridRef.current.offsetWidth
             ),
-            backgroundColor: "black",
-            opacity: 0.2,
+            backgroundColor: "rgb(0, 0, 0,0.5)",
+            opacity: 0.7,
             /* border:
                 props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
           }}
-        />
+        >
+          <div
+            className="ws-ruler-zoom-cont-handle"
+            onMouseDown={() => setResizingHandle("left")}
+            style={{ left: 0, opacity: 0 }}
+          />
+          <div
+            className="ws-ruler-zoom-cont-handle"
+            onMouseDown={() => setResizingHandle("right")}
+            style={{ right: 0, opacity: 0 }}
+          />
+        </div>
       )}
 
       {/* <div style={{ position: "absolute", right: -64 }}>

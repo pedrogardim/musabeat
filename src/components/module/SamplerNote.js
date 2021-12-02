@@ -4,13 +4,16 @@ import * as Tone from "tone";
 import { colors } from "../../utils/materialPalette";
 
 function SamplerNote(props) {
+  const isSelected =
+    props.selectedNotes && props.selectedNotes.includes(props.index);
+
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
   return (
     <div
       className="module-score-note"
       style={{
         height: props.rowRef.current.scrollHeight / props.moduleRows.length,
-        width: props.rowRef.current.offsetWidth / (zoomSize * props.gridSize),
+        width: 0,
         transform: props.ghost
           ? `translate(${
               props.gridPos[1] *
@@ -46,7 +49,8 @@ function SamplerNote(props) {
           top: "calc(50% - 8px)",
           width: 16,
           left: -8,
-          backgroundColor: colors[props.module.color][300] /*  border:
+          backgroundColor:
+            colors[props.module.color][isSelected ? 800 : 300] /*  border:
           props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */,
           transform: "rotate(45deg)",
         }}

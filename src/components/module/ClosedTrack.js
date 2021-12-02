@@ -140,31 +140,28 @@ function ClosedTrack(props) {
       >
         {rowRef.current &&
           props.module.score.length > 0 &&
-          props.module.score
-            .filter(
-              (e) =>
-                e.time.split(":")[0] < props.zoomPosition[1] + 1 &&
-                e.time.split(":")[0] >= props.zoomPosition[0]
-            )
-            .map((note, noteIndex) => (
-              <ClosedTrackNote
-                rowRef={rowRef}
-                moduleRows={moduleRows}
-                note={note}
-                drawingNote={drawingNote}
-                module={props.module}
-                sessionSize={props.sessionSize}
-                gridSize={props.gridSize}
-                gridPos={gridPos}
-                deletableNote={deletableNote}
-                setDrawingNote={setDrawingNote}
-                index={noteIndex}
-                setModules={props.setModules}
-                isMouseDown={isMouseDown}
-                selectedModule={props.selectedModule}
-                zoomPosition={props.zoomPosition}
-              />
-            ))}
+          props.module.score.map((note, noteIndex) => (
+            <ClosedTrackNote
+              rowRef={rowRef}
+              moduleRows={moduleRows}
+              note={note}
+              drawingNote={drawingNote}
+              module={props.module}
+              sessionSize={props.sessionSize}
+              gridSize={props.gridSize}
+              gridPos={gridPos}
+              deletableNote={deletableNote}
+              setDrawingNote={setDrawingNote}
+              index={noteIndex}
+              setModules={props.setModules}
+              isMouseDown={isMouseDown}
+              selectedModule={props.selectedModule}
+              zoomPosition={props.zoomPosition}
+              selected={
+                props.selectedNotes && props.selectedNotes.includes(noteIndex)
+              }
+            />
+          ))}
       </div>
       <IconButton className={"closed-track-button"}>
         <Icon style={{ color: colors[props.module.color][900] }}>

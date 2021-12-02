@@ -57,7 +57,9 @@ function ClosedTrackNote(props) {
             top: "calc(50% - 4px)",
             width: 8,
             left: -3,
-            backgroundColor: colors[props.module.color][900],
+            backgroundColor: props.selected
+              ? "white"
+              : colors[props.module.color][900],
             transform: "rotate(45deg)",
           }}
         />
@@ -70,7 +72,9 @@ function ClosedTrackNote(props) {
             top: "calc(50% - 4px)",
             width: "100%",
             left: 1,
-            backgroundColor: colors[props.module.color][900],
+            backgroundColor: props.selected
+              ? "white"
+              : colors[props.module.color][900],
           }}
         />
       )}

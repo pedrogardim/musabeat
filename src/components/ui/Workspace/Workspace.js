@@ -139,6 +139,7 @@ function Workspace(props) {
 
   const [editorProfiles, setEditorProfiles] = useState(null);
   const [selection, setSelection] = useState([]);
+  const [selectedNotes, setSelectedNotes] = useState([]);
 
   const [optionsMenu, setOptionsMenu] = useState(false);
 
@@ -771,6 +772,28 @@ function Workspace(props) {
     setSnackbarMessage(null);
   };
 
+  const updateSelectedNotes = () => {
+    setSelectedNotes(
+      modules.map((mod, modIndex) => {
+        if (selectedModule !== null && selectedModule !== modIndex) return [];
+        let notes = [];
+        for (let x = 0; x < mod.score.length; x++) {
+          let note = mod.score[x];
+          if (
+            Tone.Time(note.time).toSeconds() +
+              (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
+              (selection[0] / gridSize) * Tone.Time("1m").toSeconds() +
+                (note.duration ? 0.0001 : 0) &&
+            Tone.Time(note.time).toSeconds() <
+              (selection[1] / gridSize) * Tone.Time("1m").toSeconds()
+          )
+            notes.push(x);
+        }
+        return notes;
+      })
+    );
+  };
+
   const togglePlaying = (e) => {
     //console.log(Tone.Transport.state);
     Tone.start();
@@ -1092,8 +1115,12 @@ function Workspace(props) {
   }, [metronomeState]);
 
   useEffect(() => {
-    console.log(selection);
+    modules && updateSelectedNotes();
   }, [selection]);
+
+  useEffect(() => {
+    console.log(selectedNotes);
+  }, [selectedNotes]);
 
   useEffect(() => {
     let begin = zoomPosition[0] * Tone.Time("1m").toSeconds();
@@ -1219,6 +1246,8 @@ function Workspace(props) {
               resetUndoHistory={() => handleUndo("RESET")}
               selection={selection}
               setSelection={setSelection}
+              selectedNotes={selectedNotes[selectedModule]}
+              setSelectedNotes={setSelectedNotes}
               duplicateModule={duplicateModule}
               setSnackbarMessage={setSnackbarMessage}
               isLoaded={isLoaded}
@@ -1253,6 +1282,7 @@ function Workspace(props) {
                     resetUndoHistory={() => handleUndo("RESET")}
                     selection={selection}
                     setSelection={setSelection}
+                    selectedNotes={selectedNotes[moduleIndex]}
                     duplicateModule={duplicateModule}
                     setSnackbarMessage={setSnackbarMessage}
                     isLoaded={isLoaded}

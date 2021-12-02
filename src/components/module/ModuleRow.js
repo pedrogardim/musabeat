@@ -358,6 +358,10 @@ function ModuleRow(props) {
   }, [props.cursorMode]);
 
   useEffect(() => {
+    props.selectedNotes && setSelectedNotes(props.selectedNotes);
+  }, [props.selectedNotes]);
+
+  useEffect(() => {
     rowWrapperRef.current.scrollTop =
       rowWrapperRef.current.scrollHeight / 2 -
       rowWrapperRef.current.offsetHeight / 2;
@@ -439,7 +443,7 @@ function ModuleRow(props) {
         {rowRef.current &&
           props.module.score.length > 0 &&
           props.module.score
-            .filter((e) => e.time.split(":")[0] < props.sessionSize)
+            //.filter((e) => e.time.split(":")[0] < props.sessionSize)
             .map((note, noteIndex) =>
               trackType === 0 ? (
                 <SamplerNote
@@ -453,6 +457,7 @@ function ModuleRow(props) {
                   deletableNote={deletableNote}
                   index={noteIndex}
                   selectedModule={props.selectedModule}
+                  selectedNotes={props.selectedNotes}
                   zoomPosition={props.zoomPosition}
                   a={rowRef.current}
                 />
@@ -473,8 +478,8 @@ function ModuleRow(props) {
                   setModules={props.setModules}
                   isMouseDown={isMouseDown}
                   selectedModule={props.selectedModule}
-                  selectedNotes={selectedNotes}
-                  setSelectedNotes={setSelectedNotes}
+                  selectedNotes={props.selectedNotes}
+                  setSelectedNotes={props.setSelectedNotes}
                   zoomPosition={props.zoomPosition}
                   a={rowRef.current}
                 />

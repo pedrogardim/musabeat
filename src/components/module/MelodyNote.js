@@ -9,7 +9,8 @@ function MelodyNote(props) {
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
 
-  const isSelected = props.selectedNotes.includes(props.index);
+  const isSelected =
+    props.selectedNotes && props.selectedNotes.includes(props.index);
 
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
@@ -24,7 +25,12 @@ function MelodyNote(props) {
             props.gridSize *
             zoomSize
       );
-      props.setSelectedNotes([props.index]);
+      props.setSelectedNotes(() => {
+        let newNotes = [];
+        newNotes[props.selectedModule] = [props.index];
+        //console.log(newNotes);
+        return newNotes;
+      });
     }
 
     /*  props.setDrawingNote((note) => {
@@ -168,7 +174,7 @@ function MelodyNote(props) {
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
-        backgroundColor: colors[props.module.color][isSelected ? 900 : 600],
+        backgroundColor: colors[props.module.color][isSelected ? 800 : 300],
         outline: `solid 1px ${colors[props.module.color][800]}`,
         //borderRadius: 4,
         //margin: "-2px -2px 0 0",
