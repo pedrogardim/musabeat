@@ -28,6 +28,7 @@ function WorkspaceGrid(props) {
   );
 
   const [gridPos, setGridPos] = useState(null);
+  const [initialSelectionPos, setInitialSelectionPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
@@ -64,6 +65,7 @@ function WorkspaceGrid(props) {
       Tone.Transport.seconds =
         (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
 
+      setInitialSelectionPos(gridPos);
       props.setSelection([gridPos, null]);
     }
   };
@@ -90,16 +92,19 @@ function WorkspaceGrid(props) {
   const handleMouseUp = () => {
     setIsMouseDown(false);
     setResizingHandle(null);
+    setInitialSelectionPos(null);
     //props.setSelection([]);
   };
 
   const onGridPosChange = () => {
     //drag note input
-    if (isMouseDown) {
+    if (isMouseDown && !resizingHandle) {
       if (props.cursorMode === "edit") {
         //handleMouseDown();
       } else {
-        props.setSelection((prev) => [prev[0], gridPos]);
+        props.setSelection((prev) =>
+          [initialSelectionPos, gridPos].sort((a, b) => a - b)
+        );
       }
     }
     if (resizingHandle) {
@@ -186,27 +191,27 @@ function WorkspaceGrid(props) {
         <div className="ws-grid-line" />
       </div>
 
-      {props.selection.length === 0 ||
-        (props.selection.includes(null) && (
-          <Draggable
-            axis="x"
-            onDrag={handleCursorDrag}
-            onStart={handleCursorDragStart}
-            onStop={handleCursorDragStop}
-            onMouseDown={handleMouseDown}
-            position={{
-              x:
-                gridRef.current && cursorPosition * gridRef.current.offsetWidth,
-              y: 0,
-            }}
-            bounds=".ws-grid-line-cont"
-          >
-            <div
-              className={"ws-grid-cursor"}
-              style={{ backgroundColor: props.isRecording && "#f50057" }}
-            />
-          </Draggable>
-        ))}
+      {(props.selection.length === 0 ||
+        props.selection.includes(null) ||
+        props.selection[0] === props.selection[1]) && (
+        <Draggable
+          axis="x"
+          onDrag={handleCursorDrag}
+          onStart={handleCursorDragStart}
+          onStop={handleCursorDragStop}
+          onMouseDown={handleMouseDown}
+          position={{
+            x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
+            y: 0,
+          }}
+          bounds=".ws-grid-line-cont"
+        >
+          <div
+            className={"ws-grid-cursor"}
+            style={{ backgroundColor: props.isRecording && "#f50057" }}
+          />
+        </Draggable>
+      )}
 
       {props.children}
 

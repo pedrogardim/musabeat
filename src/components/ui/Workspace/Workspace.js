@@ -1119,7 +1119,7 @@ function Workspace(props) {
   }, [selection]);
 
   useEffect(() => {
-    console.log(selectedNotes);
+    //console.log(selectedNotes);
   }, [selectedNotes]);
 
   useEffect(() => {

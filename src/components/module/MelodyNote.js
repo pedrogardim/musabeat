@@ -84,8 +84,10 @@ function MelodyNote(props) {
     props.setModules((prev) => {
       let newModules = [...prev];
       let newTime = Tone.Time(
-        ((props.gridPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
-          props.gridSize
+        Tone.Time(
+          ((props.gridPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
+            props.gridSize
+        ).quantize(props.gridSize + "n")
       ).toBarsBeatsSixteenths();
       let newNote = 108 - props.gridPos[0];
 
