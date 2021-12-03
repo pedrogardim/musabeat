@@ -10,16 +10,18 @@ import {
   MenuItem,
   Tooltip,
   LinearProgress,
+  Fab,
+  Icon,
+  Grid,
+  Select,
 } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
 
-import EnvelopeControl from "./EnvelopeControl";
-import SynthParameters from "./SynthParameters";
-import OscillatorEditor from "./OscillatorEditor";
 import PatchExplorer from "../ui/PatchExplorer/PatchExplorer";
 import FileExplorer from "../ui/FileExplorer/FileExplorer";
+import SynthEditor from "./SynthEditor/SynthEditor";
 
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
@@ -37,8 +39,6 @@ import {
   fileTypes,
   fileExtentions,
 } from "../../assets/musicutils";
-
-import { Fab, Icon, Grid, Select } from "@material-ui/core";
 
 import "./InstrumentEditor.css";
 
@@ -71,6 +71,14 @@ function InstrumentEditor(props) {
   const isDrum = props.module.type === 0;
 
   const patchSizeLimit = 5242880;
+
+  const setIntrument = (newInstrument) => {
+    props.setInstruments((prev) => {
+      let newInstruments = [...prev];
+      newInstruments[props.selectedModule] = newInstrument;
+      return newInstruments;
+    });
+  };
 
   const changeInstrumentType = async (e) => {
     let newType = e.target.value;
@@ -105,7 +113,7 @@ function InstrumentEditor(props) {
 
     //console.log(newInstrument, conserverdProps);
 
-    props.setInstrument(newInstrument);
+    setIntrument(newInstrument);
 
     props.setModules &&
       props.setModules((prev) => {
@@ -152,8 +160,8 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
-    props.setInstrument(newInstrument);
-    props.onInstrumentMod(fileId, fileName, soundindex, true);
+    setIntrument(newInstrument);
+    onInstrumentMod(fileId, fileName, soundindex, true);
 
     firebase
       .firestore()
@@ -172,9 +180,9 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
-    props.setInstrument(newInstrument);
+    setIntrument(newInstrument);
 
-    props.onInstrumentMod(
+    onInstrumentMod(
       fileId,
       Tone.Frequency(fileName, "midi").toNote(),
       "",
@@ -189,7 +197,7 @@ function InstrumentEditor(props) {
   };
 
   const renamePlayersLabel = (index, newName) => {
-    props.setLabels(index, newName);
+    //props.setLabels(index, newName);
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     if (typeof props.module.instrument === "string") {
@@ -387,6 +395,68 @@ function InstrumentEditor(props) {
     setPatchExplorer(false);
   };
 
+  const onInstrumentMod = async (fileId, name, soundindex, isRemoving) => {
+    //update instrument info in module object
+
+    if (props.module.type === 0 || props.instrument.name === "Sampler") {
+      let patch =
+        typeof props.module.instrument === "string"
+          ? (
+              await firebase
+                .firestore()
+                .collection(props.module.type === 0 ? "drumpatches" : "patches")
+                .doc(props.module.instrument)
+                .get()
+            ).data()
+          : { ...props.module.instrument };
+
+      typeof props.module.instrument === "string" &&
+        firebase
+          .firestore()
+          .collection(props.module.type === 0 ? "drumpatches" : "patches")
+          .doc(props.module.instrument)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(fileId)
+        .update({
+          in: firebase.firestore.FieldValue.increment(isRemoving ? -1 : 1),
+          ld: firebase.firestore.FieldValue.increment(isRemoving ? 0 : 1),
+        });
+
+      //console.log(props.module.instrument, patch, soundindex, name);
+
+      !isRemoving
+        ? (patch.urls[props.module.type === 0 ? soundindex : name] = fileId)
+        : delete patch.urls[props.module.type === 0 ? soundindex : name];
+      if (props.module.type === 0) {
+        //console.log(patch.lbls, soundindex);
+
+        !isRemoving
+          ? (patch.lbls[soundindex] = name)
+          : delete patch.lbls[soundindex];
+      }
+
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].instrument = { ...patch };
+        if (props.module.type === 0) {
+          newModules[props.index].lbls = { ...patch.lbls };
+        }
+        return newModules;
+      });
+    } else {
+      props.setModules((prev) => {
+        let newModules = [...prev];
+        newModules[props.index].instrument = props.instrument.get();
+        return newModules;
+      });
+    }
+    props.resetUndoHistory();
+  };
+
   //used for
 
   /* ================================================================ */
@@ -523,52 +593,11 @@ function InstrumentEditor(props) {
       );
     } else {
       mainContent = (
-        <Fragment>
-          <Select
-            native
-            value={
-              props.instrument._dummyVoice
-                ? props.instrument._dummyVoice.name
-                : props.instrument.name
-            }
-            onChange={changeInstrumentType}
-            className="instrument-editor-type-select"
-          >
-            {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
-            ))}
-          </Select>
-          <Grid
-            container
-            spacing={2}
-            className="ie-synth-cont"
-            direction="column"
-            alignItems="stretch"
-            justifyContent="center"
-          >
-            <OscillatorEditor
-              onInstrumentMod={props.onInstrumentMod}
-              instrument={props.instrument}
-              columnRef={oscColumn}
-            />
-
-            <SynthParameters
-              onInstrumentMod={props.onInstrumentMod}
-              instrument={props.instrument}
-            />
-
-            {Object.keys(props.instrument.get()).map(
-              (envelope, envelopeIndex) =>
-                envelope.toLowerCase().includes("envelope") && (
-                  <EnvelopeControl
-                    onInstrumentMod={props.onInstrumentMod}
-                    instrument={props.instrument}
-                    envelopeType={envelope}
-                  />
-                )
-            )}
-          </Grid>
-        </Fragment>
+        <SynthEditor
+          instrument={props.instrument}
+          onInstrumentMod={onInstrumentMod}
+          changeInstrumentType={changeInstrumentType}
+        />
       );
     }
   }
@@ -581,59 +610,17 @@ function InstrumentEditor(props) {
 
   return (
     <div
-      className="ws-note-input-options"
+      className="instrument-editor"
       onDragEnter={() => {
         setDraggingOver(true);
         ieWrapper.current.scrollTop = 0;
       }}
       ref={ieWrapper}
     >
-      <Select value={selectedPatch}>
-        <MenuItem
-          value={
-            selectedPatch === "Custom" ? "Custom" : props.module.instrument
-          }
-        >
-          {selectedPatch === "Custom"
-            ? "Custom"
-            : props.instrumentInfo &&
-              props.instrumentInfo.patch &&
-              props.instrumentInfo.patch.name}
-        </MenuItem>
-      </Select>
-      <IconButton>
-        <Icon>tune</Icon>
-      </IconButton>
-      {selectedPatch === "Custom" && (
-        <IconButton>
-          <Icon>save</Icon>
-        </IconButton>
-      )}
-
-      {/* patchExplorer && (
-        <PatchExplorer
-          compact
-          patchExplorer={patchExplorer}
-          index={props.index}
-          module={props.module}
-          setModules={props.setModules}
-          setModulePage={props.setModulePage}
-          setPatchExplorer={setPatchExplorer}
-          instrument={props.instrument}
-          setInstruments={props.setInstruments}
-          setInstrument={props.setInstrument}
-          setInstrumentLoaded={props.setInstrumentLoaded}
-          setInstrumentsLoaded={props.setInstrumentsLoaded}
-          saveUserPatch={saveUserPatch}
-          isDrum={isDrum}
-          updateFilesStatsOnChange={props.updateFilesStatsOnChange}
-        />
-      ) */}
-
       {/* {fileExplorer && (
         <FileExplorer
           compact
-          setInstrumentLoaded={props.setInstrumentLoaded}
+          setInstrumentLoaded={setIntrumentLoaded}
           onFileClick={props.handleFileClick}
           setFileExplorer={setFileExplorer}
           setSnackbarMessage={props.setSnackbarMessage}
@@ -645,7 +632,7 @@ function InstrumentEditor(props) {
         />
       )} */}
 
-      {!patchExplorer && mainContent}
+      {mainContent}
       {draggingOver && props.instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {
@@ -696,10 +683,10 @@ function InstrumentEditor(props) {
         open={uploadingFiles.length > 0}
         files={uploadingFiles}
         setUploadingFiles={setUploadingFiles}
-        onInstrumentMod={props.onInstrumentMod}
+        onInstrumentMod={onInstrumentMod}
         module={props.module}
         instrument={props.instrument}
-        setInstrumentLoaded={props.setInstrumentLoaded}
+        setInstrumentLoaded={setIntrumentLoaded}
         setFilesName={setFilesName}
         setFilesId={setFilesId}
         renamePlayersLabel={renamePlayersLabel}

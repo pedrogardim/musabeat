@@ -1216,125 +1216,126 @@ function Workspace(props) {
         </div>
       </div>
 
-      <WorkspaceTransport
-        modules={modules}
-        sessionSize={sessionSize}
-        setSessionSize={setSessionSize}
-        gridSize={gridSize}
-        setGridSize={setGridSize}
-        selectedModule={selectedModule}
-        setSelectedModule={setSelectedModule}
-      />
+      {!IEOpen ? (
+        <Fragment>
+          <WorkspaceTransport
+            modules={modules}
+            sessionSize={sessionSize}
+            setSessionSize={setSessionSize}
+            gridSize={gridSize}
+            setGridSize={setGridSize}
+            selectedModule={selectedModule}
+            setSelectedModule={setSelectedModule}
+          />
 
-      <WorkspaceRuler
-        modules={modules}
-        sessionSize={sessionSize}
-        zoomPosition={zoomPosition}
-        setZoomPosition={setZoomPosition}
-      />
+          <WorkspaceRuler
+            modules={modules}
+            sessionSize={sessionSize}
+            zoomPosition={zoomPosition}
+            setZoomPosition={setZoomPosition}
+          />
 
-      <div className="ws-grid-cont" tabIndex="-1">
-        <WorkspaceGrid
-          modules={modules}
-          sessionSize={sessionSize}
-          setSessionSize={setSessionSize}
-          gridSize={gridSize}
-          isRecording={isRecording}
-          selection={selection}
-          setSelection={setSelection}
-          cursorMode={cursorMode}
-          zoomPosition={zoomPosition}
-          selectedModule={selectedModule}
-        >
-          {selectedModule !== null ? (
-            <ModuleRow
-              tabIndex={-1}
-              key={modules[selectedModule].id}
-              index={selectedModule}
-              selectedModule={selectedModule}
-              module={modules[selectedModule]}
-              instrument={instruments[selectedModule]}
-              setInstruments={setInstruments}
-              loaded={instrumentsLoaded[selectedModule]}
-              setInstrumentsLoaded={setInstrumentsLoaded}
-              sessionData={sessionData}
+          <div className="ws-grid-cont" tabIndex="-1">
+            <WorkspaceGrid
+              modules={modules}
               sessionSize={sessionSize}
-              setModules={setModules}
-              editMode={editMode}
-              resetUndoHistory={() => handleUndo("RESET")}
-              selection={selection}
-              setSelection={setSelection}
-              selectedNotes={selectedNotes[selectedModule]}
-              setSelectedNotes={setSelectedNotes}
-              duplicateModule={duplicateModule}
-              setSnackbarMessage={setSnackbarMessage}
-              isLoaded={isLoaded}
-              handlePageNav={props.handlePageNav}
-              setAreUnsavedChanges={setAreUnsavedChanges}
-              cursorMode={cursorMode}
+              setSessionSize={setSessionSize}
               gridSize={gridSize}
               isRecording={isRecording}
-              playingOctave={playingOctave}
-              setPlayNoteFunction={setPlayNoteFunction}
+              selection={selection}
+              setSelection={setSelection}
+              cursorMode={cursorMode}
               zoomPosition={zoomPosition}
-            />
-          ) : (
-            <Fragment>
-              {modules &&
-                modules.map((module, moduleIndex) => (
-                  <ClosedTrack
-                    tabIndex={-1}
-                    key={module.id}
-                    index={moduleIndex}
-                    selectedModule={selectedModule}
-                    setSelectedModule={setSelectedModule}
-                    module={module}
-                    instrument={instruments[moduleIndex]}
-                    setInstruments={setInstruments}
-                    loaded={instrumentsLoaded[moduleIndex]}
-                    setInstrumentsLoaded={setInstrumentsLoaded}
-                    sessionData={sessionData}
-                    sessionSize={sessionSize}
-                    setModules={setModules}
-                    editMode={editMode}
-                    resetUndoHistory={() => handleUndo("RESET")}
-                    selection={selection}
-                    setSelection={setSelection}
-                    selectedNotes={selectedNotes[moduleIndex]}
-                    duplicateModule={duplicateModule}
-                    setSnackbarMessage={setSnackbarMessage}
-                    isLoaded={isLoaded}
-                    handlePageNav={props.handlePageNav}
-                    setAreUnsavedChanges={setAreUnsavedChanges}
-                    cursorMode={cursorMode}
-                    gridSize={gridSize}
-                    isRecording={isRecording}
-                    zoomPosition={zoomPosition}
-                  />
-                ))}
-              <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
-                <Icon>add</Icon>
-              </IconButton>
-            </Fragment>
-          )}
-        </WorkspaceGrid>
-        {IEOpen && modules && modules[selectedModule] && (
-          <InstrumentEditor
-            index={selectedModule}
-            module={modules && modules[selectedModule]}
-            setModules={setModules}
-            instrument={instruments[selectedModule]}
-            instrumentInfo={instrumentsInfo[selectedModule]}
-            setInstruments={setInstruments}
-            setInstrumentsLoaded={setInstrumentsLoaded}
-            setSnackbarMessage={setSnackbarMessage}
-            /* handleFileClick={handleFileClick} 
-          setLabels={setLabels}
-          updateFilesStatsOnChange={updateFilesStatsOnChange}*/
-            handlePageNav={props.handlePageNav}
-          />
-        )}
-      </div>
+              selectedModule={selectedModule}
+            >
+              {selectedModule !== null ? (
+                <ModuleRow
+                  tabIndex={-1}
+                  key={modules[selectedModule].id}
+                  index={selectedModule}
+                  selectedModule={selectedModule}
+                  module={modules[selectedModule]}
+                  instrument={instruments[selectedModule]}
+                  setInstruments={setInstruments}
+                  loaded={instrumentsLoaded[selectedModule]}
+                  setInstrumentsLoaded={setInstrumentsLoaded}
+                  sessionData={sessionData}
+                  sessionSize={sessionSize}
+                  setModules={setModules}
+                  editMode={editMode}
+                  resetUndoHistory={() => handleUndo("RESET")}
+                  selection={selection}
+                  setSelection={setSelection}
+                  selectedNotes={selectedNotes[selectedModule]}
+                  setSelectedNotes={setSelectedNotes}
+                  duplicateModule={duplicateModule}
+                  setSnackbarMessage={setSnackbarMessage}
+                  isLoaded={isLoaded}
+                  handlePageNav={props.handlePageNav}
+                  setAreUnsavedChanges={setAreUnsavedChanges}
+                  cursorMode={cursorMode}
+                  gridSize={gridSize}
+                  isRecording={isRecording}
+                  playingOctave={playingOctave}
+                  setPlayNoteFunction={setPlayNoteFunction}
+                  zoomPosition={zoomPosition}
+                />
+              ) : (
+                <Fragment>
+                  {modules &&
+                    modules.map((module, moduleIndex) => (
+                      <ClosedTrack
+                        tabIndex={-1}
+                        key={module.id}
+                        index={moduleIndex}
+                        selectedModule={selectedModule}
+                        setSelectedModule={setSelectedModule}
+                        module={module}
+                        instrument={instruments[moduleIndex]}
+                        setInstruments={setInstruments}
+                        loaded={instrumentsLoaded[moduleIndex]}
+                        setInstrumentsLoaded={setInstrumentsLoaded}
+                        sessionData={sessionData}
+                        sessionSize={sessionSize}
+                        setModules={setModules}
+                        editMode={editMode}
+                        resetUndoHistory={() => handleUndo("RESET")}
+                        selection={selection}
+                        setSelection={setSelection}
+                        selectedNotes={selectedNotes[moduleIndex]}
+                        duplicateModule={duplicateModule}
+                        setSnackbarMessage={setSnackbarMessage}
+                        isLoaded={isLoaded}
+                        handlePageNav={props.handlePageNav}
+                        setAreUnsavedChanges={setAreUnsavedChanges}
+                        cursorMode={cursorMode}
+                        gridSize={gridSize}
+                        isRecording={isRecording}
+                        zoomPosition={zoomPosition}
+                      />
+                    ))}
+                  <IconButton
+                    tabIndex="-1"
+                    onClick={() => setModulePicker(true)}
+                  >
+                    <Icon>add</Icon>
+                  </IconButton>
+                </Fragment>
+              )}
+            </WorkspaceGrid>
+          </div>
+        </Fragment>
+      ) : (
+        <InstrumentEditor
+          module={modules[selectedModule]}
+          instrument={instruments[selectedModule]}
+          instrumentsInfo={instrumentsInfo[selectedModule]}
+          setModules={setModules}
+          setInstruments={setInstruments}
+          resetUndoHistory={() => handleUndo("RESET")}
+          index={selectedModule}
+        />
+      )}
 
       <div className="ws-note-input">
         {selectedModule !== null && (
@@ -1372,7 +1373,7 @@ function Workspace(props) {
                       instrumentsInfo[selectedModule].patch.name}
                 </MenuItem>
               </Select>
-              <IconButton>
+              <IconButton onClick={() => setIEOpen((prev) => !prev)}>
                 <Icon>tune</Icon>
               </IconButton>
               {checkCustomPatch && (

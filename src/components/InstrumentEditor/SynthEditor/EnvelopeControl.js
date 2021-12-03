@@ -2,20 +2,27 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import { Typography, Slider, Icon, IconButton, Grid } from "@material-ui/core";
 
-import "./InstrumentEditor.css";
+import "../InstrumentEditor.css";
 
 import { useTranslation } from "react-i18next";
+
+import Knob from "./Knob";
 
 function EnvelopeControl(props) {
   const { t } = useTranslation();
 
+  const envelopeType =
+    props.type === "filter" || props.type === "modulation"
+      ? props.type + "Envelope"
+      : "envelope";
+
   const [envelope, setEnvelope] = useState(
-    props.instrument.get()[props.envelopeType]
+    props.instrument.get()[envelopeType]
   );
 
   const handleChange = (element, value) => {
-    props.instrument.set({ [props.envelopeType]: { [element]: value } });
-    setEnvelope(props.instrument.get()[props.envelopeType]);
+    props.instrument.set({ [envelopeType]: { [element]: value } });
+    setEnvelope(props.instrument.get()[envelopeType]);
     /* setEnvelope((prev) => {
       return { ...prev, [element]: value };
     }); */
@@ -32,15 +39,12 @@ function EnvelopeControl(props) {
   };
 
   useEffect(() => {
-    setEnvelope(props.instrument.get()[props.envelopeType]);
-  }, [props.instrument, props.envelopeType]);
+    setEnvelope(props.instrument.get()[envelopeType]);
+  }, [props.instrument, envelopeType]);
 
   return (
-    <Grid item xs={6} className="instrument-editor-envelope-container">
-      <Typography
-        variant="overline"
-        className="instrument-editor-envelope-label"
-      >
+    <div className="ie-envelope-container">
+      <span className="ie-envelope-label">
         {Object.keys(envelope).includes("octaves") && (
           <IconButton
             color={envelope.octaves !== 0 ? "primary" : "default"}
@@ -51,23 +55,25 @@ function EnvelopeControl(props) {
             <Icon>power_settings_new</Icon>
           </IconButton>
         )}
-        {props.envelopeType
-          .toLowerCase()
-          .replace(
-            "envelope",
-            " " + t("instrumentEditor.synthEditor.parameters.envelope")
-          )
-          .replace(
-            "filter",
-            " " + t("instrumentEditor.synthEditor.parameters.filter")
-          )
-          .replace(
-            "modulation",
-            " " + t("instrumentEditor.synthEditor.parameters.mod")
-          )}
-      </Typography>
+        {envelopeType.toUpperCase()}
+      </span>
+      <div className="break" />
 
-      {Object.keys(envelope).map(
+      {["attack", "decay", "sustain", "release"].map((e) => (
+        <Knob
+          min={0}
+          size={32}
+          step={0.01}
+          max={e === "sustain" ? 1 : e === "attack" ? 4 : e === "decay" ? 4 : 2}
+          defaultValue={envelope[e]}
+          onChange={(v) => handleChange(e, v)}
+          label={e[0]}
+          mousePosition={props.mousePosition}
+          style={{ margin: "0 8px" }}
+        />
+      ))}
+
+      {/* {Object.keys(envelope).map(
         (element, index) =>
           (element === "attack" ||
             element === "decay" ||
@@ -103,8 +109,8 @@ function EnvelopeControl(props) {
               <Typography variant="overline">{element[0]}</Typography>
             </div>
           )
-      )}
-    </Grid>
+      )} */}
+    </div>
   );
 }
 

@@ -7,6 +7,7 @@
   justify-content: flex-start;
   position: relative;
   height: 100%;
+  width: 100%;
   overflow: hidden !important;
 }
 
@@ -29,19 +30,26 @@
   padding: 0 8px;
 }
 
-.instrument-editor-envelope-container {
+.ie-envelope-container {
   position: relative;
   display: flex;
   flex-direction: row;
   align-content: center;
+  justify-content: center;
   flex-wrap: wrap;
+  width: 80%;
 }
 
-.instrument-editor-envelope-label {
-  width: 100%;
+.ie-envelope-label {
   text-align: center;
   position: relative;
-  top: 0;
+  top: -12px;
+  width: 100%;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(0, 0, 0, 0.562);
+  user-select: none;
 }
 
 .instrument-editor-envelope-slider-container {
@@ -70,13 +78,43 @@
 }
 
 .ie-synth-cont {
+  position: relative;
   max-height: 100% !important;
+  height: 100%;
   flex: 1 1 1px;
   margin: 0 !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  overflow: visible;
+  justify-content: space-between;
 }
 
-.ie-synth-cont > div {
-  width: 33.33% !important;
+.ie-synth-compact-item {
+  position: relative;
+  flex: 1 1 1px;
+  margin: 16px !important;
+  height: 50%;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: space-evenly;
+}
+
+.ie-synth-fs-item {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: space-evenly;
+  z-index: 1;
+  background-color: white;
 }
 
 .turnonoff-button {
