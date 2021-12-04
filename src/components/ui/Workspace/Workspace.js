@@ -110,6 +110,7 @@ function Workspace(props) {
     () => {},
     () => {},
   ]);
+  const [moduleRows, setModuleRows] = useState([]);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -1280,6 +1281,7 @@ function Workspace(props) {
                   playingOctave={playingOctave}
                   setPlayNoteFunction={setPlayNoteFunction}
                   zoomPosition={zoomPosition}
+                  setModuleRows={setModuleRows}
                 />
               ) : (
                 <Fragment>
@@ -1351,6 +1353,7 @@ function Workspace(props) {
               playNoteFunction={playNoteFunction}
               playingOctave={playingOctave}
               setPlayingOctave={setPlayingOctave}
+              instrumentInfo={instrumentsInfo[selectedModule]}
             />
             <div className="ws-note-input-options">
               <Select

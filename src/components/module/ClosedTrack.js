@@ -39,38 +39,19 @@ function ClosedTrack(props) {
   const loadModuleRows = () => {
     let rows = [];
     if (!props.instrument) return;
-    if (trackType === 0) {
-      let array = isSelected
-        ? Object.keys(
-            Array(props.instrument._buffers._buffers.size).fill(0)
-          ).map((e) => parseInt(e))
-        : [...new Set(props.module.score.map((item) => item.note))].sort(
-            (a, b) => a - b
-          );
 
-      rows = array.map((e, i) => {
-        return {
-          note: e,
-          //player: props.instrument.player(e),
-        };
-      });
-    }
-    if (trackType === 1) {
-      let array = isSelected
-        ? Array(88)
-            .fill(0)
-            .map((e, i) => 108 - i)
-        : [...new Set(props.module.score.map((item) => item.note))].sort(
-            (a, b) => b - a
-          );
+    let array = [...new Set(props.module.score.map((item) => item.note))].sort(
+      (a, b) => a - b
+    );
 
-      rows = array.map((e, i) => {
-        return {
-          index: e,
-          note: e,
-        };
-      });
-    }
+    rows = array.map((e, i) => {
+      return {
+        note: e,
+        index: e,
+        //player: props.instrument.player(e),
+      };
+    });
+
     setModuleRows(rows);
   };
 

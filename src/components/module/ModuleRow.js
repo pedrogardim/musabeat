@@ -20,7 +20,7 @@ import {
   clearEvents,
 } from "../../utils/TransportSchedule";
 
-import { drumMapping } from "../../assets/musicutils";
+import { drumMapping, drumAbbreviations } from "../../assets/musicutils";
 
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
@@ -46,8 +46,9 @@ function ModuleRow(props) {
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
   const loadModuleRows = () => {
-    let rows = [];
     if (!props.instrument) return;
+    let rows = [];
+
     if (trackType === 0) {
       let array = isSelected
         ? [...props.instrument._buffers._buffers.keys()].map((e) => parseInt(e))
@@ -59,8 +60,8 @@ function ModuleRow(props) {
         return {
           note: e,
           player: props.instrument.has(e) ? props.instrument.player(e) : null,
-          wavepath: drawWave(props.instrument.player(e).buffer.toArray()),
-          lbl: drumMapping[e],
+          //wavepath: drawWave(props.instrument.player(e).buffer.toArray()),
+          lbl: drumAbbreviations[e],
         };
       });
     }
@@ -103,9 +104,14 @@ function ModuleRow(props) {
   };
 
   const playNote = (note) => {
-    //console.log(Tone.Frequency(note, "midi").toNote());
+    console.log(moduleRows, note);
     if (props.module.type === 0) {
-      if (!props.instrument.has(moduleRows[note].note)) return;
+      if (
+        moduleRows[note] === undefined ||
+        moduleRows[note] === null ||
+        !props.instrument.has(moduleRows[note].note)
+      )
+        return;
       props.instrument.player(moduleRows[note].note).start();
     } else {
       props.instrument.triggerAttack(Tone.Frequency(note, "midi"));
@@ -342,13 +348,13 @@ function ModuleRow(props) {
   }, [gridPos]);
 
   useEffect(() => {
-    //console.log(moduleRows[0], moduleRows.length);
+    moduleRows && props.setModuleRows(moduleRows);
   }, [moduleRows]);
 
   useEffect(() => {
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
-  }, []);
+  }, [moduleRows]);
 
   useEffect(() => {
     //console.log(drawingNote);
@@ -430,13 +436,7 @@ function ModuleRow(props) {
               className="module-inner-row-label"
               style={{ color: colors[props.module.color][900] }}
             >
-              {trackType === 0
-                ? row.lbl
-                    .match(/[^aeiou., ]/gi)
-                    .slice(0, 3)
-                    .join()
-                    .replaceAll(",", "")
-                : row.lbl}
+              {row.lbl}
             </span>
             {trackType === 0 && <div className="module-inner-row-line" />}
           </div>

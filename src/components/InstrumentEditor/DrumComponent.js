@@ -66,9 +66,7 @@ function DrumElement(props) {
       e.target.className.includes &&
       e.target.className.includes("drum-component")
     ) {
-      props.instrument.name === "Sampler"
-        ? props.instrument.triggerAttackRelease(props.fileLabel, "8n")
-        : props.instrument.player(props.index).start();
+      if (props.exists) props.instrument.player(props.index).start();
     }
   };
 
@@ -84,6 +82,7 @@ function DrumElement(props) {
       component={Paper}
       onClick={handleClick}
       className="drum-component"
+      style={{ backgroundColor: !props.exists && "lightgray" }}
     >
       {props.exists && (
         <img className="dc-img-corner" src={drumImgMag[props.index]} />

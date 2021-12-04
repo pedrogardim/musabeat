@@ -13,8 +13,7 @@ import Keyboard from "./Keyboard";
 function NotesInput(props) {
   const [keyPage, setKeyPage] = useState(0);
   const handleClick = (event, i) => {
-    if (!props.instrument.has(i)) return;
-    props.instrument.player(i).start();
+    props.playNoteFunction[0](i);
     props.setPressedKeys((prev) => [...prev, i]);
   };
 
@@ -61,7 +60,9 @@ function NotesInput(props) {
                 style={{
                   backgroundColor: props.pressedKeys.includes(i)
                     ? "darkgray"
-                    : !props.instrument.has(i) && "lightgray",
+                    : !props.instrument.has(
+                        Object.keys(props.instrumentInfo.filesInfo)[i]
+                      ) && "lightgray",
                 }}
               >
                 {/* <Tooltip title={filesName && filesName[i]}>
@@ -98,7 +99,14 @@ function NotesInput(props) {
                 >
                   {e}
                 </span>
-                <span style={{ lineHeight: 1.3 }}>{drumMapping[i]}</span>
+                <span style={{ lineHeight: 1.3 }}>
+                  {props.instrumentInfo &&
+                    drumMapping[
+                      Object.keys(props.instrumentInfo.filesInfo).sort(
+                        (a, b) => a - b
+                      )[i]
+                    ]}
+                </span>
               </Paper>
               {i === 9 && <div className="break" />}
             </Fragment>
