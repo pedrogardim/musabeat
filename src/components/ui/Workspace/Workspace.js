@@ -807,6 +807,7 @@ function Workspace(props) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
+      instruments.forEach((e) => !e.name.includes("Player") && e.releaseAll());
       Tone.Transport.pause();
       setIsRecording(false);
       setIsPlaying(false);
@@ -1329,7 +1330,7 @@ function Workspace(props) {
         <InstrumentEditor
           module={modules[selectedModule]}
           instrument={instruments[selectedModule]}
-          instrumentsInfo={instrumentsInfo[selectedModule]}
+          instrumentInfo={instrumentsInfo[selectedModule]}
           setModules={setModules}
           setInstruments={setInstruments}
           resetUndoHistory={() => handleUndo("RESET")}

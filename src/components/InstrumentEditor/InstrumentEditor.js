@@ -247,12 +247,12 @@ function InstrumentEditor(props) {
         .doc(props.module.instrument)
         .get()
         .then((urls) => {
-          setFilesName((prev) => {
+          /*    setFilesName((prev) => {
             let newFileNames = { ...prev };
             newFileNames[newNote] = newFileNames[note];
             delete newFileNames[note];
             return newFileNames;
-          });
+          }); */
 
           let urlsObj = urls.data().urls;
           urlsObj[newNote] = urlsObj[note];
@@ -289,12 +289,12 @@ function InstrumentEditor(props) {
               });
         });
     } else {
-      setFilesName((prev) => {
+      /*  setFilesName((prev) => {
         let newFileNames = { ...prev };
         newFileNames[newNote] = newFileNames[note];
         delete newFileNames[note];
         return newFileNames;
-      });
+      }); */
 
       let urlsObj = { ...props.module.instrument.urls };
       urlsObj[newNote] = urlsObj[note];
@@ -502,7 +502,7 @@ function InstrumentEditor(props) {
           className={"ie-drum-cont"}
           spacing={1}
         >
-          {Array(32)
+          {Array(20)
             .fill(false)
             .map((e, i) => (
               <Grid xs={3} sm={3} md={3} lg={3} item>
@@ -517,12 +517,7 @@ function InstrumentEditor(props) {
                   buffer={props.instrument._buffers._buffers.get(
                     JSON.stringify(i)
                   )}
-                  fileLabel={
-                    props.module.lbls[i]
-                      ? `"${props.module.lbls[i]}"`
-                      : "Slot " + (i + 1)
-                  }
-                  fileName={filesName[i]}
+                  fileInfo={props.instrumentInfo.filesInfo[i]}
                   setRenamingLabel={setRenamingLabel}
                   openFilePage={(ev) =>
                     props.handlePageNav("file", filesId[i], ev)

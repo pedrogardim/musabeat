@@ -20,6 +20,8 @@ import {
   clearEvents,
 } from "../../utils/TransportSchedule";
 
+import { drumMapping } from "../../assets/musicutils";
+
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
 import { ContactPhoneSharp } from "@material-ui/icons";
@@ -48,9 +50,7 @@ function ModuleRow(props) {
     if (!props.instrument) return;
     if (trackType === 0) {
       let array = isSelected
-        ? Object.keys(
-            Array(props.instrument._buffers._buffers.size).fill(0)
-          ).map((e) => parseInt(e))
+        ? [...props.instrument._buffers._buffers.keys()].map((e) => parseInt(e))
         : [...new Set(props.module.score.map((item) => item.note))].sort(
             (a, b) => a - b
           );
@@ -58,9 +58,9 @@ function ModuleRow(props) {
       rows = array.map((e, i) => {
         return {
           note: e,
-          lbl: props.module.lbls[e],
-          player: props.instrument.player(e),
+          player: props.instrument.has(e) ? props.instrument.player(e) : null,
           wavepath: drawWave(props.instrument.player(e).buffer.toArray()),
+          lbl: drumMapping[e],
         };
       });
     }
@@ -105,8 +105,8 @@ function ModuleRow(props) {
   const playNote = (note) => {
     //console.log(Tone.Frequency(note, "midi").toNote());
     if (props.module.type === 0) {
-      if (!props.instrument.has(note)) return;
-      props.instrument.player(note).start();
+      if (!props.instrument.has(moduleRows[note].note)) return;
+      props.instrument.player(moduleRows[note].note).start();
     } else {
       props.instrument.triggerAttack(Tone.Frequency(note, "midi"));
     }
@@ -115,7 +115,7 @@ function ModuleRow(props) {
 
     if (trackType === 0) {
       let newNote = {
-        note: note,
+        note: moduleRows[note].note,
         time: Tone.Time(
           Tone.Time(Tone.Transport.seconds).quantize(`${props.gridSize}n`)
         ).toBarsBeatsSixteenths(),
@@ -190,7 +190,8 @@ function ModuleRow(props) {
       let find =
         props.module.score.findIndex(
           (e) =>
-            (e.note === gridPos[0] || e.note === 108 - gridPos[0]) &&
+            (e.note === moduleRows[gridPos[0]].note ||
+              e.note === 108 - gridPos[0]) &&
             e.time ===
               Tone.Time(
                 (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
@@ -222,7 +223,7 @@ function ModuleRow(props) {
 
     if (trackType === 0) {
       let newNote = {
-        note: gridPos[0],
+        note: moduleRows[gridPos[0]].note,
         time: Tone.Time(
           (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
         ).toBarsBeatsSixteenths(),

@@ -6,6 +6,8 @@ import { Paper, IconButton, Typography } from "@material-ui/core";
 
 import "./NotesInput.css";
 
+import { drumMapping } from "../../../assets/musicutils";
+
 import Keyboard from "./Keyboard";
 
 function NotesInput(props) {
@@ -96,9 +98,7 @@ function NotesInput(props) {
                 >
                   {e}
                 </span>
-                <span variant="overline" style={{ lineHeight: 1.3 }}>
-                  {props.module.lbls && props.module.lbls[i]}
-                </span>
+                <span style={{ lineHeight: 1.3 }}>{drumMapping[i]}</span>
               </Paper>
               {i === 9 && <div className="break" />}
             </Fragment>

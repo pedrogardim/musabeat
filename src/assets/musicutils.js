@@ -598,6 +598,107 @@ export const sessionTags = {
   191: "Psybient",
 };
 
+/* export const standardMIDIDrumMapping = {
+  0: "Acoustic Bass Drum",
+  1: "Bass Drum 1",
+  2: "Side Stick",
+  3: "Acoustic Snare",
+  4: "Hand Clap",
+  5: "Electric Snare",
+  6: "Low Floor Tom",
+  7: "Closed Hi Hat",
+  8: "High Floor Tom",
+  9: "Pedal Hi-Hat",
+  10: "Low Tom",
+  11: "Open Hi-Hat",
+  12: "Low-Mid Tom",
+  13: "Hi-Mid Tom",
+  14: "Crash Cymbal 1",
+  15: "High Tom",
+  16: "Ride Cymbal 1",
+  17: "Chinese Cymbal",
+  18: "Ride Bell",
+  19: "Tambourine",
+  20: "Splash Cymbal",
+  21: "Cowbell",
+  22: "Crash Cymbal 2",
+  23: "Vibraslap",
+  24: "Ride Cymbal 2",
+  25: "Hi Bongo",
+  26: "Low Bongo",
+  27: "Mute Hi Conga",
+  28: "Open Hi Conga",
+  29: "Low Conga",
+  30: "High Timbale",
+  31: "Low Timbale",
+  32: "High Agogo",
+  33: "Low Agogo",
+  34: "Cabasa",
+  35: "Maracas",
+  36: "Short Whistle",
+  37: "Long Whistle",
+  38: "Short Guiro",
+  39: "Long Guiro",
+  40: "Claves",
+  41: "Hi Wood Block",
+  42: "Low Wood Block",
+  43: "Mute Cuica",
+  44: "Open Cuica",
+  45: "Mute Triangle",
+  46: "Open Triangle",
+}; */
+
+//GOOD ONE
+
+export const drumMapping = {
+  0: "Kick 1",
+  1: "Kick 2",
+  2: "Snare 1",
+  3: "Snare 2",
+  4: "Side Stick",
+  5: "Clap",
+  6: "Closed Hi Hat",
+  7: "Open Hi-Hat",
+  8: "Pedal Hi-Hat",
+  9: "Floor Tom",
+  10: "Low Tom",
+  11: "Mid Tom",
+  12: "Hi Tom",
+  13: "Crash 1",
+  14: "Crash 2",
+  15: "Ride 1",
+  16: "Ride 2",
+  17: "Ride Bell",
+  18: "Tambourine",
+  19: "Cowbell",
+
+  /*   21: "Splash Cymbal",
+  23: "Vibraslap",
+  24: "Chinese Cymbal",
+  25: "Hi Bongo",
+  26: "Low Bongo",
+  27: "Mute Hi Conga",
+  28: "Open Hi Conga",
+  29: "Low Conga",
+  30: "High Timbale",
+  31: "Low Timbale",
+  32: "High Agogo",
+  33: "Low Agogo",
+  34: "Cabasa",
+  35: "Maracas",
+  36: "Short Whistle",
+  37: "Long Whistle",
+  38: "Short Guiro",
+  39: "Long Guiro",
+  40: "Claves",
+  41: "Hi Wood Block",
+  42: "Low Wood Block",
+  43: "Mute Cuica",
+  44: "Open Cuica",
+  45: "Mute Triangle",
+  46: "Open Triangle", */
+};
+
 export const keySamplerMapping = {
   KeyQ: 0,
   KeyW: 1,
@@ -1219,13 +1320,16 @@ export const loadDrumPatch = async (
   let filesInfo = await Promise.all(
     Object.keys(patch.urls).map(async (e, i) => {
       try {
-        return (
-          await firebase
-            .firestore()
-            .collection("files")
-            .doc(patch.urls[e])
-            .get()
-        ).data();
+        return [
+          e,
+          (
+            await firebase
+              .firestore()
+              .collection("files")
+              .doc(patch.urls[e])
+              .get()
+          ).data(),
+        ];
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
@@ -1237,7 +1341,10 @@ export const loadDrumPatch = async (
 
   setInstrumentsInfo((prev) => {
     let newInfo = [...prev];
-    newInfo[moduleIndex] = { patch: patch, filesInfo: filesInfo };
+    newInfo[moduleIndex] = {
+      patch: patch,
+      filesInfo: Object.fromEntries(filesInfo),
+    };
     return newInfo;
   });
 
@@ -1248,6 +1355,8 @@ export const loadDrumPatch = async (
       .filter((e) => e !== undefined)
       .map((e, i) => [Object.keys(patch.urls)[i], e])
   );
+
+  //console.log(urls);
 
   //console.log(urls);
 

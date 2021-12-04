@@ -51,8 +51,7 @@ function ClosedTrack(props) {
       rows = array.map((e, i) => {
         return {
           note: e,
-          lbl: props.module.lbls[e],
-          player: props.instrument.player(e),
+          //player: props.instrument.player(e),
         };
       });
     }
@@ -69,7 +68,6 @@ function ClosedTrack(props) {
         return {
           index: e,
           note: e,
-          lbl: Tone.Frequency(e, "midi").toNote(),
         };
       });
     }
