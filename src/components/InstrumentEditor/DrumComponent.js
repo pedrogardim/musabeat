@@ -16,7 +16,7 @@ import {
   Typography,
   Tooltip,
   Paper,
-  Button,
+  Grid,
   ButtonBase,
 } from "@material-ui/core";
 
@@ -59,7 +59,6 @@ function DrumElement(props) {
   const { t } = useTranslation();
 
   const [wavePath, setWavePath] = useState("");
-  const isDrum = true;
 
   const handleClick = (e) => {
     if (
@@ -76,71 +75,82 @@ function DrumElement(props) {
   );
 
   return (
-    <ButtonBase
-      fullWidth={true}
-      elevation={2}
-      component={Paper}
-      onClick={handleClick}
-      className="drum-component"
-      style={{ backgroundColor: !props.exists && "lightgray" }}
-    >
-      {props.exists && (
-        <img className="dc-img-corner" src={drumImgMag[props.index]} />
-      )}
-
-      <div
-        style={{
-          height: 64,
-          width: 128,
-          margin: 16,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+    <Grid xs={3} sm={3} md={3} lg={3} item>
+      <ButtonBase
+        fullWidth={true}
+        elevation={!props.exists ? 0 : 2}
+        component={Paper}
+        onClick={handleClick}
+        className="drum-component"
+        style={{ backgroundColor: !props.exists && "rgba(0,0,0,0.05)" }}
       >
-        {props.exists ? (
-          <svg
-            onClick={props.openFilePage}
-            className="dc-audio-file-item-waveform"
-            width="128px"
-            height="64px"
-            viewBow="0 0 64 32"
-          >
-            <path d={wavePath} stroke="#3f51b5" fill="none" />
-          </svg>
+        {!props.isDrum ? (
+          <span className="dc-slot-indicator">{props.index + 1}</span>
         ) : (
-          <img className={"dc-img-centered"} src={drumImgMag[props.index]} />
+          props.exists && (
+            <img className="dc-img-corner" src={drumImgMag[props.index]} />
+          )
         )}
-      </div>
 
-      <span
-        className="audio-file-item-label"
-        /* onClick={() =>
+        {(props.exists || props.isDrum) && (
+          <div
+            style={{
+              position: "relative",
+              width: 128,
+              height: 64,
+              minHeight: 64,
+              marginBottom: 16,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flex: "0 0",
+            }}
+          >
+            {props.exists ? (
+              <svg
+                onClick={props.openFilePage}
+                className="dc-audio-file-item-waveform"
+                viewBow="0 0 64 32"
+              >
+                <path d={wavePath} stroke="#3f51b5" fill="none" />
+              </svg>
+            ) : (
+              props.isDrum && (
+                <img
+                  className={"dc-img-centered"}
+                  src={drumImgMag[props.index]}
+                />
+              )
+            )}
+          </div>
+        )}
+
+        <span
+          className="audio-file-item-label"
+          /* onClick={() =>
           props.instrument.name === "Players" &&
           props.setRenamingLabel(props.index)
         } */
-      >
-        {props.exists
-          ? props.fileInfo.name + "." + fileExtentions[props.fileInfo.type]
-          : drumMapping[props.index]}
-      </span>
-
-      <Tooltip title="Remove file from instrument">
-        <IconButton
-          className="remove-drum-component-button"
-          onClick={() =>
-            props.handleFileDelete(props.fileId, props.fileLabel, props.index)
-          }
         >
-          <Icon style={{ fontSize: 18 }}>close</Icon>
-        </IconButton>
-      </Tooltip>
-      {!isDrum && (
-        <Typography variant="overline" className="dc-slot-indicator">
-          {props.index + 1}
-        </Typography>
-      )}
-    </ButtonBase>
+          {props.exists
+            ? props.fileInfo.name + "." + fileExtentions[props.fileInfo.type]
+            : props.isDrum
+            ? drumMapping[props.index]
+            : "Empty"}
+        </span>
+
+        <Tooltip title="Remove file from instrument">
+          <IconButton
+            className="remove-drum-component-button"
+            onClick={() =>
+              props.handleFileDelete(props.fileId, props.fileLabel, props.index)
+            }
+          >
+            <Icon style={{ fontSize: 18 }}>close</Icon>
+          </IconButton>
+        </Tooltip>
+      </ButtonBase>
+    </Grid>
   );
 }
 

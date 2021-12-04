@@ -157,10 +157,6 @@ function Workspace(props) {
       ? keySamplerMapping
       : keyboardMapping;
 
-  const checkCustomPatch =
-    selectedModule !== null &&
-    typeof modules[selectedModule].instrument !== "string";
-
   const handleUndo = (action) => {
     let currentModules = deepCopy(modules);
 
@@ -1333,6 +1329,7 @@ function Workspace(props) {
           module={modules[selectedModule]}
           instrument={instruments[selectedModule]}
           instrumentInfo={instrumentsInfo[selectedModule]}
+          setInstrumentsInfo={setInstrumentsInfo}
           setModules={setModules}
           setInstruments={setInstruments}
           resetUndoHistory={() => handleUndo("RESET")}
@@ -1353,38 +1350,10 @@ function Workspace(props) {
               playNoteFunction={playNoteFunction}
               playingOctave={playingOctave}
               setPlayingOctave={setPlayingOctave}
+              moduleRows={moduleRows}
               instrumentInfo={instrumentsInfo[selectedModule]}
             />
             <div className="ws-note-input-options">
-              <Select
-                value={
-                  checkCustomPatch
-                    ? "Custom"
-                    : modules[selectedModule].instrument
-                }
-              >
-                <MenuItem
-                  value={
-                    checkCustomPatch
-                      ? "Custom"
-                      : modules[selectedModule].instrument
-                  }
-                >
-                  {checkCustomPatch
-                    ? "Custom"
-                    : instrumentsInfo[selectedModule] &&
-                      instrumentsInfo[selectedModule].patch &&
-                      instrumentsInfo[selectedModule].patch.name}
-                </MenuItem>
-              </Select>
-              <IconButton onClick={() => setIEOpen((prev) => !prev)}>
-                <Icon>tune</Icon>
-              </IconButton>
-              {checkCustomPatch && (
-                <IconButton>
-                  <Icon>save</Icon>
-                </IconButton>
-              )}
               {modules[selectedModule].type === 1 && (
                 <div style={{ marginLeft: "auto" }}>
                   Octave {playingOctave + 1}
@@ -1449,52 +1418,57 @@ function Workspace(props) {
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
       >
-        <Fade in={menuOpen}>
-          <Fragment>
-            <div
-              style={{
-                width: 56,
-                right: 16,
-                position: "fixed",
-                bottom: 80,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-              }}
-            >
-              <Fab color="primary" className="ws-fab-v">
-                <Icon>settings</Icon>
-              </Fab>
+        <Fragment>
+          <div
+            style={{
+              width: 56,
+              right: 16,
+              position: "fixed",
+              bottom: 80,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <Fab color="primary" className="ws-fab-v">
+              <Icon>settings</Icon>
+            </Fab>
 
-              <Fab color="primary" className="ws-fab-v">
-                <Icon>download</Icon>
-              </Fab>
+            <Fab color="primary" className="ws-fab-v">
+              <Icon>download</Icon>
+            </Fab>
 
-              <Fab color="primary" className="ws-fab-v">
-                <Icon>save</Icon>
-              </Fab>
-            </div>
-            <div
-              style={{
-                right: 80,
-                position: "fixed",
-                bottom: 16,
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
+            <Fab color="primary" className="ws-fab-v">
+              <Icon>save</Icon>
+            </Fab>
+          </div>
+          <div
+            style={{
+              right: 80,
+              position: "fixed",
+              bottom: 16,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <Fab
+              className="ws-fab-h"
+              onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
             >
-              <Fab
-                className="ws-fab-h"
-                onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
-              >
-                <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
-                  {cursorMode ? "edit" : "navigation"}
-                </Icon>
-              </Fab>
-            </div>
-          </Fragment>
-        </Fade>
+              <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
+                {cursorMode ? "edit" : "navigation"}
+              </Icon>
+            </Fab>
+            <Fab
+              className="ws-fab-h"
+              onClick={() => setIEOpen((prev) => !prev)}
+              color="primary"
+            >
+              <Icon>piano</Icon>
+            </Fab>
+          </div>
+        </Fragment>
       </Modal>
 
       {/* <Paper

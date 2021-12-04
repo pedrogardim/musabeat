@@ -14,6 +14,7 @@ import {
   Icon,
   Grid,
   Select,
+  SvgIcon,
 } from "@material-ui/core";
 
 import AudioFileItem from "./AudioFileItem";
@@ -34,10 +35,13 @@ import { FileDrop } from "react-file-drop";
 
 import { useTranslation } from "react-i18next";
 
+//import sdImg from "../../../src/assets/img/sd.svg";
+
 import {
   detectPitch,
   fileTypes,
   fileExtentions,
+  drumIcon,
 } from "../../assets/musicutils";
 
 import "./InstrumentEditor.css";
@@ -68,9 +72,13 @@ function InstrumentEditor(props) {
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
 
-  const isDrum = props.module.type === 0;
+  const trackType = props.module.type;
 
   const patchSizeLimit = 5242880;
+
+  const checkCustomPatch = typeof module.instrument !== "string";
+
+  const isDrum = trackType === 0 && props.instrumentInfo.patch.dr;
 
   const setIntrument = (newInstrument) => {
     props.setInstruments((prev) => {
@@ -137,6 +145,14 @@ function InstrumentEditor(props) {
         }
         return newPatch;
       });
+  };
+
+  const toggleSamplerMode = () => {
+    props.setInstrumentsInfo((prev) => {
+      let newInstrInfo = [...prev];
+      newInstrInfo[props.index].patch.dr = !newInstrInfo[props.index].patch.dr;
+      return newInstrInfo;
+    });
   };
 
   const handleFileDrop = (files, event) => {
@@ -343,7 +359,7 @@ function InstrumentEditor(props) {
       likes: 0,
     };
 
-    let patchInfo = !isDrum
+    let patchInfo = !trackType
       ? props.instrument.name === "Sampler"
         ? {
             base: "Sampler",
@@ -367,7 +383,7 @@ function InstrumentEditor(props) {
 
     const newPatchRef = firebase
       .firestore()
-      .collection(!isDrum ? "patches" : "drumpatches");
+      .collection(!trackType ? "patches" : "drumpatches");
 
     const userRef = firebase.firestore().collection("users").doc(user.uid);
 
@@ -385,7 +401,7 @@ function InstrumentEditor(props) {
       );
 
       userRef.update(
-        !isDrum
+        !trackType
           ? { patches: firebase.firestore.FieldValue.arrayUnion(r.id) }
           : { drumPatches: firebase.firestore.FieldValue.arrayUnion(r.id) }
       );
@@ -499,32 +515,32 @@ function InstrumentEditor(props) {
           direction="row"
           justifyContent="center"
           alignItems="stretch"
-          className={"ie-drum-cont"}
+          className="ie-drum-cont"
+          columns={{ xs: 4, sm: 4, md: 4 }}
           spacing={1}
         >
           {Array(20)
             .fill(false)
             .map((e, i) => (
-              <Grid xs={3} sm={3} md={3} lg={3} item>
-                <DrumComponent
-                  exists={props.instrument._buffers._buffers.has(
-                    JSON.stringify(i)
-                  )}
-                  key={i}
-                  index={i}
-                  instrument={props.instrument}
-                  handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
-                  buffer={props.instrument._buffers._buffers.get(
-                    JSON.stringify(i)
-                  )}
-                  fileInfo={props.instrumentInfo.filesInfo[i]}
-                  setRenamingLabel={setRenamingLabel}
-                  openFilePage={(ev) =>
-                    props.handlePageNav("file", filesId[i], ev)
-                  }
-                  fileId={filesId[i]}
-                />
-              </Grid>
+              <DrumComponent
+                exists={props.instrument._buffers._buffers.has(
+                  JSON.stringify(i)
+                )}
+                key={i}
+                index={i}
+                instrument={props.instrument}
+                handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
+                buffer={props.instrument._buffers._buffers.get(
+                  JSON.stringify(i)
+                )}
+                fileInfo={props.instrumentInfo.filesInfo[i]}
+                setRenamingLabel={setRenamingLabel}
+                openFilePage={(ev) =>
+                  props.handlePageNav("file", filesId[i], ev)
+                }
+                fileId={filesId[i]}
+                isDrum={isDrum}
+              />
             ))}
         </Grid>
       );
@@ -621,13 +637,45 @@ function InstrumentEditor(props) {
           setSnackbarMessage={props.setSnackbarMessage}
           module={props.module}
           instrument={props.instrument}
-          isDrum={isDrum}
+          trackType={trackType}
           patchSize={patchSize}
           setPatchSize={setPatchSize}
         />
       )} */}
 
       {mainContent}
+      <div className="ie-bottom-menu">
+        <Select value={checkCustomPatch ? "Custom" : props.module.instrument}>
+          <MenuItem
+            value={checkCustomPatch ? "Custom" : props.module.instrument}
+          >
+            {checkCustomPatch
+              ? "Custom"
+              : props.instrumentInfo &&
+                props.instrumentInfo.patch &&
+                props.instrumentInfo.patch.name}
+          </MenuItem>
+        </Select>
+
+        {checkCustomPatch && (
+          <IconButton>
+            <Icon>save</Icon>
+          </IconButton>
+        )}
+        <Divider orientation="vertical" flexItem />
+        {trackType === 0 ? (
+          <Fragment>
+            <IconButton
+              color={isDrum ? "primary" : "disabled"}
+              onClick={toggleSamplerMode}
+            >
+              <SvgIcon viewBox="0 0 351 322.7">{drumIcon}</SvgIcon>
+            </IconButton>
+          </Fragment>
+        ) : (
+          <Fragment></Fragment>
+        )}
+      </div>
       {draggingOver && props.instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {

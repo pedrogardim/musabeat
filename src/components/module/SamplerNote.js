@@ -49,9 +49,8 @@ function SamplerNote(props) {
           top: "calc(50% - 8px)",
           width: 16,
           left: -8,
-          backgroundColor:
-            colors[props.module.color][isSelected ? 800 : 300] /*  border:
-          props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */,
+          backgroundColor: colors[props.module.color][isSelected ? 800 : 300],
+          filter: !props.exists && "saturate(0.2)",
           transform: "rotate(45deg)",
         }}
       />

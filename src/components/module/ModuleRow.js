@@ -40,6 +40,8 @@ function ModuleRow(props) {
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
+  const [showingAll, setShowingAll] = useState(false);
+
   const trackType = props.module.type;
   const isSelected = props.selectedModule === props.index;
 
@@ -51,7 +53,11 @@ function ModuleRow(props) {
 
     if (trackType === 0) {
       let array = isSelected
-        ? [...props.instrument._buffers._buffers.keys()].map((e) => parseInt(e))
+        ? showingAll
+          ? Object.keys(Array(20).fill(0)).map((e) => parseInt(e))
+          : [...props.instrument._buffers._buffers.keys()].map((e) =>
+              parseInt(e)
+            )
         : [...new Set(props.module.score.map((item) => item.note))].sort(
             (a, b) => a - b
           );
@@ -104,7 +110,6 @@ function ModuleRow(props) {
   };
 
   const playNote = (note) => {
-    console.log(moduleRows, note);
     if (props.module.type === 0) {
       if (
         moduleRows[note] === undefined ||
@@ -341,7 +346,13 @@ function ModuleRow(props) {
 
   useEffect(() => {
     loadModuleRows();
-  }, [props.instrument, props.module, props.isLoaded, props.selectedModule]);
+  }, [
+    props.instrument,
+    props.module,
+    props.isLoaded,
+    props.selectedModule,
+    showingAll,
+  ]);
 
   useEffect(() => {
     onGridPosChange();
@@ -349,11 +360,9 @@ function ModuleRow(props) {
 
   useEffect(() => {
     moduleRows && props.setModuleRows(moduleRows);
-  }, [moduleRows]);
-
-  useEffect(() => {
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
+    console.log(moduleRows);
   }, [moduleRows]);
 
   useEffect(() => {
@@ -434,7 +443,13 @@ function ModuleRow(props) {
           >
             <span
               className="module-inner-row-label"
-              style={{ color: colors[props.module.color][900] }}
+              onClick={() => setShowingAll((prev) => !prev)}
+              style={{
+                color:
+                  trackType === 0 && !props.instrument.has(row.note)
+                    ? "lightgrey"
+                    : colors[props.module.color][900],
+              }}
             >
               {row.lbl}
             </span>
@@ -461,6 +476,7 @@ function ModuleRow(props) {
                   selectedNotes={props.selectedNotes}
                   zoomPosition={props.zoomPosition}
                   a={rowRef.current}
+                  exists={props.instrument.has(note.note)}
                 />
               ) : (
                 <MelodyNote

@@ -32,7 +32,10 @@ function NotesInput(props) {
 
   return (
     <div className="ws-note-input-key-cont">
-      {props.module && props.instrument && props.module.type === 0 ? (
+      {props.module &&
+      props.instrument &&
+      props.moduleRows.length > 0 &&
+      props.module.type === 0 ? (
         /* Array(props.instrument._buffers._buffers.size) */
         Object.keys(props.keyMapping)
           .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
@@ -60,9 +63,8 @@ function NotesInput(props) {
                 style={{
                   backgroundColor: props.pressedKeys.includes(i)
                     ? "darkgray"
-                    : !props.instrument.has(
-                        Object.keys(props.instrumentInfo.filesInfo)[i]
-                      ) && "lightgray",
+                    : !props.instrument.has(props.moduleRows[i].note) &&
+                      "lightgray",
                 }}
               >
                 {/* <Tooltip title={filesName && filesName[i]}>
@@ -101,11 +103,7 @@ function NotesInput(props) {
                 </span>
                 <span style={{ lineHeight: 1.3 }}>
                   {props.instrumentInfo &&
-                    drumMapping[
-                      Object.keys(props.instrumentInfo.filesInfo).sort(
-                        (a, b) => a - b
-                      )[i]
-                    ]}
+                    drumMapping[props.moduleRows[i].note]}
                 </span>
               </Paper>
               {i === 9 && <div className="break" />}
