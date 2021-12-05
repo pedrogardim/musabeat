@@ -178,7 +178,7 @@ function WorkspaceGrid(props) {
                       : 0.2,
                 }}
               >
-                {i % props.gridSize === 0 && (
+                {i % props.gridSize === 0 && !props.IEOpen && (
                   <span className="ws-grid-line-mesure-num">
                     {i / props.gridSize + 1 + props.zoomPosition[0]}
                   </span>

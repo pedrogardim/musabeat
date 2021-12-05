@@ -41,7 +41,11 @@ function ClosedTrackNote(props) {
               (zoomSize * Tone.Time("1m").toSeconds())) -
           props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
         }px,${
-          props.moduleRows.findIndex((e) => e.note === props.note.note) *
+          props.moduleRows
+            .sort((a, b) =>
+              trackType === 0 ? a.note - b.note : b.note - a.note
+            )
+            .findIndex((e) => e.note === props.note.note) *
           (props.rowRef.current.scrollHeight / props.moduleRows.length)
         }px)`,
         backgroundColor: "transparent",

@@ -50,7 +50,7 @@ function InstrumentEditor(props) {
   const { t } = useTranslation();
 
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchExplorer, setPatchExplorer] = useState(!props.patchPage);
+  const [patchExplorer, setPatchExplorer] = useState(false);
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -473,6 +473,47 @@ function InstrumentEditor(props) {
     props.resetUndoHistory();
   };
 
+  const updateFilesStatsOnChange = async () => {
+    //when change the instrument, update file "in" stat by -1
+    /*
+
+    let instrobj =
+      typeof props.module.instrument === "string"
+        ? (
+            await firebase
+              .firestore()
+              .collection(props.module.type === 0 ? "drumpatches" : "patches")
+              .doc(props.module.instrument)
+              .get()
+          ).data()
+        : props.module.instrument;
+
+    typeof props.module.instrument === "string" &&
+      firebase
+        .firestore()
+        .collection(props.module.type === 0 ? "drumpatches" : "patches")
+        .doc(props.module.instrument)
+        .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+    if (instrobj.urls)
+      Object.values(instrobj.urls).forEach((e) =>
+        firebase
+          .firestore()
+          .collection("files")
+          .doc(e)
+          .update({ in: firebase.firestore.FieldValue.increment(-1) })
+      );
+
+    if (instrobj.url)
+      firebase
+        .firestore()
+        .collection("files")
+        .doc(instrobj.url)
+        .update({ in: firebase.firestore.FieldValue.increment(-1) });
+
+        */
+  };
+
   //used for
 
   /* ================================================================ */
@@ -645,7 +686,11 @@ function InstrumentEditor(props) {
 
       {mainContent}
       <div className="ie-bottom-menu">
-        <Select value={checkCustomPatch ? "Custom" : props.module.instrument}>
+        <Select
+          value={checkCustomPatch ? "Custom" : props.module.instrument}
+          onMouseDown={() => setPatchExplorer(true)}
+          inputProps={{ readOnly: true }}
+        >
           <MenuItem
             value={checkCustomPatch ? "Custom" : props.module.instrument}
           >
@@ -739,6 +784,25 @@ function InstrumentEditor(props) {
         patchSize={patchSize}
         setPatchSize={setPatchSize}
       /> */}
+
+      {patchExplorer && (
+        <PatchExplorer
+          compact
+          patchExplorer={patchExplorer}
+          index={props.index}
+          module={props.module}
+          setModules={props.setModules}
+          setIEOpen={props.setIEOpen}
+          setPatchExplorer={setPatchExplorer}
+          instrument={props.instrument}
+          setInstruments={props.setInstruments}
+          setInstrumentLoaded={props.setInstrumentLoaded}
+          setInstrumentsLoaded={props.setInstrumentsLoaded}
+          saveUserPatch={saveUserPatch}
+          isDrum={isDrum}
+          updateFilesStatsOnChange={updateFilesStatsOnChange}
+        />
+      )}
 
       {renamingLabel &&
         (props.module.type === 0 ? (

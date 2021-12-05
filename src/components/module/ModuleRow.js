@@ -47,6 +47,8 @@ function ModuleRow(props) {
 
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
+  const trackInstrument = props.instruments[props.selectedModule];
+
   const loadModuleRows = () => {
     if (!props.instrument) return;
     let rows = [];
@@ -348,6 +350,7 @@ function ModuleRow(props) {
     loadModuleRows();
   }, [
     props.instrument,
+    props.instruments,
     props.module,
     props.isLoaded,
     props.selectedModule,
@@ -359,11 +362,11 @@ function ModuleRow(props) {
   }, [gridPos]);
 
   useEffect(() => {
+    console.log("props.instrument", props.instrument);
     moduleRows && props.setModuleRows(moduleRows);
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
-    console.log(moduleRows);
-  }, [moduleRows]);
+  }, [props.instrument, props.instruments]);
 
   useEffect(() => {
     //console.log(drawingNote);

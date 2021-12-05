@@ -100,6 +100,14 @@ function PatchExplorer(props) {
 
   const itemsPerPage = 15;
 
+  const setTrackIntrument = (instr) => {
+    props.setInstruments((prev) => {
+      let newInstruments = [...prev];
+      newInstruments[props.index] = instr;
+      return newInstruments;
+    });
+  };
+
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
       props.updateFilesStatsOnChange();
@@ -143,7 +151,7 @@ function PatchExplorer(props) {
           () => {},
           setNotifications
         ).then((instr) => {
-          props.setInstrument(instr);
+          setTrackIntrument(instr);
         });
       } else if (patchdata[index].base === "Sampler") {
         loadSamplerFromObject(
@@ -153,11 +161,11 @@ function PatchExplorer(props) {
           () => {},
           setNotifications
         ).then((instr) => {
-          props.setInstrument(instr);
+          setTrackIntrument(instr);
         });
       } else {
         let instr = loadSynthFromGetObject(patchdata[index]);
-        props.setInstrument(instr);
+        setTrackIntrument(instr);
       }
 
       props.setModules((previous) =>
@@ -174,8 +182,9 @@ function PatchExplorer(props) {
         })
       );
       setSelectedPatch(patchIdList[index]);
-      //props.setPatchExplorer(false);
-      props.setModulePage(null);
+      props.setPatchExplorer(false);
+
+      //props.setIEOpen(false);
     }
   };
 

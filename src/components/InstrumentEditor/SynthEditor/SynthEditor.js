@@ -54,7 +54,7 @@ function SynthEditor(props) {
 
   return (
     <div
-      className="instrument-editor"
+      className="ie-synth-cont"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
@@ -67,50 +67,51 @@ function SynthEditor(props) {
         }
         onChange={props.changeInstrumentType}
         className="instrument-editor-type-select"
+        style={{ position: "absolute", top: 0 }}
       >
         {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
           <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
         ))}
       </Select>
-      <div className="ie-synth-cont">
-        <OscillatorEditor
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-          mousePosition={mousePosition}
-          expanded={expanded === 0}
-          setExpanded={setExpanded}
-        />
-        <div
-          style={{
-            height: 3,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            minWidth: 24,
-          }}
-        />
 
-        <SynthModifier
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-          mousePosition={mousePosition}
-          expanded={expanded === 1}
-          setExpanded={setExpanded}
-        />
-        <div
-          style={{
-            height: 3,
-            backgroundColor: "rgba(0,0,0,0.3)",
-            minWidth: 24,
-          }}
-        />
-        <SynthOutput
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-          mousePosition={mousePosition}
-          expanded={expanded === 2}
-          setExpanded={setExpanded}
-        />
+      <OscillatorEditor
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        mousePosition={mousePosition}
+        expanded={expanded === 0}
+        setExpanded={setExpanded}
+      />
+      <div
+        style={{
+          height: 3,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          minWidth: 24,
+        }}
+      />
 
-        {/* {Object.keys(props.instrument.get()).map(
+      <SynthModifier
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        mousePosition={mousePosition}
+        expanded={expanded === 1}
+        setExpanded={setExpanded}
+      />
+      <div
+        style={{
+          height: 3,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          minWidth: 24,
+        }}
+      />
+      <SynthOutput
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        mousePosition={mousePosition}
+        expanded={expanded === 2}
+        setExpanded={setExpanded}
+      />
+
+      {/* {Object.keys(props.instrument.get()).map(
           (envelope, envelopeIndex) =>
             envelope.toLowerCase().includes("envelope") && (
               <EnvelopeControl
@@ -121,7 +122,6 @@ function SynthEditor(props) {
               />
             )
         )} */}
-      </div>
     </div>
   );
 }
