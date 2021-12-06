@@ -14,6 +14,8 @@ import {
   Grow,
 } from "@material-ui/core";
 
+import Knob from "./Knob";
+
 import { useTranslation } from "react-i18next";
 
 import { waveformShapes } from "../../../assets/musicutils";
@@ -75,11 +77,16 @@ function OscillatorEditor(props) {
     props.onInstrumentMod();
   };
 
-  const handleOscPartialsSelect = (e, value) => {
+  const handleOscPartialsSelect = (value) => {
     let newPartial = value === 0 ? "" : value;
     setOscPartials(newPartial);
     let newWave = oscType + oscWave + newPartial;
     props.instrument.set({ oscillator: { type: newWave } });
+  };
+
+  const handleOscParamSelect = (param, value) => {
+    props.instrument.set({ oscillator: { [param]: value } });
+    drawOscWave();
   };
 
   const drawOscWave = () => {
@@ -119,6 +126,8 @@ function OscillatorEditor(props) {
         <path d={oscillatorWaveForm} stroke="#3f51b5" fill="none" />
       </svg>
 
+      <div className="break" />
+
       <ButtonGroup
         variant="outlined"
         disabled={oscType === "pwm" || oscType === "pulse"}
@@ -148,54 +157,164 @@ function OscillatorEditor(props) {
           </Button>
         ))}
       </ButtonGroup>
-      <div className="break" />
-      {props.expanded && (
-        <>
-          <FormControl>
-            <InputLabel>
-              {t("instrumentEditor.synthEditor.parameters.type")}
-            </InputLabel>
-            <Select native value={oscType} onChange={handleOscTypeSelect}>
-              {oscTypes.map((e) => (
-                <option key={e} value={e}>
-                  {t(`instrumentEditor.synthEditor.oscMode.${e}`)}
-                </option>
-              ))}
-            </Select>
-          </FormControl>
-          {/* <FormControl>
-            <InputLabel>
-              {t("instrumentEditor.synthEditor.parameters.wave")}
-            </InputLabel>
-            <Select
-              disabled={oscType === "pwm" || oscType === "pulse"}
-              native
-              value={oscWave}
-              onChange={handleOscWaveSelect}
-            >
-              {waveForms.map((e) => (
-                <option key={e} value={e} className="capitalize">
-                  {t(`instrumentEditor.synthEditor.waveTypes.${e}`)}
-                </option>
-              ))}
-            </Select>
-          </FormControl> */}
-          <div className="break" />
 
-          <Slider
-            style={{ width: "70%" }}
-            disabled={oscType === "pwm" || oscType === "pulse"}
-            valueLabelDisplay="auto"
-            value={oscPartials}
+      {oscType !== "pwm" &&
+        oscType !== "pulse" &&
+        oscWave === "sine" &&
+        props.expanded && (
+          <Knob
+            defaultValue={oscPartials}
             onChange={handleOscPartialsSelect}
-            onChangeCommitted={() => {
-              props.onInstrumentMod();
-            }}
+            onChangeCommitted={() => props.onInstrumentMod()}
+            style={{ marginLeft: 16 }}
             min={0}
             max={24}
-            valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
+            size={36}
+            step={1}
+            label={"Mod"}
+            mousePosition={props.mousePosition}
+          />
+        )}
+    </>
+  );
+
+  let oscillatorOptions = (
+    <>
+      <FormControl>
+        <InputLabel>
+          {t("instrumentEditor.synthEditor.parameters.type")}
+        </InputLabel>
+        <Select
+          tabIndex={-1}
+          native
+          value={oscType}
+          onChange={handleOscTypeSelect}
+          style={{ marginBottom: 32 }}
+        >
+          {oscTypes.map((e) => (
+            <option key={e} value={e}>
+              {t(`instrumentEditor.synthEditor.oscMode.${e}`)}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+      <div className="break" />
+      {oscType === "fat" && (
+        <>
+          <Knob
+            defaultValue={props.instrument.get().oscillator.count}
+            onChange={(v) => handleOscParamSelect("count", v)}
+            onChangeCommitted={() => props.onInstrumentMod()}
+            style={{ margin: 16 }}
+            min={1}
+            max={8}
+            size={36}
+            step={1}
+            label={"Count"}
+            mousePosition={props.mousePosition}
+          />
+          <Knob
+            defaultValue={props.instrument.get().oscillator.spread}
+            onChange={(v) => handleOscParamSelect("spread", v)}
+            onChangeCommitted={() => props.onInstrumentMod()}
+            style={{ margin: 16 }}
+            min={0}
+            max={100}
+            size={36}
+            step={1}
+            label={"Spread"}
+            mousePosition={props.mousePosition}
           />
         </>
+      )}
+      {(oscType === "fm" || oscType === "am") && (
+        <>
+          <ButtonGroup variant="outlined">
+            {waveForms.map((e, i) => (
+              <Button
+                color={"primary"}
+                onClick={() => handleOscParamSelect("modulationType", e)}
+                variant={
+                  props.instrument.get().oscillator.modulationType === e
+                    ? "contained"
+                    : "outlined"
+                }
+                key={e}
+              >
+                <svg
+                  viewBox={waveformShapes.viewBox}
+                  preserveAspectRatio="none"
+                  style={{
+                    fill: "none",
+                    stroke:
+                      props.instrument.get().oscillator.modulationType === e
+                        ? "white"
+                        : "rgb(63, 81, 181)",
+                    strokeWidth: 8,
+                    height: 16,
+                    width: 32,
+                    overflow: "visible",
+                  }}
+                >
+                  {waveformShapes[e]}
+                </svg>
+              </Button>
+            ))}
+          </ButtonGroup>
+
+          <Knob
+            defaultValue={props.instrument.get().oscillator.harmonicity}
+            onChange={(v) => handleOscParamSelect("harmonicity", v)}
+            onChangeCommitted={() => props.onInstrumentMod()}
+            style={{ margin: 16 }}
+            min={0}
+            max={50}
+            size={36}
+            label={t(`instrumentEditor.synthEditor.parameters.harmonicity`)}
+            mousePosition={props.mousePosition}
+          />
+        </>
+      )}
+      {oscType === "fm" && (
+        <Knob
+          defaultValue={props.instrument.get().oscillator.modulationIndex}
+          onChange={(v) => handleOscParamSelect("modulationIndex", v)}
+          onChangeCommitted={() => props.onInstrumentMod()}
+          style={{ margin: 16 }}
+          min={0}
+          max={50}
+          size={36}
+          label={"Mod.index"}
+          mousePosition={props.mousePosition}
+        />
+      )}
+      {oscType === "pwm" && (
+        <Knob
+          defaultValue={props.instrument.get().oscillator.modulationFrequency}
+          onChange={(v) => handleOscParamSelect("modulationFrequency", v)}
+          onChangeCommitted={() => props.onInstrumentMod()}
+          style={{ margin: 16 }}
+          min={0.1}
+          max={20000}
+          size={36}
+          step={0.1}
+          label={"Mod.Frec"}
+          mousePosition={props.mousePosition}
+        />
+      )}
+
+      {oscType === "pulse" && (
+        <Knob
+          defaultValue={props.instrument.get().oscillator.width}
+          onChange={(v) => handleOscParamSelect("width", v)}
+          onChangeCommitted={() => props.onInstrumentMod()}
+          style={{ margin: 16 }}
+          min={-1}
+          max={0}
+          size={36}
+          label={"Width"}
+          mousePosition={props.mousePosition}
+        />
       )}
     </>
   );
@@ -210,7 +329,32 @@ function OscillatorEditor(props) {
         >
           <Icon>close</Icon>
         </IconButton>
-        {mainContent}
+        <div
+          style={{
+            flex: "1 0 50%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "wrap",
+            alignContent: "space-evenly",
+          }}
+        >
+          {mainContent}
+        </div>
+        <div
+          style={{
+            flex: "1 0 50%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "wrap",
+            alignContent: "center",
+          }}
+        >
+          {oscillatorOptions}
+        </div>
       </div>
     </Grow>
   ) : (

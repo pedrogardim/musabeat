@@ -1402,6 +1402,7 @@ function Workspace(props) {
         cursorMode={cursorMode}
         setCursorMode={setCursorMode}
         setIEOpen={setIEOpen}
+        selectedModule={selectedModule}
       />
 
       {/* <Paper

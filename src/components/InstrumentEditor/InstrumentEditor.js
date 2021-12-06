@@ -81,9 +81,12 @@ function InstrumentEditor(props) {
   const isDrum = trackType === 0 && props.instrumentInfo.patch.dr;
 
   const setIntrument = (newInstrument) => {
+    console.log("instrument set", newInstrument._dummyVoice);
     props.setInstruments((prev) => {
       let newInstruments = [...prev];
-      newInstruments[props.selectedModule] = newInstrument;
+      newInstruments[props.index].dispose();
+      delete newInstruments[props.index];
+      newInstruments[props.index] = newInstrument;
       return newInstruments;
     });
   };
@@ -91,7 +94,7 @@ function InstrumentEditor(props) {
   const changeInstrumentType = async (e) => {
     let newType = e.target.value;
 
-    props.instrument.dispose();
+    console.log(newType);
 
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
@@ -120,6 +123,8 @@ function InstrumentEditor(props) {
     newInstrument.set(conserverdProps);
 
     //console.log(newInstrument, conserverdProps);
+
+    setSelectedPatch("Custom");
 
     setIntrument(newInstrument);
 

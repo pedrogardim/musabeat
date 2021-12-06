@@ -84,9 +84,9 @@ export const TRANSLATIONS_ES = {
     removingItemAlert:
       "Este sonido será removido del instrumento. El archivo seguirá a salvo en tu cuenta.",
     types: {
-      MonoSynth: "Sintetizador + Filtro",
-      FMSynth: "Sintetizador FM",
-      AMSynth: "Sintetizador AM",
+      MonoSynth: "Filtro",
+      FMSynth: "Modulación FM",
+      AMSynth: "Modulación AM",
       Sampler: "Sampler",
     },
     synthEditor: {

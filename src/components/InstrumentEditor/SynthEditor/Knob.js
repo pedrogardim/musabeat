@@ -73,15 +73,21 @@ function Knob(props) {
     //angle = props.logScale ? logToLinearScale(val, -135, 135) : angle;
 
     setAngle(Math.floor(angle));
+    setOpen(false);
   };
 
   useEffect(() => {
-    props.onChange(value);
+    if (typeof value === "number") props.onChange(value);
   }, [value]);
 
   useEffect(() => {
+    if (!open && typeof value === "number" && props.onChangeCommited)
+      props.onChangeCommited(value);
+  }, [open]);
+
+  useEffect(() => {
     !props.mousePosition && setOpen(false);
-    props.mousePosition && open && handleKnobMove();
+    if (props.mousePosition && open) handleKnobMove();
   }, [props.mousePosition]);
   /* 
   useEffect(() => {
@@ -95,6 +101,8 @@ function Knob(props) {
         height: props.size,
         width: props.size,
         backgroundColor: props.color ? props.color : "#3f51b5",
+        filter: props.disabled && "saturate(0)",
+        pointerEvents: props.disabled && "none",
         ...props.style,
       }}
       onMouseDown={() => setOpen(true)}

@@ -28,14 +28,23 @@ const HSpringsData = Array.from(Array(4)).map((_, i) => {
   };
 });
 
-const HSpringsDataA = [
-  { id: 0, from: { bottom: 16 }, to: { bottom: 88 }, icon: "add" },
-  { id: 1, from: { bottom: 16 }, to: { bottom: 160 }, icon: "add" },
-  { id: 2, from: { bottom: 16 }, to: { bottom: 232 }, icon: "add" },
-];
-
 function ScreenButtons(props) {
   const [open, setOpen] = useState(false);
+
+  const HButtonsData = [
+    {
+      fn: () => props.setIEOpen((prev) => !prev),
+      icon: "piano",
+      disabled: typeof props.selectedModule !== "number",
+    },
+    {
+      fn: () => props.setCursorMode((prev) => (!prev ? "edit" : null)),
+      icon: props.cursorMode ? "edit" : "navigation",
+      iconStyle: {
+        transform: !props.cursorMode && "rotate(-45deg)",
+      },
+    },
+  ];
 
   const AnimatedFab = animated(Fab);
   const VSprings = useSprings(
@@ -87,21 +96,14 @@ function ScreenButtons(props) {
           ))}
           {HSprings.map((sp, i) => (
             <AnimatedFab
-              key={HSpringsData[i].id}
+              key={"HButtons" + i}
               color="primary"
               style={{ ...sp, position: "fixed", bottom: 16 }}
-              onClick={() =>
-                i === 0
-                  ? props.setIEOpen((prev) => !prev)
-                  : props.setCursorMode((prev) => (!prev ? "edit" : null))
-              }
+              onClick={HButtonsData[i].fn}
+              disabled={HButtonsData[i].disabled}
             >
-              <Icon
-                style={{
-                  transform: i === 1 && !props.cursorMode && "rotate(-45deg)",
-                }}
-              >
-                {i === 0 ? "piano" : props.cursorMode ? "edit" : "navigation"}
+              <Icon style={HButtonsData[i].iconStyle}>
+                {HButtonsData[i].icon}
               </Icon>
             </AnimatedFab>
           ))}

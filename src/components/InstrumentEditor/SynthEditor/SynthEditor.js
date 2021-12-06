@@ -58,22 +58,6 @@ function SynthEditor(props) {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <Select
-        native
-        value={
-          props.instrument._dummyVoice
-            ? props.instrument._dummyVoice.name
-            : props.instrument.name
-        }
-        onChange={props.changeInstrumentType}
-        className="instrument-editor-type-select"
-        style={{ position: "absolute", top: 0 }}
-      >
-        {["MonoSynth", "FMSynth", "AMSynth", "Sampler"].map((e, i) => (
-          <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
-        ))}
-      </Select>
-
       <OscillatorEditor
         onInstrumentMod={props.onInstrumentMod}
         instrument={props.instrument}
@@ -95,6 +79,7 @@ function SynthEditor(props) {
         mousePosition={mousePosition}
         expanded={expanded === 1}
         setExpanded={setExpanded}
+        changeInstrumentType={props.changeInstrumentType}
       />
       <div
         style={{

@@ -33,41 +33,41 @@ function NotesInput(props) {
   return (
     <div className="ws-note-input-key-cont">
       {props.module &&
-      props.instrument &&
-      props.moduleRows.length > 0 &&
-      props.module.type === 0 ? (
-        /* Array(props.instrument._buffers._buffers.size) */
-        Object.keys(props.keyMapping)
-          .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
-          .map((e) => e.replace("Key", "").replace("Semicolon", ":"))
-          .map((e, i) => (
-            <>
-              <Paper
-                className="ws-note-input-key"
-                onMouseDown={(event) => handleClick(event, i)}
-                onMouseOut={() =>
-                  props.setPressedKeys((prev) =>
-                    prev.filter((note) => note !== i)
-                  )
-                }
-                onMouseLeave={() =>
-                  props.setPressedKeys((prev) =>
-                    prev.filter((note) => note !== i)
-                  )
-                }
-                onClick={() =>
-                  props.setPressedKeys((prev) =>
-                    prev.filter((note) => note !== i)
-                  )
-                }
-                style={{
-                  backgroundColor: props.pressedKeys.includes(i)
-                    ? "darkgray"
-                    : !props.instrument.has(props.moduleRows[i].note) &&
-                      "lightgray",
-                }}
-              >
-                {/* <Tooltip title={filesName && filesName[i]}>
+        props.instrument &&
+        props.moduleRows.length > 0 &&
+        (props.module.type === 0 ? (
+          /* Array(props.instrument._buffers._buffers.size) */
+          Object.keys(props.keyMapping)
+            .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
+            .map((e) => e.replace("Key", "").replace("Semicolon", ":"))
+            .map((e, i) => (
+              <>
+                <Paper
+                  className="ws-note-input-key"
+                  onMouseDown={(event) => handleClick(event, i)}
+                  onMouseOut={() =>
+                    props.setPressedKeys((prev) =>
+                      prev.filter((note) => note !== i)
+                    )
+                  }
+                  onMouseLeave={() =>
+                    props.setPressedKeys((prev) =>
+                      prev.filter((note) => note !== i)
+                    )
+                  }
+                  onClick={() =>
+                    props.setPressedKeys((prev) =>
+                      prev.filter((note) => note !== i)
+                    )
+                  }
+                  style={{
+                    backgroundColor: props.pressedKeys.includes(i)
+                      ? "darkgray"
+                      : !props.instrument.has(props.moduleRows[i].note) &&
+                        "lightgray",
+                  }}
+                >
+                  {/* <Tooltip title={filesName && filesName[i]}>
                 <svg
                   viewBox="0 0 64 32"
                   preserveAspectRatio="none"
@@ -90,44 +90,44 @@ function NotesInput(props) {
                   )}
                 </svg> 
               </Tooltip> */}
-                <span
-                  variant="overline"
-                  style={{
-                    position: "absolute",
-                    left: 4,
-                    top: 4,
-                    lineHeight: 1,
-                  }}
-                >
-                  {e}
-                </span>
-                <span style={{ lineHeight: 1.3 }}>
-                  {props.instrumentInfo &&
-                    drumMapping[props.moduleRows[i].note]}
-                </span>
-              </Paper>
-              {i === 9 && <div className="break" />}
-            </>
-          ))
-      ) : (
-        <Keyboard
-          activeNotes={props.pressedKeys}
-          style={{
-            minWidth: 400,
-            height: 72,
-            zIndex: 0,
-          }}
-          color={props.module.color}
-          octaves={1.42}
-          notesLabel={Object.keys(props.keyMapping).map((e) =>
-            e.replace("Key", "").replace("Semicolon", ":")
-          )}
-          octave={props.playingOctave}
-          onKeyClick={props.playNoteFunction[0]}
-          onKeyUp={props.playNoteFunction[1]}
-          setPressedKeys={props.setPressedKeys}
-        />
-      )}
+                  <span
+                    variant="overline"
+                    style={{
+                      position: "absolute",
+                      left: 4,
+                      top: 4,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {e}
+                  </span>
+                  <span style={{ lineHeight: 1.3 }}>
+                    {props.instrumentInfo &&
+                      drumMapping[props.moduleRows[i].note]}
+                  </span>
+                </Paper>
+                {i === 9 && <div className="break" />}
+              </>
+            ))
+        ) : (
+          <Keyboard
+            activeNotes={props.pressedKeys}
+            style={{
+              minWidth: 400,
+              height: 72,
+              zIndex: 0,
+            }}
+            color={props.module.color}
+            octaves={1.42}
+            notesLabel={Object.keys(props.keyMapping).map((e) =>
+              e.replace("Key", "").replace("Semicolon", ":")
+            )}
+            octave={props.playingOctave}
+            onKeyClick={props.playNoteFunction[0]}
+            onKeyUp={props.playNoteFunction[1]}
+            setPressedKeys={props.setPressedKeys}
+          />
+        ))}
     </div>
   );
 }

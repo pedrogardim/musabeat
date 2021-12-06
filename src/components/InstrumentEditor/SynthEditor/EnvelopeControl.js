@@ -43,20 +43,28 @@ function EnvelopeControl(props) {
   }, [props.instrument, envelopeType]);
 
   return (
-    <div className="ie-envelope-container">
-      <span className="ie-envelope-label">
-        {Object.keys(envelope).includes("octaves") && (
-          <IconButton
-            color={envelope.octaves !== 0 ? "primary" : "default"}
-            onClick={toggleFilterEnvelope}
-            size="small"
-            className="turnonoff-button"
-          >
-            <Icon>power_settings_new</Icon>
-          </IconButton>
-        )}
-        {envelopeType.toUpperCase()}
-      </span>
+    <div
+      className="ie-envelope-container"
+      style={{
+        filter:
+          props.type === "filter" && envelope.octaves === 0 && "saturate(0)",
+      }}
+    >
+      {props.label !== false && (
+        <span className="ie-envelope-label">
+          {envelope.hasOwnProperty("octaves") && (
+            <IconButton
+              color={envelope.octaves !== 0 ? "primary" : "default"}
+              onClick={toggleFilterEnvelope}
+              size="small"
+              className="turnonoff-button"
+            >
+              <Icon>power_settings_new</Icon>
+            </IconButton>
+          )}
+          {envelopeType.toUpperCase()}
+        </span>
+      )}
       <div className="break" />
 
       {["attack", "decay", "sustain", "release"].map((e) => (

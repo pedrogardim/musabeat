@@ -14,6 +14,7 @@ import { Button, Typography } from "@material-ui/core";
 
 function AdminDashboard(props) {
   const [value, setValue] = useState(0);
+  const [testSynth, setTestSynth] = useState(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -227,6 +228,13 @@ function AdminDashboard(props) {
       .then((r) => r.docs.forEach((e) => e.ref.update({ of: false })));
   };
 
+  const testWithSynth = () => {
+    let synth = new Tone.PolySynth().toDestination();
+    synth.set({ oscillator: { type: "fatsine12", spread: 100, count: 3 } });
+    console.log(synth.get());
+    setTestSynth(synth);
+  };
+
   return (
     <div
       className="file-page"
@@ -251,7 +259,6 @@ function AdminDashboard(props) {
       <div className={"admin-panel-container"}>
         {value === 0 && <PåatchEditor />}
       </div> */}
-      <Button onClick={updatePatchesPremium}>Update Patches Premium</Button>
 
       {/* <Button onClick={resetPatchesOfficial}>Reset Patches Official</Button> */}
 
@@ -260,7 +267,12 @@ function AdminDashboard(props) {
       <Button onClick={updateLikes}>Update files, patches like</Button>*/}
       {/* <Button onClick={updateSessions}>Update session scale</Button>
       <Button onClick={missingFileTest}>missing File Test</Button> */}
-      <Button onClick={duplicateDrumPatch}>duplicateDrumPatch</Button>
+      <Button onClick={testWithSynth}>testWithSynth</Button>
+      <Button
+        onClick={() => testSynth.triggerAttackRelease(["C4", "G4", "C5"], "8n")}
+      >
+        Play
+      </Button>
 
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
     </div>

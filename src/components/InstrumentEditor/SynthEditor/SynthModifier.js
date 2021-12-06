@@ -7,6 +7,7 @@ import {
   Button,
   Paper,
   Grow,
+  Select,
 } from "@material-ui/core";
 
 import { waveTypes } from "../../../assets/musicutils";
@@ -60,7 +61,7 @@ function SynthModifier(props) {
     });
     props.instrument.set({
       filter: newFilter,
-      filterEnvelope: { baseFrequency: newFilter.frequency, octaves: 0 },
+      filterEnvelope: { baseFrequency: newFilter.frequency },
     });
     //console.log(newFilter, props.instrument.get());
     props.onInstrumentMod();
@@ -76,30 +77,35 @@ function SynthModifier(props) {
     console.log(instrumentParamenters);
   }, [instrumentParamenters]); */
 
-  let mainContent =
-    props.instrument._dummyVoice.name === "MonoSynth" ? (
-      <FilterEditor
-        instrumentParamenters={instrumentParamenters}
-        handleFilterChange={handleFilterChange}
-        instrument={props.instrument}
-      />
-    ) : (
-      <>
-        {["harmonicity", "modulationIndex"].map((parameter, index) => (
-          <Knob
-            size={48}
-            min={0}
-            max={50}
-            defaultValue={instrumentParamenters[parameter]}
-            onChange={(v) => handleChange(parameter, v)}
-            label={t(`instrumentEditor.synthEditor.parameters.${parameter}`)}
-            mousePosition={props.mousePosition}
-            style={{ margin: "0 16px" }}
-          />
-        ))}
+  let mainContent = instrumentParamenters.hasOwnProperty("filter") ? (
+    <FilterEditor
+      instrumentParamenters={instrumentParamenters}
+      handleFilterChange={handleFilterChange}
+      instrument={props.instrument}
+      expanded={props.expanded}
+      mousePosition={props.mousePosition}
+    />
+  ) : (
+    <>
+      {(instrumentParamenters.hasOwnProperty("modulationIndex")
+        ? ["harmonicity", "modulationIndex"]
+        : ["harmonicity"]
+      ).map((parameter, index) => (
+        <Knob
+          size={48}
+          min={0}
+          max={50}
+          defaultValue={instrumentParamenters[parameter]}
+          onChange={(v) => handleChange(parameter, v)}
+          label={t(`instrumentEditor.synthEditor.parameters.${parameter}`)}
+          mousePosition={props.mousePosition}
+          style={{ margin: "0 16px" }}
+        />
+      ))}
 
-        <div className="break" />
+      <div className="break" />
 
+      {props.expanded && (
         <ButtonGroup variant="outlined">
           {waveForms.map((e, i) => (
             <Button
@@ -133,8 +139,9 @@ function SynthModifier(props) {
             </Button>
           ))}
         </ButtonGroup>
+      )}
 
-        {/* <Select
+      {/* <Select
         native
         labelId="fm-wave-selector-label"
         value={instrumentParamenters.modulation.type}
@@ -147,16 +154,17 @@ function SynthModifier(props) {
         ))}
       </Select> */}
 
-        <div className="break" />
+      <div className="break" />
 
-        <EnvelopeControl
-          onInstrumentMod={props.onInstrumentMod}
-          instrument={props.instrument}
-          type={type}
-          mousePosition={props.mousePosition}
-        />
-      </>
-    );
+      <EnvelopeControl
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        type={type}
+        mousePosition={props.mousePosition}
+        label={props.expanded}
+      />
+    </>
+  );
 
   return props.expanded ? (
     <Grow in={props.expanded} timeout={200}>
@@ -168,6 +176,20 @@ function SynthModifier(props) {
         >
           <Icon>close</Icon>
         </IconButton>
+        <Select
+          native
+          value={
+            props.instrument._dummyVoice
+              ? props.instrument._dummyVoice.name
+              : props.instrument.name
+          }
+          onChange={props.changeInstrumentType}
+          style={{ position: "absolute", top: 0 }}
+        >
+          {["MonoSynth", "FMSynth", "AMSynth"].map((e, i) => (
+            <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
+          ))}
+        </Select>
         {mainContent}
       </div>
     </Grow>

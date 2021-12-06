@@ -6,6 +6,9 @@ import { Typography, Slider, Grid } from "@material-ui/core";
 
 import "./FilterEditor.css";
 
+import Knob from "./Knob";
+import EnvelopeControl from "./EnvelopeControl";
+
 import { useTranslation } from "react-i18next";
 
 function FilterEditor(props) {
@@ -37,11 +40,18 @@ function FilterEditor(props) {
     tempFilter.set({
       [parameter]: value,
     });
+    props.instrument.set({
+      filter: {
+        [parameter]: value,
+      },
+      filterEnvelope: parameter === "frequency" ? { baseFrequency: value } : {},
+    });
     parameter === "frequency" ? setFrequency(value) : setFilterQ(value);
     setFilterFR(tempFilter.getFrequencyResponse(64));
   };
 
   const registerToSynth = () => {
+    //console.log("registerToSynth!!!!!!");
     props.handleFilterChange(tempFilter.get());
     //setFilterFR(tempFilter.getFrequencyResponse(64));
 
@@ -75,75 +85,66 @@ function FilterEditor(props) {
   }, [filterFR]);
 
   useEffect(() => {
-    setTempFilter(
-      new Tone.Filter({
-        ...props.instrument.get().filter,
-        frequency: props.instrument.get().filterEnvelope.baseFrequency,
-      })
-    );
+    props.instrument.get().filter &&
+      setTempFilter(
+        new Tone.Filter({
+          ...props.instrument.get().filter,
+          frequency: props.instrument.get().filterEnvelope.baseFrequency,
+        })
+      );
   }, [props.instrument]);
 
   return (
     <>
-      <Grid item xs={6} className="filter-editor-grid">
-        <Typography variant="overline">
-          {/*<IconButton
-          color={filterState ? "primary" : "default"}
-          onClick={toggleFilter}
-          size="small"
-          className="turnonoff-button"
-        >
-          <Icon>power_settings_new</Icon>
-        </IconButton>*/}
-          {t("instrumentEditor.synthEditor.parameters.filter")}
-        </Typography>
-        <div className="break" />
+      {/*   <Typography variant="overline">
+       
+        {t("instrumentEditor.synthEditor.parameters.filter")}
+      </Typography>
+      <div className="break" /> */}
 
-        <svg
-          width="128px"
-          height="64px"
-          style={{ border: "1px solid #05386b", marginBottom: 8 }}
-        >
-          {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
-          <path d={filterFRWave} stroke="#05386b" fill="none" />
-        </svg>
-      </Grid>
-      <Grid
-        item
-        xs={6}
-        className="filter-editor-grid filter-editor-grid-parameters"
+      <svg
+        width="128px"
+        height="64px"
+        style={{ border: "1px solid #05386b", marginBottom: 8 }}
       >
-        <Typography variant="overline" className="filter-editor-labels">
-          {t("instrumentEditor.synthEditor.parameters.frequency") +
-            ": " +
-            Math.floor(frequency) +
-            "Hz"}
-        </Typography>
-        <Slider
-          valueLabelDisplay="auto"
-          min={20}
-          max={20000}
-          step={10}
-          value={frequency}
-          onChange={(e, v) => handleParameterChange("frequency", v)}
-          onChangeCommitted={registerToSynth}
-        />
-        <div className="break" />
-        <Typography variant="overline" className="filter-editor-labels">
-          {t("instrumentEditor.synthEditor.parameters.resonance") +
-            ": " +
-            filterQ}
-        </Typography>
-        <Slider
-          valueLabelDisplay="auto"
-          min={0}
-          max={5}
-          step={0.1}
-          value={filterQ}
-          onChange={(e, v) => handleParameterChange("Q", v)}
-          onChangeCommitted={registerToSynth}
-        />
-      </Grid>
+        {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
+        <path d={filterFRWave} stroke="#05386b" fill="none" />
+      </svg>
+      <div className="break" />
+      <Knob
+        min={20}
+        max={20000}
+        step={10}
+        size={48}
+        defaultValue={frequency}
+        onChange={(v) => handleParameterChange("frequency", v)}
+        onChangeCommited={registerToSynth}
+        label={"Frequency"}
+        mousePosition={props.mousePosition}
+        style={{ margin: "0 16px" }}
+      />
+
+      <Knob
+        min={0}
+        max={5}
+        step={0.1}
+        size={48}
+        defaultValue={filterQ}
+        onChange={(v) => handleParameterChange("Q", v)}
+        onChangeCommited={registerToSynth}
+        label={"Reso"}
+        mousePosition={props.mousePosition}
+        style={{ margin: "0 16px" }}
+      />
+      <div className="break" />
+
+      <EnvelopeControl
+        onInstrumentMod={props.onInstrumentMod}
+        instrument={props.instrument}
+        type={"filter"}
+        mousePosition={props.mousePosition}
+        label={props.expanded}
+      />
     </>
   );
 }
