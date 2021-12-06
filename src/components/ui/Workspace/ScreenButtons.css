@@ -1,0 +1,25 @@
+.ws-fab-cont {
+  position: fixed !important;
+  width: 54px;
+  bottom: 32px;
+  right: 32px;
+  height: 128px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-fab-main {
+  position: fixed !important;
+  z-index: 1111111;
+  right: 16px;
+  bottom: 16px;
+}
+
+.ws-fab-v {
+  margin: 8px 0px !important;
+}
+
+.ws-fab-h {
+  margin: 0px 8px !important;
+}

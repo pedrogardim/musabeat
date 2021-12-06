@@ -29,6 +29,7 @@ import ClosedTrack from "../../Module/ClosedTrack";
 
 import WorkspaceTitle from "./WorkspaceTitle";
 import WorkspaceTransport from "./WorkspaceTransport";
+import ScreenButtons from "./ScreenButtons";
 
 import ModulePicker from "../ModulePicker";
 import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
@@ -1065,7 +1066,7 @@ function Workspace(props) {
   }, [listener]);
 
   useEffect(() => {
-    console.log("WP UseEffect triggerd");
+    //console.log("WP UseEffect triggerd");
     instruments.forEach((e, i) => {
       if (modules && modules[i] && e) {
         e.volume.value = modules[i].volume;
@@ -1396,73 +1397,13 @@ function Workspace(props) {
         />
       )}
       {/*setModulesVolume={setModulesVolume}*/}
-      <Fab
-        tabIndex={-1}
-        color="primary"
-        className="ws-fab-main"
-        onClick={() => setMenuOpen((prev) => !prev)}
-      >
-        <Icon>{menuOpen ? "close" : "menu"}</Icon>
-      </Fab>
-      <Modal
-        BackdropProps={{
-          timeout: 500,
-        }}
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-      >
-        <Fragment>
-          <div
-            style={{
-              width: 56,
-              right: 16,
-              position: "fixed",
-              bottom: 80,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-          >
-            <Fab color="primary" className="ws-fab-v">
-              <Icon>settings</Icon>
-            </Fab>
 
-            <Fab color="primary" className="ws-fab-v">
-              <Icon>download</Icon>
-            </Fab>
+      <ScreenButtons
+        cursorMode={cursorMode}
+        setCursorMode={setCursorMode}
+        setIEOpen={setIEOpen}
+      />
 
-            <Fab color="primary" className="ws-fab-v">
-              <Icon>save</Icon>
-            </Fab>
-          </div>
-          <div
-            style={{
-              right: 80,
-              position: "fixed",
-              bottom: 16,
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Fab
-              className="ws-fab-h"
-              onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
-            >
-              <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
-                {cursorMode ? "edit" : "navigation"}
-              </Icon>
-            </Fab>
-            <Fab
-              className="ws-fab-h"
-              onClick={() => setIEOpen((prev) => !prev)}
-              color="primary"
-            >
-              <Icon>piano</Icon>
-            </Fab>
-          </div>
-        </Fragment>
-      </Modal>
       {/* <Paper
         className="ws-opt-btn-cont"
         style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}

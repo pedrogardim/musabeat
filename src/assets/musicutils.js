@@ -4,6 +4,8 @@
 
 import * as Tone from "tone";
 
+import React from "react";
+
 import lamejs from "lamejs";
 
 import firebase from "firebase";

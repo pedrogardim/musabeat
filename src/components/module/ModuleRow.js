@@ -362,7 +362,7 @@ function ModuleRow(props) {
   }, [gridPos]);
 
   useEffect(() => {
-    console.log("props.instrument", props.instrument);
+    //console.log("props.instrument", props.instrument);
     moduleRows && props.setModuleRows(moduleRows);
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
