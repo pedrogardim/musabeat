@@ -40,7 +40,7 @@ function Exporter(props) {
   //it's necessary to trigger rescheduling after export
 
   return (
-    <Fragment>
+    <>
       <IconButton
         color="primary"
         className="ws-fab ws-fab-export"
@@ -76,7 +76,7 @@ function Exporter(props) {
           </div>
         </Dialog>
       }
-    </Fragment>
+    </>
   );
 }
 

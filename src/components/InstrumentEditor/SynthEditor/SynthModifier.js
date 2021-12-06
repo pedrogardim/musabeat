@@ -84,7 +84,7 @@ function SynthModifier(props) {
         instrument={props.instrument}
       />
     ) : (
-      <Fragment>
+      <>
         {["harmonicity", "modulationIndex"].map((parameter, index) => (
           <Knob
             size={48}
@@ -155,7 +155,7 @@ function SynthModifier(props) {
           type={type}
           mousePosition={props.mousePosition}
         />
-      </Fragment>
+      </>
     );
 
   return props.expanded ? (

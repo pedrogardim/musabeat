@@ -190,7 +190,7 @@ function MelodyNote(props) {
       )}
 
       {isSelected && props.selectedNotes.length === 1 && (
-        <Fragment>
+        <>
           <IconButton
             onMouseDown={deleteNote}
             style={{
@@ -216,7 +216,7 @@ function MelodyNote(props) {
           >
             open_with
           </Icon>
-        </Fragment>
+        </>
       )}
     </div>
   );

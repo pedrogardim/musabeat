@@ -469,7 +469,7 @@ function PatchPage(props) {
       onKeyUp={handleKeyUp}
     >
       {instrument && patchInfo !== undefined ? (
-        <Fragment>
+        <>
           <Typography variant="h4">
             {patchInfo ? patchInfo.name : "..."}
           </Typography>
@@ -599,7 +599,7 @@ function PatchPage(props) {
               variableOctave
             />
           )}
-        </Fragment>
+        </>
       ) : !instrument ? (
         <LoadingScreen open={true} />
       ) : (

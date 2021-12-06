@@ -41,7 +41,7 @@ function NotesInput(props) {
           .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
           .map((e) => e.replace("Key", "").replace("Semicolon", ":"))
           .map((e, i) => (
-            <Fragment>
+            <>
               <Paper
                 className="ws-note-input-key"
                 onMouseDown={(event) => handleClick(event, i)}
@@ -107,7 +107,7 @@ function NotesInput(props) {
                 </span>
               </Paper>
               {i === 9 && <div className="break" />}
-            </Fragment>
+            </>
           ))
       ) : (
         <Keyboard

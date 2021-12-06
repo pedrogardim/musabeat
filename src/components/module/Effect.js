@@ -63,7 +63,7 @@ function Effect(props) {
       onClick={handleClick}
     >
       {props.effect && parameters.length ? (
-        <Fragment>
+        <>
           <Typography>{props.effect.name}</Typography>
           <div className="break" />
           {Object.keys(props.effect.get())
@@ -97,7 +97,7 @@ function Effect(props) {
                     onChangeCommitted={(event, v) => handleKnobStop(v, e, i)}
                   ></Slider>
                 </Tooltip>
-              </Fragment>
+              </>
             ))}
           <div className="break" />
           <IconButton
@@ -108,9 +108,9 @@ function Effect(props) {
           >
             <Icon>delete</Icon>
           </IconButton>
-        </Fragment>
+        </>
       ) : (
-        <Fragment>
+        <>
           <Tooltip title="Add Effect">
             <IconButton onClick={openMenu}>
               <Icon>add</Icon>
@@ -128,7 +128,7 @@ function Effect(props) {
               </MenuItem>
             ))}
           </Menu>
-        </Fragment>
+        </>
       )}
     </div>
   );

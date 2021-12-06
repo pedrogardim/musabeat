@@ -491,9 +491,9 @@ function FileExplorer(props) {
   useEffect(() => onAppWrapperScrollTrigger(), [props.bottomScroll]);
 
   const mainContent = (
-    <Fragment>
+    <>
       {props.compact || props.explore ? (
-        <Fragment>
+        <>
           <Autocomplete
             multiple
             freeSolo
@@ -515,12 +515,12 @@ function FileExplorer(props) {
                 InputProps={{
                   ...params.InputProps,
                   startAdornment: (
-                    <Fragment>
+                    <>
                       <InputAdornment position="start">
                         <Icon>search</Icon>
                       </InputAdornment>
                       {params.InputProps.startAdornment}
-                    </Fragment>
+                    </>
                   ),
                 }}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -529,7 +529,7 @@ function FileExplorer(props) {
             )}
           />
           <div className="break" />
-        </Fragment>
+        </>
       ) : (
         <div className="break" style={{ height: 32 }} />
       )}
@@ -552,7 +552,7 @@ function FileExplorer(props) {
           <TableRow>
             <TableCell style={{ width: 50 }}></TableCell>
             <TableCell>Name</TableCell>
-            <Fragment>
+            <>
               <TableCell>Categories</TableCell>
               {(props.explore || !!showingLiked) && (
                 <TableCell style={{ width: 50 }} align="center">
@@ -574,7 +574,7 @@ function FileExplorer(props) {
                   Delete
                 </TableCell>
               )}
-            </Fragment>
+            </>
           </TableRow>
         </TableHead>
       ) */}
@@ -715,7 +715,7 @@ function FileExplorer(props) {
                     </div>
                   </TableCell>
 
-                  <Fragment>
+                  <>
                     {(props.explore || props.compact || !!showingLiked) && (
                       <TableCell style={{ width: 50 }} align="center">
                         <IconButton onClick={() => handleLike(index)}>
@@ -757,7 +757,7 @@ function FileExplorer(props) {
                         </IconButton>
                       </TableCell>
                     )}
-                  </Fragment>
+                  </>
                 </TableRow>
               ))}
               {isLoading &&
@@ -786,7 +786,7 @@ function FileExplorer(props) {
                           ))}
                         </div>
                       </TableCell>
-                      <Fragment>
+                      <>
                         {props.explore && (
                           <TableCell style={{ width: 50 }} align="center">
                             <IconButton>
@@ -815,7 +815,7 @@ function FileExplorer(props) {
                             </IconButton>
                           </TableCell>
                         )}
-                      </Fragment>
+                      </>
                     </TableRow>
                   ))}
             </TableBody>
@@ -891,7 +891,7 @@ function FileExplorer(props) {
           onClose={() => setFileLimitDialog(false)}
         />
       )}
-    </Fragment>
+    </>
   );
 
   return props.compact ? (

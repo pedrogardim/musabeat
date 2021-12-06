@@ -109,7 +109,7 @@ function ChordRhythmSequence(props) {
           }}
         >
           {!props.arpeggiatorState && (
-            <Fragment>
+            <>
               <IconButton
                 onClick={() => updateRhythmSteps(chordIndex, true)}
                 className="add-step-chord-rhythm-button"
@@ -122,7 +122,7 @@ function ChordRhythmSequence(props) {
               >
                 <Icon>remove</Icon>
               </IconButton>
-            </Fragment>
+            </>
           )}
           {chord.map((rhythm, rhythmIndex) => (
             <ChordRhythmTile

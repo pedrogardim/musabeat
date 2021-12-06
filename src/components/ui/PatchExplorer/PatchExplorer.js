@@ -671,7 +671,7 @@ function PatchExplorer(props) {
       style={{ marginTop: props.userPatches && 32 }}
     >
       {props.compact || props.explore ? (
-        <Fragment>
+        <>
           <Autocomplete
             multiple
             freeSolo
@@ -693,12 +693,12 @@ function PatchExplorer(props) {
                 InputProps={{
                   ...params.InputProps,
                   startAdornment: (
-                    <Fragment>
+                    <>
                       <InputAdornment position="start">
                         <Icon>search</Icon>
                       </InputAdornment>
                       {params.InputProps.startAdornment}
-                    </Fragment>
+                    </>
                   ),
                 }}
                 onChange={(e) => setSearchValue(e.target.value)}
@@ -707,7 +707,7 @@ function PatchExplorer(props) {
             )}
           />
           <div className="break" />
-        </Fragment>
+        </>
       ) : (
         <div className="break" style={{ height: 32 }} />
       )}
@@ -925,7 +925,7 @@ function PatchExplorer(props) {
                         </div>
                       </TableCell>
                       {!props.compact && (
-                        <Fragment>
+                        <>
                           {(props.explore || !!showingLiked) && (
                             <TableCell style={{ width: 50 }} align="center">
                               <IconButton onClick={() => handleLike(index)}>
@@ -971,7 +971,7 @@ function PatchExplorer(props) {
                               </IconButton>
                             </TableCell>
                           )}
-                        </Fragment>
+                        </>
                       )}
                     </TableRow>
                   )
@@ -1005,7 +1005,7 @@ function PatchExplorer(props) {
                         </div>
                       </TableCell>
                       {!props.compact && (
-                        <Fragment>
+                        <>
                           {props.explore && (
                             <TableCell style={{ width: 50 }} align="center">
                               <IconButton>
@@ -1034,7 +1034,7 @@ function PatchExplorer(props) {
                               </IconButton>
                             </TableCell>
                           )}
-                        </Fragment>
+                        </>
                       )}
                     </TableRow>
                   ))}

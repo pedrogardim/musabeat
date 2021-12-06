@@ -49,7 +49,7 @@ function PlayerOptions(props) {
   }, [pitch, playbackRate, props.instrument]);
 
   return (
-    <Fragment>
+    <>
       <IconButton
         ref={btnRef}
         color="primary"
@@ -101,7 +101,7 @@ function PlayerOptions(props) {
           </Paper>
         )}
       </Popper>
-    </Fragment>
+    </>
   );
 }
 

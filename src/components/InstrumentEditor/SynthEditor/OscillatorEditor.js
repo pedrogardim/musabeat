@@ -103,7 +103,7 @@ function OscillatorEditor(props) {
   /*================================================================================*/
 
   let mainContent = (
-    <Fragment>
+    <>
       {props.expanded && (
         <Typography variant="overline">
           {t("instrumentEditor.synthEditor.parameters.oscillator")}
@@ -150,7 +150,7 @@ function OscillatorEditor(props) {
       </ButtonGroup>
       <div className="break" />
       {props.expanded && (
-        <Fragment>
+        <>
           <FormControl>
             <InputLabel>
               {t("instrumentEditor.synthEditor.parameters.type")}
@@ -195,9 +195,9 @@ function OscillatorEditor(props) {
             max={24}
             valueLabelFormat={(x) => (x === 0 ? "Off" : x)}
           />
-        </Fragment>
+        </>
       )}
-    </Fragment>
+    </>
   );
 
   return props.expanded ? (

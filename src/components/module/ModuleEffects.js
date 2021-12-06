@@ -51,7 +51,7 @@ function ModuleEffects(props) {
               index={i}
             />
             <Divider orientation="vertical" />
-          </Fragment>
+          </>
         ))
       ) : (
         <Effect

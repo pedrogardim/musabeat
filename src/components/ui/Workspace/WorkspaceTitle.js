@@ -170,7 +170,7 @@ function WorkspaceTitle(props) {
       <div className="break" style={{ margin: 0 }} />
 
       {props.sessionData && expanded && (
-        <Fragment>
+        <>
           <Typography variant="overline" style={{ fontSize: 10 }}>
             {`${
               props.sessionData ? props.sessionData.bpm : "-"
@@ -192,7 +192,7 @@ function WorkspaceTitle(props) {
           </Typography>
           <div className="break" />
           {props.sessionData.tags && !!props.sessionData.tags.length && (
-            <Fragment>
+            <>
               {props.sessionData.tags.map((e, i) => (
                 <Chip
                   style={{ margin: "0px 4px" }}
@@ -203,9 +203,9 @@ function WorkspaceTitle(props) {
                   onDelete={() => handleTagDelete(i)}
                 />
               ))}
-            </Fragment>
+            </>
           )}
-        </Fragment>
+        </>
       )}
     </div>
   );

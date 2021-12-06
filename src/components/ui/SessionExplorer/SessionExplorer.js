@@ -283,12 +283,12 @@ function SessionExplorer(props) {
               InputProps={{
                 ...params.InputProps,
                 startAdornment: (
-                  <Fragment>
+                  <>
                     <InputAdornment position="start">
                       <Icon>search</Icon>
                     </InputAdornment>
                     {params.InputProps.startAdornment}
-                  </Fragment>
+                  </>
                 ),
               }}
               value={searchValue}

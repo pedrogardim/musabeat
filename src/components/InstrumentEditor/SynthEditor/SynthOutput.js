@@ -20,7 +20,7 @@ function SynthOutput(props) {
   };
 
   let mainContent = (
-    <Fragment>
+    <>
       <Knob
         min={-60}
         step={0.01}
@@ -39,7 +39,7 @@ function SynthOutput(props) {
         type={"envelope"}
         mousePosition={props.mousePosition}
       />
-    </Fragment>
+    </>
   );
 
   return props.expanded ? (

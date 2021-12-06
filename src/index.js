@@ -29,7 +29,7 @@ firebase.initializeApp(firebaseConfig);
 const startApp = () => {
   //console.log(device.cordova);
   ReactDOM.render(
-    <Fragment>
+    <>
       <ErrorBoundary
         FallbackComponent={ErrorFallback}
         onReset={() => {
@@ -40,7 +40,7 @@ const startApp = () => {
           <App />
         </HashRouter>
       </ErrorBoundary>
-    </Fragment>,
+    </>,
     document.getElementById("root")
   );
 };

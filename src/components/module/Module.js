@@ -570,7 +570,7 @@ function Module(props) {
   }, [zoomAnchorEl]);
 
   return (
-    <Fragment>
+    <>
       {fullScreen && (
         <div
           className="module-fs-backdrop"
@@ -623,7 +623,7 @@ function Module(props) {
           )}
 
           {(props.module.type === 3 || props.module.type === 4) && (
-            <Fragment>
+            <>
               <IconButton
                 className="module-zoom-button"
                 tabIndex={-1}
@@ -653,7 +653,7 @@ function Module(props) {
                   style={{ width: 120, margin: "0 8px" }}
                 />
               </Popover>
-            </Fragment>
+            </>
           )}
           <IconButton
             tabIndex={-1}
@@ -743,7 +743,7 @@ function Module(props) {
           </Menu>
         </div>
         {props.loaded ? (
-          <Fragment>
+          <>
             {modulePage === "instrument" && (
               <InstrumentEditor
                 module={props.module}
@@ -796,7 +796,7 @@ function Module(props) {
             )}
 
             {modulePage === null && moduleContent}
-          </Fragment>
+          </>
         ) : (
           <CircularProgress
             className="loading-progress"
@@ -810,7 +810,7 @@ function Module(props) {
         onClose={() => setDeleteDialog(null)}
         action={removeModule}
       />
-    </Fragment>
+    </>
   );
 }
 

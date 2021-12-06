@@ -294,7 +294,7 @@ function FilePage(props) {
   return (
     <div className="file-page">
       {fileInfo !== undefined ? (
-        <Fragment>
+        <>
           <Typography variant="h4">
             {fileInfo
               ? `${fileInfo.name}.${fileExtentions[fileInfo.type]}`
@@ -424,7 +424,7 @@ function FilePage(props) {
             </Grid>
           )}
           <LoadingScreen open={fileInfo === null} />
-        </Fragment>
+        </>
       ) : (
         <NotFoundPage
           type="filePage"

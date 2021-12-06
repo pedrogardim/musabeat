@@ -57,7 +57,7 @@ function SessionSettings(props) {
   }, [open]);
 
   return (
-    <Fragment>
+    <>
       <IconButton
         ref={btnRef}
         color="primary"
@@ -323,7 +323,7 @@ function SessionSettings(props) {
         setNewSessionData={setNewSessionData}
         setEditorProfiles={props.setEditorProfiles}
       />
-    </Fragment>
+    </>
   );
 }
 

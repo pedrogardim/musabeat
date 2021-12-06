@@ -94,7 +94,7 @@ function Keyboard(props) {
           </div>
         ))}
       {props.variableOctave && (
-        <Fragment>
+        <>
           {octave < 6 && (
             <IconButton
               style={{
@@ -133,7 +133,7 @@ function Keyboard(props) {
           >
             Octave: {octave + 1}
           </Typography>
-        </Fragment>
+        </>
       )}
     </div>
   );

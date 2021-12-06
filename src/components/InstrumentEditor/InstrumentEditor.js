@@ -612,7 +612,7 @@ function InstrumentEditor(props) {
               {bufferObjects
                 .sort((a, b) => a[1] - b[1])
                 .map((e, i) => (
-                  <Fragment>
+                  <>
                     <AudioFileItem
                       key={i}
                       index={i}
@@ -632,7 +632,7 @@ function InstrumentEditor(props) {
                       setRenamingLabel={setRenamingLabel}
                     />
                     <Divider />
-                  </Fragment>
+                  </>
                 ))}
             </List>
           ) : (
@@ -709,16 +709,16 @@ function InstrumentEditor(props) {
         )}
         <Divider orientation="vertical" flexItem />
         {trackType === 0 ? (
-          <Fragment>
+          <>
             <IconButton
               color={isDrum ? "primary" : "disabled"}
               onClick={toggleSamplerMode}
             >
               <SvgIcon viewBox="0 0 351 322.7">{drumIcon}</SvgIcon>
             </IconButton>
-          </Fragment>
+          </>
         ) : (
-          <Fragment></Fragment>
+          <></>
         )}
       </div>
       {draggingOver && props.instrument.name !== "PolySynth" && (
@@ -737,7 +737,7 @@ function InstrumentEditor(props) {
       )}
 
       {/* (props.module.type === 0 || props.instrument.name === "Sampler") && (
-        <Fragment>
+        <>
           <Fab
             style={{ position: "absolute", right: 16, bottom: 16 }}
             onClick={() => setFileExplorer(true)}
@@ -764,7 +764,7 @@ function InstrumentEditor(props) {
               />
             </Tooltip>
           }
-        </Fragment>
+        </>
       ) */}
 
       {/* <FileUploader

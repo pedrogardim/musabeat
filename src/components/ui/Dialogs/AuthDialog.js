@@ -253,7 +253,7 @@ function AuthDialog(props) {
   };
 
   return (
-    <Fragment>
+    <>
       <Dialog
         className="auth-dialog"
         open={props.authDialog}
@@ -266,7 +266,7 @@ function AuthDialog(props) {
           {!creatingAccount ? t("auth.login") : t("auth.createAccount")}
         </DialogTitle>
         {!emailLogIn && !creatingAccount && (
-          <Fragment>
+          <>
             <DialogContent>
               <DialogContentText className="auth-dialog-text">
                 {t("auth.description")}
@@ -293,7 +293,7 @@ function AuthDialog(props) {
                 {t("auth.emailLogin")}
               </Button>
             </div>
-          </Fragment>
+          </>
         )}
 
         {emailLogIn && (
@@ -380,7 +380,7 @@ function AuthDialog(props) {
           </DialogContent>
         </Dialog>
       )}
-    </Fragment>
+    </>
   );
 }
 

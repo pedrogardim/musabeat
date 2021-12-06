@@ -112,12 +112,12 @@ function AddUserDialog(props) {
               InputProps={{
                 ...params.InputProps,
                 startAdornment: (
-                  <Fragment>
+                  <>
                     <InputAdornment position="start">
                       <Icon>search</Icon>
                     </InputAdornment>
                     {params.InputProps.startAdornment}
-                  </Fragment>
+                  </>
                 ),
               }}
               onChange={(e) => userQuery(e.target.value)}

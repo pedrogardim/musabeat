@@ -160,7 +160,7 @@ function App() {
   /////TESTING
 
   return (
-    <Fragment>
+    <>
       <Fade in={false /* !isOnline */}>
         <div className="app-offline-screen">
           <AppLogo
@@ -405,7 +405,7 @@ function App() {
         onClose={() => setFollowingRoute(null)}
         action={() => handlePageNav(...followingRoute)}
       />
-    </Fragment>
+    </>
   );
 }
 

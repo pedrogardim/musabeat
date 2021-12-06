@@ -84,7 +84,7 @@ function FilterEditor(props) {
   }, [props.instrument]);
 
   return (
-    <Fragment>
+    <>
       <Grid item xs={6} className="filter-editor-grid">
         <Typography variant="overline">
           {/*<IconButton
@@ -144,7 +144,7 @@ function FilterEditor(props) {
           onChangeCommitted={registerToSynth}
         />
       </Grid>
-    </Fragment>
+    </>
   );
 }
 

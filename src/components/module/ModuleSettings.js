@@ -165,7 +165,7 @@ function ModuleSettings(props) {
   };
 
   mainContent = (
-    <Fragment>
+    <>
       {(props.module.type === 0 || props.module.type === 1) && (
         <FormControl>
           <InputLabel id="subdivision-select-label">
@@ -265,7 +265,7 @@ function ModuleSettings(props) {
       <div className="break" />
 
       {props.module.type === 1 && (
-        <Fragment>
+        <>
           <div style={{ width: "100%", height: "16px" }} />
           <Slider
             style={{ width: "50%" }}
@@ -275,7 +275,7 @@ function ModuleSettings(props) {
             min={1}
             max={7}
           />
-        </Fragment>
+        </>
       )}
       {props.module.type === 2 && (
         <FormControl>
@@ -294,7 +294,7 @@ function ModuleSettings(props) {
           </Select>
         </FormControl>
       )}
-    </Fragment>
+    </>
   );
 
   return (

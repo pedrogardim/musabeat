@@ -1209,7 +1209,7 @@ function Workspace(props) {
           </IconButton>
         </div>
       </div>
-      <Fragment>
+      <>
         {!IEOpen && (
           <WorkspaceTransport
             modules={modules}
@@ -1293,7 +1293,7 @@ function Workspace(props) {
                 setModuleRows={setModuleRows}
               />
             ) : (
-              <Fragment>
+              <>
                 {modules &&
                   modules.map((module, moduleIndex) => (
                     <ClosedTrack
@@ -1329,15 +1329,15 @@ function Workspace(props) {
                 <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
                   <Icon>add</Icon>
                 </IconButton>
-              </Fragment>
+              </>
             )}
           </WorkspaceGrid>
         </div>
-      </Fragment>
+      </>
 
       <div className="ws-note-input">
         {selectedModule !== null && (
-          <Fragment>
+          <>
             <NotesInput
               keyMapping={keyMapping}
               module={modules && modules[selectedModule]}
@@ -1372,7 +1372,7 @@ function Workspace(props) {
                 </div>
               )}
             </div>
-          </Fragment>
+          </>
         )}
       </div>
       {modulePicker && (
@@ -1417,7 +1417,7 @@ function Workspace(props) {
           <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
         </IconButton>
         {editMode && (
-          <Fragment>
+          <>
             {sessionData && (
               <SessionSettings
                 premiumMode={premiumMode}
@@ -1439,7 +1439,7 @@ function Workspace(props) {
                 <Icon>save</Icon>
               </IconButton>
             </Tooltip>
-          </Fragment>
+          </>
         )}
 
         {!props.hidden && isLoaded && sessionData && (
