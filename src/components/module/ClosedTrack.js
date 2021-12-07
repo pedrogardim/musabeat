@@ -17,6 +17,7 @@ import {
 import {
   scheduleSampler,
   scheduleMelody,
+  scheduleAudioTrack,
   clearEvents,
 } from "../../utils/TransportSchedule";
 
@@ -64,7 +65,14 @@ function ClosedTrack(props) {
             Tone.Transport,
             props.module.id
           )
-        : scheduleMelody(
+        : trackType === 1
+        ? scheduleMelody(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+        : scheduleAudioTrack(
             props.module.score,
             props.instrument,
             Tone.Transport,

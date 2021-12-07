@@ -17,6 +17,7 @@ import {
 import {
   scheduleSampler,
   scheduleMelody,
+  scheduleAudioTrack,
   clearEvents,
 } from "../../utils/TransportSchedule";
 
@@ -24,6 +25,8 @@ import { drumMapping, drumAbbreviations } from "../../assets/musicutils";
 
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
+import AudioClip from "./AudioClip";
+
 import { ContactPhoneSharp } from "@material-ui/icons";
 
 function ModuleRow(props) {
@@ -32,12 +35,15 @@ function ModuleRow(props) {
 
   const [moduleRows, setModuleRows] = useState([]);
   const [gridPos, setGridPos] = useState([]);
+  const [floatPos, setFloatPos] = useState([]);
+
   const [drawingNote, setDrawingNote] = useState(null);
 
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [deletableNote, setDeletableNote] = useState(false);
 
   const [selection, setSelection] = useState([]);
+
   const [selectedNotes, setSelectedNotes] = useState([]);
 
   const [showingAll, setShowingAll] = useState(false);
@@ -90,6 +96,14 @@ function ModuleRow(props) {
         };
       });
     }
+    if (trackType === 2) {
+      rows = [
+        {
+          note: 0,
+          lbl: "A",
+        },
+      ];
+    }
     setModuleRows(rows);
   };
 
@@ -102,7 +116,14 @@ function ModuleRow(props) {
             Tone.Transport,
             props.module.id
           )
-        : scheduleMelody(
+        : trackType === 1
+        ? scheduleMelody(
+            props.module.score,
+            props.instrument,
+            Tone.Transport,
+            props.module.id
+          )
+        : scheduleAudioTrack(
             props.module.score,
             props.instrument,
             Tone.Transport,
@@ -179,21 +200,25 @@ function ModuleRow(props) {
           : 0),
     ];
 
-    let gridPos = [
-      Math.floor(
+    let pos = [
+      parseFloat(
         Math.abs(
           (hoveredPos[0] / rowRef.current.scrollHeight) * moduleRows.length
-        )
+        ).toFixed(3)
       ),
-      Math.floor(
+      parseFloat(
         Math.abs(
           (hoveredPos[1] / rowRef.current.offsetWidth) *
             zoomSize *
             props.gridSize
-        )
+        ).toFixed(3)
       ) +
         props.zoomPosition[0] * props.gridSize,
     ];
+
+    setFloatPos(pos);
+
+    let gridPos = pos.map((e) => Math.floor(e));
 
     setGridPos((prev) =>
       JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
@@ -288,6 +313,7 @@ function ModuleRow(props) {
   };
 
   const handleMouseUp = (e) => {
+    //console.log(e.target);
     setIsMouseDown(false);
     if (trackType === 1 && drawingNote && props.cursorMode === "edit") {
       let newNote = { ...drawingNote };
@@ -343,6 +369,7 @@ function ModuleRow(props) {
   /* ================================================================================== */
 
   useEffect(() => {
+    console.log("change detected on moduleRow");
     scheduleNotes();
   }, [props.instrument, props.module, props.module.score, props.isLoaded]);
 
@@ -461,7 +488,9 @@ function ModuleRow(props) {
             >
               {row.lbl}
             </span>
-            {trackType === 0 && <div className="module-inner-row-line" />}
+            {(trackType === 0 || trackType === 2) && (
+              <div className="module-inner-row-line" />
+            )}
           </div>
         ))}
         {rowRef.current &&
@@ -486,7 +515,7 @@ function ModuleRow(props) {
                   a={rowRef.current}
                   exists={props.instrument.has(note.note)}
                 />
-              ) : (
+              ) : trackType === 1 ? (
                 <MelodyNote
                   key={noteIndex}
                   rowRef={rowRef}
@@ -507,6 +536,30 @@ function ModuleRow(props) {
                   setSelectedNotes={props.setSelectedNotes}
                   zoomPosition={props.zoomPosition}
                   a={rowRef.current}
+                />
+              ) : (
+                <AudioClip
+                  key={noteIndex}
+                  rowRef={rowRef}
+                  moduleRows={moduleRows}
+                  note={note}
+                  player={props.instrument.player(note.clip)}
+                  drawingNote={drawingNote}
+                  module={props.module}
+                  sessionSize={props.sessionSize}
+                  gridSize={props.gridSize}
+                  gridPos={gridPos}
+                  deletableNote={deletableNote}
+                  setDrawingNote={setDrawingNote}
+                  index={noteIndex}
+                  setModules={props.setModules}
+                  isMouseDown={isMouseDown}
+                  selectedModule={props.selectedModule}
+                  selectedNotes={props.selectedNotes}
+                  setSelectedNotes={props.setSelectedNotes}
+                  zoomPosition={props.zoomPosition}
+                  floatPos={floatPos}
+                  loaded={true}
                 />
               )
             )}

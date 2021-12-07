@@ -49,8 +49,10 @@ import "./InstrumentEditor.css";
 function InstrumentEditor(props) {
   const { t } = useTranslation();
 
+  const trackType = props.module.type;
+
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchExplorer, setPatchExplorer] = useState(false);
+  const [patchExplorer, setPatchExplorer] = useState(true);
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -72,8 +74,6 @@ function InstrumentEditor(props) {
   const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
 
-  const trackType = props.module.type;
-
   const patchSizeLimit = 5242880;
 
   const checkCustomPatch = typeof module.instrument !== "string";
@@ -81,7 +81,7 @@ function InstrumentEditor(props) {
   const isDrum = trackType === 0 && props.instrumentInfo.patch.dr;
 
   const setIntrument = (newInstrument) => {
-    console.log("instrument set", newInstrument._dummyVoice);
+    //console.log("instrument set", newInstrument._dummyVoice);
     props.setInstruments((prev) => {
       let newInstruments = [...prev];
       newInstruments[props.index].dispose();

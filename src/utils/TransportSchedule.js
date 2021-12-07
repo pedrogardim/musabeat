@@ -430,3 +430,38 @@ export const scheduleMelody = (score, instrument, transport, moduleId) => {
 
   scheduledEvents[moduleId] = scheduledNotes;
 };
+
+/* ==============================*/
+
+export const scheduleAudioTrack = (score, players, transport, moduleId) => {
+  moduleId !== undefined && clearEvents(moduleId);
+
+  let scheduledSounds = [];
+
+  console.log("scheduled");
+
+  let cursorTime = transport.seconds;
+
+  score.forEach((event, eventIndex) => {
+    let scoreTime = Tone.Time(event.time).toSeconds();
+
+    let isCursorinBetween =
+      cursorTime > scoreTime && cursorTime < scoreTime + event.duration;
+
+    let eventOffset = parseFloat(
+      (isCursorinBetween ? cursorTime - scoreTime : 0).toFixed(3)
+    );
+    let eventTime = parseFloat(
+      (isCursorinBetween ? cursorTime : scoreTime).toFixed(3)
+    );
+
+    //console.log(eventTime, eventOffset);
+
+    let thisevent = transport.schedule((time) => {
+      players.player(event.clip).start(time, eventOffset, event.duration);
+    }, eventTime);
+    scheduledSounds.push(thisevent);
+  });
+
+  scheduledEvents[moduleId] = scheduledSounds;
+};

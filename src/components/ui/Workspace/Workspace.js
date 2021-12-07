@@ -54,6 +54,7 @@ import {
   loadSamplerFromObject,
   keySamplerMapping,
   keyboardMapping,
+  loadAudioTrack,
 } from "../../../assets/musicutils";
 
 import { colors } from "../../../utils/materialPalette";
@@ -99,6 +100,8 @@ function Workspace(props) {
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
   const [instrumentsInfo, setInstrumentsInfo] = useState([]);
+  const [buffers, setBuffers] = useState([]);
+
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [metronome, setMetronome] = useState(null);
@@ -325,61 +328,20 @@ function Workspace(props) {
       }
 
       //player
-      else if (module.type === 3) {
-        if (module.instrument.url) {
-          firebase
-            .storage()
-            .ref(module.instrument.url)
-            .getDownloadURL()
-            .then((r) => {
-              let instrument = new Tone.GrainPlayer(r, () =>
-                setInstrumentsLoaded((prev) => {
-                  let a = [...prev];
-                  a[moduleIndex] = true;
-                  return a;
-                })
-              ).toDestination();
-              setInstruments((prev) => {
-                let a = [...prev];
-                a[moduleIndex] = instrument;
-                return a;
-              });
-              firebase
-                .firestore()
-                .collection("files")
-                .doc(module.instrument.url)
-                .update({ in: firebase.firestore.FieldValue.increment(1) });
-            })
-            .catch((er) => {
-              setInstrumentsLoaded((prev) => {
-                let a = [...prev];
-                a[moduleIndex] = true;
-                return a;
-              });
-
-              let instrument = new Tone.GrainPlayer().toDestination();
-              setInstruments((prev) => {
-                let a = [...prev];
-                a[moduleIndex] = instrument;
-                return a;
-              });
-              setNotifications((prev) => [...prev, module.instrument.url]);
-            });
-        } else {
-          let instrument = new Tone.GrainPlayer();
-
-          setInstrumentsLoaded((prev) => {
-            let a = [...prev];
-            a[moduleIndex] = true;
-            return a;
-          });
-
+      else if (module.type === 2) {
+        loadAudioTrack(
+          module.instrument,
+          setInstrumentsLoaded,
+          moduleIndex,
+          setNotifications,
+          setInstrumentsInfo
+        ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
-            a[moduleIndex] = instrument;
+            a[moduleIndex] = r;
             return a;
-          });
-        }
+          })
+        );
       }
       //load from patch id
       else if (typeof module.instrument === "string") {
@@ -505,56 +467,20 @@ function Workspace(props) {
       }
     }
     //player
-    else if (module.type === 3) {
-      if (module.instrument.url) {
-        firebase
-          .storage()
-          .ref(module.instrument.url)
-          .getDownloadURL()
-          .then((r) => {
-            let instrument = new Tone.GrainPlayer(r, () =>
-              setInstrumentsLoaded((prev) => {
-                let a = [...prev];
-                a[index] = true;
-                return a;
-              })
-            ).toDestination();
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[index] = instrument;
-              return a;
-            });
-          })
-          .catch((er) => {
-            setInstrumentsLoaded((prev) => {
-              let a = [...prev];
-              a[index] = true;
-              return a;
-            });
-
-            let instrument = new Tone.GrainPlayer().toDestination();
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[index] = instrument;
-              return a;
-            });
-            setNotifications((prev) => [...prev, module.instrument.url]);
-          });
-      } else {
-        let instrument = new Tone.GrainPlayer().toDestination();
-
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[index] = true;
-          return a;
-        });
-
+    else if (module.type === 2) {
+      loadAudioTrack(
+        module.instrument,
+        setInstrumentsLoaded,
+        index,
+        setNotifications,
+        setInstrumentsInfo
+      ).then((r) =>
         setInstruments((prev) => {
           let a = [...prev];
-          a[index] = instrument;
+          a[index] = r;
           return a;
-        });
-      }
+        })
+      );
     }
     //load from patch id
     else if (typeof module.instrument === "string") {

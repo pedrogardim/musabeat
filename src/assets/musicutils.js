@@ -1336,6 +1336,107 @@ export const loadDrumPatch = async (
   return drumPlayers;
 };
 
+export const loadAudioTrack = async (
+  input,
+  setInstrumentsLoaded,
+  moduleIndex,
+  setModules,
+  setInstrumentsInfo,
+  setNotifications
+) => {
+  let instrumentLoaded = (isLoaded, players) => {
+    //console.log("ITS LOADED ITS LOADED ITS LOADED ITS LOADED ITS LOADED");
+    setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[moduleIndex] = isLoaded;
+      return a;
+    });
+  };
+
+  if (JSON.stringify(input.urls) === "{}") {
+    setInstrumentsLoaded((prev) => {
+      //console.log("======LOADED=======")
+      let a = [...prev];
+      a[moduleIndex] = true;
+      return a;
+    });
+    return new Tone.Players().toDestination();
+  }
+
+  //get urls from file ids
+
+  let urlArray = await Promise.all(
+    Object.keys(input.urls).map(async (e, i) => {
+      try {
+        return await firebase.storage().ref(input.urls[e]).getDownloadURL();
+      } catch (er) {
+        setNotifications((prev) => [
+          ...prev,
+          ["file", input.urls[e], moduleIndex],
+        ]);
+      }
+    })
+  );
+
+  let filesInfo = await Promise.all(
+    Object.keys(input.urls).map(async (e, i) => {
+      try {
+        return [
+          e,
+          (
+            await firebase
+              .firestore()
+              .collection("files")
+              .doc(input.urls[e])
+              .get()
+          ).data(),
+        ];
+      } catch (er) {
+        setNotifications((prev) => [
+          ...prev,
+          ["fileInfo", input.urls[e], moduleIndex],
+        ]);
+      }
+    })
+  );
+
+  setInstrumentsInfo((prev) => {
+    let newInfo = [...prev];
+    newInfo[moduleIndex] = {
+      info: input,
+      filesInfo: Object.fromEntries(filesInfo),
+    };
+    return newInfo;
+  });
+
+  //console.log(urlArray);
+
+  let urls = Object.fromEntries(
+    urlArray
+      .filter((e) => e !== undefined)
+      .map((e, i) => [Object.keys(input.urls)[i], e])
+  );
+
+  //console.log(urls);
+
+  //console.log(urls);
+
+  setInstrumentsLoaded((prev) => {
+    //console.log("======LOADED=======")
+    let a = [...prev];
+    a[moduleIndex] = false;
+    return a;
+  });
+
+  let trackPlayers = new Tone.Players(urls, () =>
+    instrumentLoaded(true, trackPlayers)
+  ).toDestination();
+
+  trackPlayers.volume.value = input.volume;
+
+  return trackPlayers;
+};
+
 export const loadEffect = (type, options) => {
   //type as effects array index
   //console.log(options);
