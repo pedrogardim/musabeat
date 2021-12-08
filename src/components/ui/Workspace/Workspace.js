@@ -114,6 +114,8 @@ function Workspace(props) {
     () => {},
     () => {},
   ]);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+
   const [moduleRows, setModuleRows] = useState([]);
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -1183,6 +1185,7 @@ function Workspace(props) {
             zoomPosition={zoomPosition}
             selectedModule={selectedModule}
             IEOpen={IEOpen}
+            isMouseDown={isMouseDown}
           >
             {selectedModule !== null ? (
               <ModuleRow
@@ -1195,6 +1198,7 @@ function Workspace(props) {
                 instruments={instruments}
                 setInstruments={setInstruments}
                 loaded={instrumentsLoaded[selectedModule]}
+                instrumentInfo={instrumentsInfo[selectedModule]}
                 setInstrumentsLoaded={setInstrumentsLoaded}
                 sessionData={sessionData}
                 sessionSize={sessionSize}
@@ -1217,6 +1221,7 @@ function Workspace(props) {
                 setPlayNoteFunction={setPlayNoteFunction}
                 zoomPosition={zoomPosition}
                 setModuleRows={setModuleRows}
+                setIsMouseDown={setIsMouseDown}
               />
             ) : (
               <>

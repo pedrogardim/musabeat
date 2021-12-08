@@ -21,3 +21,10 @@
   height: 100%;
   width: 100%;
 }
+
+.audioclip-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white !important;
+}

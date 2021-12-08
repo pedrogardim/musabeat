@@ -36,8 +36,7 @@ function WorkspaceGrid(props) {
 
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds =
-      (element.x / gridRef.current.offsetWidth) *
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
+      (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
 
     setCursorPosition(element.x);
   };
@@ -149,6 +148,10 @@ function WorkspaceGrid(props) {
     //console.log(gridPos);
   }, [gridPos]);
 
+  /* useEffect(() => {
+    console.log(props.isMouseDown);
+  }, [props.isMouseDown]); */
+
   return (
     <div
       className="ws-grid"
@@ -203,11 +206,16 @@ function WorkspaceGrid(props) {
             x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
             y: 0,
           }}
+          disabled={props.isMouseDown}
           bounds=".ws-grid-line-cont"
+          style={{ pointerEvents: props.isMouseDown && "none" }}
         >
           <div
             className={"ws-grid-cursor"}
-            style={{ backgroundColor: props.isRecording && "#f50057" }}
+            style={{
+              backgroundColor: props.isRecording && "#f50057",
+              pointerEvents: props.isMouseDown && "none",
+            }}
           />
         </Draggable>
       )}

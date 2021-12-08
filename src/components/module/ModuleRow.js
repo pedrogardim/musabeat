@@ -369,7 +369,7 @@ function ModuleRow(props) {
   /* ================================================================================== */
 
   useEffect(() => {
-    console.log("change detected on moduleRow");
+    //console.log("change detected on moduleRow");
     scheduleNotes();
   }, [props.instrument, props.module, props.module.score, props.isLoaded]);
 
@@ -389,7 +389,7 @@ function ModuleRow(props) {
   }, [gridPos]);
 
   useEffect(() => {
-    console.log("props.instrument", props.instrument);
+    //console.log("props.instrument", props.instrument);
     moduleRows && props.setModuleRows(moduleRows);
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
@@ -417,6 +417,10 @@ function ModuleRow(props) {
       rowWrapperRef.current.scrollHeight / 2 -
       rowWrapperRef.current.offsetHeight / 2;
   }, [props.selectedModule, rowWrapperRef.current]);
+
+  useEffect(() => {
+    props.setIsMouseDown(isMouseDown);
+  }, [isMouseDown]);
 
   /* ================================================================================== */
   /* ================================================================================== */
@@ -558,6 +562,7 @@ function ModuleRow(props) {
                   selectedNotes={props.selectedNotes}
                   setSelectedNotes={props.setSelectedNotes}
                   zoomPosition={props.zoomPosition}
+                  fileInfo={props.instrumentInfo.filesInfo[note.clip]}
                   floatPos={floatPos}
                   loaded={true}
                 />

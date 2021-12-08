@@ -8,11 +8,30 @@ import { colors } from "../../utils/materialPalette";
 function MelodyNote(props) {
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
+  const [noteTime, setNoteTime] = useState(props.note.time);
+  const [noteNote, setNoteNote] = useState(props.note.note);
+  const [noteDuration, setNoteDuration] = useState(props.note.duration);
 
   const isSelected =
     props.selectedNotes && props.selectedNotes.includes(props.index);
 
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+
+  const commitChanges = () => {
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      newModules[props.selectedModule].score = [
+        ...newModules[props.selectedModule].score,
+      ];
+
+      newModules[props.selectedModule].score[props.index].duration =
+        noteDuration;
+      newModules[props.selectedModule].score[props.index].time = noteTime;
+      newModules[props.selectedModule].score[props.index].note = noteNote;
+
+      return newModules;
+    });
+  };
 
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
@@ -20,10 +39,8 @@ function MelodyNote(props) {
     if (!e.target.className.includes("module-score-note-handle")) {
       setIsMoving(
         props.gridPos[1] -
-          (Tone.Time(props.note.time).toSeconds() /
-            (props.sessionSize * Tone.Time("1m").toSeconds())) *
-            props.gridSize *
-            zoomSize
+          (props.gridSize * Tone.Time(noteTime).toSeconds()) /
+            Tone.Time("1m").toSeconds()
       );
       props.setSelectedNotes(() => {
         let newNotes = [];
@@ -56,23 +73,14 @@ function MelodyNote(props) {
     if (props.ghost) return;
 
     props.setDrawingNote(null);
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      let newDuration = Tone.Time(
+    setNoteDuration((prev) => {
+      let newDuration =
         ((props.gridPos[1] + 1) * Tone.Time("1m").toSeconds()) /
           props.gridSize -
-          Tone.Time(
-            newModules[props.selectedModule].score[props.index].time
-          ).toSeconds()
-      ).toBarsBeatsSixteenths();
+        Tone.Time(noteTime).toSeconds();
 
-      if (
-        Tone.Time(newDuration).toSeconds() >=
-        Tone.Time("1m").toSeconds() / props.gridSize
-      ) {
-        newModules[props.selectedModule].score[props.index].duration =
-          newDuration;
-        return newModules;
+      if (newDuration >= Tone.Time("1m").toSeconds() / props.gridSize) {
+        return Tone.Time(newDuration).toBarsBeatsSixteenths();
       }
       return prev;
     });
@@ -81,24 +89,17 @@ function MelodyNote(props) {
   const handleMove = () => {
     if (props.ghost) return;
 
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      let newTime = Tone.Time(
-        Tone.Time(
-          ((props.gridPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
-            props.gridSize
-        ).quantize(props.gridSize + "n")
-      ).toBarsBeatsSixteenths();
-      let newNote = 108 - props.gridPos[0];
+    let newTime = Tone.Time(
+      ((props.gridPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
+        props.gridSize
+    ).quantize(props.gridSize + "n");
 
-      if (true) {
-        newModules[props.selectedModule].score[props.index].time = newTime;
-        newModules[props.selectedModule].score[props.index].note = newNote;
+    let newNote = 108 - props.gridPos[0];
 
-        return newModules;
-      }
-      return prev;
-    });
+    if (true) {
+      setNoteTime(Tone.Time(newTime).toBarsBeatsSixteenths());
+      setNoteNote(newNote);
+    }
   };
 
   useEffect(() => {
@@ -107,8 +108,17 @@ function MelodyNote(props) {
   }, [props.gridPos]);
 
   useEffect(() => {
+    setNoteTime((prev) => (props.note.time !== prev ? props.note.time : prev));
+    setNoteDuration((prev) =>
+      props.note.duration !== prev ? props.note.duration : prev
+    );
+    setNoteNote((prev) => (props.note.note !== prev ? props.note.note : prev));
+  }, [props.note]);
+
+  useEffect(() => {
     //console.log(props.isMouseDown);
     if (props.isMouseDown === false) {
+      commitChanges();
       setIsResizing(false);
       setIsMoving(false);
     }
@@ -147,7 +157,7 @@ function MelodyNote(props) {
                   (props.rowRef.current.offsetWidth /
                     (zoomSize * Tone.Time("1m").toSeconds()))
               : props.rowRef.current.offsetWidth / (zoomSize * props.gridSize)
-            : (Tone.Time(props.note.duration).toSeconds() /
+            : (Tone.Time(noteDuration).toSeconds() /
                 Tone.Time("1m").toSeconds()) *
               (props.rowRef.current.offsetWidth / zoomSize)) - 2,
         transform: props.ghost
@@ -166,13 +176,13 @@ function MelodyNote(props) {
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`
           : `translate(${
-              Tone.Time(props.note.time).toSeconds() *
+              Tone.Time(noteTime).toSeconds() *
                 (props.rowRef.current.offsetWidth /
                   (zoomSize * Tone.Time("1m").toSeconds())) -
               props.zoomPosition[0] *
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
-              props.moduleRows.findIndex((e) => e.note === props.note.note) *
+              props.moduleRows.findIndex((e) => e.note === noteNote) *
               (props.rowRef.current.scrollHeight / props.moduleRows.length)
             }px)`,
         opacity: props.ghost && 0.5,

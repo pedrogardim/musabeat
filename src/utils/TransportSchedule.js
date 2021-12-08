@@ -438,7 +438,7 @@ export const scheduleAudioTrack = (score, players, transport, moduleId) => {
 
   let scheduledSounds = [];
 
-  console.log("scheduled");
+  //console.log("scheduled");
 
   let cursorTime = transport.seconds;
 

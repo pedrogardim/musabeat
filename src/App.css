@@ -156,6 +156,13 @@ body *::-webkit-scrollbar-thumb {
   align-items: center;
 }
 
+.up {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(0, 0, 0, 0.562);
+}
+
 @keyframes flashing-alert-icon {
   0% {
     color: rgba(0, 0, 0, 0.137);

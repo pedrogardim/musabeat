@@ -23,6 +23,9 @@ function AudioClip(props) {
   const commitChanges = () => {
     props.setModules((prev) => {
       let newModules = [...prev];
+      newModules[props.selectedModule].score = [
+        ...newModules[props.selectedModule].score,
+      ];
       newModules[props.selectedModule].score[props.index].duration =
         noteDuration;
       newModules[props.selectedModule].score[props.index].time = noteTime;
@@ -84,12 +87,16 @@ function AudioClip(props) {
 
     if (typeof props.floatPos[1] !== "number") return;
 
-    setNoteTime(
-      Tone.Time(
-        ((props.floatPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
-          props.gridSize
-      ).toBarsBeatsSixteenths()
-    );
+    let newTime =
+      ((props.floatPos[1] - isMoving) * Tone.Time("1m").toSeconds()) /
+      props.gridSize;
+
+    let maxTime = (props.zoomPosition[1] + 1) * Tone.Time("1m").toSeconds();
+
+    if (newTime < 0) newTime = 0;
+    if (newTime + noteDuration > maxTime) newTime = maxTime - noteDuration;
+
+    setNoteTime(Tone.Time(newTime).toBarsBeatsSixteenths());
   };
 
   useEffect(() => {
@@ -186,6 +193,8 @@ function AudioClip(props) {
           onMouseDown={() => setIsResizing(true)}
         />
       )}
+
+      <span className="audioclip-text up">{props.fileInfo.name}</span>
 
       <canvas
         className="sampler-audio-clip-wave"
