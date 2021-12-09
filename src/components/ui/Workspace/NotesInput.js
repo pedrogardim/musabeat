@@ -63,7 +63,8 @@ function NotesInput(props) {
                   style={{
                     backgroundColor: props.pressedKeys.includes(i)
                       ? "darkgray"
-                      : !props.instrument.has(props.moduleRows[i].note) &&
+                      : props.moduleRows[i] &&
+                        !props.instrument.has(props.moduleRows[i].note) &&
                         "lightgray",
                   }}
                 >

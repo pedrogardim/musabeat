@@ -6,13 +6,13 @@ import * as Tone from "tone";
 
 import React from "react";
 
-import lamejs from "lamejs";
-
 import firebase from "firebase";
 
 import { PitchDetector } from "pitchy";
 
 import { Midi } from "@tonejs/midi";
+
+const lamejs = require("lamejs");
 
 export const musicalNotes = [
   "C",
@@ -1529,16 +1529,18 @@ export const encodeAudioFile = (aBuffer, format) => {
   var left = new Int16Array(leftData);
   var right = new Int16Array(rightData);
 
-  if (format === "mp3") {
-    //STEREO
-    //console.log(wavHdr.channels, left, right);
+  let finalWav = new Blob([btwArrBuff], { type: "audio/wav" });
 
+  if (format === "mp3") {
+    //return wavToMp3(finalWav);
+
+    //STEREO
     if (wavHdr.channels === 2)
       return wavToMp3(wavHdr.channels, wavHdr.sampleRate, left, right);
     //MONO
     else if (wavHdr.channels === 1)
       return wavToMp3(wavHdr.channels, wavHdr.sampleRate, data);
-  } else return new Blob([btwArrBuff], { type: "audio/wav" });
+  } else return finalWav;
 
   function setUint16(data) {
     btwView.setUint16(btwPos, data, true);

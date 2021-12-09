@@ -21,13 +21,18 @@ import {
   clearEvents,
 } from "../../utils/TransportSchedule";
 
-import { drumMapping, drumAbbreviations } from "../../assets/musicutils";
+import {
+  drumMapping,
+  drumAbbreviations,
+  encodeAudioFile,
+} from "../../assets/musicutils";
 
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
 import AudioClip from "./AudioClip";
+import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 
-import { ContactPhoneSharp } from "@material-ui/icons";
+import { ContactPhoneSharp, ContactSupportOutlined } from "@material-ui/icons";
 
 function ModuleRow(props) {
   const rowRef = useRef(null);
@@ -43,10 +48,13 @@ function ModuleRow(props) {
   const [deletableNote, setDeletableNote] = useState(false);
 
   const [selection, setSelection] = useState([]);
-
   const [selectedNotes, setSelectedNotes] = useState([]);
 
   const [showingAll, setShowingAll] = useState(false);
+
+  const [recTools, setRecTools] = useState(null);
+  const [meterLevel, setMeterLevel] = useState(0);
+  const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const trackType = props.module.type;
   const isSelected = props.selectedModule === props.index;
@@ -181,6 +189,46 @@ function ModuleRow(props) {
   const releaseNote = (note) => {
     if (trackType === 1) {
       props.instrument.triggerRelease(Tone.Frequency(note, "midi"));
+    }
+  };
+
+  const toggleAudioRecording = () => {
+    if (!recTools) return;
+    if (props.isRecording) {
+      let newAudioIndex = Object.keys(props.instrumentInfo.info.urls).length;
+      let drawingNote = { time: Tone.Transport.position, clip: newAudioIndex };
+      setDrawingNote(drawingNote);
+
+      //recTools.userMedia.open().then(() => recTools.recorder.start());
+      recTools.recorder.start();
+    } else {
+      recTools.recorder.stop().then((blob) => {
+        setUploadingFiles((prev) => [...prev, blob]);
+        blob.arrayBuffer().then((arrayBuffer) => {
+          Tone.getContext().rawContext.decodeAudioData(
+            arrayBuffer,
+            (audiobuffer) => {
+              //let finalFile = encodeAudioFile(audiobuffer, "mp3");
+              //console.log(drawingNote);
+              props.instrument.add(drawingNote.clip, audiobuffer);
+              props.setModules((prev) => {
+                let newModules = [...prev];
+                let newNote = {
+                  ...drawingNote,
+                  duration: parseFloat(audiobuffer.duration.toFixed(3)),
+                };
+                newModules[props.index].score = [
+                  ...newModules[props.index].score,
+                  newNote,
+                ];
+                return newModules;
+              });
+              setDrawingNote(null);
+              //recTools.userMedia.close();
+            }
+          );
+        });
+      });
     }
   };
 
@@ -374,6 +422,11 @@ function ModuleRow(props) {
   }, [props.instrument, props.module, props.module.score, props.isLoaded]);
 
   useEffect(() => {
+    //console.log("change detected on moduleRow");
+    trackType === 2 && scheduleNotes();
+  }, [props.isPlaying]);
+
+  useEffect(() => {
     loadModuleRows();
   }, [
     props.instrument,
@@ -421,6 +474,28 @@ function ModuleRow(props) {
   useEffect(() => {
     props.setIsMouseDown(isMouseDown);
   }, [isMouseDown]);
+
+  useEffect(() => {
+    if (trackType === 2) toggleAudioRecording();
+  }, [props.isRecording]);
+
+  useEffect(() => {
+    if (trackType === 2) {
+      const recorder = new Tone.Recorder();
+      const meter = new Tone.Meter({ normalRange: true });
+      const userMedia = new Tone.UserMedia().fan(recorder, meter);
+      userMedia.open();
+      let tools = { recorder: recorder, userMedia: userMedia, meter: meter };
+      setRecTools(tools);
+      let meterInterval = setInterval(() => {
+        setMeterLevel(meter.getValue());
+      }, 16);
+      return () => {
+        userMedia.close();
+        clearInterval(meterInterval);
+      };
+    }
+  }, []);
 
   /* ================================================================================== */
   /* ================================================================================== */
@@ -542,30 +617,33 @@ function ModuleRow(props) {
                   a={rowRef.current}
                 />
               ) : (
-                <AudioClip
-                  key={noteIndex}
-                  rowRef={rowRef}
-                  moduleRows={moduleRows}
-                  note={note}
-                  player={props.instrument.player(note.clip)}
-                  drawingNote={drawingNote}
-                  module={props.module}
-                  sessionSize={props.sessionSize}
-                  gridSize={props.gridSize}
-                  gridPos={gridPos}
-                  deletableNote={deletableNote}
-                  setDrawingNote={setDrawingNote}
-                  index={noteIndex}
-                  setModules={props.setModules}
-                  isMouseDown={isMouseDown}
-                  selectedModule={props.selectedModule}
-                  selectedNotes={props.selectedNotes}
-                  setSelectedNotes={props.setSelectedNotes}
-                  zoomPosition={props.zoomPosition}
-                  fileInfo={props.instrumentInfo.filesInfo[note.clip]}
-                  floatPos={floatPos}
-                  loaded={true}
-                />
+                props.instrument &&
+                props.instrument.has(note.clip) && (
+                  <AudioClip
+                    key={noteIndex}
+                    rowRef={rowRef}
+                    moduleRows={moduleRows}
+                    note={note}
+                    player={props.instrument.player(note.clip)}
+                    drawingNote={drawingNote}
+                    module={props.module}
+                    sessionSize={props.sessionSize}
+                    gridSize={props.gridSize}
+                    gridPos={gridPos}
+                    deletableNote={deletableNote}
+                    setDrawingNote={setDrawingNote}
+                    index={noteIndex}
+                    setModules={props.setModules}
+                    isMouseDown={isMouseDown}
+                    selectedModule={props.selectedModule}
+                    selectedNotes={props.selectedNotes}
+                    setSelectedNotes={props.setSelectedNotes}
+                    zoomPosition={props.zoomPosition}
+                    fileInfo={props.instrumentInfo.filesInfo[note.clip]}
+                    floatPos={floatPos}
+                    loaded={true}
+                  />
+                )
               )
             )}
         {rowRef.current &&
@@ -602,7 +680,49 @@ function ModuleRow(props) {
               zoomPosition={props.zoomPosition}
             />
           ))}
+
+        {rowRef.current && trackType === 2 && (
+          <>
+            <div
+              style={{
+                position: "absolute",
+                left: -32,
+                bottom: 0,
+                width: 16,
+                height: rowRef.current.offsetHeight * meterLevel,
+                backgroundColor: "#3f51b5",
+              }}
+            />
+
+            {props.isRecording && drawingNote && (
+              <AudioClip
+                recording
+                note={drawingNote}
+                rowRef={rowRef}
+                moduleRows={moduleRows}
+                zoomPosition={props.zoomPosition}
+                player={{ buffer: { loaded: "" } }}
+                module={props.module}
+                fileInfo={{}}
+              />
+            )}
+          </>
+        )}
       </div>
+      <FileUploader
+        open={uploadingFiles.length > 0}
+        files={uploadingFiles}
+        setUploadingFiles={setUploadingFiles}
+        module={props.module}
+        instrument={props.instrument}
+        setInstrumentsInfo={props.setInstrumentsInfo}
+        setModules={props.setModules}
+        drawingNote={drawingNote}
+        index={props.index}
+        /* setInstrumentLoaded={props.setInstrumentLoaded}
+        onInstrumentMod={props.onInstrumentMod} 
+        updateOnFileLoaded={props.updateOnFileLoaded}*/
+      />
     </div>
   );
 }

@@ -18,6 +18,13 @@ function MelodyNote(props) {
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
   const commitChanges = () => {
+    if (
+      noteTime === props.note.time &&
+      noteDuration === props.note.duration &&
+      noteNote === props.note.note
+    )
+      return;
+
     props.setModules((prev) => {
       let newModules = [...prev];
       newModules[props.selectedModule].score = [

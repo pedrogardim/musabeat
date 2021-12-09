@@ -60,8 +60,6 @@ import {
 import { colors } from "../../../utils/materialPalette";
 import { clearEvents } from "../../../utils/TransportSchedule";
 
-Tone.Transport.loopEnd = "1m";
-
 const userSubmitedSessionProps = [
   "alwcp",
   "bpm",
@@ -733,23 +731,36 @@ function Workspace(props) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
-      instruments.forEach((e) => !e.name.includes("Player") && e.releaseAll());
       Tone.Transport.pause();
+      instruments.forEach((e) =>
+        e.name === "Players" ? e.stopAll() : e.releaseAll()
+      );
       setIsRecording(false);
       setIsPlaying(false);
     }
   };
 
   const toggleRecording = (e) => {
-    Tone.Transport.pause();
-    Tone.Transport.seconds = `${
-      Tone.Time(Tone.Transport.seconds).toBarsBeatsSixteenths().split(":")[0] -
-      1
-    }:0:0`;
+    if (!isRecording) {
+      Tone.Transport.pause();
+      let newTime = `${
+        Tone.Time(Tone.Transport.seconds)
+          .toBarsBeatsSixteenths()
+          .split(":")[0] - 1
+      }:0:0`;
 
-    Tone.Transport.start();
-    setIsPlaying(true);
-    setIsRecording(true);
+      newTime = Tone.Time(newTime).toSeconds() < 0 ? "0:0:0" : newTime;
+
+      Tone.Transport.position = newTime;
+
+      Tone.Transport.start();
+      setIsPlaying(true);
+      setIsRecording(true);
+    } else {
+      Tone.Transport.pause();
+      setIsPlaying(false);
+      setIsRecording(false);
+    }
   };
 
   const playNote = (e) => {
@@ -1011,8 +1022,6 @@ function Workspace(props) {
   }, [instrumentsInfo]);
 
   useEffect(() => {
-    Tone.Transport.loopEnd = Tone.Time("1m").toSeconds() * sessionSize;
-
     setSessionData((prev) => {
       let newSesData = { ...prev };
       newSesData.size = sessionSize;
@@ -1056,14 +1065,13 @@ function Workspace(props) {
   }, [selection]);
 
   useEffect(() => {
-    //console.log(selectedNotes);
-  }, [selectedNotes]);
+    //console.log(instrumentsInfo);
+  }, [instrumentsInfo]);
 
   useEffect(() => {
     let begin = zoomPosition[0] * Tone.Time("1m").toSeconds();
     Tone.Transport.setLoopPoints(
       begin,
-
       (zoomPosition[1] + 1) * Tone.Time("1m").toSeconds()
     );
 
@@ -1199,6 +1207,7 @@ function Workspace(props) {
                 setInstruments={setInstruments}
                 loaded={instrumentsLoaded[selectedModule]}
                 instrumentInfo={instrumentsInfo[selectedModule]}
+                setInstrumentsInfo={setInstrumentsInfo}
                 setInstrumentsLoaded={setInstrumentsLoaded}
                 sessionData={sessionData}
                 sessionSize={sessionSize}
@@ -1216,6 +1225,7 @@ function Workspace(props) {
                 setAreUnsavedChanges={setAreUnsavedChanges}
                 cursorMode={cursorMode}
                 gridSize={gridSize}
+                isPlaying={isPlaying}
                 isRecording={isRecording}
                 playingOctave={playingOctave}
                 setPlayNoteFunction={setPlayNoteFunction}
@@ -1267,7 +1277,7 @@ function Workspace(props) {
       </>
 
       <div className="ws-note-input">
-        {selectedModule !== null && (
+        {selectedModule !== null && modules[selectedModule].type !== 2 && (
           <>
             <NotesInput
               keyMapping={keyMapping}

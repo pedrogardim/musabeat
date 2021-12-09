@@ -13,7 +13,9 @@ function AudioClip(props) {
   const [isMoving, setIsMoving] = useState(false);
 
   const [noteTime, setNoteTime] = useState(props.note.time);
-  const [noteDuration, setNoteDuration] = useState(props.note.duration);
+  const [noteDuration, setNoteDuration] = useState(
+    props.recording ? 0 : props.note.duration
+  );
 
   const isSelected =
     props.selectedNotes && props.selectedNotes.includes(props.index);
@@ -21,6 +23,8 @@ function AudioClip(props) {
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
   const commitChanges = () => {
+    if (noteTime === props.note.time && noteDuration === props.note.duration)
+      return;
     props.setModules((prev) => {
       let newModules = [...prev];
       newModules[props.selectedModule].score = [
@@ -134,6 +138,22 @@ function AudioClip(props) {
   }, []); */
 
   useEffect(() => {
+    //console.log(props.recording);
+    let recordingNoteRefresh =
+      props.recording &&
+      setInterval(
+        () =>
+          setNoteDuration(
+            Tone.Transport.seconds - Tone.Time(props.note.time).toSeconds()
+          ),
+        16
+      );
+    return () => {
+      clearInterval(recordingNoteRefresh);
+    };
+  }, []);
+
+  /*  useEffect(() => {
     //updateClipPosition();
   }, [
     props.moduleSize,
@@ -142,7 +162,7 @@ function AudioClip(props) {
     props.player.loaded,
     props.moduleZoom,
     props.fullScreen,
-  ]);
+  ]); */
 
   useEffect(() => {
     //watch to window resize to update clips position
@@ -158,7 +178,12 @@ function AudioClip(props) {
         props.rowRef.current.offsetWidth,
         props.index
       );
-  }, [props.player, props.player.buffer.loaded, props.zoomPosition]);
+  }, [
+    props.rowRef.current,
+    props.player,
+    props.player.buffer.loaded,
+    props.zoomPosition,
+  ]);
 
   return (
     <div
@@ -181,7 +206,9 @@ function AudioClip(props) {
           props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
         }px,${props.rowRef.current.scrollHeight / 4}px)`,
         opacity: props.ghost && 0.5,
-        backgroundColor: colors[props.module.color][isSelected ? 800 : 300],
+        backgroundColor: props.recording
+          ? "#f50057"
+          : colors[props.module.color][isSelected ? 800 : 300],
         outline: `solid 1px ${colors[props.module.color][800]}`,
         borderRadius: 4,
         //margin: "-2px -2px 0 0",
@@ -194,19 +221,23 @@ function AudioClip(props) {
         />
       )}
 
-      <span className="audioclip-text up">{props.fileInfo.name}</span>
+      <span className="audioclip-text up">
+        {props.fileInfo && props.fileInfo.name}
+      </span>
 
-      <canvas
-        className="sampler-audio-clip-wave"
-        id={`canvas-${props.index}`}
-        height={props.rowRef.current.scrollHeight / 2}
-        width={
-          (props.note.duration / Tone.Time("1m").toSeconds()) *
-            (props.rowRef.current.offsetWidth / zoomSize) -
-          2
-        }
-        style={{ height: "100%", width: "100%", pointerEvents: "none" }}
-      />
+      {!props.recording && (
+        <canvas
+          className="sampler-audio-clip-wave"
+          id={`canvas-${props.index}`}
+          height={props.rowRef.current.scrollHeight / 2}
+          width={
+            (props.note.duration / Tone.Time("1m").toSeconds()) *
+              (props.rowRef.current.offsetWidth / zoomSize) -
+            2
+          }
+          style={{ height: "100%", width: "100%", pointerEvents: "none" }}
+        />
+      )}
 
       {isSelected && props.selectedNotes.length === 1 && (
         <>

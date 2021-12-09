@@ -1,6 +1,12 @@
-/* .file-uploader > div {
-  background-color: aquamarine;
-} */
+.file-uploader {
+  position: fixed !important;
+  bottom: 16px;
+  right: 16px;
+  max-width: 50vw;
+  width: 256px;
+  z-index: 1;
+  min-height: 150px;
+}
 
 .clickable-filename:hover {
   cursor: pointer;

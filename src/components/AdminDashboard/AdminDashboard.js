@@ -150,18 +150,21 @@ function AdminDashboard(props) {
 
   const convertAudio = (file) => {
     console.log(file);
-    file.arrayBuffer().then((r) => {
-      Tone.getContext().rawContext.decodeAudioData(r, (audiobuffer) => {
-        let blob = encodeAudioFile(audiobuffer, "mp3");
+    file.arrayBuffer().then((arrayBuffer) => {
+      Tone.getContext().rawContext.decodeAudioData(
+        arrayBuffer,
+        (audiobuffer) => {
+          let blob = encodeAudioFile(audiobuffer, "mp3");
 
-        var bUrl = window.URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.download = file.name.split(".")[0] + ".mp3";
-        link.href = bUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      });
+          var bUrl = window.URL.createObjectURL(blob);
+          var link = document.createElement("a");
+          link.download = file.name.split(".")[0] + ".mp3";
+          link.href = bUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      );
     });
   };
 
