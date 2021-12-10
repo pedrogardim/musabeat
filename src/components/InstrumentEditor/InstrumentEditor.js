@@ -707,11 +707,11 @@ function InstrumentEditor(props) {
           </MenuItem>
         </Select>
 
-        {checkCustomPatch && (
+        {/* checkCustomPatch && (
           <IconButton>
             <Icon>save</Icon>
           </IconButton>
-        )}
+        ) */}
         <Divider orientation="vertical" flexItem />
         {trackType === 0 ? (
           <>

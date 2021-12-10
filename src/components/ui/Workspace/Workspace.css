@@ -84,6 +84,7 @@
   flex-direction: column;
   flex-wrap: wrap;
   height: 32px;
+  min-height: 16px;
   width: 100%;
   /* transition: height 0.2s; */
   /* filter: brightness(0.9); */
@@ -181,5 +182,11 @@
 @media only screen and (max-height: 800px) {
   .ws-transport {
     margin: 8px !important;
+  }
+}
+
+@media only screen and (max-height: 540px) {
+  .ws-header {
+    height: 40px;
   }
 }

@@ -41,7 +41,7 @@ function Mixer(props) {
         />
       ))}
       <IconButton
-        onClick={() => props.setMixerOpened(false)}
+        onClick={() => props.setMixerOpen(false)}
         className="mp-closebtn"
         color="primary"
       >

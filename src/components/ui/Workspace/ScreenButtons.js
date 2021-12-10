@@ -19,21 +19,15 @@ import {
   MenuItem,
 } from "@material-ui/core";
 
-const HSpringsData = Array.from(Array(4)).map((_, i) => {
-  return {
-    id: i,
-    from: { bottom: 16 },
-    to: { bottom: 16 + (56 + 16) * (i + 1) },
-    icon: i === 0 ? "piano" : "add",
-  };
-});
-
 function ScreenButtons(props) {
   const [open, setOpen] = useState(false);
 
   const HButtonsData = [
     {
-      fn: () => props.setIEOpen((prev) => !prev),
+      fn: () => {
+        props.setIEOpen((prev) => !prev);
+        setOpen(false);
+      },
       icon: "piano",
       disabled: typeof props.selectedModule !== "number",
     },
@@ -46,10 +40,28 @@ function ScreenButtons(props) {
     },
   ];
 
+  const VButtonsData = [
+    {
+      fn: () => {
+        props.saveSession();
+        setOpen(false);
+      },
+      icon: "save",
+      disabled: !props.areUnsavedChanges,
+    },
+    {
+      fn: () => {
+        props.setFileListOpen((prev) => !prev);
+        setOpen(false);
+      },
+      icon: "audio_file",
+    },
+  ];
+
   const AnimatedFab = animated(Fab);
   const VSprings = useSprings(
-    3,
-    Array.from(Array(3)).map((_, i) => ({
+    2,
+    Array.from(Array(2)).map((_, i) => ({
       bottom: open ? 16 + (56 + 16) * (i + 1) : 16,
       config: { tension: 300, friction: 13 },
     }))
@@ -87,11 +99,13 @@ function ScreenButtons(props) {
         <>
           {VSprings.map((sp, i) => (
             <AnimatedFab
-              key={HSpringsData[i].id}
+              key={VButtonsData[i].id}
+              onClick={VButtonsData[i].fn}
               color="primary"
               style={{ ...sp, position: "fixed", right: 16 }}
+              disabled={HButtonsData[i].disabled}
             >
-              <Icon>{HSpringsData[i].icon}</Icon>
+              <Icon>{VButtonsData[i].icon}</Icon>
             </AnimatedFab>
           ))}
           {HSprings.map((sp, i) => (

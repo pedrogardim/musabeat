@@ -669,7 +669,7 @@ function ModuleRow(props) {
               selectedModule={props.selectedModule}
               zoomPosition={props.zoomPosition}
             />
-          ) : (
+          ) : trackType === 1 ? (
             <MelodyNote
               ghost
               rowRef={rowRef}
@@ -686,6 +686,8 @@ function ModuleRow(props) {
               setDrawingNote={setDrawingNote}
               zoomPosition={props.zoomPosition}
             />
+          ) : (
+            <></>
           ))}
 
         {rowRef.current && trackType === 2 && (

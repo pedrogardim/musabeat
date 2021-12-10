@@ -158,8 +158,8 @@ body *::-webkit-scrollbar-thumb {
 
 .up {
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
   color: rgba(0, 0, 0, 0.562);
 }
 
@@ -169,5 +169,13 @@ body *::-webkit-scrollbar-thumb {
   }
   100% {
     color: rgba(0, 0, 0, 0.493);
+  }
+}
+
+@media only screen and (max-height: 540px) {
+  .app-bar {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
   }
 }

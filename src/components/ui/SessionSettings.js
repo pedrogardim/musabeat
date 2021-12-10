@@ -34,7 +34,6 @@ function SessionSettings(props) {
   const { t } = useTranslation();
 
   const btnRef = useRef(null);
-  const [open, setOpen] = useState(false);
   const [newSessionData, setNewSessionData] = useState(props.sessionData);
   const [userDialog, setUserDialog] = useState(false);
   const sessionData = props.sessionData;
@@ -53,26 +52,21 @@ function SessionSettings(props) {
   };
 
   useEffect(() => {
-    !open && props.setSessionData(newSessionData);
-  }, [open]);
+    !props.open && props.setSessionData(newSessionData);
+  }, [props.open]);
+
+  useEffect(() => {
+    setNewSessionData(props.sessionData);
+  }, [props.sessionData]);
 
   return (
     <>
-      <IconButton
-        ref={btnRef}
-        color="primary"
-        className="ws-fab ws-fab-settings"
-        tabIndex={-1}
-        onClick={() => setOpen(true)}
-      >
-        <Icon>settings</Icon>
-      </IconButton>
-      {sessionData && (
+      {
         <Dialog
           fullWidth
           maxWidth="md"
-          open={open}
-          onClose={() => setOpen(false)}
+          open={props.open}
+          onClose={props.onClose}
           PaperProps={{ className: "session-settings-cont" }}
         >
           <Grid container direction="row" wrap="wrap" spacing={2}>
@@ -234,7 +228,7 @@ function SessionSettings(props) {
                 <Slider
                   min={40}
                   max={300}
-                  defaultValue={sessionData.bpm}
+                  defaultValue={newSessionData.bpm}
                   valueLabelDisplay="auto"
                   onChangeCommitted={handleBpmChange}
                 />
@@ -247,7 +241,7 @@ function SessionSettings(props) {
 
                 <Select
                   native
-                  defaultValue={sessionData.root}
+                  defaultValue={newSessionData.root}
                   onChange={(e) => handleInfoChange("root", e.target.value)}
                 >
                   {musicalNotes.map((note, noteIndex) => (
@@ -258,7 +252,7 @@ function SessionSettings(props) {
                 </Select>
                 <Select
                   native
-                  defaultValue={sessionData.scale}
+                  defaultValue={newSessionData.scale}
                   onChange={(e) => handleInfoChange("scale", e.target.value)}
                 >
                   {scales.map((scale, scaleIndex) => (
@@ -308,14 +302,14 @@ function SessionSettings(props) {
             </Grid>
           </Grid>
           <IconButton
-            onClick={() => setOpen(false)}
+            onClick={props.onClose}
             className="mp-closebtn"
             color="primary"
           >
             <Icon>close</Icon>
           </IconButton>
         </Dialog>
-      )}
+      }
 
       <AddUserDialog
         open={userDialog}

@@ -8,9 +8,11 @@ import { colors } from "../../utils/materialPalette";
 function MelodyNote(props) {
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
-  const [noteTime, setNoteTime] = useState(props.note.time);
-  const [noteNote, setNoteNote] = useState(props.note.note);
-  const [noteDuration, setNoteDuration] = useState(props.note.duration);
+  const [noteTime, setNoteTime] = useState(props.note && props.note.time);
+  const [noteNote, setNoteNote] = useState(props.note && props.note.note);
+  const [noteDuration, setNoteDuration] = useState(
+    props.note && props.note.duration
+  );
 
   const isSelected =
     props.selectedNotes && props.selectedNotes.includes(props.index);
@@ -18,6 +20,8 @@ function MelodyNote(props) {
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
   const commitChanges = () => {
+    if (props.ghost) return;
+
     if (
       noteTime === props.note.time &&
       noteDuration === props.note.duration &&
@@ -115,6 +119,7 @@ function MelodyNote(props) {
   }, [props.gridPos]);
 
   useEffect(() => {
+    if (props.ghost) return;
     setNoteTime((prev) => (props.note.time !== prev ? props.note.time : prev));
     setNoteDuration((prev) =>
       props.note.duration !== prev ? props.note.duration : prev

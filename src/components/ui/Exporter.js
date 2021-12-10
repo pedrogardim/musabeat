@@ -42,7 +42,6 @@ function Exporter(props) {
   return (
     <>
       <IconButton
-        color="primary"
         className="ws-fab ws-fab-export"
         tabIndex={-1}
         onClick={() => setOpen(true)}

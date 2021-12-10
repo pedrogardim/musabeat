@@ -21,12 +21,6 @@ function WorkspaceGrid(props) {
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [cursorAnimator, setCursorAnimator] = useState(null);
-  const [compact, setCompact] = useState(true);
-  const [draggingSelect, setDraggingSelect] = useState(false);
-  const [TLinputSessionSize, setTLinputSessionSize] = useState(
-    props.sessionSize
-  );
-
   const [gridPos, setGridPos] = useState(null);
   const [initialSelectionPos, setInitialSelectionPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
@@ -120,10 +114,10 @@ function WorkspaceGrid(props) {
       });
     }
   };
-
+  /* 
   useEffect(() => {
     setTLinputSessionSize(props.sessionSize);
-  }, [props.sessionSize]);
+  }, [props.sessionSize]); */
 
   useEffect(() => {
     //toggleCursor(Tone.Transport.state);
@@ -181,7 +175,7 @@ function WorkspaceGrid(props) {
                       : 0.2,
                 }}
               >
-                {i % props.gridSize === 0 && !props.IEOpen && (
+                {i % props.gridSize === 0 && !props.hiddenNumbers && (
                   <span className="ws-grid-line-mesure-num">
                     {i / props.gridSize + 1 + props.zoomPosition[0]}
                   </span>

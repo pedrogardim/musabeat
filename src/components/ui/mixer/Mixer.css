@@ -1,14 +1,13 @@
 .mixer {
-  position: fixed;
-  width: 100vw;
-  z-index: 1;
-  height: calc(100vh - 64px);
+  position: absolute;
+  height: 100%;
+  width: 100%;
   background: white;
-  top: 64px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  z-index: 5;
 }

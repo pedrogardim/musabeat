@@ -20,6 +20,7 @@ import {
   Modal,
   Select,
   MenuItem,
+  Divider,
 } from "@material-ui/core";
 
 import "./Workspace.css";
@@ -36,15 +37,17 @@ import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
 
 import Exporter from "../Exporter";
 import SessionSettings from "../SessionSettings";
-import Mixer from "../mixer/Mixer";
+import Mixer from "../Mixer/Mixer";
 import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceGrid from "./WorkspaceGrid";
 import WorkspaceRuler from "./WorkspaceRuler";
 
+import NotesInput from "./NotesInput";
+import FileList from "./FileList";
+
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
 import NotFoundPage from "../NotFoundPage";
-import NotesInput from "./NotesInput";
 
 import {
   patchLoader,
@@ -116,6 +119,8 @@ function Workspace(props) {
 
   const [moduleRows, setModuleRows] = useState([]);
 
+  const [fileListOpen, setFileListOpen] = useState(false);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
@@ -130,7 +135,7 @@ function Workspace(props) {
   const [isRecording, setIsRecording] = useState(false);
 
   const [modulePicker, setModulePicker] = useState(false);
-  const [mixerOpened, setMixerOpened] = useState(false);
+  const [mixerOpen, setMixerOpen] = useState(false);
   const [sessionDupDialog, setSessionDupDialog] = useState(false);
 
   const [focusedModule, setFocusedModule] = useState(null);
@@ -146,7 +151,7 @@ function Workspace(props) {
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
-  const [optionsMenu, setOptionsMenu] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   const [notifications, setNotifications] = useState([]);
 
@@ -531,7 +536,7 @@ function Workspace(props) {
   };
 
   const saveToDatabase = (mod, data, a) => {
-    //console.log(DBSessionRef, isLoaded);
+    console.log("isLoaded", isLoaded);
     if (DBSessionRef !== null) {
       savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
 
@@ -632,7 +637,7 @@ function Workspace(props) {
     setIsPlaying(false);
 
     setModulePicker(false);
-    setMixerOpened(false);
+    setMixerOpen(false);
 
     //true: timeline ; false: loopmode
   };
@@ -845,7 +850,7 @@ function Workspace(props) {
         togglePlaying(e);
         break;
       case 8:
-        selectionAction("delete");
+        !optionsOpen && selectionAction("delete");
         break;
       case 65:
         break;
@@ -939,7 +944,6 @@ function Workspace(props) {
           saveToDatabase(modules, null);
         }
       }
-
       modules && handleUndo();
     }
 
@@ -1039,7 +1043,7 @@ function Workspace(props) {
   }, [premiumMode]);
 
   useEffect(() => {
-    //console.log(areUnsavedChanges);
+    console.log("areUnsavedChanges", areUnsavedChanges);
 
     if (
       !props.hidden &&
@@ -1145,8 +1149,9 @@ function Workspace(props) {
           </IconButton>
         </div>
       </div>
-      <>
-        {!IEOpen && (
+
+      {!IEOpen && !mixerOpen && (
+        <>
           <WorkspaceTransport
             modules={modules}
             sessionSize={sessionSize}
@@ -1156,128 +1161,182 @@ function Workspace(props) {
             selectedModule={selectedModule}
             setSelectedModule={setSelectedModule}
           />
-        )}
 
-        {!IEOpen && (
           <WorkspaceRuler
             modules={modules}
             sessionSize={sessionSize}
             zoomPosition={zoomPosition}
             setZoomPosition={setZoomPosition}
           />
-        )}
+        </>
+      )}
 
-        <div className="ws-grid-cont" tabIndex="-1">
-          {IEOpen && (
-            <InstrumentEditor
+      <div className="ws-grid-cont" tabIndex="-1">
+        {IEOpen && (
+          <InstrumentEditor
+            module={modules[selectedModule]}
+            instrument={instruments[selectedModule]}
+            instrumentInfo={instrumentsInfo[selectedModule]}
+            setInstrumentsInfo={setInstrumentsInfo}
+            setModules={setModules}
+            setInstruments={setInstruments}
+            resetUndoHistory={() => handleUndo("RESET")}
+            index={selectedModule}
+            setIEOpen={setIEOpen}
+          />
+        )}
+        {mixerOpen && (
+          <Mixer
+            modules={modules}
+            instruments={instruments}
+            setModules={setModules}
+            setMixerOpen={setMixerOpen}
+          />
+        )}
+        <WorkspaceGrid
+          modules={modules}
+          sessionSize={sessionSize}
+          setSessionSize={setSessionSize}
+          gridSize={gridSize}
+          isRecording={isRecording}
+          selection={selection}
+          setSelection={setSelection}
+          cursorMode={cursorMode}
+          zoomPosition={zoomPosition}
+          selectedModule={selectedModule}
+          hiddenNumbers={IEOpen || mixerOpen}
+          isMouseDown={isMouseDown}
+        >
+          {selectedModule !== null ? (
+            <ModuleRow
+              tabIndex={-1}
+              key={modules[selectedModule].id}
+              index={selectedModule}
+              selectedModule={selectedModule}
               module={modules[selectedModule]}
               instrument={instruments[selectedModule]}
+              instruments={instruments}
+              setInstruments={setInstruments}
+              loaded={instrumentsLoaded[selectedModule]}
               instrumentInfo={instrumentsInfo[selectedModule]}
               setInstrumentsInfo={setInstrumentsInfo}
+              setInstrumentsLoaded={setInstrumentsLoaded}
+              sessionData={sessionData}
+              sessionSize={sessionSize}
               setModules={setModules}
-              setInstruments={setInstruments}
+              editMode={editMode}
               resetUndoHistory={() => handleUndo("RESET")}
-              index={selectedModule}
-              setIEOpen={setIEOpen}
+              selection={selection}
+              setSelection={setSelection}
+              selectedNotes={selectedNotes[selectedModule]}
+              setSelectedNotes={setSelectedNotes}
+              duplicateModule={duplicateModule}
+              setSnackbarMessage={setSnackbarMessage}
+              isLoaded={isLoaded}
+              handlePageNav={props.handlePageNav}
+              setAreUnsavedChanges={setAreUnsavedChanges}
+              cursorMode={cursorMode}
+              gridSize={gridSize}
+              isPlaying={isPlaying}
+              isRecording={isRecording}
+              playingOctave={playingOctave}
+              setPlayNoteFunction={setPlayNoteFunction}
+              zoomPosition={zoomPosition}
+              setModuleRows={setModuleRows}
+              setIsMouseDown={setIsMouseDown}
             />
+          ) : (
+            <>
+              {modules &&
+                modules.map((module, moduleIndex) => (
+                  <ClosedTrack
+                    tabIndex={-1}
+                    key={module.id}
+                    index={moduleIndex}
+                    selectedModule={selectedModule}
+                    setSelectedModule={setSelectedModule}
+                    module={module}
+                    instrument={instruments[moduleIndex]}
+                    setInstruments={setInstruments}
+                    loaded={instrumentsLoaded[moduleIndex]}
+                    setInstrumentsLoaded={setInstrumentsLoaded}
+                    sessionData={sessionData}
+                    sessionSize={sessionSize}
+                    setModules={setModules}
+                    editMode={editMode}
+                    resetUndoHistory={() => handleUndo("RESET")}
+                    selection={selection}
+                    setSelection={setSelection}
+                    selectedNotes={selectedNotes[moduleIndex]}
+                    duplicateModule={duplicateModule}
+                    setSnackbarMessage={setSnackbarMessage}
+                    isLoaded={isLoaded}
+                    handlePageNav={props.handlePageNav}
+                    setAreUnsavedChanges={setAreUnsavedChanges}
+                    cursorMode={cursorMode}
+                    gridSize={gridSize}
+                    isRecording={isRecording}
+                    zoomPosition={zoomPosition}
+                  />
+                ))}
+              <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
+                <Icon>add</Icon>
+              </IconButton>
+            </>
           )}
-          <WorkspaceGrid
-            modules={modules}
-            sessionSize={sessionSize}
-            setSessionSize={setSessionSize}
-            gridSize={gridSize}
-            isRecording={isRecording}
-            selection={selection}
-            setSelection={setSelection}
-            cursorMode={cursorMode}
-            zoomPosition={zoomPosition}
-            selectedModule={selectedModule}
-            IEOpen={IEOpen}
-            isMouseDown={isMouseDown}
-          >
-            {selectedModule !== null ? (
-              <ModuleRow
-                tabIndex={-1}
-                key={modules[selectedModule].id}
-                index={selectedModule}
-                selectedModule={selectedModule}
-                module={modules[selectedModule]}
-                instrument={instruments[selectedModule]}
-                instruments={instruments}
-                setInstruments={setInstruments}
-                loaded={instrumentsLoaded[selectedModule]}
-                instrumentInfo={instrumentsInfo[selectedModule]}
-                setInstrumentsInfo={setInstrumentsInfo}
-                setInstrumentsLoaded={setInstrumentsLoaded}
-                sessionData={sessionData}
-                sessionSize={sessionSize}
-                setModules={setModules}
-                editMode={editMode}
-                resetUndoHistory={() => handleUndo("RESET")}
-                selection={selection}
-                setSelection={setSelection}
-                selectedNotes={selectedNotes[selectedModule]}
-                setSelectedNotes={setSelectedNotes}
-                duplicateModule={duplicateModule}
-                setSnackbarMessage={setSnackbarMessage}
-                isLoaded={isLoaded}
-                handlePageNav={props.handlePageNav}
-                setAreUnsavedChanges={setAreUnsavedChanges}
-                cursorMode={cursorMode}
-                gridSize={gridSize}
-                isPlaying={isPlaying}
-                isRecording={isRecording}
-                playingOctave={playingOctave}
-                setPlayNoteFunction={setPlayNoteFunction}
-                zoomPosition={zoomPosition}
-                setModuleRows={setModuleRows}
-                setIsMouseDown={setIsMouseDown}
-              />
+        </WorkspaceGrid>
+      </div>
+      {/* ================================================ */}
+      {/* ================================================ */}
+      {/* ================================================ */}
+      <div className="ws-note-input-options">
+        <IconButton
+          onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
+        >
+          <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
+            {cursorMode ? "edit" : "navigation"}
+          </Icon>
+        </IconButton>
+        <IconButton onClick={() => setMixerOpen((prev) => !prev)}>
+          <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
+        </IconButton>
+        <IconButton onClick={() => setOptionsOpen((prev) => !prev)}>
+          <Icon>settings</Icon>
+        </IconButton>
+        <IconButton
+          disabled={!areUnsavedChanges}
+          onClick={() => setAreUnsavedChanges(false)}
+        >
+          <Icon>save</Icon>
+        </IconButton>
+        <Exporter
+          sessionSize={sessionSize}
+          sessionData={sessionData}
+          modules={modules}
+          modulesInstruments={instruments}
+        />
+
+        {typeof selectedModule === "number" && (
+          <>
+            <Divider orientation="vertical" flexItem />
+            {modules[selectedModule].type !== 2 ? (
+              <IconButton onClick={() => setIEOpen((prev) => !prev)}>
+                <Icon>piano</Icon>
+              </IconButton>
             ) : (
-              <>
-                {modules &&
-                  modules.map((module, moduleIndex) => (
-                    <ClosedTrack
-                      tabIndex={-1}
-                      key={module.id}
-                      index={moduleIndex}
-                      selectedModule={selectedModule}
-                      setSelectedModule={setSelectedModule}
-                      module={module}
-                      instrument={instruments[moduleIndex]}
-                      setInstruments={setInstruments}
-                      loaded={instrumentsLoaded[moduleIndex]}
-                      setInstrumentsLoaded={setInstrumentsLoaded}
-                      sessionData={sessionData}
-                      sessionSize={sessionSize}
-                      setModules={setModules}
-                      editMode={editMode}
-                      resetUndoHistory={() => handleUndo("RESET")}
-                      selection={selection}
-                      setSelection={setSelection}
-                      selectedNotes={selectedNotes[moduleIndex]}
-                      duplicateModule={duplicateModule}
-                      setSnackbarMessage={setSnackbarMessage}
-                      isLoaded={isLoaded}
-                      handlePageNav={props.handlePageNav}
-                      setAreUnsavedChanges={setAreUnsavedChanges}
-                      cursorMode={cursorMode}
-                      gridSize={gridSize}
-                      isRecording={isRecording}
-                      zoomPosition={zoomPosition}
-                    />
-                  ))}
-                <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
-                  <Icon>add</Icon>
-                </IconButton>
-              </>
+              <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
+                <Icon>audio_file</Icon>
+              </IconButton>
             )}
-          </WorkspaceGrid>
-        </div>
-      </>
+          </>
+        )}
+      </div>
+      {/* ================================================ */}
+      {/* ================================================ */}
+      {/* ================================================ */}
 
       <div className="ws-note-input">
-        {selectedModule !== null && (
+        {selectedModule !== null && modules[selectedModule].type !== 2 && (
           <NotesInput
             keyMapping={keyMapping}
             module={modules && modules[selectedModule]}
@@ -1307,99 +1366,40 @@ function Workspace(props) {
           sessionData={sessionData}
         />
       )}
-      {mixerOpened && (
-        <Mixer
-          modules={modules}
-          instruments={instruments}
-          setModules={setModules}
-          setMixerOpened={setMixerOpened}
-        />
-      )}
+
       {/*setModulesVolume={setModulesVolume}*/}
 
-      <ScreenButtons
+      <FileList
+        onClose={() => setFileListOpen(false)}
+        open={fileListOpen}
+        instrumentsInfo={instrumentsInfo}
+        instruments={instruments}
+        selectedModule={selectedModule}
+        modules={modules}
+      />
+
+      {sessionData && (
+        <SessionSettings
+          open={optionsOpen}
+          onClose={() => setOptionsOpen(false)}
+          premiumMode={premiumMode}
+          sessionData={sessionData}
+          setSessionData={setSessionData}
+          editorProfiles={editorProfiles}
+          setEditorProfiles={setEditorProfiles}
+        />
+      )}
+
+      {/* <ScreenButtons
         cursorMode={cursorMode}
         setCursorMode={setCursorMode}
         setIEOpen={setIEOpen}
+        setFileListOpen={setFileListOpen}
         selectedModule={selectedModule}
-      />
+        areUnsavedChanges={areUnsavedChanges}
+        saveSession={() => setAreUnsavedChanges(false)}
+      /> */}
 
-      {/* <Paper
-        className="ws-opt-btn-cont"
-        style={{ height: optionsMenu ? (editMode ? 240 : 144) : 0 }}
-      >
-        <IconButton
-          tabIndex={-1}
-          className="ws-fab ws-fab-mix"
-          color="primary"
-          onClick={() => setMixerOpened((prev) => (prev ? false : true))}
-        >
-          <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
-        </IconButton>
-        {editMode && (
-          <>
-            {sessionData && (
-              <SessionSettings
-                premiumMode={premiumMode}
-                sessionData={sessionData}
-                setSessionData={setSessionData}
-                editorProfiles={editorProfiles}
-                setEditorProfiles={setEditorProfiles}
-              />
-            )}
-
-            <Tooltip title={t("misc.saveChanges")}>
-              <IconButton
-                disabled={!areUnsavedChanges || !props.user}
-                tabIndex={-1}
-                className="ws-fab ws-fab-save"
-                color="primary"
-                onClick={() => setAreUnsavedChanges(false)}
-              >
-                <Icon>save</Icon>
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-
-        {!props.hidden && isLoaded && sessionData && (
-          <Exporter
-            sessionSize={sessionSize}
-            sessionData={sessionData}
-            modules={modules}
-            modulesInstruments={instruments}
-          />
-        )}
-
-        {sessionData && (
-          <Tooltip
-            title={
-              !props.user
-                ? "Log in to be able to copy sessions"
-                : (props.user && props.user.uid) !== sessionData.creator &&
-                  !sessionData.alwcp
-                ? "The user doesn't allow this session to be copied"
-                : "Create a copy"
-            }
-            placement="top"
-          >
-            <div>
-              <IconButton
-                tabIndex={-1}
-                color="primary"
-                className="ws-fab ws-fab-copy"
-                disabled={
-                  !props.user ||
-                  (props.user.uid !== sessionData.creator && !sessionData.alwcp)
-                }
-                onClick={() => setSessionDupDialog(true)}
-              >
-                <Icon>content_copy</Icon>
-              </IconButton>
-            </div>
-          </Tooltip>
-        )}
-      </Paper> */}
       <Snackbar
         open={!!snackbarMessage}
         message={snackbarMessage}
