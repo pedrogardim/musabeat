@@ -196,14 +196,20 @@ function ModuleRow(props) {
     if (!recTools) return;
     if (props.isRecording) {
       let newAudioIndex = Object.keys(props.instrumentInfo.info.urls).length;
-      let drawingNote = { time: Tone.Transport.position, clip: newAudioIndex };
-      setDrawingNote(drawingNote);
+      let dn = { time: Tone.Transport.position, clip: newAudioIndex };
+      setDrawingNote(dn);
 
       //recTools.userMedia.open().then(() => recTools.recorder.start());
       recTools.recorder.start();
     } else {
       recTools.recorder.stop().then((blob) => {
-        setUploadingFiles((prev) => [...prev, blob]);
+        let filename =
+          (props.module.name ? props.module.name : "Audio") +
+          "_" +
+          drawingNote.clip +
+          1;
+        let file = new File([blob], filename);
+        setUploadingFiles((prev) => [...prev, file]);
         blob.arrayBuffer().then((arrayBuffer) => {
           Tone.getContext().rawContext.decodeAudioData(
             arrayBuffer,
@@ -216,6 +222,7 @@ function ModuleRow(props) {
                 let newNote = {
                   ...drawingNote,
                   duration: parseFloat(audiobuffer.duration.toFixed(3)),
+                  offset: 0,
                 };
                 newModules[props.index].score = [
                   ...newModules[props.index].score,

@@ -16,6 +16,7 @@ function AudioClip(props) {
   const [noteDuration, setNoteDuration] = useState(
     props.recording ? 0 : props.note.duration
   );
+  const [noteOffset, setNoteOffset] = useState(props.note.offset);
 
   const isSelected =
     props.selectedNotes && props.selectedNotes.includes(props.index);
@@ -23,18 +24,109 @@ function AudioClip(props) {
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
   const commitChanges = () => {
-    if (noteTime === props.note.time && noteDuration === props.note.duration)
+    if (
+      noteTime === props.note.time &&
+      noteDuration === props.note.duration &&
+      noteOffset === props.note.offset
+    )
       return;
     props.setModules((prev) => {
       let newModules = [...prev];
       newModules[props.selectedModule].score = [
         ...newModules[props.selectedModule].score,
       ];
-      newModules[props.selectedModule].score[props.index].duration =
-        noteDuration;
+      newModules[props.selectedModule].score[props.index].duration = parseFloat(
+        noteDuration.toFixed(3)
+      );
       newModules[props.selectedModule].score[props.index].time = noteTime;
+
+      newModules[props.selectedModule].score[props.index].offset = parseFloat(
+        noteOffset.toFixed(3)
+      );
+
+      newModules[props.selectedModule].score = handleOverlappingClips(
+        newModules[props.selectedModule].score,
+        props.index
+      );
       return newModules;
     });
+  };
+
+  const handleOverlappingClips = (score, noteIndex) => {
+    let newScore = score.map((e) => ({
+      ...e,
+      time: parseFloat(Tone.Time(e.time).toSeconds().toFixed(3)),
+    }));
+    //console.log("newScore", newScore);
+    let commitedNote = newScore[noteIndex];
+    for (let i = 0; i < score.length; i++) {
+      if (i === noteIndex || newScore[i] === null) continue;
+      //case 1: total overlapping
+      if (
+        commitedNote.time < newScore[i].time &&
+        commitedNote.time + commitedNote.duration >
+          newScore[i].time + newScore[i].duration
+      ) {
+        newScore[i] = null;
+        //console.log("case 1: total overlapping");
+        continue;
+      }
+      //case 2: overlapping only in the middle (splited)
+      if (
+        commitedNote.time > newScore[i].time &&
+        commitedNote.time + commitedNote.duration <
+          newScore[i].time + newScore[i].duration
+      ) {
+        //clip on the right
+        let newClip = {
+          clip: newScore[i].clip,
+          duration:
+            newScore[i].time +
+            newScore[i].duration -
+            (commitedNote.time + commitedNote.duration),
+          time: commitedNote.time + commitedNote.duration,
+          offset: commitedNote.time + commitedNote.duration - newScore[i].time,
+        };
+        //clip on the left
+        newScore[i].duration = commitedNote.time - newScore[i].time;
+        newScore = [...newScore, newClip];
+
+        //console.log("case 2: middle overlapping");
+        continue;
+      }
+      //case 3: overlapping on the left
+      if (
+        commitedNote.time + commitedNote.duration > newScore[i].time &&
+        commitedNote.time + commitedNote.duration <
+          newScore[i].time + newScore[i].duration
+      ) {
+        let difference =
+          commitedNote.time + commitedNote.duration - newScore[i].time;
+        newScore[i].time = newScore[i].time + difference;
+        newScore[i].offset = difference;
+        newScore[i].duration = newScore[i].duration - difference;
+        //console.log("case 3: overlapping on the left");
+        continue;
+      }
+      //case 4: overlapping on the right
+      if (
+        newScore[i].time + newScore[i].duration > commitedNote.time &&
+        commitedNote.time + commitedNote.duration >
+          newScore[i].time + newScore[i].duration
+      ) {
+        let difference =
+          newScore[i].time + newScore[i].duration - commitedNote.time;
+        newScore[i].duration = newScore[i].duration - difference;
+        //console.log("case 4: overlapping on the right");
+        continue;
+      }
+    }
+    return newScore
+      .filter((e, i) => e !== null || i === noteIndex)
+      .map((e) => ({
+        ...e,
+        time: Tone.Time(e.time).toBarsBeatsSixteenths(),
+      }));
   };
 
   const handleMouseDown = (e) => {
@@ -82,7 +174,7 @@ function AudioClip(props) {
         ((props.floatPos[1] + 1) * Tone.Time("1m").toSeconds()) /
           props.gridSize -
         Tone.Time(noteTime).toSeconds();
-      return newDurtime < 0 ? 0 : Tone.Time(newDurtime).toBarsBeatsSixteenths();
+      return newDurtime < 0 ? 0 : newDurtime;
     });
   };
 
@@ -183,6 +275,7 @@ function AudioClip(props) {
     props.player,
     props.player.buffer.loaded,
     props.zoomPosition,
+    props.note,
   ]);
 
   return (
@@ -211,6 +304,7 @@ function AudioClip(props) {
           : colors[props.module.color][isSelected ? 800 : 300],
         outline: `solid 1px ${colors[props.module.color][800]}`,
         borderRadius: 4,
+        zIndex: isSelected && 2,
         //margin: "-2px -2px 0 0",
       }}
     >
@@ -281,17 +375,17 @@ const drawClipWave = (buffer, duration, offset, color, parentWidth, index) => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   //console.log(canvas.width);
 
-  let rightOffset =
-    ((duration - buffer.duration) * parentWidth) /
-    Tone.Time(Tone.Transport.loopEnd).toSeconds();
+  let rightOffset = (duration - buffer.duration) * parentWidth;
+
+  let leftOffset = (duration - offset) * parentWidth;
 
   let waveArray = buffer.toArray(0);
-  let xScale = waveArray.length / (canvas.width - rightOffset);
+  let xScale = waveArray.length / (canvas.width - rightOffset - leftOffset);
   let yScale = 2;
 
   ctx.fillStyle = color[900];
 
-  for (let x = 0; x < canvas.width - rightOffset; x++) {
+  for (let x = 0; x < canvas.width - rightOffset - leftOffset; x++) {
     let rectHeight =
       Math.abs(Math.floor(waveArray[Math.floor(x * xScale)] * canvas.height)) *
       yScale;
