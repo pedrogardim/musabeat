@@ -1277,43 +1277,21 @@ function Workspace(props) {
       </>
 
       <div className="ws-note-input">
-        {selectedModule !== null && modules[selectedModule].type !== 2 && (
-          <>
-            <NotesInput
-              keyMapping={keyMapping}
-              module={modules && modules[selectedModule]}
-              instrument={instruments[selectedModule]}
-              pressedKeys={pressedKeys}
-              setPressedKeys={setPressedKeys}
-              handlePageNav={props.handlePageNav}
-              playNoteFunction={playNoteFunction}
-              playingOctave={playingOctave}
-              setPlayingOctave={setPlayingOctave}
-              moduleRows={moduleRows}
-              instrumentInfo={instrumentsInfo[selectedModule]}
-            />
-            <div className="ws-note-input-options">
-              {modules[selectedModule].type === 1 && (
-                <div style={{ marginLeft: "auto" }}>
-                  Octave {playingOctave + 1}
-                  <IconButton
-                    onClick={() =>
-                      setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
-                    }
-                  >
-                    <Icon>navigate_before</Icon>
-                  </IconButton>
-                  <IconButton
-                    onClick={() =>
-                      setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
-                    }
-                  >
-                    <Icon>navigate_next</Icon>
-                  </IconButton>
-                </div>
-              )}
-            </div>
-          </>
+        {selectedModule !== null && (
+          <NotesInput
+            keyMapping={keyMapping}
+            module={modules && modules[selectedModule]}
+            instrument={instruments[selectedModule]}
+            pressedKeys={pressedKeys}
+            setPressedKeys={setPressedKeys}
+            handlePageNav={props.handlePageNav}
+            playNoteFunction={playNoteFunction}
+            playingOctave={playingOctave}
+            setPlayingOctave={setPlayingOctave}
+            moduleRows={moduleRows}
+            instrumentInfo={instrumentsInfo[selectedModule]}
+            isMouseDown={isMouseDown}
+          />
         )}
       </div>
       {modulePicker && (

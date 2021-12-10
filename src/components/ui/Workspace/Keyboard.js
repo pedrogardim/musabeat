@@ -49,6 +49,7 @@ function Keyboard(props) {
             onMouseDown={() => handleKeyClick(i)}
             onMouseUp={() => handleKeyUp(i)}
             onMouseLeave={() => handleKeyUp(i)}
+            onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
             style={{
               left: (i * 100) / (octaves * 12) + "%",
               backgroundColor:
@@ -90,7 +91,12 @@ function Keyboard(props) {
               "keyboard-key-active"
             }`}
           >
-            <span>{props.notesLabel && props.notesLabel[i]}</span>
+            <span className={"up"}>
+              {props.notesLabel && props.notesLabel[i]}
+            </span>
+            <span className={"up"} style={{ opacity: 0.5 }}>
+              {Tone.Frequency(i + octave * 12 + 24, "midi").toNote()}
+            </span>
           </div>
         ))}
       {props.variableOctave && (

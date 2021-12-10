@@ -1,10 +1,9 @@
 .keyboard {
-  width: 100%;
+  flex: 1 1;
   height: 56px;
   display: flex;
   position: relative;
   user-select: none;
-  font-family: "Barlow Semi Condensed", sans-serif;
 }
 
 .keyboard-key {
@@ -19,6 +18,8 @@
   position: absolute;
   width: calc(100% / 78);
   justify-content: center;
+}
+.keyboard-black-key > span {
   color: white !important;
 }
 

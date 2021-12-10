@@ -1,5 +1,6 @@
 .ws-note-input {
-  font-family: "Barlow Semi Condensed", sans-serif;
+  /*   font-family: "Barlow Semi Condensed", sans-serif;
+ */
   position: relative;
   width: 100%;
   display: flex;
@@ -7,7 +8,6 @@
   margin: 32px 0;
   user-select: none;
   flex-wrap: wrap;
-  color: black;
 }
 
 .ws-note-input-key-cont {

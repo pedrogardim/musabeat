@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
-import { Paper, IconButton, Typography } from "@material-ui/core";
+import { Paper, IconButton, Typography, Icon } from "@material-ui/core";
 
 import "./NotesInput.css";
 
@@ -111,23 +111,49 @@ function NotesInput(props) {
               </>
             ))
         ) : (
-          <Keyboard
-            activeNotes={props.pressedKeys}
-            style={{
-              minWidth: 400,
-              height: 72,
-              zIndex: 0,
-            }}
-            color={props.module.color}
-            octaves={1.42}
-            notesLabel={Object.keys(props.keyMapping).map((e) =>
-              e.replace("Key", "").replace("Semicolon", ":")
-            )}
-            octave={props.playingOctave}
-            onKeyClick={props.playNoteFunction[0]}
-            onKeyUp={props.playNoteFunction[1]}
-            setPressedKeys={props.setPressedKeys}
-          />
+          <>
+            <div
+              style={{
+                width: 48,
+                height: "100%",
+                left: 0,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <IconButton
+                onClick={() =>
+                  props.setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
+                }
+              >
+                <Icon>navigate_next</Icon>
+              </IconButton>
+              <IconButton
+                onClick={() =>
+                  props.setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
+                }
+              >
+                <Icon>navigate_before</Icon>
+              </IconButton>
+            </div>
+            <Keyboard
+              activeNotes={props.pressedKeys}
+              style={{
+                height: "100%",
+                zIndex: 0,
+              }}
+              color={props.module.color}
+              octaves={1.42}
+              notesLabel={Object.keys(props.keyMapping).map((e) =>
+                e.replace("Key", "").replace("Semicolon", ":")
+              )}
+              octave={props.playingOctave}
+              onKeyClick={props.playNoteFunction[0]}
+              onKeyUp={props.playNoteFunction[1]}
+              setPressedKeys={props.setPressedKeys}
+              isMouseDown={props.isMouseDown}
+            />
+          </>
         ))}
     </div>
   );
