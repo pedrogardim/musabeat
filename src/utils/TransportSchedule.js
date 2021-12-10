@@ -448,9 +448,9 @@ export const scheduleAudioTrack = (score, players, transport, moduleId) => {
     let isCursorinBetween =
       cursorTime > scoreTime && cursorTime < scoreTime + event.duration;
 
-    let eventOffset = parseFloat(
-      (isCursorinBetween ? cursorTime - scoreTime : 0).toFixed(3)
-    );
+    let eventOffset =
+      parseFloat((isCursorinBetween ? cursorTime - scoreTime : 0).toFixed(3)) +
+      event.offset;
     let eventTime = parseFloat(
       (isCursorinBetween ? cursorTime : scoreTime).toFixed(3)
     );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import * as Tone from "tone";
 
@@ -9,6 +9,7 @@ import { IconButton, Icon } from "@material-ui/core";
 import "./AudioClip.css";
 
 function AudioClip(props) {
+  const noteRef = useRef(null);
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
 
@@ -168,14 +169,39 @@ function AudioClip(props) {
 
   const handleResize = () => {
     if (props.ghost) return;
+    let note = {};
     props.setDrawingNote(null);
-    setNoteDuration((prev) => {
-      let newDurtime =
-        ((props.floatPos[1] + 1) * Tone.Time("1m").toSeconds()) /
-          props.gridSize -
+    if (isResizing === "right") {
+      note.dur =
+        (props.floatPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize -
         Tone.Time(noteTime).toSeconds();
-      return newDurtime < 0 ? 0 : newDurtime;
-    });
+      setNoteDuration(
+        note.dur < 0.1
+          ? 0.1
+          : note.dur > props.player.buffer.duration - props.note.offset
+          ? props.player.buffer.duration - props.note.offset
+          : note.dur
+      );
+    }
+    if (isResizing === "left") {
+      note.time =
+        (props.floatPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize;
+
+      if (note.time <= 0) return;
+
+      note.offset = note.time - Tone.Time(props.note.time).toSeconds();
+
+      note.dur =
+        Tone.Time(props.note.time).toSeconds() +
+        props.note.duration -
+        (props.floatPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize;
+
+      if (note.dur > props.player.buffer.duration || note.dur < 0.1) return;
+
+      setNoteTime(note.time < 0 ? 0 : note.time);
+      setNoteOffset(note.offset < 0 ? 0 : note.offset);
+      setNoteDuration(note.dur);
+    }
   };
 
   const handleMove = () => {
@@ -264,10 +290,11 @@ function AudioClip(props) {
         props.player.buffer,
         //clipHeight,
         //clipWidth,
-        props.note.duration,
-        props.note.offset,
+        noteDuration,
+        noteOffset,
         colors[props.module.color],
         props.rowRef.current.offsetWidth,
+        noteRef.current.offsetWidth,
         props.index
       );
   }, [
@@ -276,6 +303,8 @@ function AudioClip(props) {
     props.player.buffer.loaded,
     props.zoomPosition,
     props.note,
+    noteDuration,
+    noteOffset,
   ]);
 
   return (
@@ -285,6 +314,7 @@ function AudioClip(props) {
       } ${props.deletableNote && "module-score-note-deletable"} ${
         props.module.type === 1 && "module-score-note-melody"
       }`}
+      ref={noteRef}
       onMouseDown={handleMouseDown}
       style={{
         height: props.rowRef.current.scrollHeight / 2,
@@ -309,10 +339,18 @@ function AudioClip(props) {
       }}
     >
       {!props.ghost && (
-        <div
-          className="module-score-note-handle"
-          onMouseDown={() => setIsResizing(true)}
-        />
+        <>
+          <div
+            className="module-score-note-handle"
+            onMouseDown={() => setIsResizing("left")}
+            style={{ left: 0, cursor: "ew-resize" }}
+          />
+          <div
+            className="module-score-note-handle"
+            onMouseDown={() => setIsResizing("right")}
+            style={{ right: 0, cursor: "ew-resize" }}
+          />
+        </>
       )}
 
       <span className="audioclip-text up">
@@ -324,12 +362,6 @@ function AudioClip(props) {
           className="sampler-audio-clip-wave"
           id={`canvas-${props.index}`}
           height={props.rowRef.current.scrollHeight / 2}
-          width={
-            (props.note.duration / Tone.Time("1m").toSeconds()) *
-              (props.rowRef.current.offsetWidth / zoomSize) -
-            2
-          }
-          style={{ height: "100%", width: "100%", pointerEvents: "none" }}
         />
       )}
 
@@ -366,26 +398,35 @@ function AudioClip(props) {
   );
 }
 
-const drawClipWave = (buffer, duration, offset, color, parentWidth, index) => {
+const drawClipWave = (
+  buffer,
+  duration,
+  offset,
+  color,
+  parentWidth,
+  noteWidth,
+  index
+) => {
   //if (clipHeight === 0 || clipWidth === 0) return;
 
   const canvas = document.getElementById(`canvas-${index}`);
+  canvas.width = noteWidth;
+
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   //console.log(canvas.width);
 
-  let rightOffset = (duration - buffer.duration) * parentWidth;
+  let waveArray = buffer.slice(offset);
 
-  let leftOffset = (duration - offset) * parentWidth;
+  waveArray = waveArray.slice(0, duration).toArray(0);
 
-  let waveArray = buffer.toArray(0);
-  let xScale = waveArray.length / (canvas.width - rightOffset - leftOffset);
+  let xScale = waveArray.length / canvas.width;
   let yScale = 2;
 
   ctx.fillStyle = color[900];
 
-  for (let x = 0; x < canvas.width - rightOffset - leftOffset; x++) {
+  for (let x = 0; x < canvas.width; x++) {
     let rectHeight =
       Math.abs(Math.floor(waveArray[Math.floor(x * xScale)] * canvas.height)) *
       yScale;
