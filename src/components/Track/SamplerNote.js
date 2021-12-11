@@ -12,7 +12,7 @@ function SamplerNote(props) {
     <div
       className="module-score-note"
       style={{
-        height: props.rowRef.current.scrollHeight / props.moduleRows.length,
+        height: props.rowRef.current.scrollHeight / props.trackRows.length,
         width: 0,
         transform: props.ghost
           ? `translate(${
@@ -23,7 +23,7 @@ function SamplerNote(props) {
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.gridPos[0] *
-              (props.rowRef.current.scrollHeight / props.moduleRows.length)
+              (props.rowRef.current.scrollHeight / props.trackRows.length)
             }px)`
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
@@ -32,8 +32,8 @@ function SamplerNote(props) {
               props.zoomPosition[0] *
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
-              props.moduleRows.findIndex((e) => e.note === props.note.note) *
-              (props.rowRef.current.scrollHeight / props.moduleRows.length)
+              props.trackRows.findIndex((e) => e.note === props.note.note) *
+              (props.rowRef.current.scrollHeight / props.trackRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
         /* backgroundColor:
@@ -69,9 +69,9 @@ function SamplerNote(props) {
           viewBox: "auto",
         }}
       >
-        {props.moduleRows[note.note] && (
+        {props.trackRows[note.note] && (
           <path
-            d={props.moduleRows[note.note].wavepath}
+            d={props.trackRows[note.note].wavepath}
             stroke={
               props.cursorMode === "edit"
                 ? "rgba(0,0,0,0.5)"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
-import "./ModuleRow.css";
+import "./Track.css";
 
 import Draggable from "react-draggable";
 
@@ -27,7 +27,7 @@ import MelodyNote from "./MelodyNote";
 function ClosedTrack(props) {
   const rowRef = useRef(null);
 
-  const [moduleRows, setModuleRows] = useState([]);
+  const [trackRows, setTrackRows] = useState([]);
   const [gridPos, setGridPos] = useState([]);
   const [drawingNote, setDrawingNote] = useState(null);
 
@@ -53,7 +53,7 @@ function ClosedTrack(props) {
       };
     });
 
-    setModuleRows(rows);
+    setTrackRows(rows);
   };
 
   const scheduleNotes = () => {
@@ -130,7 +130,7 @@ function ClosedTrack(props) {
           props.module.score.map((note, noteIndex) => (
             <ClosedTrackNote
               rowRef={rowRef}
-              moduleRows={moduleRows}
+              trackRows={trackRows}
               note={note}
               drawingNote={drawingNote}
               module={props.module}

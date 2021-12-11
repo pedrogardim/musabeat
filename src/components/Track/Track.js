@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
-import "./ModuleRow.css";
+import "./Track.css";
 
 import Draggable from "react-draggable";
 
@@ -34,11 +34,11 @@ import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 
 import { ContactPhoneSharp, ContactSupportOutlined } from "@material-ui/icons";
 
-function ModuleRow(props) {
+function Track(props) {
   const rowRef = useRef(null);
   const rowWrapperRef = useRef(null);
 
-  const [moduleRows, setModuleRows] = useState([]);
+  const [trackRows, setTrackRows] = useState([]);
   const [gridPos, setGridPos] = useState([]);
   const [floatPos, setFloatPos] = useState([]);
 
@@ -112,7 +112,7 @@ function ModuleRow(props) {
         },
       ];
     }
-    setModuleRows(rows);
+    setTrackRows(rows);
   };
 
   const scheduleNotes = () => {
@@ -143,12 +143,12 @@ function ModuleRow(props) {
   const playNote = (note) => {
     if (props.module.type === 0) {
       if (
-        moduleRows[note] === undefined ||
-        moduleRows[note] === null ||
-        !props.instrument.has(moduleRows[note].note)
+        trackRows[note] === undefined ||
+        trackRows[note] === null ||
+        !props.instrument.has(trackRows[note].note)
       )
         return;
-      props.instrument.player(moduleRows[note].note).start();
+      props.instrument.player(trackRows[note].note).start();
     } else {
       props.instrument.triggerAttack(Tone.Frequency(note, "midi"));
     }
@@ -157,7 +157,7 @@ function ModuleRow(props) {
 
     if (trackType === 0) {
       let newNote = {
-        note: moduleRows[note].note,
+        note: trackRows[note].note,
         time: Tone.Time(
           Tone.Time(Tone.Transport.seconds).quantize(`${props.gridSize}n`)
         ).toBarsBeatsSixteenths(),
@@ -272,7 +272,7 @@ function ModuleRow(props) {
     let pos = [
       parseFloat(
         Math.abs(
-          (hoveredPos[0] / rowRef.current.scrollHeight) * moduleRows.length
+          (hoveredPos[0] / rowRef.current.scrollHeight) * trackRows.length
         ).toFixed(3)
       ),
       parseFloat(
@@ -297,7 +297,7 @@ function ModuleRow(props) {
       let find =
         props.module.score.findIndex(
           (e) =>
-            (e.note === moduleRows[gridPos[0]].note ||
+            (e.note === trackRows[gridPos[0]].note ||
               e.note === 108 - gridPos[0]) &&
             e.time ===
               Tone.Time(
@@ -330,7 +330,7 @@ function ModuleRow(props) {
 
     if (trackType === 0) {
       let newNote = {
-        note: moduleRows[gridPos[0]].note,
+        note: trackRows[gridPos[0]].note,
         time: Tone.Time(
           (gridPos[1] * Tone.Time("1m").toSeconds()) / props.gridSize
         ).toBarsBeatsSixteenths(),
@@ -464,15 +464,15 @@ function ModuleRow(props) {
 
   useEffect(() => {
     //console.log("props.instrument", props.instrument);
-    moduleRows && props.setModuleRows(moduleRows);
+    trackRows && props.setTrackRows(trackRows);
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
   }, [props.instrument, props.instruments]);
 
   useEffect(() => {
     //console.log("props.instrument", props.instrument);
-    moduleRows && props.setModuleRows(moduleRows);
-  }, [moduleRows]);
+    trackRows && props.setTrackRows(trackRows);
+  }, [trackRows]);
 
   useEffect(() => {
     //console.log(drawingNote);
@@ -554,7 +554,7 @@ function ModuleRow(props) {
             trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
         }}
       >
-        {moduleRows.map((row, rowIndex) => (
+        {trackRows.map((row, rowIndex) => (
           <div
             className="module-inner-row"
             style={{
@@ -602,7 +602,7 @@ function ModuleRow(props) {
                 <SamplerNote
                   key={noteIndex}
                   rowRef={rowRef}
-                  moduleRows={moduleRows}
+                  trackRows={trackRows}
                   note={note}
                   module={props.module}
                   sessionSize={props.sessionSize}
@@ -619,7 +619,7 @@ function ModuleRow(props) {
                 <MelodyNote
                   key={noteIndex}
                   rowRef={rowRef}
-                  moduleRows={moduleRows}
+                  trackRows={trackRows}
                   note={note}
                   drawingNote={drawingNote}
                   module={props.module}
@@ -643,7 +643,7 @@ function ModuleRow(props) {
                   <AudioClip
                     key={noteIndex}
                     rowRef={rowRef}
-                    moduleRows={moduleRows}
+                    trackRows={trackRows}
                     note={note}
                     player={props.instrument.player(note.clip)}
                     drawingNote={drawingNote}
@@ -675,7 +675,7 @@ function ModuleRow(props) {
             <SamplerNote
               ghost
               rowRef={rowRef}
-              moduleRows={moduleRows}
+              trackRows={trackRows}
               gridPos={gridPos}
               module={props.module}
               sessionSize={props.sessionSize}
@@ -687,7 +687,7 @@ function ModuleRow(props) {
             <MelodyNote
               ghost
               rowRef={rowRef}
-              moduleRows={moduleRows}
+              trackRows={trackRows}
               gridPos={gridPos}
               drawingNote={drawingNote}
               module={props.module}
@@ -722,7 +722,7 @@ function ModuleRow(props) {
                 recording
                 note={drawingNote}
                 rowRef={rowRef}
-                moduleRows={moduleRows}
+                trackRows={trackRows}
                 zoomPosition={props.zoomPosition}
                 player={{ buffer: { loaded: "" } }}
                 module={props.module}
@@ -776,4 +776,4 @@ const drawWave = (wavearray, setWavePath) => {
   return pathstring;
 };
 
-export default ModuleRow;
+export default Track;

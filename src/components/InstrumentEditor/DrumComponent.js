@@ -126,7 +126,8 @@ function DrumElement(props) {
         )}
 
         <span
-          className="audio-file-item-label"
+          className="up"
+          style={{ color: "rgba(0,0,0,0.8)" }}
           /* onClick={() =>
           props.instrument.name === "Players" &&
           props.setRenamingLabel(props.index)

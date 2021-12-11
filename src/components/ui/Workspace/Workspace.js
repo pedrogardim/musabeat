@@ -25,20 +25,19 @@ import {
 
 import "./Workspace.css";
 
-import ModuleRow from "../../Module/ModuleRow";
-import ClosedTrack from "../../Module/ClosedTrack";
+import Track from "../../Track/Track";
+import ClosedTrack from "../../Track/ClosedTrack";
 
 import WorkspaceTitle from "./WorkspaceTitle";
 import WorkspaceTransport from "./WorkspaceTransport";
 import ScreenButtons from "./ScreenButtons";
 
-import ModulePicker from "../ModulePicker";
+import TrackPicker from "../TrackPicker";
 import InstrumentEditor from "../../InstrumentEditor/InstrumentEditor";
 
 import Exporter from "../Exporter";
 import SessionSettings from "../SessionSettings";
 import Mixer from "../Mixer/Mixer";
-import SessionProgressBar from "../SessionProgressBar";
 import WorkspaceGrid from "./WorkspaceGrid";
 import WorkspaceRuler from "./WorkspaceRuler";
 
@@ -119,7 +118,7 @@ function Workspace(props) {
   ]);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const [moduleRows, setModuleRows] = useState([]);
+  const [trackRows, setTrackRows] = useState([]);
 
   const [fileListOpen, setFileListOpen] = useState(false);
 
@@ -136,7 +135,7 @@ function Workspace(props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
 
-  const [modulePicker, setModulePicker] = useState(false);
+  const [modulePicker, setTrackPicker] = useState(false);
   const [mixerOpen, setMixerOpen] = useState(false);
   const [sessionDupDialog, setSessionDupDialog] = useState(false);
 
@@ -275,6 +274,7 @@ function Workspace(props) {
         let sessionInfo = { ...data };
         delete sessionInfo.modules;
         setSessionData(sessionInfo);
+        setZoomPosition([0, sessionInfo.size - 1]);
 
         if (data.hasOwnProperty("modules")) {
           loadSessionInstruments(data.modules);
@@ -657,7 +657,7 @@ function Workspace(props) {
 
     setIsPlaying(false);
 
-    setModulePicker(false);
+    setTrackPicker(false);
     setMixerOpen(false);
 
     //true: timeline ; false: loopmode
@@ -1237,6 +1237,7 @@ function Workspace(props) {
             resetUndoHistory={() => handleUndo("RESET")}
             index={selectedModule}
             setIEOpen={setIEOpen}
+            handlePageNav={props.handlePageNav}
           />
         )}
         {mixerOpen && (
@@ -1262,7 +1263,7 @@ function Workspace(props) {
           isMouseDown={isMouseDown}
         >
           {selectedModule !== null ? (
-            <ModuleRow
+            <Track
               tabIndex={-1}
               key={modules[selectedModule].id}
               index={selectedModule}
@@ -1296,7 +1297,7 @@ function Workspace(props) {
               playingOctave={playingOctave}
               setPlayNoteFunction={setPlayNoteFunction}
               zoomPosition={zoomPosition}
-              setModuleRows={setModuleRows}
+              setTrackRows={setTrackRows}
               setIsMouseDown={setIsMouseDown}
               setPendingUploadFiles={setPendingUploadFiles}
             />
@@ -1334,7 +1335,7 @@ function Workspace(props) {
                     zoomPosition={zoomPosition}
                   />
                 ))}
-              <IconButton tabIndex="-1" onClick={() => setModulePicker(true)}>
+              <IconButton tabIndex="-1" onClick={() => setTrackPicker(true)}>
                 <Icon>add</Icon>
               </IconButton>
             </>
@@ -1407,18 +1408,18 @@ function Workspace(props) {
             playNoteFunction={playNoteFunction}
             playingOctave={playingOctave}
             setPlayingOctave={setPlayingOctave}
-            moduleRows={moduleRows}
+            trackRows={trackRows}
             instrumentInfo={instrumentsInfo[selectedModule]}
             isMouseDown={isMouseDown}
           />
         )}
       </div>
       {modulePicker && (
-        <ModulePicker
+        <TrackPicker
           tabIndex={-1}
           open={modulePicker}
-          onClose={() => setModulePicker(false)}
-          setModulePicker={setModulePicker}
+          onClose={() => setTrackPicker(false)}
+          setTrackPicker={setTrackPicker}
           setModules={setModules}
           loadNewModuleInstrument={loadNewModuleInstrument}
           modules={modules}

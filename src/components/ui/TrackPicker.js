@@ -1,4 +1,4 @@
-import "./ModulePicker.css";
+import "./TrackPicker.css";
 
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -44,7 +44,7 @@ const moduletypes = [
 const stepValues = [4, 8, 12, 16, 24, 32];
 const lengthValues = [1, 2, 4, 8, 16];
 
-function ModulePicker(props) {
+function TrackPicker(props) {
   const { t } = useTranslation();
 
   const [selectedType, setSelectedType] = useState(0);
@@ -117,7 +117,7 @@ function ModulePicker(props) {
       return newModules;
     });
 
-    props.setModulePicker(false);
+    props.setTrackPicker(false);
     props.loadNewModuleInstrument(newModule, newModules.length - 1);
   };
 
@@ -159,7 +159,7 @@ function ModulePicker(props) {
       <Button onClick={addModule}>{t("modulePicker.submit")}</Button>
 
       <IconButton
-        onClick={() => props.setModulePicker(false)}
+        onClick={() => props.setTrackPicker(false)}
         className="mp-closebtn"
         color="primary"
       >
@@ -169,4 +169,4 @@ function ModulePicker(props) {
   );
 }
 
-export default ModulePicker;
+export default TrackPicker;

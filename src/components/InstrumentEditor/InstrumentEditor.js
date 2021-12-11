@@ -52,7 +52,9 @@ function InstrumentEditor(props) {
   const trackType = props.module.type;
 
   const [draggingOver, setDraggingOver] = useState(false);
-  const [patchExplorer, setPatchExplorer] = useState(true);
+  const [patchExplorer, setPatchExplorer] = useState(
+    trackType === 0 ? false : true
+  );
 
   const [filesName, setFilesName] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);

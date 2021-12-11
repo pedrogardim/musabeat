@@ -158,7 +158,7 @@ function MelodyNote(props) {
       }`}
       onMouseDown={handleMouseDown}
       style={{
-        height: props.rowRef.current.scrollHeight / props.moduleRows.length - 1,
+        height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
         width:
           (props.ghost
             ? props.drawingNote
@@ -185,7 +185,7 @@ function MelodyNote(props) {
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
               props.gridPos[0] *
-              (props.rowRef.current.scrollHeight / props.moduleRows.length)
+              (props.rowRef.current.scrollHeight / props.trackRows.length)
             }px)`
           : `translate(${
               Tone.Time(noteTime).toSeconds() *
@@ -194,8 +194,8 @@ function MelodyNote(props) {
               props.zoomPosition[0] *
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${
-              props.moduleRows.findIndex((e) => e.note === noteNote) *
-              (props.rowRef.current.scrollHeight / props.moduleRows.length)
+              props.trackRows.findIndex((e) => e.note === noteNote) *
+              (props.rowRef.current.scrollHeight / props.trackRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
         backgroundColor: colors[props.module.color][isSelected ? 800 : 300],

@@ -28,7 +28,7 @@ function ClosedTrackNote(props) {
     <div
       className={`module-score-note`}
       style={{
-        height: props.rowRef.current.scrollHeight / props.moduleRows.length - 1,
+        height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
         width: props.note.duration
           ? (Tone.Time(props.note.duration).toSeconds() /
               Tone.Time("1m").toSeconds()) *
@@ -41,12 +41,12 @@ function ClosedTrackNote(props) {
               (zoomSize * Tone.Time("1m").toSeconds())) -
           props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
         }px,${
-          props.moduleRows
+          props.trackRows
             .sort((a, b) =>
               trackType === 0 ? a.note - b.note : b.note - a.note
             )
             .findIndex((e) => e.note === props.note.note) *
-          (props.rowRef.current.scrollHeight / props.moduleRows.length)
+          (props.rowRef.current.scrollHeight / props.trackRows.length)
         }px)`,
         backgroundColor: "transparent",
         //borderRadius: 4,

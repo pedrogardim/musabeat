@@ -34,7 +34,7 @@ function NotesInput(props) {
     <div className="ws-note-input-key-cont">
       {props.module &&
         props.instrument &&
-        props.moduleRows.length > 0 &&
+        props.trackRows.length > 0 &&
         (props.module.type === 0 ? (
           /* Array(props.instrument._buffers._buffers.size) */
           Object.keys(props.keyMapping)
@@ -63,8 +63,8 @@ function NotesInput(props) {
                   style={{
                     backgroundColor: props.pressedKeys.includes(i)
                       ? "darkgray"
-                      : props.moduleRows[i] &&
-                        !props.instrument.has(props.moduleRows[i].note) &&
+                      : props.trackRows[i] &&
+                        !props.instrument.has(props.trackRows[i].note) &&
                         "lightgray",
                   }}
                 >
@@ -92,7 +92,7 @@ function NotesInput(props) {
                 </svg> 
               </Tooltip> */}
                   <span
-                    variant="overline"
+                    className="up"
                     style={{
                       position: "absolute",
                       left: 4,
@@ -102,9 +102,8 @@ function NotesInput(props) {
                   >
                     {e}
                   </span>
-                  <span style={{ lineHeight: 1.3 }}>
-                    {props.instrumentInfo &&
-                      drumMapping[props.moduleRows[i].note]}
+                  <span className="up">
+                    {props.trackRows[i] && drumMapping[props.trackRows[i].note]}
                   </span>
                 </Paper>
                 {i === 9 && <div className="break" />}
