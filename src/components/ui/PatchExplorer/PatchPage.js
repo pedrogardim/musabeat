@@ -504,7 +504,7 @@ function PatchPage(props) {
             {isLoaded ? (
               <InstrumentEditor
                 patchPage
-                module={{
+                track={{
                   type: props.isDrum ? 0 : 1,
                   instrument: { urls: patchInfo.urls, ...patchInfo.options },
                   lbls: patchInfo.lbls,

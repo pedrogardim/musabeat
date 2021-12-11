@@ -160,7 +160,7 @@ function WorkspaceGrid(props) {
         {Array(zoomSize * props.gridSize)
           .fill(0)
           .map((e, i) =>
-            i % props.gridSize !== 0 && props.selectedModule === null ? (
+            i % props.gridSize !== 0 && props.selectedTrack === null ? (
               ""
             ) : (
               <div

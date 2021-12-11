@@ -29,25 +29,24 @@ function MelodyNote(props) {
     )
       return;
 
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      newModules[props.selectedModule].score = [
-        ...newModules[props.selectedModule].score,
+    props.setTracks((prev) => {
+      let newTracks = [...prev];
+      newTracks[props.selectedTrack].score = [
+        ...newTracks[props.selectedTrack].score,
       ];
 
-      newModules[props.selectedModule].score[props.index].duration =
-        noteDuration;
-      newModules[props.selectedModule].score[props.index].time = noteTime;
-      newModules[props.selectedModule].score[props.index].note = noteNote;
+      newTracks[props.selectedTrack].score[props.index].duration = noteDuration;
+      newTracks[props.selectedTrack].score[props.index].time = noteTime;
+      newTracks[props.selectedTrack].score[props.index].note = noteNote;
 
-      return newModules;
+      return newTracks;
     });
   };
 
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
 
-    if (!e.target.className.includes("module-score-note-handle")) {
+    if (!e.target.className.includes("track-score-note-handle")) {
       setIsMoving(
         props.gridPos[1] -
           (props.gridSize * Tone.Time(noteTime).toSeconds()) /
@@ -55,7 +54,7 @@ function MelodyNote(props) {
       );
       props.setSelectedNotes(() => {
         let newNotes = [];
-        newNotes[props.selectedModule] = [props.index];
+        newNotes[props.selectedTrack] = [props.index];
         //console.log(newNotes);
         return newNotes;
       });
@@ -70,13 +69,13 @@ function MelodyNote(props) {
   };
 
   const deleteNote = () => {
-    props.setModules((prev) => {
+    props.setTracks((prev) => {
       console.log(props.index);
-      let newModules = [...prev];
-      newModules[props.selectedModule].score = newModules[
-        props.selectedModule
+      let newTracks = [...prev];
+      newTracks[props.selectedTrack].score = newTracks[
+        props.selectedTrack
       ].score.filter((e, i) => i !== props.index);
-      return newModules;
+      return newTracks;
     });
   };
 
@@ -151,11 +150,9 @@ function MelodyNote(props) {
 
   return (
     <div
-      className={`module-score-note ${
-        props.ghost && "module-score-note-ghost"
-      } ${props.deletableNote && "module-score-note-deletable"} ${
-        props.module.type === 1 && "module-score-note-melody"
-      }`}
+      className={`track-score-note ${props.ghost && "track-score-note-ghost"} ${
+        props.deletableNote && "track-score-note-deletable"
+      } ${props.track.type === 1 && "track-score-note-melody"}`}
       onMouseDown={handleMouseDown}
       style={{
         height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
@@ -198,15 +195,15 @@ function MelodyNote(props) {
               (props.rowRef.current.scrollHeight / props.trackRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
-        backgroundColor: colors[props.module.color][isSelected ? 800 : 300],
-        outline: `solid 1px ${colors[props.module.color][800]}`,
+        backgroundColor: colors[props.track.color][isSelected ? 800 : 300],
+        outline: `solid 1px ${colors[props.track.color][800]}`,
         //borderRadius: 4,
         //margin: "-2px -2px 0 0",
       }}
     >
       {!props.ghost && (
         <div
-          className="module-score-note-handle"
+          className="track-score-note-handle"
           onMouseDown={() => setIsResizing(true)}
         />
       )}

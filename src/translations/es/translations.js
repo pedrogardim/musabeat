@@ -44,10 +44,10 @@ export const TRANSLATIONS_ES = {
       copyPasteIncompatible:
         "El contenido que intentas pegar pertenece a otro tipo de módulo",
       copyPasteEmptyClipboard: "Nada que pegar",
-      copySuccess: "Copiado del módulo",
-      pasteSuccessMeasure: "Compás copiado pegado en el módulo",
-      pasteSuccessChord: "Acorde copiado pegado en el módulo",
-      stepsChange: "Pasos en el módulo final cambiado a",
+      copySuccess: "Copiado de la pista",
+      pasteSuccessMeasure: "Compás copiado pegado en la pista",
+      pasteSuccessChord: "Acorde copiado pegado en la pista",
+      stepsChange: "Pasos en la pista final cambiado a",
     },
     options: {
       hiddenSession: "Sesión Oculta",
@@ -62,7 +62,7 @@ export const TRANSLATIONS_ES = {
       "No has iniciado sesión! Los cambios no serán guardados en la nube",
     untitledSession: "Sesión sin nombre",
   },
-  module: {
+  track: {
     options: {
       fullscreen: "Pantalla Completa",
       loadFile: "Cargar archivo",
@@ -122,7 +122,7 @@ export const TRANSLATIONS_ES = {
       emptySlot: "Slot Vacío",
     },
   },
-  modulePicker: {
+  trackPicker: {
     create: "Crear nuevo módulo",
     submit: "Añadir Módulo",
     types: {
@@ -166,7 +166,7 @@ export const TRANSLATIONS_ES = {
     none: "Ninguno",
     offlineAlert:
       "MusaBeat requiere una conexión estable a al servidor. Comprueba tu conexión a internet.",
-    initialModules: "Módulos Iniciales",
+    initialTracks: "Pistas Iniciales",
     comingSoon: "(Próximamente)",
     nothingFound: "No se ha encontrado nada",
     pageNotFound: "Página no encontrada",

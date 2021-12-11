@@ -31,25 +31,25 @@ function AudioClip(props) {
       noteOffset === props.note.offset
     )
       return;
-    props.setModules((prev) => {
-      let newModules = [...prev];
-      newModules[props.selectedModule].score = [
-        ...newModules[props.selectedModule].score,
+    props.setTracks((prev) => {
+      let newTracks = [...prev];
+      newTracks[props.selectedTrack].score = [
+        ...newTracks[props.selectedTrack].score,
       ];
-      newModules[props.selectedModule].score[props.index].duration = parseFloat(
+      newTracks[props.selectedTrack].score[props.index].duration = parseFloat(
         noteDuration.toFixed(3)
       );
-      newModules[props.selectedModule].score[props.index].time = noteTime;
+      newTracks[props.selectedTrack].score[props.index].time = noteTime;
 
-      newModules[props.selectedModule].score[props.index].offset = parseFloat(
+      newTracks[props.selectedTrack].score[props.index].offset = parseFloat(
         noteOffset.toFixed(3)
       );
 
-      newModules[props.selectedModule].score = handleOverlappingClips(
-        newModules[props.selectedModule].score,
+      newTracks[props.selectedTrack].score = handleOverlappingClips(
+        newTracks[props.selectedTrack].score,
         props.index
       );
-      return newModules;
+      return newTracks;
     });
   };
 
@@ -133,7 +133,7 @@ function AudioClip(props) {
   const handleMouseDown = (e) => {
     if (props.ghost || props.deletingNote) return;
 
-    if (!e.target.className.includes("module-score-note-handle")) {
+    if (!e.target.className.includes("track-score-note-handle")) {
       if (typeof props.floatPos[1] !== "number") return;
       let clickedPoint =
         props.floatPos[1] -
@@ -142,7 +142,7 @@ function AudioClip(props) {
       setIsMoving(clickedPoint);
       props.setSelectedNotes(() => {
         let newNotes = [];
-        newNotes[props.selectedModule] = [props.index];
+        newNotes[props.selectedTrack] = [props.index];
         //console.log(newNotes);
         return newNotes;
       });
@@ -157,13 +157,13 @@ function AudioClip(props) {
   };
 
   const deleteNote = () => {
-    props.setModules((prev) => {
+    props.setTracks((prev) => {
       console.log(props.index);
-      let newModules = [...prev];
-      newModules[props.selectedModule].score = newModules[
-        props.selectedModule
+      let newTracks = [...prev];
+      newTracks[props.selectedTrack].score = newTracks[
+        props.selectedTrack
       ].score.filter((e, i) => i !== props.index);
-      return newModules;
+      return newTracks;
     });
   };
 
@@ -274,11 +274,11 @@ function AudioClip(props) {
   /*  useEffect(() => {
     //updateClipPosition();
   }, [
-    props.moduleSize,
+    props.trackSize,
     props.score,
     props.player,
     props.player.loaded,
-    props.moduleZoom,
+    props.trackZoom,
     props.fullScreen,
   ]); */
 
@@ -292,7 +292,7 @@ function AudioClip(props) {
         //clipWidth,
         noteDuration,
         noteOffset,
-        colors[props.module.color],
+        colors[props.track.color],
         props.rowRef.current.offsetWidth,
         noteRef.current.offsetWidth,
         props.index
@@ -309,11 +309,9 @@ function AudioClip(props) {
 
   return (
     <div
-      className={`module-score-note ${
-        props.ghost && "module-score-note-ghost"
-      } ${props.deletableNote && "module-score-note-deletable"} ${
-        props.module.type === 1 && "module-score-note-melody"
-      }`}
+      className={`track-score-note ${props.ghost && "track-score-note-ghost"} ${
+        props.deletableNote && "track-score-note-deletable"
+      } ${props.track.type === 1 && "track-score-note-melody"}`}
       ref={noteRef}
       onMouseDown={handleMouseDown}
       style={{
@@ -331,8 +329,8 @@ function AudioClip(props) {
         opacity: props.ghost && 0.5,
         backgroundColor: props.recording
           ? "#f50057"
-          : colors[props.module.color][isSelected ? 800 : 300],
-        outline: `solid 1px ${colors[props.module.color][800]}`,
+          : colors[props.track.color][isSelected ? 800 : 300],
+        outline: `solid 1px ${colors[props.track.color][800]}`,
         borderRadius: 4,
         zIndex: isSelected && 2,
         //margin: "-2px -2px 0 0",
@@ -341,12 +339,12 @@ function AudioClip(props) {
       {!props.ghost && (
         <>
           <div
-            className="module-score-note-handle"
+            className="track-score-note-handle"
             onMouseDown={() => setIsResizing("left")}
             style={{ left: 0, cursor: "ew-resize" }}
           />
           <div
-            className="module-score-note-handle"
+            className="track-score-note-handle"
             onMouseDown={() => setIsResizing("right")}
             style={{ right: 0, cursor: "ew-resize" }}
           />

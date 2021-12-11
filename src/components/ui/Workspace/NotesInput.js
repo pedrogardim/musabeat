@@ -26,16 +26,16 @@ function NotesInput(props) {
           drawWave(props.instrument.player(JSON.stringify(i)).buffer.toArray())
         )
     ); */
-  }, [props.module, props.instrument]);
+  }, [props.track, props.instrument]);
 
   useEffect(() => {}, [props.pressedKeys]);
 
   return (
     <div className="ws-note-input-key-cont">
-      {props.module &&
+      {props.track &&
         props.instrument &&
         props.trackRows.length > 0 &&
-        (props.module.type === 0 ? (
+        (props.track.type === 0 ? (
           /* Array(props.instrument._buffers._buffers.size) */
           Object.keys(props.keyMapping)
             .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
@@ -84,7 +84,7 @@ function NotesInput(props) {
                   {filesLine[i] && (
                     <path
                       d={filesLine[i]}
-                      stroke={colors[props.module.color][300]}
+                      stroke={colors[props.track.color][300]}
                       strokeWidth={1}
                       fill="none"
                     />
@@ -141,7 +141,7 @@ function NotesInput(props) {
                 height: "100%",
                 zIndex: 0,
               }}
-              color={props.module.color}
+              color={props.track.color}
               octaves={1.42}
               notesLabel={Object.keys(props.keyMapping).map((e) =>
                 e.replace("Key", "").replace("Semicolon", ":")

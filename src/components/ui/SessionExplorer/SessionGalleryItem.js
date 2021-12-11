@@ -147,12 +147,12 @@ function SessionGalleryItem(props) {
             </div>
           )}
 
-        <div className="session-gallery-item-modules-cont">
-          {props.session.modules !== undefined &&
-          !!props.session.modules.length ? (
-            props.session.modules.map((e) => (
+        <div className="session-gallery-item-track-cont">
+          {props.session.tracks !== undefined &&
+          !!props.session.tracks.length ? (
+            props.session.tracks.map((e) => (
               <Paper
-                className="session-gallery-item-module"
+                className="session-gallery-item-track"
                 style={{
                   backgroundColor: colors[e.color][500],
                   borderRadius: 0,
@@ -162,7 +162,7 @@ function SessionGalleryItem(props) {
                   title={
                     e.name
                       ? `"${e.name}"`
-                      : t(`modulePicker.types.${e.type}.name`)
+                      : t(`trackPicker.types.${e.type}.name`)
                   }
                 >
                   <Icon>
@@ -181,10 +181,10 @@ function SessionGalleryItem(props) {
             ))
           ) : (
             <Paper
-              className="session-gallery-item-module"
+              className="session-gallery-item-track"
               style={{ backgroundColor: "gray", opacity: 0.7 }}
             >
-              No Modules
+              No Tracks
             </Paper>
           )}
         </div>
@@ -192,9 +192,9 @@ function SessionGalleryItem(props) {
           <div className="session-gallery-item-footer">
             {props.playingLoadingProgress !== 100 &&
             props.playingSession &&
-            !!props.session.modules ? (
+            !!props.session.tracks ? (
               <CircularProgress value={props.playingLoadingProgress} />
-            ) : !!props.session.modules ||
+            ) : !!props.session.tracks ||
               props.playingLoadingProgress === 100 ? (
               <IconButton onClick={props.setPlayingSession}>
                 <Icon>{props.playingSession ? "stop" : "play_arrow"}</Icon>

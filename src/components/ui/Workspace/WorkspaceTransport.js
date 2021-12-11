@@ -65,8 +65,8 @@ function WorkspaceTransport(props) {
       tabIndex="-1"
     >
       <div style={{ width: 88 }}>
-        {props.selectedModule !== null && (
-          <IconButton onClick={() => props.setSelectedModule(null)}>
+        {props.selectedTrack !== null && (
+          <IconButton onClick={() => props.setSelectedTrack(null)}>
             <Icon>arrow_back</Icon>
           </IconButton>
         )}

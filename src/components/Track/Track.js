@@ -56,14 +56,14 @@ function Track(props) {
   const [meterLevel, setMeterLevel] = useState(0);
   const [uploadingFiles, setUploadingFiles] = useState([]);
 
-  const trackType = props.module.type;
-  const isSelected = props.selectedModule === props.index;
+  const trackType = props.track.type;
+  const isSelected = props.selectedTrack === props.index;
 
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
-  const trackInstrument = props.instruments[props.selectedModule];
+  const trackInstrument = props.instruments[props.selectedTrack];
 
-  const loadModuleRows = () => {
+  const loadTrackRows = () => {
     if (!props.instrument) return;
     let rows = [];
 
@@ -74,7 +74,7 @@ function Track(props) {
           : [...props.instrument._buffers._buffers.keys()].map((e) =>
               parseInt(e)
             )
-        : [...new Set(props.module.score.map((item) => item.note))].sort(
+        : [...new Set(props.track.score.map((item) => item.note))].sort(
             (a, b) => a - b
           );
 
@@ -92,7 +92,7 @@ function Track(props) {
         ? Array(88)
             .fill(0)
             .map((e, i) => 108 - i)
-        : [...new Set(props.module.score.map((item) => item.note))].sort(
+        : [...new Set(props.track.score.map((item) => item.note))].sort(
             (a, b) => a - b
           );
 
@@ -116,32 +116,32 @@ function Track(props) {
   };
 
   const scheduleNotes = () => {
-    !props.module.muted
+    !props.track.muted
       ? trackType === 0
         ? scheduleSampler(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
         : trackType === 1
         ? scheduleMelody(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
         : scheduleAudioTrack(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
-      : clearEvents(props.module.id);
+      : clearEvents(props.track.id);
   };
 
   const playNote = (note) => {
-    if (props.module.type === 0) {
+    if (props.track.type === 0) {
       if (
         trackRows[note] === undefined ||
         trackRows[note] === null ||
@@ -163,18 +163,15 @@ function Track(props) {
         ).toBarsBeatsSixteenths(),
       };
 
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        let find = newModules[props.selectedModule].score.findIndex(
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
+        let find = newTracks[props.selectedTrack].score.findIndex(
           (e) => e.note === newNote.note && e.time === newNote.time
         );
         //console.log(find);
         if (find !== -1) return prev;
-        newModules[props.selectedModule].score = [
-          ...newModules[0].score,
-          newNote,
-        ];
-        return newModules;
+        newTracks[props.selectedTrack].score = [...newTracks[0].score, newNote];
+        return newTracks;
       });
     } else {
       let drawingNote = {
@@ -207,7 +204,7 @@ function Track(props) {
     } else {
       recTools.recorder.stop().then((blob) => {
         let filename =
-          (props.module.name ? props.module.name : "Audio") +
+          (props.track.name ? props.track.name : "Audio") +
           "_" +
           drawingNote.clip +
           1;
@@ -230,19 +227,19 @@ function Track(props) {
                   fileInfo;
                 return newInfo;
               }); */
-              props.setModules((prev) => {
-                let newModules = [...prev];
+              props.setTracks((prev) => {
+                let newTracks = [...prev];
                 let newNote = {
                   ...drawingNote,
                   duration: parseFloat(audiobuffer.duration.toFixed(3)),
                   offset: 0,
                 };
 
-                newModules[props.index].score = [
-                  ...newModules[props.index].score,
+                newTracks[props.index].score = [
+                  ...newTracks[props.index].score,
                   newNote,
                 ];
-                return newModules;
+                return newTracks;
               });
               setDrawingNote(null);
               //recTools.userMedia.close();
@@ -295,7 +292,7 @@ function Track(props) {
 
     if (props.cursorMode === "edit" && trackType === 0) {
       let find =
-        props.module.score.findIndex(
+        props.track.score.findIndex(
           (e) =>
             (e.note === trackRows[gridPos[0]].note ||
               e.note === 108 - gridPos[0]) &&
@@ -314,14 +311,14 @@ function Track(props) {
 
     setIsMouseDown(true);
 
-    let isClickOnNote = e && e.target.className.includes("module-score-note");
+    let isClickOnNote = e && e.target.className.includes("track-score-note");
 
     if (!isClickOnNote) {
       setSelectedNotes([]);
     }
 
     if (
-      (e && e.target.className.includes("module-score-note-handle")) ||
+      (e && e.target.className.includes("track-score-note-handle")) ||
       props.cursorMode !== "edit"
     )
       return;
@@ -336,16 +333,16 @@ function Track(props) {
         ).toBarsBeatsSixteenths(),
       };
 
-      props.setModules((prev) => {
-        let newModules = [...prev];
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
 
-        newModules[props.index].score = deletableNote
-          ? newModules[props.index].score.filter(
+        newTracks[props.index].score = deletableNote
+          ? newTracks[props.index].score.filter(
               (e) => e.note !== newNote.note || e.time !== newNote.time
             )
-          : [...newModules[props.index].score, { ...newNote }];
+          : [...newTracks[props.index].score, { ...newNote }];
 
-        return newModules;
+        return newTracks;
       });
     } else {
       let newNote = {
@@ -360,10 +357,10 @@ function Track(props) {
             deletableNote
           ); 
 
-          props.setModules((prev) => {
-            let newModules = [...prev];
+          props.setTracks((prev) => {
+            let newTracks = [...prev];
 
-            newModules[props.index].score = newModules[
+            newTracks[props.index].score = newTracks[
               props.index
             ].score.filter(
               (e) =>
@@ -371,7 +368,7 @@ function Track(props) {
                 e.time !== Tone.Time(newNote.time).toBarsBeatsSixteenths()
             );
 
-            return newModules;
+            return newTracks;
           });
         } else  */
       if (!isClickOnNote) {
@@ -399,19 +396,19 @@ function Track(props) {
 
       newNote.time = Tone.Time(newNote.time).toBarsBeatsSixteenths();
 
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        let find = newModules[props.index].score.findIndex(
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
+        let find = newTracks[props.index].score.findIndex(
           (e) => e.note === newNote.note && e.time === newNote.time
         );
-        newModules[props.index].score =
+        newTracks[props.index].score =
           find === -1
-            ? [...newModules[props.index].score, { ...newNote }]
-            : newModules[props.index].score.filter(
+            ? [...newTracks[props.index].score, { ...newNote }]
+            : newTracks[props.index].score.filter(
                 (e) => e.note !== newNote.note || e.time !== newNote.time
               );
 
-        return newModules;
+        return newTracks;
       });
       setDrawingNote(null);
     }
@@ -438,23 +435,23 @@ function Track(props) {
   /* ================================================================================== */
 
   useEffect(() => {
-    //console.log("change detected on moduleRow");
+    //console.log("change detected on trackRow");
     scheduleNotes();
-  }, [props.instrument, props.module, props.module.score, props.isLoaded]);
+  }, [props.instrument, props.track, props.track.score, props.isLoaded]);
 
   useEffect(() => {
-    //console.log("change detected on moduleRow");
+    //console.log("change detected on trackRow");
     trackType === 2 && scheduleNotes();
   }, [props.isPlaying]);
 
   useEffect(() => {
-    loadModuleRows();
+    loadTrackRows();
   }, [
     props.instrument,
     props.instruments,
-    props.module,
+    props.track,
     props.isLoaded,
-    props.selectedModule,
+    props.selectedTrack,
     showingAll,
   ]);
 
@@ -490,7 +487,7 @@ function Track(props) {
     rowWrapperRef.current.scrollTop =
       rowWrapperRef.current.scrollHeight / 2 -
       rowWrapperRef.current.offsetHeight / 2;
-  }, [props.selectedModule, rowWrapperRef.current]);
+  }, [props.selectedTrack, rowWrapperRef.current]);
 
   useEffect(() => {
     props.setIsMouseDown(isMouseDown);
@@ -526,7 +523,7 @@ function Track(props) {
 
   return (
     <div
-      className="module-grid-row-wrapper"
+      className="track-grid-row-wrapper"
       ref={rowWrapperRef}
       style={{
         overflowY: trackType === 1 && isSelected && "overlay",
@@ -535,7 +532,7 @@ function Track(props) {
       }}
     >
       <div
-        className="module-grid-row"
+        className="track-grid-row"
         ref={rowRef}
         onMouseMove={handleHover}
         onMouseDown={handleMouseDown}
@@ -556,12 +553,12 @@ function Track(props) {
       >
         {trackRows.map((row, rowIndex) => (
           <div
-            className="module-inner-row"
+            className="track-inner-row"
             style={{
               //borderTop: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
               borderBottom:
                 trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
-              margin: props.selectedModule === null && "8px 0",
+              margin: props.selectedTrack === null && "8px 0",
               minHeight: trackType === 1 && "6.66666%",
               background:
                 trackType === 1 &&
@@ -572,30 +569,30 @@ function Track(props) {
                   rowIndex % 12 === 9 ||
                   rowIndex % 12 === 11) &&
                 //"#0000001a",
-                colors[props.module.color][800] + "3a",
+                colors[props.track.color][800] + "3a",
             }}
             key={rowIndex + "ri"}
           >
             <span
-              className="module-inner-row-label"
+              className="track-inner-row-label"
               onClick={() => setShowingAll((prev) => !prev)}
               style={{
                 color:
                   trackType === 0 && !props.instrument.has(row.note)
                     ? "lightgrey"
-                    : colors[props.module.color][900],
+                    : colors[props.track.color][900],
               }}
             >
               {row.lbl}
             </span>
             {(trackType === 0 || trackType === 2) && (
-              <div className="module-inner-row-line" />
+              <div className="track-inner-row-line" />
             )}
           </div>
         ))}
         {rowRef.current &&
-          props.module.score.length > 0 &&
-          props.module.score
+          props.track.score.length > 0 &&
+          props.track.score
             //.filter((e) => e.time.split(":")[0] < props.sessionSize)
             .map((note, noteIndex) =>
               trackType === 0 ? (
@@ -604,12 +601,12 @@ function Track(props) {
                   rowRef={rowRef}
                   trackRows={trackRows}
                   note={note}
-                  module={props.module}
+                  track={props.track}
                   sessionSize={props.sessionSize}
                   gridSize={props.gridSize}
                   deletableNote={deletableNote}
                   index={noteIndex}
-                  selectedModule={props.selectedModule}
+                  selectedTrack={props.selectedTrack}
                   selectedNotes={props.selectedNotes}
                   zoomPosition={props.zoomPosition}
                   a={rowRef.current}
@@ -622,16 +619,16 @@ function Track(props) {
                   trackRows={trackRows}
                   note={note}
                   drawingNote={drawingNote}
-                  module={props.module}
+                  track={props.track}
                   sessionSize={props.sessionSize}
                   gridSize={props.gridSize}
                   gridPos={gridPos}
                   deletableNote={deletableNote}
                   setDrawingNote={setDrawingNote}
                   index={noteIndex}
-                  setModules={props.setModules}
+                  setTracks={props.setTracks}
                   isMouseDown={isMouseDown}
-                  selectedModule={props.selectedModule}
+                  selectedTrack={props.selectedTrack}
                   selectedNotes={props.selectedNotes}
                   setSelectedNotes={props.setSelectedNotes}
                   zoomPosition={props.zoomPosition}
@@ -647,16 +644,16 @@ function Track(props) {
                     note={note}
                     player={props.instrument.player(note.clip)}
                     drawingNote={drawingNote}
-                    module={props.module}
+                    track={props.track}
                     sessionSize={props.sessionSize}
                     gridSize={props.gridSize}
                     gridPos={gridPos}
                     deletableNote={deletableNote}
                     setDrawingNote={setDrawingNote}
                     index={noteIndex}
-                    setModules={props.setModules}
+                    setTracks={props.setTracks}
                     isMouseDown={isMouseDown}
-                    selectedModule={props.selectedModule}
+                    selectedTrack={props.selectedTrack}
                     selectedNotes={props.selectedNotes}
                     setSelectedNotes={props.setSelectedNotes}
                     zoomPosition={props.zoomPosition}
@@ -668,7 +665,7 @@ function Track(props) {
               )
             )}
         {rowRef.current &&
-          props.selectedModule !== null &&
+          props.selectedTrack !== null &&
           props.cursorMode === "edit" &&
           !deletableNote &&
           (trackType === 0 ? (
@@ -677,10 +674,10 @@ function Track(props) {
               rowRef={rowRef}
               trackRows={trackRows}
               gridPos={gridPos}
-              module={props.module}
+              track={props.track}
               sessionSize={props.sessionSize}
               gridSize={props.gridSize}
-              selectedModule={props.selectedModule}
+              selectedTrack={props.selectedTrack}
               zoomPosition={props.zoomPosition}
             />
           ) : trackType === 1 ? (
@@ -690,13 +687,13 @@ function Track(props) {
               trackRows={trackRows}
               gridPos={gridPos}
               drawingNote={drawingNote}
-              module={props.module}
+              track={props.track}
               sessionSize={props.sessionSize}
               gridPos={gridPos}
               gridSize={props.gridSize}
-              setModules={props.setModules}
+              setTracks={props.setTracks}
               selectedNotes={[]}
-              selectedModule={props.selectedModule}
+              selectedTrack={props.selectedTrack}
               setDrawingNote={setDrawingNote}
               zoomPosition={props.zoomPosition}
             />
@@ -725,7 +722,7 @@ function Track(props) {
                 trackRows={trackRows}
                 zoomPosition={props.zoomPosition}
                 player={{ buffer: { loaded: "" } }}
-                module={props.module}
+                track={props.track}
                 fileInfo={{}}
               />
             )}
@@ -736,10 +733,10 @@ function Track(props) {
         open={uploadingFiles.length > 0}
         files={uploadingFiles}
         setUploadingFiles={setUploadingFiles}
-        module={props.module}
+        track={props.track}
         instrument={props.instrument}
         setInstrumentsInfo={props.setInstrumentsInfo}
-        setModules={props.setModules}
+        setTracks={props.setTracks}
         drawingNote={drawingNote}
         index={props.index}
         /* setInstrumentLoaded={props.setInstrumentLoaded}

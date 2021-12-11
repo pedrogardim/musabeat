@@ -1021,14 +1021,14 @@ export const createChordProgression = (scale, root, extentions, length) => {
 export const patchLoader = async (
   input,
   setInstrumentsLoaded,
-  moduleIndex,
+  trackIndex,
   setNotifications,
   setInstrumentsInfo
 ) => {
   let instrumentLoaded = (isLoaded) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
-      a[moduleIndex] = isLoaded;
+      a[trackIndex] = isLoaded;
       return a;
     });
   };
@@ -1044,7 +1044,7 @@ export const patchLoader = async (
   let patch = patchSnaphot.exists ? patchSnaphot.data() : demoInstrumentPatch;
 
   !patchSnaphot.exists &&
-    setNotifications((prev) => [...prev, ["patch", input, moduleIndex]]);
+    setNotifications((prev) => [...prev, ["patch", input, trackIndex]]);
 
   //console.log(patch);
 
@@ -1055,14 +1055,14 @@ export const patchLoader = async (
     return await loadSamplerFromObject(
       patch,
       setInstrumentsLoaded,
-      moduleIndex,
+      trackIndex,
       setNotifications
     );
   } else {
     instrumentLoaded(true);
     setInstrumentsInfo((prev) => {
       let newInfo = [...prev];
-      newInfo[moduleIndex] = { patch: patch };
+      newInfo[trackIndex] = { patch: patch };
       return newInfo;
     });
   }
@@ -1132,14 +1132,14 @@ export const patchLoader = async (
 export const loadSamplerFromObject = async (
   obj,
   setInstrumentsLoaded,
-  moduleIndex,
+  trackIndex,
   nowLoaded,
   setNotifications
 ) => {
   let instrumentLoaded = (isLoaded, sampler) => {
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
-      a[moduleIndex] = isLoaded;
+      a[trackIndex] = isLoaded;
       return a;
     });
 
@@ -1161,7 +1161,7 @@ export const loadSamplerFromObject = async (
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
-          ["file", obj.urls[e], moduleIndex],
+          ["file", obj.urls[e], trackIndex],
         ]);
       }
     })
@@ -1206,9 +1206,9 @@ export const loadSynthFromGetObject = (obj) => {
 export const loadDrumPatch = async (
   input,
   setInstrumentsLoaded,
-  moduleIndex,
+  trackIndex,
   onLoad,
-  setModules,
+  setTracks,
   setLabels,
   setInstrumentsInfo,
   setNotifications
@@ -1217,7 +1217,7 @@ export const loadDrumPatch = async (
     //console.log("ITS LOADED ITS LOADED ITS LOADED ITS LOADED ITS LOADED");
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
-      a[moduleIndex] = isLoaded;
+      a[trackIndex] = isLoaded;
       return a;
     });
     if (onLoad !== undefined && isLoaded && players) onLoad(players);
@@ -1233,7 +1233,7 @@ export const loadDrumPatch = async (
   let patch = patchRef ? (await patchRef.get()).data() : input;
 
   if (patch === undefined) {
-    setNotifications((prev) => [...prev, ["patch", input, moduleIndex]]);
+    setNotifications((prev) => [...prev, ["patch", input, trackIndex]]);
     patch = demoDrumPatch;
   }
 
@@ -1243,7 +1243,7 @@ export const loadDrumPatch = async (
     setInstrumentsLoaded((prev) => {
       //console.log("======LOADED=======")
       let a = [...prev];
-      a[moduleIndex] = true;
+      a[trackIndex] = true;
       return a;
     });
     return new Tone.Players().toDestination();
@@ -1258,7 +1258,7 @@ export const loadDrumPatch = async (
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
-          ["file", patch.urls[e], moduleIndex],
+          ["file", patch.urls[e], trackIndex],
         ]);
       }
     })
@@ -1280,7 +1280,7 @@ export const loadDrumPatch = async (
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
-          ["fileInfo", patch.urls[e], moduleIndex],
+          ["fileInfo", patch.urls[e], trackIndex],
         ]);
       }
     })
@@ -1288,7 +1288,7 @@ export const loadDrumPatch = async (
 
   setInstrumentsInfo((prev) => {
     let newInfo = [...prev];
-    newInfo[moduleIndex] = {
+    newInfo[trackIndex] = {
       patch: patch,
       filesInfo: Object.fromEntries(filesInfo),
     };
@@ -1310,24 +1310,13 @@ export const loadDrumPatch = async (
   setInstrumentsLoaded((prev) => {
     //console.log("======LOADED=======")
     let a = [...prev];
-    a[moduleIndex] = false;
+    a[trackIndex] = false;
     return a;
   });
 
   let drumPlayers = new Tone.Players(urls, () =>
     instrumentLoaded(true, drumPlayers)
   ).toDestination();
-
-  setModules &&
-    setModules((prev) => {
-      let newModules = [...prev];
-      if (
-        JSON.stringify(newModules[moduleIndex].lbls) !==
-        JSON.stringify(patch.lbls)
-      )
-        newModules[moduleIndex].lbls = patch.lbls;
-      return newModules;
-    });
 
   setLabels && setLabels(patch.lbls);
 
@@ -1339,8 +1328,8 @@ export const loadDrumPatch = async (
 export const loadAudioTrack = async (
   input,
   setInstrumentsLoaded,
-  moduleIndex,
-  setModules,
+  trackIndex,
+  setTracks,
   setInstrumentsInfo,
   setNotifications
 ) => {
@@ -1348,7 +1337,7 @@ export const loadAudioTrack = async (
     //console.log("ITS LOADED ITS LOADED ITS LOADED ITS LOADED ITS LOADED");
     setInstrumentsLoaded((prev) => {
       let a = [...prev];
-      a[moduleIndex] = isLoaded;
+      a[trackIndex] = isLoaded;
       return a;
     });
   };
@@ -1357,12 +1346,12 @@ export const loadAudioTrack = async (
     setInstrumentsLoaded((prev) => {
       //console.log("======LOADED=======")
       let a = [...prev];
-      a[moduleIndex] = true;
+      a[trackIndex] = true;
       return a;
     });
     setInstrumentsInfo((prev) => {
       let newInfo = [...prev];
-      newInfo[moduleIndex] = {
+      newInfo[trackIndex] = {
         filesInfo: {},
       };
       return newInfo;
@@ -1379,7 +1368,7 @@ export const loadAudioTrack = async (
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
-          ["file", input.urls[e], moduleIndex],
+          ["file", input.urls[e], trackIndex],
         ]);
       }
     })
@@ -1401,7 +1390,7 @@ export const loadAudioTrack = async (
       } catch (er) {
         setNotifications((prev) => [
           ...prev,
-          ["fileInfo", input.urls[e], moduleIndex],
+          ["fileInfo", input.urls[e], trackIndex],
         ]);
       }
     })
@@ -1411,7 +1400,7 @@ export const loadAudioTrack = async (
 
   setInstrumentsInfo((prev) => {
     let newInfo = [...prev];
-    newInfo[moduleIndex] = {
+    newInfo[trackIndex] = {
       filesInfo: Object.fromEntries(filesInfo),
     };
     return newInfo;
@@ -1432,7 +1421,7 @@ export const loadAudioTrack = async (
   setInstrumentsLoaded((prev) => {
     //console.log("======LOADED=======")
     let a = [...prev];
-    a[moduleIndex] = false;
+    a[trackIndex] = false;
     return a;
   });
 

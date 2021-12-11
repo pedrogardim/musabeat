@@ -10,15 +10,15 @@ function Mixer(props) {
   };
 
   const handleSliderStop = (index, value) => {
-    props.setModules((prev) => {
-      let newModules = [...prev];
+    props.setTracks((prev) => {
+      let newTracks = [...prev];
       prev[index].volume = value;
-      return newModules;
+      return newTracks;
     });
   };
 
   const handleMute = (index) => {
-    props.setModules((prev) => {
+    props.setTracks((prev) => {
       let newMutedArray = [...prev];
       prev[index].muted = !prev[index].muted;
       return newMutedArray;
@@ -29,11 +29,11 @@ function Mixer(props) {
 
   return (
     <div className="mixer" tabIndex={-1} style={props.style}>
-      {props.modules.map((module, index) => (
+      {props.tracks.map((track, index) => (
         <ChannelStrip
           index={index}
           key={index}
-          module={module}
+          track={track}
           instrument={props.instruments[index]}
           handleSliderMove={handleSliderMove}
           handleSliderStop={handleSliderStop}

@@ -37,7 +37,7 @@ import {
   musicalNotes,
 } from "../../../assets/musicutils";
 
-const moduletypes = [
+const tracktypes = [
   {
     name: "Drum Sequencer",
     icon: "grid_on",
@@ -71,7 +71,7 @@ const sessionTemplate = {
   root: 0,
   scale: 0,
   timeline: { on: false, size: 1 },
-  modules: [],
+  tracks: [],
 };
 
 function NewSessionDialog(props) {
@@ -83,19 +83,19 @@ function NewSessionDialog(props) {
     isCopy ? props.newSessionDialog : sessionTemplate
   );
 
-  const addModule = (moduleType) => {
+  const addTrack = (trackType) => {
     const initialDrumPatch = "8fsbChTqV7aaWNyI1hTC";
     const initialPatch = "jSjo9Rzv3eg1vTkkEj1s";
 
-    let newModule = {
+    let newTrack = {
       id:
-        !session.modules || !session.modules.length
+        !session.tracks || !session.tracks.length
           ? 0
-          : Math.max(...session.modules.map((e) => e.id)) + 1,
+          : Math.max(...session.tracks.map((e) => e.id)) + 1,
       name: "",
-      type: moduleType,
+      type: trackType,
       score:
-        moduleType !== 2
+        trackType !== 2
           ? []
           : createChordProgression(session.scale, session.root, 3, 2).map(
               (e, i) => {
@@ -105,9 +105,9 @@ function NewSessionDialog(props) {
       volume: 0,
       muted: false,
       instrument:
-        moduleType === 0
+        trackType === 0
           ? initialDrumPatch
-          : moduleType === 3
+          : trackType === 3
           ? {
               url: "",
             }
@@ -116,39 +116,37 @@ function NewSessionDialog(props) {
       fx: [],
     };
 
-    if (moduleType === 1) {
-      //newModule.root = selectedRoot;
-      //newModule.scale = selectedScale;
-      newModule.range = 3;
+    if (trackType === 1) {
+      //newTrack.root = selectedRoot;
+      //newTrack.scale = selectedScale;
+      newTrack.range = 3;
     }
 
-    if (moduleType === 2) {
-      //newModule.root = selectedRoot;
-      //newModule.scale = selectedScale;
-      newModule.complexity = 3;
+    if (trackType === 2) {
+      //newTrack.root = selectedRoot;
+      //newTrack.scale = selectedScale;
+      newTrack.complexity = 3;
     }
 
-    if (moduleType === 3 || moduleType === 4) {
-      newModule.size = 1;
+    if (trackType === 3 || trackType === 4) {
+      newTrack.size = 1;
     }
 
     setSession((prev) => {
       let newSession = { ...prev };
-      newSession.modules = [...newSession.modules, newModule];
+      newSession.tracks = [...newSession.tracks, newTrack];
       newSession.timeline = {
         ...newSession.timeline,
-        [newModule.id]: [...Array(2).keys()],
+        [newTrack.id]: [...Array(2).keys()],
       };
       return newSession;
     });
   };
 
-  const removeModule = (moduleType) => {
+  const removeTrack = (trackType) => {
     setSession((prev) => {
       let newSession = { ...prev };
-      newSession.modules = newSession.modules.filter(
-        (e) => e.type !== moduleType
-      );
+      newSession.tracks = newSession.tracks.filter((e) => e.type !== trackType);
       return newSession;
     });
   };
@@ -160,7 +158,7 @@ function NewSessionDialog(props) {
   };
 
   const handleCreateNewSession = () => {
-    session.modules.map((e) => {
+    session.tracks.map((e) => {
       if (typeof e.instrument === "string") {
         firebase
           .firestore()
@@ -210,7 +208,7 @@ function NewSessionDialog(props) {
       <div className="break" style={{ height: 16 }} />
 
       {/* <p variant="overline">
-        {t(`modulePicker.types.${selectedType}.description`)}
+        {t(`trackPicker.types.${selectedType}.description`)}
       </p> */}
 
       <Grid container direction="row" wrap="wrap" spacing={2}>
@@ -338,7 +336,7 @@ function NewSessionDialog(props) {
           </Grid>
           <Grid item>
             <Typography variant="overline">
-              {t("module.settings.sessionScale")}
+              {t("track.settings.sessionScale")}
             </Typography>
             <div className="break" />
 
@@ -367,15 +365,15 @@ function NewSessionDialog(props) {
           </Grid>
           <Grid item>
             <Typography variant="overline">
-              {/* t("module.settings.sessionScale") */}
-              {t("misc.initialModules")}
+              {/* t("track.settings.sessionScale") */}
+              {t("misc.initialTracks")}
             </Typography>
             <div className="break" />
             {isCopy ? (
-              <div className="session-gallery-item-modules-cont">
-                {session.modules.map((e) => (
+              <div className="session-gallery-item-track-cont">
+                {session.tracks.map((e) => (
                   <Paper
-                    className="session-gallery-item-module"
+                    className="session-gallery-item-track"
                     style={{
                       backgroundColor: colors[e.color][500],
                       borderRadius: 0,
@@ -385,7 +383,7 @@ function NewSessionDialog(props) {
                       title={
                         e.name
                           ? `"${e.name}"`
-                          : t(`modulePicker.types.${e.type}.name`)
+                          : t(`trackPicker.types.${e.type}.name`)
                       }
                     >
                       <Icon>
@@ -405,19 +403,19 @@ function NewSessionDialog(props) {
               </div>
             ) : (
               <ButtonGroup color="primary" style={{ margin: "auto" }}>
-                {moduletypes.map((e, i) => (
-                  <Tooltip title={t(`modulePicker.types.${i}.name`)}>
+                {tracktypes.map((e, i) => (
+                  <Tooltip title={t(`trackPicker.types.${i}.name`)}>
                     <Button
                       color="primary"
                       variant={
-                        session.modules.some((e) => e.type === i)
+                        session.tracks.some((e) => e.type === i)
                           ? "contained"
                           : "outlined"
                       }
                       onClick={() =>
-                        session.modules.some((e) => e.type === i)
-                          ? removeModule(i)
-                          : addModule(i)
+                        session.tracks.some((e) => e.type === i)
+                          ? removeTrack(i)
+                          : addTrack(i)
                       }
                       key={e.name}
                     >

@@ -1,4 +1,4 @@
-.module-picker {
+.track-picker {
   z-index: 2;
   background-color: white;
   padding: 8px;
@@ -9,7 +9,7 @@
   overflow: hidden;
 }
 
-.module-picker-select-cont {
+.track-picker-select-cont {
   width: 100%;
   display: flex;
   justify-content: space-around;

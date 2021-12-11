@@ -34,14 +34,14 @@ function ClosedTrack(props) {
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [deletableNote, setDeletableNote] = useState(false);
 
-  const trackType = props.module.type;
-  const isSelected = props.selectedModule === props.index;
+  const trackType = props.track.type;
+  const isSelected = props.selectedTrack === props.index;
 
-  const loadModuleRows = () => {
+  const loadTrackRows = () => {
     let rows = [];
     if (!props.instrument) return;
 
-    let array = [...new Set(props.module.score.map((item) => item.note))].sort(
+    let array = [...new Set(props.track.score.map((item) => item.note))].sort(
       (a, b) => a - b
     );
 
@@ -57,28 +57,28 @@ function ClosedTrack(props) {
   };
 
   const scheduleNotes = () => {
-    !props.module.muted
+    !props.track.muted
       ? trackType === 0
         ? scheduleSampler(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
         : trackType === 1
         ? scheduleMelody(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
         : scheduleAudioTrack(
-            props.module.score,
+            props.track.score,
             props.instrument,
             Tone.Transport,
-            props.module.id
+            props.track.id
           )
-      : clearEvents(props.module.id);
+      : clearEvents(props.track.id);
   };
 
   /* ================================================================================== */
@@ -88,12 +88,12 @@ function ClosedTrack(props) {
   /* ================================================================================== */
 
   useEffect(() => {
-    loadModuleRows();
-  }, [props.instrument, props.module, props.isLoaded, props.selectedModule]);
+    loadTrackRows();
+  }, [props.instrument, props.track, props.isLoaded, props.selectedTrack]);
 
   useEffect(() => {
     scheduleNotes();
-  }, [props.instrument, props.module, props.module.score, props.isLoaded]);
+  }, [props.instrument, props.track, props.track.score, props.isLoaded]);
 
   /* ================================================================================== */
   /* ================================================================================== */
@@ -105,7 +105,7 @@ function ClosedTrack(props) {
     <Paper
       className="closed-track"
       ref={rowRef}
-      onClick={() => props.setSelectedModule(props.index)}
+      onClick={() => props.setSelectedTrack(props.index)}
       disabled
       style={{
         /* width: `${
@@ -113,7 +113,7 @@ function ClosedTrack(props) {
           (props.zoomPosition[1] - props.zoomPosition[0] + 1)
         }%`, */
         border: trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
-        backgroundColor: colors[props.module.color][400],
+        backgroundColor: colors[props.track.color][400],
       }}
     >
       <div
@@ -126,23 +126,23 @@ function ClosedTrack(props) {
         }}
       >
         {rowRef.current &&
-          props.module.score.length > 0 &&
-          props.module.score.map((note, noteIndex) => (
+          props.track.score.length > 0 &&
+          props.track.score.map((note, noteIndex) => (
             <ClosedTrackNote
               rowRef={rowRef}
               trackRows={trackRows}
               note={note}
               drawingNote={drawingNote}
-              module={props.module}
+              track={props.track}
               sessionSize={props.sessionSize}
               gridSize={props.gridSize}
               gridPos={gridPos}
               deletableNote={deletableNote}
               setDrawingNote={setDrawingNote}
               index={noteIndex}
-              setModules={props.setModules}
+              setTracks={props.setTracks}
               isMouseDown={isMouseDown}
-              selectedModule={props.selectedModule}
+              selectedTrack={props.selectedTrack}
               zoomPosition={props.zoomPosition}
               selected={
                 props.selectedNotes && props.selectedNotes.includes(noteIndex)
@@ -151,10 +151,10 @@ function ClosedTrack(props) {
           ))}
       </div>
       <IconButton className={"closed-track-button"}>
-        <Icon style={{ color: colors[props.module.color][900] }}>
-          {props.module.type === 0
+        <Icon style={{ color: colors[props.track.color][900] }}>
+          {props.track.type === 0
             ? "grid_on"
-            : props.module.type === 1
+            : props.track.type === 1
             ? "piano"
             : "graphic_eq"}
         </Icon>

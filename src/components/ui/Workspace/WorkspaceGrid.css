@@ -33,7 +33,7 @@
   min-height: 24px;
 }
 
-.ws-grid-module {
+.ws-grid-track {
   height: 32px;
   flex-grow: 1;
   width: 100%;
@@ -43,7 +43,7 @@
   flex-wrap: nowrap;
 }
 
-.ws-grid-module-compact {
+.ws-grid-track-compact {
   height: 8px;
   flex-grow: 1;
   width: 100%;
@@ -52,12 +52,12 @@
   margin-bottom: 0px;
 }
 
-.ws-grid-module-tile {
+.ws-grid-track-tile {
   height: 100%;
   flex-grow: 0;
 }
 
-.ws-grid-module-tile-active {
+.ws-grid-track-tile-active {
 }
 
 .ws-grid-slider {

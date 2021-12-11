@@ -76,8 +76,8 @@ function PatchExplorer(props) {
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
   const [selectedPatch, setSelectedPatch] = useState(
-    props.module && typeof props.module.instrument === "string"
-      ? props.module.instrument
+    props.track && typeof props.track.instrument === "string"
+      ? props.track.instrument
       : null
   );
   const [selectedPatchInfo, setSelectedPatchInfo] = useState(null);
@@ -168,16 +168,16 @@ function PatchExplorer(props) {
         setTrackIntrument(instr);
       }
 
-      props.setModules((previous) =>
-        previous.map((module, i) => {
+      props.setTracks((previous) =>
+        previous.map((track, i) => {
           if (i === props.index) {
-            let newModule = { ...module };
-            newModule.instrument = patchIdList[index];
-            newModule.volume = patchdata[index].volume;
+            let newTrack = { ...track };
+            newTrack.instrument = patchIdList[index];
+            newTrack.volume = patchdata[index].volume;
 
-            return newModule;
+            return newTrack;
           } else {
-            return module;
+            return track;
           }
         })
       );

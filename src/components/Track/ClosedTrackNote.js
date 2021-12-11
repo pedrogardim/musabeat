@@ -7,7 +7,7 @@ function ClosedTrackNote(props) {
   const [isResizing, setIsResizing] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
 
-  const trackType = props.module.type;
+  const trackType = props.track.type;
 
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
@@ -26,7 +26,7 @@ function ClosedTrackNote(props) {
 
   return (
     <div
-      className={`module-score-note`}
+      className={`track-score-note`}
       style={{
         height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
         width: props.note.duration
@@ -63,7 +63,7 @@ function ClosedTrackNote(props) {
             left: -3,
             backgroundColor: props.selected
               ? "white"
-              : colors[props.module.color][900],
+              : colors[props.track.color][900],
             transform: "rotate(45deg)",
           }}
         />
@@ -78,7 +78,7 @@ function ClosedTrackNote(props) {
             left: 1,
             backgroundColor: props.selected
               ? "white"
-              : colors[props.module.color][900],
+              : colors[props.track.color][900],
           }}
         />
       )}

@@ -39,16 +39,16 @@ export const TRANSLATIONS_EN = {
     logOut: "Log Out",
   },
   workspace: {
-    empty: "No Modules!",
-    addBtn: "Add New Module",
+    empty: "No Tracks!",
+    addBtn: "Add New Track",
     sessionNotFound: "Session Not Found",
     actions: {
       copyPasteIncompatible:
-        "The content you are trying to paste belongs to a different type of module",
+        "The content you are trying to paste belongs to a different type of track",
       copyPasteEmptyClipboard: "Nothing to paste",
-      copySuccess: "Copied from module",
-      pasteSuccessMeasure: "Copied measure pasted on module",
-      pasteSuccessChord: "Copied chord pasted on module",
+      copySuccess: "Copied from track",
+      pasteSuccessMeasure: "Copied measure pasted on track",
+      pasteSuccessChord: "Copied chord pasted on track",
       stepsChange: "Steps on target were changed to",
     },
     options: {
@@ -63,7 +63,7 @@ export const TRANSLATIONS_EN = {
     unloggedEditor: "You are not logged in! Changes will not be saved",
     untitledSession: "Untitled Session",
   },
-  module: {
+  track: {
     options: {
       fullscreen: "Fullscreen",
       loadFile: "Load audio file",
@@ -71,7 +71,7 @@ export const TRANSLATIONS_EN = {
       settings: "Settings",
       effects: "Effects",
       duplicate: "Duplicate",
-      remove: "Remove Module",
+      remove: "Remove Track",
     },
     settings: {
       steps: "Steps",
@@ -123,9 +123,9 @@ export const TRANSLATIONS_EN = {
       emptySlot: "Empty Slot",
     },
   },
-  modulePicker: {
-    create: "Create a new module",
-    submit: "Add Module",
+  trackPicker: {
+    create: "Create a new track",
+    submit: "Add Track",
     types: {
       0: {
         name: "Sampler",
@@ -166,7 +166,7 @@ export const TRANSLATIONS_EN = {
     none: "None",
     offlineAlert:
       "MusaBeat requires a stable connection to the server. Check your internet connetion.",
-    initialModules: "Initial Modules",
+    initialTracks: "Initial Tracks",
     comingSoon: "(Coming Soon)",
     nothingFound: "Nothing Found",
     pageNotFound: "Page not found",

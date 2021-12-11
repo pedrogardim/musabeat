@@ -130,7 +130,7 @@
   flex: 1 1 1px;
 }
 
-.workspace-module-cont {
+.workspace-track-cont {
   position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
   background: white;
@@ -166,7 +166,7 @@
 
 /* lewjfenrigfneorjgoernijtgnritgnotngorngrk */
 
-.ws-module-selector {
+.ws-track-selector {
   height: 100%;
   width: 64px;
   margin: 0 8px;
@@ -175,7 +175,7 @@
   justify-content: center;
 }
 
-.ws-module-selector > button {
+.ws-track-selector > button {
   height: 64px;
 }
 

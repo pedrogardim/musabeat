@@ -137,7 +137,7 @@ function SessionExplorer(props) {
 
     //clear all files and patches stats first
 
-    sessions[index].modules.forEach(async (e, i) => {
+    sessions[index].tracks.forEach(async (e, i) => {
       let instrobj =
         typeof e.instrument === "string"
           ? (

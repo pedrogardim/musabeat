@@ -96,7 +96,7 @@ function Knob(props) {
 
   return (
     <Paper
-      className="module-knob"
+      className="track-knob"
       style={{
         height: props.size,
         width: props.size,

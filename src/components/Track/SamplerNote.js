@@ -10,7 +10,7 @@ function SamplerNote(props) {
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
   return (
     <div
-      className="module-score-note"
+      className="track-score-note"
       style={{
         height: props.rowRef.current.scrollHeight / props.trackRows.length,
         width: 0,
@@ -38,7 +38,7 @@ function SamplerNote(props) {
         opacity: props.ghost && 0.5,
         /* backgroundColor:
         props.cursorMod === "edit"
-          ? colors[props.module.color][300]
+          ? colors[props.track.color][300]
           : "transparent", */
       }}
     >
@@ -49,7 +49,7 @@ function SamplerNote(props) {
           top: "calc(50% - 8px)",
           width: 16,
           left: -8,
-          backgroundColor: colors[props.module.color][isSelected ? 800 : 300],
+          backgroundColor: colors[props.track.color][isSelected ? 800 : 300],
           filter: !props.exists && "saturate(0.2)",
           transform: "rotate(45deg)",
         }}
@@ -75,7 +75,7 @@ function SamplerNote(props) {
             stroke={
               props.cursorMode === "edit"
                 ? "rgba(0,0,0,0.5)"
-                : colors[props.module.color][300]
+                : colors[props.track.color][300]
             }
             strokeWidth={1}
             fill="none"

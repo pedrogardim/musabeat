@@ -49,7 +49,7 @@ import "./InstrumentEditor.css";
 function InstrumentEditor(props) {
   const { t } = useTranslation();
 
-  const trackType = props.module.type;
+  const trackType = props.track.type;
 
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(
@@ -63,8 +63,8 @@ function InstrumentEditor(props) {
   const [fileExplorer, setFileExplorer] = useState(false);
 
   const [selectedPatch, setSelectedPatch] = useState(
-    typeof props.module.instrument === "string"
-      ? props.module.instrument
+    typeof props.track.instrument === "string"
+      ? props.track.instrument
       : "Custom"
   );
 
@@ -78,7 +78,7 @@ function InstrumentEditor(props) {
 
   const patchSizeLimit = 5242880;
 
-  const checkCustomPatch = typeof module.instrument !== "string";
+  const checkCustomPatch = typeof props.track.instrument !== "string";
 
   const isDrum = trackType === 0 && props.instrumentInfo.patch.dr;
 
@@ -101,13 +101,13 @@ function InstrumentEditor(props) {
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
     let patch =
-      typeof props.module.instrument === "string"
+      typeof props.track.instrument === "string"
         ? await firebase
             .firestore()
             .collection("patches")
-            .doc(props.module.instrument)
+            .doc(props.track.instrument)
             .get()
-        : props.module.instrument;
+        : props.track.instrument;
 
     let newInstrument =
       newType === "Sampler"
@@ -130,15 +130,15 @@ function InstrumentEditor(props) {
 
     setIntrument(newInstrument);
 
-    props.setModules &&
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        newModules[props.index].instrument = newInstrument.get();
+    props.setTracks &&
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
+        newTracks[props.index].instrument = newInstrument.get();
         if (newType === "Sampler") {
-          delete newModules[props.index].instrument.onerror;
-          delete newModules[props.index].instrument.onload;
+          delete newTracks[props.index].instrument.onerror;
+          delete newTracks[props.index].instrument.onload;
         }
-        return newModules;
+        return newTracks;
       });
 
     props.setPatchInfo &&
@@ -173,7 +173,7 @@ function InstrumentEditor(props) {
   const handlePlayersFileDelete = (fileId, fileName, soundindex) => {
     //temp solution, Tone.Players doesn't allow .remove()
 
-    //let filteredScore = props.module.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
+    //let filteredScore = props.track.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
 
     let newInstrument = new Tone.Players().toDestination();
 
@@ -223,19 +223,19 @@ function InstrumentEditor(props) {
     //props.setLabels(index, newName);
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
-    if (typeof props.module.instrument === "string") {
+    if (typeof props.track.instrument === "string") {
       firebase
         .firestore()
         .collection("drumpatches")
-        .doc(props.module.instrument)
+        .doc(props.track.instrument)
         .get()
         .then((patch) => {
-          props.setModules && !props.patchPage
-            ? props.setModules((prev) => {
-                let newModules = [...prev];
-                newModules[props.index].instrument = patch.data();
+          props.setTracks && !props.patchPage
+            ? props.setTracks((prev) => {
+                let newTracks = [...prev];
+                newTracks[props.index].instrument = patch.data();
 
-                return newModules;
+                return newTracks;
               })
             : props.setPatchInfo(patch.data());
         });
@@ -263,11 +263,11 @@ function InstrumentEditor(props) {
 
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
-    if (typeof props.module.instrument === "string") {
+    if (typeof props.track.instrument === "string") {
       firebase
         .firestore()
         .collection("patches")
-        .doc(props.module.instrument)
+        .doc(props.track.instrument)
         .get()
         .then((urls) => {
           /*    setFilesName((prev) => {
@@ -299,11 +299,11 @@ function InstrumentEditor(props) {
           });
 
           !props.patchPage
-            ? props.setModules((prev) => {
-                let newModules = [...prev];
-                newModules[props.index].instrument = { urls: urlsObj };
+            ? props.setTracks((prev) => {
+                let newTracks = [...prev];
+                newTracks[props.index].instrument = { urls: urlsObj };
 
-                return newModules;
+                return newTracks;
               })
             : props.setPatchInfo((prev) => {
                 let newPatch = { ...prev };
@@ -319,7 +319,7 @@ function InstrumentEditor(props) {
         return newFileNames;
       }); */
 
-      let urlsObj = { ...props.module.instrument.urls };
+      let urlsObj = { ...props.track.instrument.urls };
       urlsObj[newNote] = urlsObj[note];
       delete urlsObj[note];
 
@@ -338,11 +338,11 @@ function InstrumentEditor(props) {
       });
 
       !props.patchPage
-        ? props.setModules((prev) => {
-            let newModules = [...prev];
-            newModules[props.index].instrument = { urls: urlsObj };
+        ? props.setTracks((prev) => {
+            let newTracks = [...prev];
+            newTracks[props.index].instrument = { urls: urlsObj };
 
-            return newModules;
+            return newTracks;
           })
         : props.setPatchInfo((prev) => {
             let newPatch = { ...prev };
@@ -360,7 +360,7 @@ function InstrumentEditor(props) {
     let clearInfo = {
       creator: user.uid,
       categ: !!category || isNaN(category) ? category : 0,
-      volume: props.module.volume,
+      volume: props.track.volume,
       createdOn: firebase.firestore.FieldValue.serverTimestamp(),
       in: 1,
       likes: 0,
@@ -371,7 +371,7 @@ function InstrumentEditor(props) {
         ? {
             base: "Sampler",
             name: !!name ? name : "Untitled Patch",
-            urls: props.module.instrument.urls,
+            urls: props.track.instrument.urls,
           }
         : {
             base: props.instrument._dummyVoice.name.replace("Synth", ""),
@@ -380,8 +380,8 @@ function InstrumentEditor(props) {
           }
       : {
           name: !!name ? name : "Untitled Drum Patch",
-          urls: props.module.instrument.urls,
-          lbls: props.module.lbls,
+          urls: props.track.instrument.urls,
+          lbls: props.track.lbls,
         };
 
     let patch = Object.assign({}, clearInfo, patchInfo);
@@ -395,14 +395,14 @@ function InstrumentEditor(props) {
     const userRef = firebase.firestore().collection("users").doc(user.uid);
 
     newPatchRef.add(patch).then((r) => {
-      props.setModules((previous) =>
-        previous.map((module, i) => {
+      props.setTracks((previous) =>
+        previous.map((track, i) => {
           if (i === props.index) {
-            let newModule = { ...module };
-            newModule.instrument = r.id;
-            return newModule;
+            let newTrack = { ...track };
+            newTrack.instrument = r.id;
+            return newTrack;
           } else {
-            return module;
+            return track;
           }
         })
       );
@@ -419,25 +419,25 @@ function InstrumentEditor(props) {
   };
 
   const onInstrumentMod = async (fileId, name, soundindex, isRemoving) => {
-    //update instrument info in module object
+    //update instrument info in track object
 
-    if (props.module.type === 0 || props.instrument.name === "Sampler") {
+    if (props.track.type === 0 || props.instrument.name === "Sampler") {
       let patch =
-        typeof props.module.instrument === "string"
+        typeof props.track.instrument === "string"
           ? (
               await firebase
                 .firestore()
-                .collection(props.module.type === 0 ? "drumpatches" : "patches")
-                .doc(props.module.instrument)
+                .collection(props.track.type === 0 ? "drumpatches" : "patches")
+                .doc(props.track.instrument)
                 .get()
             ).data()
-          : { ...props.module.instrument };
+          : { ...props.track.instrument };
 
-      typeof props.module.instrument === "string" &&
+      typeof props.track.instrument === "string" &&
         firebase
           .firestore()
-          .collection(props.module.type === 0 ? "drumpatches" : "patches")
-          .doc(props.module.instrument)
+          .collection(props.track.type === 0 ? "drumpatches" : "patches")
+          .doc(props.track.instrument)
           .update({ in: firebase.firestore.FieldValue.increment(-1) });
 
       firebase
@@ -449,12 +449,12 @@ function InstrumentEditor(props) {
           ld: firebase.firestore.FieldValue.increment(isRemoving ? 0 : 1),
         });
 
-      //console.log(props.module.instrument, patch, soundindex, name);
+      //console.log(props.track.instrument, patch, soundindex, name);
 
       !isRemoving
-        ? (patch.urls[props.module.type === 0 ? soundindex : name] = fileId)
-        : delete patch.urls[props.module.type === 0 ? soundindex : name];
-      if (props.module.type === 0) {
+        ? (patch.urls[props.track.type === 0 ? soundindex : name] = fileId)
+        : delete patch.urls[props.track.type === 0 ? soundindex : name];
+      if (props.track.type === 0) {
         //console.log(patch.lbls, soundindex);
 
         !isRemoving
@@ -462,19 +462,19 @@ function InstrumentEditor(props) {
           : delete patch.lbls[soundindex];
       }
 
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        newModules[props.index].instrument = { ...patch };
-        if (props.module.type === 0) {
-          newModules[props.index].lbls = { ...patch.lbls };
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
+        newTracks[props.index].instrument = { ...patch };
+        if (props.track.type === 0) {
+          newTracks[props.index].lbls = { ...patch.lbls };
         }
-        return newModules;
+        return newTracks;
       });
     } else {
-      props.setModules((prev) => {
-        let newModules = [...prev];
-        newModules[props.index].instrument = props.instrument.get();
-        return newModules;
+      props.setTracks((prev) => {
+        let newTracks = [...prev];
+        newTracks[props.index].instrument = props.instrument.get();
+        return newTracks;
       });
     }
     props.resetUndoHistory();
@@ -485,21 +485,21 @@ function InstrumentEditor(props) {
     /*
 
     let instrobj =
-      typeof props.module.instrument === "string"
+      typeof props.track.instrument === "string"
         ? (
             await firebase
               .firestore()
-              .collection(props.module.type === 0 ? "drumpatches" : "patches")
-              .doc(props.module.instrument)
+              .collection(props.track.type === 0 ? "drumpatches" : "patches")
+              .doc(props.track.instrument)
               .get()
           ).data()
-        : props.module.instrument;
+        : props.track.instrument;
 
-    typeof props.module.instrument === "string" &&
+    typeof props.track.instrument === "string" &&
       firebase
         .firestore()
-        .collection(props.module.type === 0 ? "drumpatches" : "patches")
-        .doc(props.module.instrument)
+        .collection(props.track.type === 0 ? "drumpatches" : "patches")
+        .doc(props.track.instrument)
         .update({ in: firebase.firestore.FieldValue.increment(-1) });
 
     if (instrobj.urls)
@@ -535,7 +535,7 @@ function InstrumentEditor(props) {
       props.instrument.name === "Sampler" &&
       console.log(
         props.instrument._buffers._buffers,
-        props.module.instrument.urls,
+        props.track.instrument.urls,
         filesName
       );
   }, [props.instrument]);
@@ -553,7 +553,7 @@ function InstrumentEditor(props) {
   let mainContent = "Nothing Here";
 
   if (props.instrument) {
-    if (props.module.type === 0) {
+    if (props.track.type === 0) {
       //console.log(props.instrument);
 
       //bufferObjects.sort((a, b) => a[1] - b[1]);
@@ -683,7 +683,7 @@ function InstrumentEditor(props) {
           onFileClick={props.handleFileClick}
           setFileExplorer={setFileExplorer}
           setSnackbarMessage={props.setSnackbarMessage}
-          module={props.module}
+          track={props.track}
           instrument={props.instrument}
           trackType={trackType}
           patchSize={patchSize}
@@ -694,12 +694,12 @@ function InstrumentEditor(props) {
       {mainContent}
       <div className="ie-bottom-menu">
         <Select
-          value={checkCustomPatch ? "Custom" : props.module.instrument}
+          value={checkCustomPatch ? "Custom" : props.track.instrument}
           onMouseDown={() => setPatchExplorer(true)}
           inputProps={{ readOnly: true }}
         >
           <MenuItem
-            value={checkCustomPatch ? "Custom" : props.module.instrument}
+            value={checkCustomPatch ? "Custom" : props.track.instrument}
           >
             {checkCustomPatch
               ? "Custom"
@@ -743,7 +743,7 @@ function InstrumentEditor(props) {
         </FileDrop>
       )}
 
-      {/* (props.module.type === 0 || props.instrument.name === "Sampler") && (
+      {/* (props.track.type === 0 || props.instrument.name === "Sampler") && (
         <>
           <Fab
             style={{ position: "absolute", right: 16, bottom: 16 }}
@@ -779,7 +779,7 @@ function InstrumentEditor(props) {
         files={uploadingFiles}
         setUploadingFiles={setUploadingFiles}
         onInstrumentMod={onInstrumentMod}
-        module={props.module}
+        track={props.track}
         instrument={props.instrument}
         setInstrumentLoaded={setIntrumentLoaded}
         setFilesName={setFilesName}
@@ -797,8 +797,8 @@ function InstrumentEditor(props) {
           compact
           patchExplorer={patchExplorer}
           index={props.index}
-          module={props.module}
-          setModules={props.setModules}
+          track={props.track}
+          setTracks={props.setTracks}
           setIEOpen={props.setIEOpen}
           setPatchExplorer={setPatchExplorer}
           instrument={props.instrument}
@@ -812,10 +812,10 @@ function InstrumentEditor(props) {
       )}
 
       {renamingLabel &&
-        (props.module.type === 0 ? (
+        (props.track.type === 0 ? (
           <NameInput
             select
-            defaultValue={props.module.lbls[renamingLabel]}
+            defaultValue={props.track.lbls[renamingLabel]}
             open={true}
             onClose={() => setRenamingLabel(null)}
             onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}

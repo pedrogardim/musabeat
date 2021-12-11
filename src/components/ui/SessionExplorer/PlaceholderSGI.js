@@ -21,7 +21,7 @@ function PlaceholderSGI(props) {
           </div>
         )}
 
-        <div className="session-gallery-item-modules-cont">
+        <div className="session-gallery-item-track-cont">
           <Skeleton height="100%" width="100%" variant="rect" />
         </div>
         <div className="session-gallery-item-footer">

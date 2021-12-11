@@ -98,8 +98,8 @@ function FileUploader(props) {
     };
 
     if (!props.workspace) {
-      if (props.module.type === 0) fileInfo.categ.push(0);
-      //if (props.module.type === 3) fileInfo.categ.push(1);
+      if (props.track.type === 0) fileInfo.categ.push(0);
+      //if (props.track.type === 3) fileInfo.categ.push(1);
       if (props.instrument.name === "Sampler") fileInfo.categ.push(1);
     }
 
@@ -183,7 +183,7 @@ function FileUploader(props) {
                 () => {
                   /////IF UPLOAD SUCCEDS
 
-                  //update instrument on "modules"
+                  //update instrument on "tracks"
                   /* props.onInstrumentMod &&
                       props.onInstrumentMod(
                         ref.id,
@@ -192,17 +192,17 @@ function FileUploader(props) {
                       ); */
 
                   /* props.workspace &&
-                    props.setModules((prev) => {
-                      let newModules = [...prev];
-                      newModules[props.files[i].track].instrument.urls[
+                    props.setTracks((prev) => {
+                      let newTracks = [...prev];
+                      newTracks[props.files[i].track].instrument.urls[
                         props.files[i].index
                       ] = ref.id;
-                      return newModules;
+                      return newTracks;
                     }); */
 
                   props.updateOnFileLoaded && props.updateOnFileLoaded();
 
-                  //props.module.type !== 3 && props.getFilesName();
+                  //props.track.type !== 3 && props.getFilesName();
 
                   //add file id to user in db
 
@@ -252,7 +252,7 @@ function FileUploader(props) {
           /*   props.onInstrumentMod &&
               props.onInstrumentMod(fileid, labelOnInstrument); */
 
-          //props.module.type !== 3 && props.getFilesName();
+          //props.track.type !== 3 && props.getFilesName();
 
           setUploadState((prev) => {
             let newState = [...prev];
@@ -302,7 +302,7 @@ function FileUploader(props) {
             if (!props.workspace) {
               if (
                 audiobuffer.duration > 10 &&
-                (props.instrument.name === "Sampler" || props.module.type === 0)
+                (props.instrument.name === "Sampler" || props.track.type === 0)
               ) {
                 /* alert(
                 `Error on file: "${file.name}" - Try importing a smaller audio file`
@@ -342,7 +342,7 @@ function FileUploader(props) {
               let slotToInsetFile = 0;
 
               while (
-                props.module.type === 0 &&
+                props.track.type === 0 &&
                 props.instrument._buffers._buffers.has(
                   JSON.stringify(slotToInsetFile)
                 )
@@ -352,7 +352,7 @@ function FileUploader(props) {
 
               console.log(slotToInsetFile);
 
-              if (props.module.type === 0) {
+              if (props.track.type === 0) {
                 props.instrument.add(
                   slotToInsetFile,
                   audiobuffer,
@@ -407,14 +407,14 @@ function FileUploader(props) {
 
   const onAllUploaded = () => {
     console.log("ALL UPLOADED");
-    props.setModules((prev) => {
-      let newModules = [...prev];
+    props.setTracks((prev) => {
+      let newTracks = [...prev];
       props.files.forEach((file, index) => {
-        newModules[file.track].instrument.urls[file.index] =
+        newTracks[file.track].instrument.urls[file.index] =
           uploadingFileIds[index];
       });
 
-      return newModules;
+      return newTracks;
     });
     props.onFinished && props.onFinished();
   };
@@ -591,7 +591,7 @@ function FileUploader(props) {
           onClose={() => setTagSelectionTarget(null)}
         >
           {tagSelectionTarget &&
-            (props.module.type === 0 ? (
+            (props.track.type === 0 ? (
               tagSelectionTarget[2] === 1 ? (
                 fileTagDrumComponents.map((e, i) => (
                   <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>

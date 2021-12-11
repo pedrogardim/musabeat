@@ -250,11 +250,11 @@ function WorkspaceRuler(props) {
           />
         ))}
 
-      {props.modules &&
-        props.modules.map((module, moduleIndex) => (
+      {props.tracks &&
+        props.tracks.map((track, trackIndex) => (
           <div
             className="ws-ruler-track"
-            style={{ backgroundColor: colors[module.color][300] }}
+            style={{ backgroundColor: colors[track.color][300] }}
           />
         ))}
     </div>

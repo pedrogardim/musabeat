@@ -1,7 +1,7 @@
 export const starterSession = {
   name: "",
   bpm: 120,
-  modules: [
+  tracks: [
     {
       id: 0,
       name: "Sequencer",

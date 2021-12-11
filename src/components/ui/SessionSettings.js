@@ -235,7 +235,7 @@ function SessionSettings(props) {
               </Grid>
               <Grid item>
                 <Typography variant="overline">
-                  {t("module.settings.sessionScale")}
+                  {t("track.settings.sessionScale")}
                 </Typography>
                 <div className="break" />
 

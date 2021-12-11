@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 function ChannelStrip(props) {
   const { t } = useTranslation();
 
-  const [volume, setVolume] = useState(props.module.volume.toFixed(2));
+  const [volume, setVolume] = useState(props.track.volume.toFixed(2));
 
   const handleSliderMove = (e, v) => {
     setVolume(v);
@@ -26,7 +26,7 @@ function ChannelStrip(props) {
     <div
       className="mixer-channel-strip"
       style={
-        (props.style, { filter: props.module.muted ? "saturate(0)" : "none" })
+        (props.style, { filter: props.track.muted ? "saturate(0)" : "none" })
       }
     >
       <Slider
@@ -41,16 +41,16 @@ function ChannelStrip(props) {
         className="channel-strip-fader"
       />{" "}
       <IconButton onClick={props.handleMute}>
-        <Icon>{props.module.muted ? "volume_off" : "volume_up"}</Icon>
+        <Icon>{props.track.muted ? "volume_off" : "volume_up"}</Icon>
       </IconButton>
       <Typography variant="overline" style={{ textTransform: "none" }}>
         {" "}
-        {props.module.muted ? "MUTED" : volume + " dB"}
+        {props.track.muted ? "MUTED" : volume + " dB"}
       </Typography>
       <Typography variant="overline" className="mixer-channel-strip-title">
-        {props.module.name
-          ? props.module.name
-          : t(`modulePicker.types.${props.module.type}.name`)}
+        {props.track.name
+          ? props.track.name
+          : t(`trackPicker.types.${props.track.type}.name`)}
       </Typography>
     </div>
   );

@@ -20,7 +20,7 @@ import {
 
 import { createChordProgression } from "../../assets/musicutils";
 
-const moduletypes = [
+const tracktypes = [
   {
     name: "Sampler",
     icon: "grid_on",
@@ -58,12 +58,12 @@ function TrackPicker(props) {
   const selectedScale = 1;
   const selectedRange = [3, 6];
 
-  const addModule = (moduletype) => {
-    let newModule = {
+  const addTrack = (tracktype) => {
+    let newTrack = {
       id:
-        !props.modules || !props.modules.length
+        !props.tracks || !props.tracks.length
           ? 0
-          : Math.max(...props.modules.map((e) => e.id)) + 1,
+          : Math.max(...props.tracks.map((e) => e.id)) + 1,
       name: "",
       type: selectedType,
       score: [],
@@ -79,20 +79,20 @@ function TrackPicker(props) {
       fx: [],
     };
 
-    if (typeof newModule.instrument === "string") {
+    if (typeof newTrack.instrument === "string") {
       firebase
         .firestore()
-        .collection(newModule.type === 0 ? "drumpatches" : "patches")
-        .doc(newModule.instrument)
+        .collection(newTrack.type === 0 ? "drumpatches" : "patches")
+        .doc(newTrack.instrument)
         .update({
           ld: firebase.firestore.FieldValue.increment(1),
           in: firebase.firestore.FieldValue.increment(1),
         });
-      if (newModule.type === 0) {
+      if (newTrack.type === 0) {
         firebase
           .firestore()
-          .collection(newModule.type === 0 ? "drumpatches" : "patches")
-          .doc(newModule.instrument)
+          .collection(newTrack.type === 0 ? "drumpatches" : "patches")
+          .doc(newTrack.instrument)
           .get()
           .then((r) =>
             Object.values(r.data().urls).map((e) =>
@@ -109,16 +109,15 @@ function TrackPicker(props) {
       }
     }
 
-    let newModules;
+    let newTracks;
 
-    props.setModules((prevModules) => {
-      newModules =
-        prevModules === null ? [newModule] : [...prevModules, newModule];
-      return newModules;
+    props.setTracks((prevTracks) => {
+      newTracks = prevTracks === null ? [newTrack] : [...prevTracks, newTrack];
+      return newTracks;
     });
 
     props.setTrackPicker(false);
-    props.loadNewModuleInstrument(newModule, newModules.length - 1);
+    props.loadNewTrackInstrument(newTrack, newTracks.length - 1);
   };
 
   const handleSizeSelect = (event) => {
@@ -133,9 +132,9 @@ function TrackPicker(props) {
     <Dialog
       open={props.open}
       onClose={props.onClose}
-      PaperProps={{ className: "module-picker" }}
+      PaperProps={{ className: "track-picker" }}
     >
-      <Typography variant="overline"> {t(`modulePicker.create`)}</Typography>
+      <Typography variant="overline"> {t(`trackPicker.create`)}</Typography>
       <BottomNavigation
         value={selectedType}
         onChange={(event, newValue) => {
@@ -143,9 +142,9 @@ function TrackPicker(props) {
         }}
         showLabels
       >
-        {moduletypes.map((e, i) => (
+        {tracktypes.map((e, i) => (
           <BottomNavigationAction
-            label={t(`modulePicker.types.${i}.name`)}
+            label={t(`trackPicker.types.${i}.name`)}
             key={e.name}
             icon={<Icon>{e.icon}</Icon>}
           />
@@ -153,10 +152,10 @@ function TrackPicker(props) {
       </BottomNavigation>
 
       <Typography variant="overline">
-        {t(`modulePicker.types.${selectedType}.description`)}
+        {t(`trackPicker.types.${selectedType}.description`)}
       </Typography>
 
-      <Button onClick={addModule}>{t("modulePicker.submit")}</Button>
+      <Button onClick={addTrack}>{t("trackPicker.submit")}</Button>
 
       <IconButton
         onClick={() => props.setTrackPicker(false)}

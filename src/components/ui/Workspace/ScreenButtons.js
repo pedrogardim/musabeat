@@ -29,7 +29,7 @@ function ScreenButtons(props) {
         setOpen(false);
       },
       icon: "piano",
-      disabled: typeof props.selectedModule !== "number",
+      disabled: typeof props.selectedTrack !== "number",
     },
     {
       fn: () => props.setCursorMode((prev) => (!prev ? "edit" : null)),

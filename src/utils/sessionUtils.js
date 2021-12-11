@@ -14,7 +14,7 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     root: 0,
     scale: 0,
     timeline: { 0: [0], size: 1, on: false },
-    modules: [
+    tracks: [
       {
         id: 0,
         name: "",

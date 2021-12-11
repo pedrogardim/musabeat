@@ -55,14 +55,14 @@ export const removeChord = (setChords, index) => {
   setChords((prev) => {
     let chordIndex = index;
     let removedChordDuration = prev[chordIndex].duration;
-    let moduleLength = Math.ceil(
+    let trackLength = Math.ceil(
       prev[prev.length - 1].duration + prev[prev.length - 1].time
     );
     let newChords = [...prev];
 
-    console.log(moduleLength);
+    console.log(trackLength);
 
-    if (newChords[chordIndex].duration === 1 && moduleLength > 1) {
+    if (newChords[chordIndex].duration === 1 && trackLength > 1) {
       newChords[chordIndex].notes = 0;
 
       let ncCheckAll = newChords

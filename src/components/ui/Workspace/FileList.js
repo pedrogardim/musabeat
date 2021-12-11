@@ -53,7 +53,7 @@ function FileList(props) {
           className="up"
           style={{
             fontSize: 12,
-            color: colors[props.modules[e.index].color][900],
+            color: colors[props.tracks[e.index].color][900],
           }}
         >{`${e.name} ${e.dur.toFixed(2)}s ${formatBytes(e.size)}`}</MenuItem>
       ))}
