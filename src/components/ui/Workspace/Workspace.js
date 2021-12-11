@@ -818,10 +818,43 @@ function Workspace(props) {
   };
 
   const handleCopy = () => {
-    //console.log("copied", copiedData);
+    setClipboard({ cont: [...selectedNotes], sel: [...selection] });
   };
 
-  const handlePaste = () => {};
+  const handlePaste = () => {
+    console.log(clipboard);
+    if (clipboard)
+      setModules((prev) =>
+        prev.map((module, moduleIndex) => ({
+          ...module,
+          score:
+            selectedModule === moduleIndex || selectedModule === null
+              ? [
+                  ...module.score,
+                  ...clipboard.cont[moduleIndex]
+                    .map((index) => ({ ...module.score[index] }))
+                    .map((note, i) => ({
+                      fn: console.log(note, i),
+
+                      ...note,
+                      time: Tone.Time(
+                        Tone.Time(note.time).toSeconds() +
+                          Tone.Transport.seconds -
+                          (clipboard.sel[0] / gridSize) *
+                            Tone.Time("1m").toSeconds()
+                      ).toBarsBeatsSixteenths(),
+                    })),
+                ]
+              : module.score,
+        }))
+      );
+    setSelection((prev) =>
+      prev.map(
+        (e) =>
+          e + (Tone.Transport.seconds / Tone.Time("1m").toSeconds()) * gridSize
+      )
+    );
+  };
 
   const handleKeyDown = (e) => {
     Tone.start();
@@ -1085,8 +1118,8 @@ function Workspace(props) {
   }, [zoomPosition]);
 
   useEffect(() => {
-    setMenuOpen(false);
-  }, [IEOpen]);
+    //console.log(selectedNotes);
+  }, [selectedNotes]);
 
   /*================================================================ */
   /*================================================================ */
