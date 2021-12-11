@@ -81,197 +81,188 @@ function FileUploader(props) {
       });
   };
 
-  const uploadFile = (
-    file,
-    audiobuffer,
-    i,
-    labelOnInstrument,
-    slotToInsetFile
-  ) => {
-    {
-      let fileInfo = {
-        name: file.name ? file.name.split(".")[0] : "AudioFile",
-        size: file.size,
-        dur: parseFloat(audiobuffer.duration.toFixed(3)),
-        ld: 1,
-        in: 0,
-        likes: 0,
-        dl: 0,
-        user: user.uid,
-        categ: [],
-        type: fileTypes.indexOf(file.type),
-        upOn: firebase.firestore.FieldValue.serverTimestamp(),
-      };
+  const uploadFile = (file, audiobuffer, i, slotToInsetFile) => {
+    console.log(file);
+    let fileInfo = {
+      name: file.name ? file.name.split(".")[0] : "AudioFile",
+      size: file.size,
+      dur: parseFloat(audiobuffer.duration.toFixed(3)),
+      ld: 1,
+      in: 0,
+      likes: 0,
+      dl: 0,
+      user: user.uid,
+      categ: [],
+      type: fileTypes.indexOf(file.type),
+      upOn: firebase.firestore.FieldValue.serverTimestamp(),
+    };
 
+    if (!props.workspace) {
       if (props.module.type === 0) fileInfo.categ.push(0);
       //if (props.module.type === 3) fileInfo.categ.push(1);
       if (props.instrument.name === "Sampler") fileInfo.categ.push(1);
+    }
 
-      setUploadingFileTags((prev) => {
-        let newTags = [...prev];
-        newTags[i] = [...fileInfo.categ];
-        return newTags;
-      });
+    setUploadingFileTags((prev) => {
+      let newTags = [...prev];
+      newTags[i] = [...fileInfo.categ];
+      return newTags;
+    });
 
-      //Prevent duplicated files: check for existing file
+    //Prevent duplicated files: check for existing file
 
-      const filesRef = firebase.firestore().collection("files");
+    const filesRef = firebase.firestore().collection("files");
 
-      filesRef
-        .where("dur", "==", fileInfo.dur)
-        .where("name", "==", fileInfo.name)
-        .where("user", "==", user.uid)
-        .where("size", "==", file.size)
-        .get()
-        .then((result) => {
-          //no matches to uploaded file, then upload it
-          if (result.empty) {
-            filesRef.add(fileInfo).then((ref) => {
-              //upload file to storage
-              const storageRef = firebase.storage().ref(ref.id);
+    filesRef
+      .where("dur", "==", fileInfo.dur)
+      .where("name", "==", fileInfo.name)
+      .where("user", "==", user.uid)
+      .where("size", "==", file.size)
+      .get()
+      .then((result) => {
+        //no matches to uploaded file, then upload it
+        if (result.empty) {
+          filesRef.add(fileInfo).then((ref) => {
+            //upload file to storage
+            const storageRef = firebase.storage().ref(ref.id);
 
-              userRef.get().then((r) => {
-                let checkPr = r.data().pr.seconds > ~~(+new Date() / 1000);
+            userRef.get().then((r) => {
+              let checkPr = r.data().pr.seconds > ~~(+new Date() / 1000);
 
-                setUserStorageMax(checkPr ? 10737418240 : 536870912);
-                setUserStorageUsage(r.data().sp);
+              setUserStorageMax(checkPr ? 10737418240 : 536870912);
+              setUserStorageUsage(r.data().sp);
 
-                let finalFile =
-                  file.type !== "audio/mpeg" && !checkPr
-                    ? encodeAudioFile(audiobuffer, "mp3")
-                    : file;
+              let finalFile =
+                file.type !== "audio/mpeg" && !checkPr
+                  ? encodeAudioFile(audiobuffer, "mp3")
+                  : file;
 
-                if (
-                  r.data().sp + finalFile.size >
-                  (checkPr ? 10737418240 : 536870912)
-                ) {
+              if (
+                r.data().sp + finalFile.size >
+                (checkPr ? 10737418240 : 536870912)
+              ) {
+                setUploadState((prev) => {
+                  let newState = [...prev];
+                  newState[i] = "noSpace";
+                  return newState;
+                });
+
+                return;
+              }
+
+              const task = storageRef.put(finalFile);
+
+              setUploadingFileIds((prev) => {
+                let newFileIds = [...prev];
+                newFileIds[i] = ref.id;
+                return newFileIds;
+              });
+
+              task.on(
+                "state_changed",
+                (snapshot) => {
                   setUploadState((prev) => {
                     let newState = [...prev];
-                    newState[i] = "noSpace";
+                    newState[i] =
+                      (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    return newState;
+                  });
+                },
+                (error) => {
+                  console.log(error);
+                  filesRef.doc(ref.id).remove();
+
+                  setUploadState((prev) => {
+                    let newState = [...prev];
+                    newState[i] = "uploadError";
                     return newState;
                   });
 
                   return;
-                }
+                },
+                () => {
+                  /////IF UPLOAD SUCCEDS
 
-                const task = storageRef.put(finalFile);
-
-                setUploadingFileIds((prev) => {
-                  let newFileIds = [...prev];
-                  newFileIds[i] = ref.id;
-                  return newFileIds;
-                });
-
-                task.on(
-                  "state_changed",
-                  (snapshot) => {
-                    setUploadState((prev) => {
-                      let newState = [...prev];
-                      newState[i] =
-                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                      return newState;
-                    });
-                  },
-                  (error) => {
-                    console.log(error);
-                    filesRef.doc(ref.id).remove();
-
-                    setUploadState((prev) => {
-                      let newState = [...prev];
-                      newState[i] = "uploadError";
-                      return newState;
-                    });
-
-                    return;
-                  },
-                  () => {
-                    /////IF UPLOAD SUCCEDS
-
-                    //update instrument on "modules"
-
-                    if (props.module.type === 2) {
-                      props.setInstrumentsInfo((prev) => {
-                        let newInfo = [...prev];
-                        newInfo[props.index].info.urls.push(ref.id);
-                        newInfo[props.index].filesInfo[props.drawingNote.clip] =
-                          fileInfo;
-                        return newInfo;
-                      });
-                    }
-
-                    props.onInstrumentMod &&
+                  //update instrument on "modules"
+                  /* props.onInstrumentMod &&
                       props.onInstrumentMod(
                         ref.id,
                         labelOnInstrument,
                         slotToInsetFile
-                      );
+                      ); */
 
-                    props.updateOnFileLoaded && props.updateOnFileLoaded();
+                  /* props.workspace &&
+                    props.setModules((prev) => {
+                      let newModules = [...prev];
+                      newModules[props.files[i].track].instrument.urls[
+                        props.files[i].index
+                      ] = ref.id;
+                      return newModules;
+                    }); */
 
-                    //props.module.type !== 3 && props.getFilesName();
+                  props.updateOnFileLoaded && props.updateOnFileLoaded();
 
-                    //add file id to user in db
+                  //props.module.type !== 3 && props.getFilesName();
 
-                    const userRef = firebase
-                      .firestore()
-                      .collection("users")
-                      .doc(user.uid);
+                  //add file id to user in db
 
-                    userRef.update({
-                      files: firebase.firestore.FieldValue.arrayUnion(ref.id),
-                      sp: firebase.firestore.FieldValue.increment(
-                        finalFile.size
-                      ),
-                    });
+                  const userRef = firebase
+                    .firestore()
+                    .collection("users")
+                    .doc(user.uid);
 
-                    setUserStorageUsage(r.data().sp + finalFile.size);
-                  }
-                );
-              });
+                  userRef.update({
+                    files: firebase.firestore.FieldValue.arrayUnion(ref.id),
+                    sp: firebase.firestore.FieldValue.increment(finalFile.size),
+                  });
+
+                  setUserStorageUsage(r.data().sp + finalFile.size);
+                }
+              );
             });
-          }
-          //the file is already uploaded to server, get its id
-          else {
-            let fileid = result.docs[0].id;
+          });
+        }
+        //the file is already uploaded to server, get its id
+        else {
+          let fileid = result.docs[0].id;
 
-            const originalFileRef = firebase
-              .firestore()
-              .collection("files")
-              .doc(fileid);
+          const originalFileRef = firebase
+            .firestore()
+            .collection("files")
+            .doc(fileid);
 
-            setUploadingFileIds((prev) => {
-              let newFileIds = [...prev];
-              newFileIds[i] = fileid;
-              return newFileIds;
+          setUploadingFileIds((prev) => {
+            let newFileIds = [...prev];
+            newFileIds[i] = fileid;
+            return newFileIds;
+          });
+
+          originalFileRef.update({
+            ld: firebase.firestore.FieldValue.increment(1),
+          });
+
+          originalFileRef.get().then((result) => {
+            setDuplicatedFilesInfo((prev) => {
+              let newDPInfo = [...prev];
+              newDPInfo[i] = result.data();
+              return newDPInfo;
             });
+          });
 
-            originalFileRef.update({
-              ld: firebase.firestore.FieldValue.increment(1),
-            });
+          /*   props.onInstrumentMod &&
+              props.onInstrumentMod(fileid, labelOnInstrument); */
 
-            originalFileRef.get().then((result) => {
-              setDuplicatedFilesInfo((prev) => {
-                let newDPInfo = [...prev];
-                newDPInfo[i] = result.data();
-                return newDPInfo;
-              });
-            });
+          //props.module.type !== 3 && props.getFilesName();
 
-            props.onInstrumentMod &&
-              props.onInstrumentMod(fileid, labelOnInstrument);
+          setUploadState((prev) => {
+            let newState = [...prev];
+            newState[i] = "duplicatedFound";
+            return newState;
+          });
+        }
+      });
 
-            //props.module.type !== 3 && props.getFilesName();
-
-            setUploadState((prev) => {
-              let newState = [...prev];
-              newState[i] = "duplicatedFound";
-              return newState;
-            });
-          }
-        });
-
-      //add file info in database
-    }
+    //add file info in database
   };
 
   /*================================================================*/
@@ -287,7 +278,7 @@ function FileUploader(props) {
     //props.setInstrumentLoaded(false);
 
     for (let i = 0; i < props.files.length; i++) {
-      let file = props.files[i];
+      let file = props.workspace ? props.files[i].file : props.files[i];
       let isLastFile = i === props.files.length - 1;
       //file to arraybuffer
       //console.log(file);
@@ -295,7 +286,7 @@ function FileUploader(props) {
         //console.log(arraybuffer);
 
         //arraybuffer to audiobuffer
-        props.instrument.context.rawContext.decodeAudioData(
+        Tone.getContext().rawContext.decodeAudioData(
           arraybuffer,
           (audiobuffer) => {
             setUploadingFilesBuffer((prev) => {
@@ -307,80 +298,76 @@ function FileUploader(props) {
             //console.log(audiobuffer);
 
             //skip if audio is too large for sampler/sequencer
-            if (
-              audiobuffer.duration > 10 &&
-              (props.instrument.name === "Sampler" || props.module.type === 0)
-            ) {
-              /* alert(
+
+            if (!props.workspace) {
+              if (
+                audiobuffer.duration > 10 &&
+                (props.instrument.name === "Sampler" || props.module.type === 0)
+              ) {
+                /* alert(
                 `Error on file: "${file.name}" - Try importing a smaller audio file`
               ); */
-              setUploadState((prev) => {
-                let newState = [...prev];
-                newState[i] = "importSmallerFile";
-                return newState;
-              });
-              return;
-            }
+                setUploadState((prev) => {
+                  let newState = [...prev];
+                  newState[i] = "importSmallerFile";
+                  return newState;
+                });
+                return;
+              }
 
-            if (
-              props.patchSize &&
-              props.patchSize + file.size > patchSizeLimit
-            ) {
-              /* alert(
+              if (
+                props.patchSize &&
+                props.patchSize + file.size > patchSizeLimit
+              ) {
+                /* alert(
                 `Error on file: "${file.name}" - Try importing a smaller audio file`
               ); */
-              setUploadState((prev) => {
-                let newState = [...prev];
-                newState[i] = "patchSizeLimit";
-                return newState;
-              });
-              return;
-            }
+                setUploadState((prev) => {
+                  let newState = [...prev];
+                  newState[i] = "patchSizeLimit";
+                  return newState;
+                });
+                return;
+              }
 
-            //set sound label on instrument
-            let labelOnInstrument =
-              props.instrument.name === "Sampler" &&
-              Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
+              //set sound label on instrument
+              let labelOnInstrument =
+                props.instrument.name === "Sampler" &&
+                Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
 
-            //console.log(labelOnInstrument);
+              //console.log(labelOnInstrument);
 
-            //find slot
+              //find slot
 
-            let slotToInsetFile = 0;
+              let slotToInsetFile = 0;
 
-            while (
-              props.module.type === 0 &&
-              props.instrument._buffers._buffers.has(
-                JSON.stringify(slotToInsetFile)
-              )
-            ) {
-              slotToInsetFile++;
-            }
+              while (
+                props.module.type === 0 &&
+                props.instrument._buffers._buffers.has(
+                  JSON.stringify(slotToInsetFile)
+                )
+              ) {
+                slotToInsetFile++;
+              }
 
-            console.log(slotToInsetFile);
+              console.log(slotToInsetFile);
 
-            /* setLabelsOnInstrument((prev) => {
-              let newLbls = [...prev];
-              newLbls[slotToInsetFile] = labelOnInstrument;
-              return newLbls;
-            }); */
+              if (props.module.type === 0) {
+                props.instrument.add(
+                  slotToInsetFile,
+                  audiobuffer,
+                  () => isLastFile && props.setInstrumentLoaded(true)
+                );
+              }
 
-            //add buffer directly to instrument
-
-            if (props.module.type === 0) {
-              props.instrument.add(
-                slotToInsetFile,
-                audiobuffer,
-                () => isLastFile && props.setInstrumentLoaded(true)
-              );
-            } /* else {
+              /* else {
               props.instrument.add(
                 labelOnInstrument,
                 audiobuffer,
                 () => isLastFile && props.setInstrumentLoaded(true)
               );
             } */
-
+            }
             /////
             //UPLOAD FILE
             /////
@@ -389,9 +376,8 @@ function FileUploader(props) {
               uploadFile(
                 file,
                 audiobuffer,
-                i,
-                labelOnInstrument,
-                slotToInsetFile
+                i
+                //!props.workspace && slotToInsetFile
               );
             else {
               setUploadState((prev) => {
@@ -417,6 +403,20 @@ function FileUploader(props) {
       });
     }
     //props.setInstrumentLoaded(true);
+  };
+
+  const onAllUploaded = () => {
+    console.log("ALL UPLOADED");
+    props.setModules((prev) => {
+      let newModules = [...prev];
+      props.files.forEach((file, index) => {
+        newModules[file.track].instrument.urls[file.index] =
+          uploadingFileIds[index];
+      });
+
+      return newModules;
+    });
+    props.onFinished && props.onFinished();
   };
 
   const handleTagSelect = (tagName) => {
@@ -446,13 +446,25 @@ function FileUploader(props) {
     setTagSelectionTarget(null);
   };
 
+  /*================================= */
+  /*==========USEEFFECTS============= */
+  /*================================= */
+
   useEffect(() => {
-    //console.log(props.files);
+    console.log(props.files);
     if (props.files.length > 0) {
       decodeFiles();
       setUploadState([]);
     }
   }, [props.files]);
+
+  useEffect(() => {
+    if (
+      uploadState.every((e) => typeof e !== "number" || e === 100) &&
+      props.files.length > 0
+    )
+      onAllUploaded();
+  }, [uploadState]);
 
   useEffect(() => {
     getInitialUserInfo();
@@ -572,7 +584,7 @@ function FileUploader(props) {
           )} / ${formatBytes(userStorageMax)}`}</span>
         </div>
 
-        <Menu
+        {/* <Menu
           anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
           keepMounted
           open={Boolean(tagSelectionTarget)}
@@ -592,7 +604,7 @@ function FileUploader(props) {
             ) : (
               <MenuItem>a</MenuItem>
             ))}
-        </Menu>
+        </Menu> */}
       </Paper>
     )
   );

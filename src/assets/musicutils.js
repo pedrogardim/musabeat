@@ -1360,6 +1360,13 @@ export const loadAudioTrack = async (
       a[moduleIndex] = true;
       return a;
     });
+    setInstrumentsInfo((prev) => {
+      let newInfo = [...prev];
+      newInfo[moduleIndex] = {
+        filesInfo: {},
+      };
+      return newInfo;
+    });
     return new Tone.Players().toDestination();
   }
 
@@ -1400,10 +1407,11 @@ export const loadAudioTrack = async (
     })
   );
 
+  console.log(Object.fromEntries(filesInfo));
+
   setInstrumentsInfo((prev) => {
     let newInfo = [...prev];
     newInfo[moduleIndex] = {
-      info: input,
       filesInfo: Object.fromEntries(filesInfo),
     };
     return newInfo;
@@ -1417,7 +1425,7 @@ export const loadAudioTrack = async (
       .map((e, i) => [Object.keys(input.urls)[i], e])
   );
 
-  //console.log(urls);
+  console.log(urls);
 
   //console.log(urls);
 

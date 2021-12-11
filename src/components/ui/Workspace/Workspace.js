@@ -47,6 +47,8 @@ import FileList from "./FileList";
 
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
+import FileUploader from "../Dialogs/FileUploader/FileUploader";
+
 import NotFoundPage from "../NotFoundPage";
 
 import {
@@ -152,6 +154,9 @@ function Workspace(props) {
   const [selectedNotes, setSelectedNotes] = useState([]);
 
   const [optionsOpen, setOptionsOpen] = useState(false);
+
+  const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const [notifications, setNotifications] = useState([]);
 
@@ -535,14 +540,30 @@ function Workspace(props) {
     });
   };
 
+  const triggerSave = (modules, sessionData) => {
+    //first, upload files and filter unwanted
+    if (pendingUploadFiles.length > 0) {
+      setUploadingFiles(
+        pendingUploadFiles.filter(
+          (file) =>
+            modules[file.track].score.findIndex(
+              (e) => e.clip === file.index
+            ) !== -1
+        )
+      );
+    } else {
+      saveToDatabase(modules, sessionData);
+    }
+  };
+
   const saveToDatabase = (mod, data, a) => {
-    console.log("isLoaded", isLoaded);
+    //console.log("isLoaded", isLoaded);
     if (DBSessionRef !== null) {
       savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
 
-      let newSessionData = !!data ? deepCopy(data) : {};
+      let newSessionData = data ? deepCopy(data) : {};
 
-      let newModules = !!mod ? deepCopy(mod) : {};
+      let newModules = mod ? deepCopy(mod) : {};
 
       //temp fix: delete properties to avoid overwrites
       if (data) {
@@ -1084,7 +1105,7 @@ function Workspace(props) {
       savingMode === "simple" &&
       !areUnsavedChanges
     )
-      saveToDatabase(modules, sessionData);
+      triggerSave(modules, sessionData);
 
     props.setUnsavedChanges && props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
@@ -1277,6 +1298,7 @@ function Workspace(props) {
               zoomPosition={zoomPosition}
               setModuleRows={setModuleRows}
               setIsMouseDown={setIsMouseDown}
+              setPendingUploadFiles={setPendingUploadFiles}
             />
           ) : (
             <>
@@ -1357,9 +1379,14 @@ function Workspace(props) {
                 <Icon>piano</Icon>
               </IconButton>
             ) : (
-              <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
-                <Icon>audio_file</Icon>
-              </IconButton>
+              <>
+                <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
+                  <Icon>add</Icon>
+                </IconButton>
+                <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
+                  <Icon>queue_music</Icon>
+                </IconButton>
+              </>
             )}
           </>
         )}
@@ -1432,6 +1459,24 @@ function Workspace(props) {
         areUnsavedChanges={areUnsavedChanges}
         saveSession={() => setAreUnsavedChanges(false)}
       /> */}
+
+      {uploadingFiles.length > 0 && (
+        <FileUploader
+          workspace
+          open={uploadingFiles.length > 0}
+          files={uploadingFiles}
+          setUploadingFiles={setUploadingFiles}
+          modules={modules}
+          instruments={instruments}
+          setInstrumentsInfo={setInstrumentsInfo}
+          setModules={setModules}
+          index={props.index}
+          onFinished={() => {
+            saveToDatabase(modules, sessionData);
+            setPendingUploadFiles([]);
+          }}
+        />
+      )}
 
       <Snackbar
         open={!!snackbarMessage}

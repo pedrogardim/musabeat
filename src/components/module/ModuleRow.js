@@ -195,7 +195,10 @@ function ModuleRow(props) {
   const toggleAudioRecording = () => {
     if (!recTools) return;
     if (props.isRecording) {
-      let newAudioIndex = Object.keys(props.instrumentInfo.info.urls).length;
+      let newAudioIndex = 0;
+      while (props.instrument.has(newAudioIndex)) {
+        newAudioIndex++;
+      }
       let dn = { time: Tone.Transport.position, clip: newAudioIndex };
       setDrawingNote(dn);
 
@@ -209,7 +212,7 @@ function ModuleRow(props) {
           drawingNote.clip +
           1;
         let file = new File([blob], filename);
-        setUploadingFiles((prev) => [...prev, file]);
+        //setUploadingFiles((prev) => [...prev, file]);
         blob.arrayBuffer().then((arrayBuffer) => {
           Tone.getContext().rawContext.decodeAudioData(
             arrayBuffer,
@@ -217,6 +220,16 @@ function ModuleRow(props) {
               //let finalFile = encodeAudioFile(audiobuffer, "mp3");
               //console.log(drawingNote);
               props.instrument.add(drawingNote.clip, audiobuffer);
+              props.setPendingUploadFiles((prev) => [
+                ...prev,
+                { file: file, index: drawingNote.clip, track: props.index },
+              ]);
+              /* props.setInstrumentsInfo((prev) => {
+                let newInfo = [...prev];
+                newInfo[props.index].filesInfo[props.drawingNote.clip] =
+                  fileInfo;
+                return newInfo;
+              }); */
               props.setModules((prev) => {
                 let newModules = [...prev];
                 let newNote = {
@@ -224,6 +237,7 @@ function ModuleRow(props) {
                   duration: parseFloat(audiobuffer.duration.toFixed(3)),
                   offset: 0,
                 };
+
                 newModules[props.index].score = [
                   ...newModules[props.index].score,
                   newNote,

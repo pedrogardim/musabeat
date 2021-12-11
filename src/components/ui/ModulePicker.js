@@ -73,7 +73,7 @@ function ModulePicker(props) {
         selectedType === 0
           ? "8fsbChTqV7aaWNyI1hTC"
           : selectedType === 2
-          ? []
+          ? { urls: {} }
           : "jSjo9Rzv3eg1vTkkEj1s",
       color: Math.floor(Math.random() * 14.99),
       fx: [],
