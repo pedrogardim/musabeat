@@ -23,8 +23,6 @@ function WorkspaceRuler(props) {
   const [resizingHandle, setResizingHandle] = useState(false);
   const [handlePosition, setHandlePosition] = useState(props.zoomPosition);
 
-  const [isMouseDown, setIsMouseDown] = useState(false);
-
   const grid = 1;
 
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
@@ -46,7 +44,6 @@ function WorkspaceRuler(props) {
   const handleCursorDragStop = (event, element) => {}; */
 
   const handleZoomContMouseDown = (e) => {
-    setIsMouseDown(true);
     if (!e.target.className.includes("handle")) {
       setIsMoving(
         ((e.pageX - rulerRef.current.getBoundingClientRect().left) /
@@ -57,40 +54,12 @@ function WorkspaceRuler(props) {
     }
   };
 
-  const handleMouseDown = (e) => {
-    /* setIsMouseDown(true);
-
-    if (!e.target.className.includes("zoom")) {
-      props.setZoomPosition((prev) => {
-        let difference = prev[0] - gridPos;
-        return prev.map((e) => e - difference);
-      });
-    } */
-  };
-
-  /* const onGridPosChange = () => {
-    if (resizingHandle) {
-    }
-    if (isMoving !== false) {
-      props.setZoomPosition((prev) => {
-        let newSessionZoom = [...prev];
-        if (
-          newSessionZoom[0] + gridPos - isMoving < 0 ||
-          newSessionZoom[1] + gridPos - isMoving > props.sessionSize
-        )
-          return prev;
-        newSessionZoom[0] = newSessionZoom[0] + gridPos - isMoving;
-        newSessionZoom[1] = newSessionZoom[1] + gridPos - isMoving;
-        return newSessionZoom;
-      });
-    }
-    console.log(gridPos);
-  }; */
-
-  const handleHover = (e) => {
+  const handleHover = (mouseX) => {
     let hoveredPos =
-      (e.pageX - rulerRef.current.getBoundingClientRect().left) /
+      (mouseX - rulerRef.current.getBoundingClientRect().left) /
       rulerRef.current.offsetWidth;
+
+    //console.log(hoveredPos);
 
     if (resizingHandle) {
       setHandlePosition((prev) => {
@@ -164,15 +133,16 @@ function WorkspaceRuler(props) {
   };
 
   useEffect(() => {
-    //onGridPosChange();
-  }, [gridPos]);
+    //console.log(props.isMouseDown);
+    if (!props.isMouseDown) handleMouseUp();
+  }, [props.isMouseDown]);
 
   useEffect(() => {
-    //console.log(isMoving);
-  }, [isMoving]);
+    handleHover(props.mousePosition[0]);
+  }, [props.mousePosition]);
 
   useEffect(() => {
-    console.log(props.zoomPosition);
+    //console.log(props.zoomPosition);
     setHandlePosition([props.zoomPosition[0], props.zoomPosition[1]]);
   }, [props.zoomPosition]);
 
@@ -180,9 +150,7 @@ function WorkspaceRuler(props) {
     <div
       className="ws-ruler"
       disabled
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleHover}
-      onMouseLeave={handleMouseUp}
+      //onMouseMove={handleHover}
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
       ref={rulerRef}

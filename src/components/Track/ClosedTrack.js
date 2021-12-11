@@ -2,17 +2,9 @@ import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 import "./Track.css";
 
-import Draggable from "react-draggable";
-
 import { colors } from "../../utils/materialPalette";
 
-import {
-  IconButton,
-  Icon,
-  Paper,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import { IconButton, Icon, Paper, CircularProgress } from "@material-ui/core";
 
 import {
   scheduleSampler,
@@ -22,7 +14,6 @@ import {
 } from "../../utils/TransportSchedule";
 
 import ClosedTrackNote from "./ClosedTrackNote";
-import MelodyNote from "./MelodyNote";
 
 function ClosedTrack(props) {
   const rowRef = useRef(null);
@@ -105,7 +96,7 @@ function ClosedTrack(props) {
     <Paper
       className="closed-track"
       ref={rowRef}
-      onClick={() => props.setSelectedTrack(props.index)}
+      onClick={() => props.loaded && props.setSelectedTrack(props.index)}
       disabled
       style={{
         /* width: `${
@@ -123,9 +114,13 @@ function ClosedTrack(props) {
           padding: 0,
           position: "absolute",
           overflow: "hidden",
+          display: !props.loaded && "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        {rowRef.current &&
+        {props.loaded ? (
+          rowRef.current &&
           props.track.score.length > 0 &&
           props.track.score.map((note, noteIndex) => (
             <ClosedTrackNote
@@ -148,7 +143,10 @@ function ClosedTrack(props) {
                 props.selectedNotes && props.selectedNotes.includes(noteIndex)
               }
             />
-          ))}
+          ))
+        ) : (
+          <CircularProgress style={{ color: colors[props.track.color][900] }} />
+        )}
       </div>
       <IconButton className={"closed-track-button"}>
         <Icon style={{ color: colors[props.track.color][900] }}>

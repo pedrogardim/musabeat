@@ -464,12 +464,7 @@ function Track(props) {
     trackRows && props.setTrackRows(trackRows);
     props.setPlayNoteFunction &&
       props.setPlayNoteFunction([playNote, releaseNote]);
-  }, [props.instrument, props.instruments]);
-
-  useEffect(() => {
-    //console.log("props.instrument", props.instrument);
-    trackRows && props.setTrackRows(trackRows);
-  }, [trackRows]);
+  }, [props.instrument, trackRows]);
 
   useEffect(() => {
     //console.log(drawingNote);

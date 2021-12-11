@@ -6,22 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router-dom";
 
-import {
-  Fab,
-  Icon,
-  IconButton,
-  Backdrop,
-  Tooltip,
-  Snackbar,
-  Input,
-  Paper,
-  Fade,
-  Button,
-  Modal,
-  Select,
-  MenuItem,
-  Divider,
-} from "@material-ui/core";
+import { Icon, IconButton, Snackbar, Divider } from "@material-ui/core";
 
 import "./Workspace.css";
 
@@ -60,9 +45,6 @@ import {
   keyboardMapping,
   loadAudioTrack,
 } from "../../../assets/musicutils";
-
-import { colors } from "../../../utils/materialPalette";
-import { clearEvents } from "../../../utils/TransportSchedule";
 
 const userSubmitedSessionProps = [
   "alwcp",
@@ -117,6 +99,7 @@ function Workspace(props) {
     () => {},
   ]);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [mousePosition, setMousePosition] = useState([0, 0]);
 
   const [trackRows, setTrackRows] = useState([]);
 
@@ -139,12 +122,11 @@ function Workspace(props) {
   const [mixerOpen, setMixerOpen] = useState(false);
   const [sessionDupDialog, setSessionDupDialog] = useState(false);
 
-  const [focusedTrack, setFocusedTrack] = useState(null);
   const [clipboard, setClipboard] = useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   const [sessionHistory, setSessionHistory] = useState({
     past: [],
-    present: null, // (?) How do we initialize the present?
+    present: null,
     future: [],
   });
 
@@ -170,66 +152,13 @@ function Workspace(props) {
       ? keySamplerMapping
       : keyboardMapping;
 
-  const handleUndo = (action) => {
-    let currentTracks = deepCopy(tracks);
-
-    setSessionHistory((prev) => {
-      let { past, present, future } = { ...prev };
-
-      let cleanHistory = {
-        past: [],
-        present: currentTracks, // (?) How do we initialize the present?
-        future: [],
-      };
-
-      switch (action) {
-        case "UNDO":
-          if (past.length < 1) return prev;
-          let previous = past[past.length - 1];
-          let newPast = past.slice(0, past.length - 1);
-          setTracks(deepCopy(previous));
-          return {
-            past: newPast,
-            present: previous,
-            future: [present, ...future],
-          };
-
-        case "REDO":
-          if (future.length < 1) return prev;
-          let next = future[0];
-          let newFuture = future.slice(1);
-          setTracks(deepCopy(next));
-          return {
-            past: [...past, present],
-            present: next,
-            future: newFuture,
-          };
-        case "RESET":
-          return cleanHistory;
-        default:
-          let areDifferent =
-            JSON.stringify(present) !== JSON.stringify(currentTracks);
-
-          //TEMP Solution: (currentTracks.length < past[past.length - 1].length) ===> Reset undo to prevent bringing back deleted tracks
-
-          return past[past.length - 1] &&
-            currentTracks.length < past[past.length - 1].length
-            ? cleanHistory
-            : areDifferent
-            ? {
-                past: [...past, present],
-                present: deepCopy(currentTracks),
-                future: [],
-              }
-            : prev;
-      }
-    });
-    //newObject && setSessionHistory(newObject);
-  };
-
-  const handleSessionCopy = () => {
-    props.setNewSessionDialog({ ...sessionData, tracks: [...tracks] });
-  };
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*===================================LOAD=SESSION=========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   const loadSession = () => {
     //TODO: optimize this, avoid call from server for each session load
@@ -243,8 +172,7 @@ function Workspace(props) {
       setEditMode(true);
       loadSessionInstruments(props.session.tracks);
     } else if (sessionKey === null) {
-      //console.log("session is null!");
-      setTracks([]);
+      console.log("session is null!");
     }
     //
     else if (typeof sessionKey === "string") {
@@ -263,14 +191,7 @@ function Workspace(props) {
         }
 
         let data = snapshot.data();
-        if (!data) {
-          console.log(
-            "======================= empty session data, loading again =========================="
-          );
-          loadSession();
-          return;
-        }
-        //console.log(snapshot.val().tracks + "-----");
+
         let sessionInfo = { ...data };
         delete sessionInfo.tracks;
         setSessionData(sessionInfo);
@@ -279,13 +200,14 @@ function Workspace(props) {
         if (data.hasOwnProperty("tracks")) {
           loadSessionInstruments(data.tracks);
           setTracks(data.tracks);
+          if (data.tracks.length === 0) setIsLoaded(true);
         }
 
         Tone.Transport.bpm.value = data.bpm;
 
-        let editors = data.editors;
-        //console.log(editors);
-        props.user && editors.includes(props.user.uid) && setEditMode(true);
+        props.user &&
+          data.editors.includes(props.user.uid) &&
+          setEditMode(true);
       });
 
       sessionRef.update({
@@ -306,6 +228,37 @@ function Workspace(props) {
       }
       loadSessionInstruments(sessionKey.tracks);
     } */
+  };
+
+  const onSessionReady = () => {
+    instruments.forEach((e, i) => {
+      //console.log(tracks[i].name, 1, e.volume.value);
+      e.volume.value = tracks[i].volume;
+      e._volume.mute = tracks[i].muted;
+      //console.log(tracks[i].name, 2, e.volume.value);
+    });
+
+    props.hidden &&
+      props.setPlayingLoadingProgress(
+        Math.floor(
+          (instrumentsLoaded.filter((e) => e !== false).length /
+            instrumentsLoaded.length) *
+            100
+        )
+      );
+
+    //TODO, realtime collaborative editing. Must activate only when multiple editors are in the same session
+    /* if (!props.hidden && DBSessionRef !== null) {
+      DBSessionRef.onSnapshot((snapshot) => {
+        updateFromDatabase(snapshot.data());
+      });
+    } */
+
+    Tone.Transport.seconds = 0;
+    props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
+    console.log("=====session ready!=====");
+    setIsLoaded(true);
+    setSavingMode(sessionData.rte ? "rte" : "simple");
   };
 
   const loadSessionInstruments = (sessionTracks) => {
@@ -540,6 +493,14 @@ function Workspace(props) {
     });
   };
 
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*===================================SAVING===============================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+
   const triggerSave = (tracks, sessionData) => {
     //first, upload files and filter unwanted
     if (pendingUploadFiles.length > 0) {
@@ -586,82 +547,6 @@ function Workspace(props) {
     }
   };
 
-  const updateFromDatabase = (sessionSnapshot) => {
-    setIsLastChangeFromServer(true);
-    //console.log("read");
-    setTracks((prev) => {
-      let index = sessionSnapshot.tracks.length - 1;
-      if (prev.length < sessionSnapshot.tracks.length)
-        loadNewTrackInstrument(sessionSnapshot.tracks[index], index);
-      //console.log("inside setter");
-      return sessionSnapshot.tracks;
-    });
-
-    let data = { ...sessionSnapshot };
-    delete data.tracks;
-
-    setSessionData((prev) => {
-      let check = !compareObjectProperties(data, prev);
-      //console.log(check ? "It's different data" : "It's the same data");
-      return check ? data : prev;
-    });
-  };
-
-  const onSessionReady = () => {
-    instruments.forEach((e, i) => {
-      //console.log(tracks[i].name, 1, e.volume.value);
-      e.volume.value = tracks[i].volume;
-      e._volume.mute = tracks[i].muted;
-      //console.log(tracks[i].name, 2, e.volume.value);
-    });
-
-    props.hidden &&
-      props.setPlayingLoadingProgress(
-        Math.floor(
-          (instrumentsLoaded.filter((e) => e !== false).length /
-            instrumentsLoaded.length) *
-            100
-        )
-      );
-
-    //TODO, realtime collaborative editing. Must activate only when multiple editors are in the same session
-    /* if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.onSnapshot((snapshot) => {
-        updateFromDatabase(snapshot.data());
-      });
-    } */
-
-    Tone.Transport.seconds = 0;
-    props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
-    console.log("=====session ready!=====");
-    setIsLoaded(true);
-    setSavingMode(sessionData.rte ? "rte" : "simple");
-  };
-
-  const resetWorkspace = () => {
-    setSavingMode("simple");
-    setAutosaver(null);
-    setAreUnsavedChanges(false);
-
-    setDBSessionRef(null);
-
-    setTracks(null);
-    setSessionData(null);
-    setSessionSize(0);
-
-    setInstruments([]);
-    setInstrumentsLoaded([]);
-    setIsLoaded(false);
-    setEditMode(false);
-
-    setIsPlaying(false);
-
-    setTrackPicker(false);
-    setMixerOpen(false);
-
-    //true: timeline ; false: loopmode
-  };
-
   const updateSavingMode = (input) => {
     //console.log("inin", input);
     if (input === "simple") {
@@ -697,6 +582,55 @@ function Workspace(props) {
     }
   };
 
+  const updateFromDatabase = (sessionSnapshot) => {
+    setIsLastChangeFromServer(true);
+    //console.log("read");
+    setTracks((prev) => {
+      let index = sessionSnapshot.tracks.length - 1;
+      if (prev.length < sessionSnapshot.tracks.length)
+        loadNewTrackInstrument(sessionSnapshot.tracks[index], index);
+      //console.log("inside setter");
+      return sessionSnapshot.tracks;
+    });
+
+    let data = { ...sessionSnapshot };
+    delete data.tracks;
+
+    setSessionData((prev) => {
+      let check = !compareObjectProperties(data, prev);
+      //console.log(check ? "It's different data" : "It's the same data");
+      return check ? data : prev;
+    });
+  };
+
+  const resetWorkspace = () => {
+    setSavingMode("simple");
+    setAutosaver(null);
+    setAreUnsavedChanges(false);
+
+    setDBSessionRef(null);
+
+    setTracks(null);
+    setSessionData(null);
+    setSessionSize(0);
+
+    setInstruments([]);
+    setInstrumentsLoaded([]);
+    setIsLoaded(false);
+    setEditMode(false);
+
+    setIsPlaying(false);
+
+    setTrackPicker(false);
+    setMixerOpen(false);
+
+    //true: timeline ; false: loopmode
+  };
+
+  const handleSessionCopy = () => {
+    props.setNewSessionDialog({ ...sessionData, tracks: [...tracks] });
+  };
+
   const duplicateTrack = (index) => {
     let newTrackId = parseInt(Math.max(...tracks.map((e) => e.id))) + 1;
     let trackToCopy = tracks[tracks.length - 1];
@@ -721,27 +655,13 @@ function Workspace(props) {
     setSnackbarMessage(null);
   };
 
-  const updateSelectedNotes = () => {
-    setSelectedNotes(
-      tracks.map((mod, modIndex) => {
-        if (selectedTrack !== null && selectedTrack !== modIndex) return [];
-        let notes = [];
-        for (let x = 0; x < mod.score.length; x++) {
-          let note = mod.score[x];
-          if (
-            Tone.Time(note.time).toSeconds() +
-              (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
-              (selection[0] / gridSize) * Tone.Time("1m").toSeconds() +
-                (note.duration ? 0.0001 : 0) &&
-            Tone.Time(note.time).toSeconds() <
-              (selection[1] / gridSize) * Tone.Time("1m").toSeconds()
-          )
-            notes.push(x);
-        }
-        return notes;
-      })
-    );
-  };
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*===================================REPRODUCTION=========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   const togglePlaying = (e) => {
     //console.log(Tone.Transport.state);
@@ -818,6 +738,14 @@ function Workspace(props) {
     playNoteFunction[1](note);
   };
 
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*===================================EDIT=ACTIONS=========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+
   const selectionAction = (action) => {
     if (!selection || selection.length < 0) return;
     if (action === "delete") {
@@ -840,7 +768,7 @@ function Workspace(props) {
   };
 
   const handlePaste = () => {
-    console.log(clipboard);
+    //console.log(clipboard);
     if (clipboard)
       setTracks((prev) =>
         prev.map((track, trackIndex) => ({
@@ -852,8 +780,7 @@ function Workspace(props) {
                   ...clipboard.cont[trackIndex]
                     .map((index) => ({ ...track.score[index] }))
                     .map((note, i) => ({
-                      fn: console.log(note, i),
-
+                      //fn: console.log(note, i),
                       ...note,
                       time: Tone.Time(
                         Tone.Time(note.time).toSeconds() +
@@ -873,6 +800,92 @@ function Workspace(props) {
       )
     );
   };
+
+  const handleUndo = (action) => {
+    let currentTracks = deepCopy(tracks);
+
+    //console.log(action);
+
+    setSessionHistory((prev) => {
+      let { past, present, future } = { ...prev };
+
+      let cleanHistory = {
+        past: [],
+        present: currentTracks,
+        future: [],
+      };
+
+      switch (action) {
+        case "UNDO":
+          if (past.length === 0 || past[past.length - 1] === null) return prev;
+          let previous = past[past.length - 1];
+          let newPast = past.slice(0, past.length - 1);
+          setTracks(deepCopy(previous));
+          return {
+            past: newPast,
+            present: previous,
+            future: [present, ...future],
+          };
+
+        case "REDO":
+          if (future.length === 0) return prev;
+          let next = future[0];
+          let newFuture = future.slice(1);
+          setTracks(deepCopy(next));
+          return {
+            past: [...past, present],
+            present: next,
+            future: newFuture,
+          };
+        case "RESET":
+          return cleanHistory;
+        default:
+          let areDifferent =
+            JSON.stringify(present) !== JSON.stringify(currentTracks);
+
+          //TEMP Solution: (currentTracks.length < past[past.length - 1].length) ===> Reset undo to prevent bringing back deleted tracks
+
+          return areDifferent
+            ? {
+                past: [...past, present],
+                present: deepCopy(currentTracks),
+                future: [],
+              }
+            : prev;
+      }
+    });
+    //newObject && setSessionHistory(newObject);
+  };
+
+  const updateSelectedNotes = () => {
+    setSelectedNotes(
+      tracks.map((mod, modIndex) => {
+        if (selectedTrack !== null && selectedTrack !== modIndex) return [];
+        let notes = [];
+        for (let x = 0; x < mod.score.length; x++) {
+          let note = mod.score[x];
+          if (
+            Tone.Time(note.time).toSeconds() +
+              (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
+              (selection[0] / gridSize) * Tone.Time("1m").toSeconds() +
+                (note.duration ? 0.0001 : 0) &&
+            Tone.Time(note.time).toSeconds() <
+              (selection[1] / gridSize) * Tone.Time("1m").toSeconds()
+          )
+            notes.push(x);
+        }
+        return notes;
+      })
+    );
+  };
+
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*=====================================KEYEVENTS==========================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
+  /*========================================================================================*/
 
   const handleKeyDown = (e) => {
     Tone.start();
@@ -912,7 +925,7 @@ function Workspace(props) {
         handleArrowKey(e);
         break;
       case 90:
-        setCursorMode((prev) => (prev ? null : "edit"));
+        /* setCursorMode((prev) => (prev ? null : "edit")); */
         break;
       default:
         break;
@@ -995,8 +1008,9 @@ function Workspace(props) {
           saveToDatabase(tracks, null);
         }
       }
-      tracks && handleUndo();
     }
+
+    tracks && handleUndo();
 
     setIsLastChangeFromServer(false);
   }, [tracks]);
@@ -1094,7 +1108,7 @@ function Workspace(props) {
   }, [premiumMode]);
 
   useEffect(() => {
-    console.log("areUnsavedChanges", areUnsavedChanges);
+    //console.log("areUnsavedChanges", areUnsavedChanges);
 
     if (
       !props.hidden &&
@@ -1120,8 +1134,8 @@ function Workspace(props) {
   }, [selection]);
 
   useEffect(() => {
-    //console.log(instrumentsInfo);
-  }, [instrumentsInfo]);
+    //console.log(sessionHistory);
+  }, [sessionHistory]);
 
   useEffect(() => {
     let begin = zoomPosition[0] * Tone.Time("1m").toSeconds();
@@ -1158,6 +1172,10 @@ function Workspace(props) {
       }}
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
+      onMouseDown={() => setIsMouseDown(true)}
+      onMouseUp={() => setIsMouseDown(false)}
+      onMouseLeave={() => setIsMouseDown(false)}
+      onMouseMove={(e) => setMousePosition([e.pageX, e.pageY])}
     >
       <LoadingScreen open={tracks === null} />
       <div className="ws-header">
@@ -1218,6 +1236,9 @@ function Workspace(props) {
             sessionSize={sessionSize}
             zoomPosition={zoomPosition}
             setZoomPosition={setZoomPosition}
+            mousePosition={mousePosition}
+            isMouseDown={isMouseDown}
+            setIsMouseDown={setIsMouseDown}
           />
         </>
       )}
@@ -1332,7 +1353,11 @@ function Workspace(props) {
                     zoomPosition={zoomPosition}
                   />
                 ))}
-              <IconButton tabIndex="-1" onClick={() => setTrackPicker(true)}>
+              <IconButton
+                style={{ width: 48, left: "50%" }}
+                tabIndex="-1"
+                onClick={() => setTrackPicker(true)}
+              >
                 <Icon>add</Icon>
               </IconButton>
             </>

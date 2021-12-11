@@ -38,6 +38,7 @@
   position: relative;
   width: calc(100% - 48px);
   height: 10%;
+  min-height: 36px;
   margin: 8px 0 8px 48px;
   right: 0;
   transition: all 0.2s;
@@ -91,4 +92,10 @@
 
 .track-score-note-melody {
   cursor: move;
+}
+
+@media only screen and (max-height: 540px) {
+  .closed-track {
+    margin: 2px 0 2px 48px;
+  }
 }

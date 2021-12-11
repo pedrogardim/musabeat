@@ -45,7 +45,7 @@ function NotesInput(props) {
                 <Paper
                   className="ws-note-input-key"
                   onMouseDown={(event) => handleClick(event, i)}
-                  onMouseOut={() =>
+                  onMouseLeave={() =>
                     props.setPressedKeys((prev) =>
                       prev.filter((note) => note !== i)
                     )

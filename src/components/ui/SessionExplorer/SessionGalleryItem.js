@@ -70,7 +70,7 @@ function SessionGalleryItem(props) {
         } ${props.compact && "session-gallery-item-compact"}`}
         onClick={handleClick}
         onMouseOver={handleHover}
-        onMouseOut={() => setHovered(false)}
+        onMouseLeave={() => setHovered(false)}
       >
         <div className="session-gallery-item-title-cont">
           <Tooltip placement={"top"} title={props.session.name}>
