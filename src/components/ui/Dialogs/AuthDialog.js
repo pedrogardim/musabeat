@@ -10,7 +10,7 @@ import {
   TextField,
   Avatar,
   Icon,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
@@ -317,6 +317,7 @@ function AuthDialog(props) {
             {creatingAccount && (
               <TextField
                 required
+                variant="standard"
                 value={accountInfo.username}
                 onChange={(e) => handleFieldChange("name", e)}
                 label={t("auth.name")}
@@ -327,6 +328,7 @@ function AuthDialog(props) {
             )}
             <TextField
               required
+              variant="standard"
               value={accountInfo.email}
               onChange={(e) => handleFieldChange("email", e)}
               label={t("auth.email")}
@@ -335,6 +337,7 @@ function AuthDialog(props) {
             />
             <TextField
               required
+              variant="standard"
               value={accountInfo.password}
               onChange={(e) => handleFieldChange("password", e)}
               label={t("auth.password")}
@@ -344,6 +347,7 @@ function AuthDialog(props) {
             {creatingAccount && (
               <TextField
                 required
+                variant="standard"
                 value={accountInfo.password2}
                 onChange={(e) => handleFieldChange("password2", e)}
                 label={t("auth.confirmPassword")}

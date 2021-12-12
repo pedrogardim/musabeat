@@ -12,7 +12,7 @@ import {
   Tooltip,
   TextField,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {
   scheduleSampler,
@@ -31,8 +31,6 @@ import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
 import AudioClip from "./AudioClip";
 import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
-
-import { ContactPhoneSharp, ContactSupportOutlined } from "@material-ui/icons";
 
 function Track(props) {
   const rowRef = useRef(null);

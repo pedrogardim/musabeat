@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { Paper, Slider, TextField } from "@material-ui/core";
+import { Paper, Slider, TextField } from "@mui/material";
 
 import "./Knob.css";
 

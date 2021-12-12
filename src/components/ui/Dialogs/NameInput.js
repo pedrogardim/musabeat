@@ -7,7 +7,7 @@ import {
   DialogActions,
   Button,
   TextField,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { labels } from "../../../assets/drumkits";
 
@@ -28,6 +28,7 @@ function NameInput(props) {
       <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
         <TextField
+          variant="standard"
           defaultValue={props.defaultValue && props.defaultValue}
           ref={inputRef}
         />

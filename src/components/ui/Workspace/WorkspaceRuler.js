@@ -7,13 +7,7 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
 
-import {
-  IconButton,
-  Icon,
-  Tooltip,
-  TextField,
-  Slider,
-} from "@material-ui/core";
+import { IconButton, Icon, Tooltip, TextField, Slider } from "@mui/material";
 
 function WorkspaceRuler(props) {
   const rulerRef = useRef(null);

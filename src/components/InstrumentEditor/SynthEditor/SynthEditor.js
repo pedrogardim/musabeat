@@ -14,7 +14,7 @@ import {
   Icon,
   Grid,
   Select,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import EnvelopeControl from "./EnvelopeControl";
 import OscillatorEditor from "./OscillatorEditor";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 
-import { Typography, Slider, Icon, IconButton, Grid } from "@material-ui/core";
+import { Typography, Slider, Icon, IconButton, Grid } from "@mui/material";
 
 import "../InstrumentEditor.css";
 

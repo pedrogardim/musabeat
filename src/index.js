@@ -8,7 +8,7 @@ import reportWebVitals from "./reportWebVitals";
 
 import firebase from "firebase";
 
-import { Dialog, DialogTitle } from "@material-ui/core";
+import { Dialog, DialogTitle } from "@mui/material";
 import { BrowserRouter, HashRouter } from "react-router-dom";
 import { ErrorBoundary } from "react-error-boundary";
 

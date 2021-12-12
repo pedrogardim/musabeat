@@ -4,7 +4,7 @@ import * as Tone from "tone";
 
 import { colors } from "../../utils/materialPalette";
 
-import { IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon } from "@mui/material";
 
 import "./AudioClip.css";
 

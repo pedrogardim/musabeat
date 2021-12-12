@@ -21,7 +21,7 @@ import {
   ListItem,
   Typography,
   Fab,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import SessionExplorer from "../SessionExplorer/SessionExplorer";
 import NotFoundPage from "../../ui/NotFoundPage";

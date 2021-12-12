@@ -16,7 +16,7 @@ import {
   Select,
   FormControl,
   InputLabel,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { createChordProgression } from "../../assets/musicutils";
 

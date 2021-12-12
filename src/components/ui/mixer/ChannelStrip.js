@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Slider, Typography, Icon, IconButton } from "@material-ui/core";
+import { Slider, Typography, Icon, IconButton } from "@mui/material";
 
 import "./ChannelStrip.css";
 

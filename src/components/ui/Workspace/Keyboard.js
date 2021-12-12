@@ -5,7 +5,7 @@ import { colors } from "../../../utils/materialPalette";
 
 import "./Keyboard.css";
 
-import { Typography, IconButton, Icon } from "@material-ui/core";
+import { Typography, IconButton, Icon } from "@mui/material";
 
 function Keyboard(props) {
   const [octaveState, setOctaveState] = useState(

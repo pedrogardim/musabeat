@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 
-import { IconButton, Icon } from "@material-ui/core";
+import { IconButton, Icon } from "@mui/material";
 
 import { colors } from "../../utils/materialPalette";
 

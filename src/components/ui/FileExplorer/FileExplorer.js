@@ -27,9 +27,9 @@ import {
   TextField,
   Fab,
   Dialog,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Skeleton, Autocomplete, useAutocomplete } from "@material-ui/lab";
+import { Skeleton, Autocomplete, useAutocomplete } from "@mui/material";
 
 import "./FileExplorer.css";
 

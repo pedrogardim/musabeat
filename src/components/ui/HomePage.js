@@ -18,7 +18,7 @@ import {
   Button,
   CircularProgress,
   Card,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import AppLogo from "./AppLogo";
 

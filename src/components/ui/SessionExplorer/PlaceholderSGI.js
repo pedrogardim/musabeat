@@ -1,9 +1,9 @@
 import React from "react";
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper } from "@mui/material";
 
 import "./SessionGalleryItem.css";
 
-import { Skeleton } from "@material-ui/lab";
+import { Skeleton } from "@mui/material";
 
 function PlaceholderSGI(props) {
   return (

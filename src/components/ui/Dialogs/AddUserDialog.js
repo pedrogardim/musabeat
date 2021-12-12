@@ -11,9 +11,9 @@ import {
   Icon,
   Typography,
   Avatar,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from "@mui/material";
 
 import firebase from "firebase";
 

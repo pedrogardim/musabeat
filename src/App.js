@@ -15,7 +15,9 @@ import {
   AppBar,
   Typography,
   Fade,
-} from "@material-ui/core";
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
 
 import * as Tone from "tone";
 
@@ -47,6 +49,13 @@ import ActionConfirm from "./components/ui/Dialogs/ActionConfirm";
 import { createNewSession } from "./utils/sessionUtils";
 
 import { createChordProgression } from "./assets/musicutils";
+
+const theme = createTheme({
+  palette: {
+    primary: { main: "#3F51B5" },
+    secondary: { main: "#ED254E" },
+  },
+});
 
 const pageLabels = {
   explore: "Explore",
@@ -160,7 +169,7 @@ function App() {
   /////TESTING
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <Fade in={false /* !isOnline */}>
         <div className="app-offline-screen">
           <AppLogo
@@ -405,7 +414,7 @@ function App() {
         onClose={() => setFollowingRoute(null)}
         action={() => handlePageNav(...followingRoute)}
       />
-    </>
+    </ThemeProvider>
   );
 }
 

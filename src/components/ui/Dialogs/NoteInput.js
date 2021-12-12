@@ -8,7 +8,7 @@ import {
   Button,
   TextField,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { labels } from "../../../assets/drumkits";
 import { useTranslation } from "react-i18next";

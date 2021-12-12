@@ -27,9 +27,9 @@ import {
   OutlinedInput,
   InputAdornment,
   Fab,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Skeleton, Autocomplete } from "@material-ui/lab";
+import { Skeleton, Autocomplete } from "@mui/material";
 
 import "./PatchExplorer.css";
 

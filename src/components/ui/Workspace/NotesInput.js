@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
-import { Paper, IconButton, Typography, Icon } from "@material-ui/core";
+import { Paper, IconButton, Typography, Icon } from "@mui/material";
 
 import "./NotesInput.css";
 

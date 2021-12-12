@@ -7,7 +7,7 @@ import {
   Dialog,
   Button,
   DialogContent,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { bounceSessionExport } from "../../utils/exportUtils";
 

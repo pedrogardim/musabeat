@@ -10,9 +10,9 @@ import {
   InputAdornment,
   Icon,
   Grid,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from "@mui/material";
 
 import SessionGalleryItem from "./SessionGalleryItem";
 import PlaceholderSGI from "./PlaceholderSGI";

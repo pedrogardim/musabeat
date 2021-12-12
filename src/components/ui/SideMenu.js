@@ -9,7 +9,7 @@ import {
   Typography,
   Divider,
   IconButton,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { useTranslation } from "react-i18next";
 

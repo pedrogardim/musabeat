@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { Drawer, MenuItem, Icon, IconButton } from "@material-ui/core";
+import { Drawer, MenuItem, Icon, IconButton } from "@mui/material";
 
 //import "./AppLogo.css";
 

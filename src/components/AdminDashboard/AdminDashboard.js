@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Tab, Tabs, AppBar } from "@material-ui/core";
+import { Tab, Tabs, AppBar } from "@mui/material";
 
 import * as Tone from "tone";
 
@@ -10,7 +10,7 @@ import "./AdminDashboard.css";
 
 import { encodeAudioFile, dete } from "../../assets/musicutils";
 
-import { Button, Typography } from "@material-ui/core";
+import { Button, Typography } from "@mui/material";
 
 function AdminDashboard(props) {
   const [value, setValue] = useState(0);

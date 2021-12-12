@@ -21,7 +21,7 @@ import {
   ListItem,
   Typography,
   Button,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import "./FilePage.css";
 

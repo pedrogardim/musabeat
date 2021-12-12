@@ -15,9 +15,9 @@ import {
   Avatar,
   Chip,
   Button,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Skeleton } from "@material-ui/lab";
+import { Skeleton } from "@mui/material";
 
 import { sessionTags } from "../../../assets/musicutils";
 

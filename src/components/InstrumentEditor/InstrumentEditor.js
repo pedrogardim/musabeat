@@ -15,7 +15,7 @@ import {
   Grid,
   Select,
   SvgIcon,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import AudioFileItem from "./AudioFileItem";
 import DrumComponent from "./DrumComponent";
@@ -601,6 +601,7 @@ function InstrumentEditor(props) {
       mainContent = (
         <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
           <Select
+            variant="standard"
             native
             value={
               props.instrument._dummyVoice
@@ -694,6 +695,7 @@ function InstrumentEditor(props) {
       {mainContent}
       <div className="ie-bottom-menu">
         <Select
+          variant="standard"
           value={checkCustomPatch ? "Custom" : props.track.instrument}
           onMouseDown={() => setPatchExplorer(true)}
           inputProps={{ readOnly: true }}

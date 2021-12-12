@@ -4,7 +4,7 @@ import "./Track.css";
 
 import { colors } from "../../utils/materialPalette";
 
-import { IconButton, Icon, Paper, CircularProgress } from "@material-ui/core";
+import { IconButton, Icon, Paper, CircularProgress } from "@mui/material";
 
 import {
   scheduleSampler,

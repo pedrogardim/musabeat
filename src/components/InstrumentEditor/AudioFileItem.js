@@ -15,7 +15,7 @@ import {
   Tooltip,
   ListItemButton,
   Fab,
-} from "@material-ui/core";
+} from "@mui/material";
 
 function AudioFileItem(props) {
   const [wavePath, setWavePath] = useState("");

@@ -8,7 +8,7 @@ import {
   Paper,
   Grow,
   Select,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { waveTypes } from "../../../assets/musicutils";
 import { useTranslation } from "react-i18next";
@@ -141,7 +141,7 @@ function SynthModifier(props) {
         </ButtonGroup>
       )}
 
-      {/* <Select
+      {/* <Select variant="standard"
         native
         labelId="fm-wave-selector-label"
         value={instrumentParamenters.modulation.type}
@@ -177,6 +177,7 @@ function SynthModifier(props) {
           <Icon>close</Icon>
         </IconButton>
         <Select
+          variant="standard"
           native
           value={
             props.instrument._dummyVoice

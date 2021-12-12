@@ -12,7 +12,7 @@ import {
   ButtonGroup,
   Button,
   Grow,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import Knob from "./Knob";
 
@@ -185,6 +185,7 @@ function OscillatorEditor(props) {
           {t("instrumentEditor.synthEditor.parameters.type")}
         </InputLabel>
         <Select
+          variant="standard"
           tabIndex={-1}
           native
           value={oscType}

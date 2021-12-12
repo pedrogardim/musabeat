@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-import { Fade } from "@material-ui/core";
+import { Fade } from "@mui/material";
 
 import AppLogo from "./AppLogo";
 

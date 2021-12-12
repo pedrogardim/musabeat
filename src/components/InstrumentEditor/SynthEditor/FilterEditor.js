@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
-import { Typography, Slider, Grid } from "@material-ui/core";
+import { Typography, Slider, Grid } from "@mui/material";
 
 import "./FilterEditor.css";
 

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Divider } from "@material-ui/core";
+import { Icon, IconButton, Snackbar, Divider } from "@mui/material";
 
 import "./Workspace.css";
 

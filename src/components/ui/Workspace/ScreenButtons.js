@@ -17,7 +17,7 @@ import {
   Modal,
   Select,
   MenuItem,
-} from "@material-ui/core";
+} from "@mui/material";
 
 function ScreenButtons(props) {
   const [open, setOpen] = useState(false);

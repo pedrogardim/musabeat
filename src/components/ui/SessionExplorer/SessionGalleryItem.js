@@ -10,7 +10,7 @@ import {
   Tooltip,
   Grid,
   Chip,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import "./SessionGalleryItem.css";
 

@@ -26,9 +26,9 @@ import {
   FormControlLabel,
   Tooltip,
   ButtonGroup,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from "@mui/material";
 
 import {
   createChordProgression,
@@ -222,6 +222,7 @@ function NewSessionDialog(props) {
         >
           <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
             <TextField
+              variant="standard"
               style={{ width: "100%" }}
               value={session.name}
               onChange={(e) =>
@@ -232,11 +233,11 @@ function NewSessionDialog(props) {
           </Grid>
           <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
             <TextField
+              variant="standard"
               style={{ width: "100%" }}
               value={session.description}
               rows={2}
               label={t("info.description")}
-              maxRows={6}
               onChange={(e) =>
                 handleInfoChange("description", e.target.value.slice(0, 255))
               }
@@ -341,6 +342,7 @@ function NewSessionDialog(props) {
             <div className="break" />
 
             <Select
+              variant="standard"
               native
               defaultValue={session.root}
               onChange={(e) => handleInfoChange("root", e.target.value)}
@@ -352,6 +354,7 @@ function NewSessionDialog(props) {
               ))}
             </Select>
             <Select
+              variant="standard"
               native
               defaultValue={session.scale}
               onChange={(e) => handleInfoChange("scale", e.target.value)}

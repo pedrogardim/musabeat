@@ -20,7 +20,7 @@ import {
   MenuItem,
   LinearProgress,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import * as Tone from "tone";
 import firebase from "firebase";

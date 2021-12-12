@@ -8,7 +8,7 @@ import {
   Button,
   TextField,
   Select,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { useTranslation } from "react-i18next";
 
@@ -38,11 +38,17 @@ function SavePatch(props) {
       <DialogTitle>{t("dialogs.insertName")}</DialogTitle>
       <DialogContent>
         <TextField
+          variant="standard"
           helperText={t("dialogs.patchName")}
           ref={inputRef}
-        ></TextField>
+        />
         <div className="break" style={{ height: 16 }} />
-        <Select native onChange={handleChange} value={selectedCategory}>
+        <Select
+          variant="standard"
+          native
+          onChange={handleChange}
+          value={selectedCategory}
+        >
           <option value={null}>{t("misc.noCategory")}</option>
           {props.isDrum
             ? drumCategories.map((e, i) => (

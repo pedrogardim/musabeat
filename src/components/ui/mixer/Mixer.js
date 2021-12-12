@@ -2,7 +2,7 @@ import "./Mixer.css";
 import ChannelStrip from "./ChannelStrip";
 import React from "react";
 
-import { Icon, IconButton } from "@material-ui/core";
+import { Icon, IconButton } from "@mui/material";
 
 function Mixer(props) {
   const handleSliderMove = (index, value) => {

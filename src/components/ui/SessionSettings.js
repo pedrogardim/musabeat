@@ -18,13 +18,13 @@ import {
   Tooltip,
   Select,
   Avatar,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { sessionTags, scales, musicalNotes } from "../../assets/musicutils";
 
 import { useTranslation } from "react-i18next";
 
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete } from "@mui/material";
 
 import AddUserDialog from "../ui/Dialogs/AddUserDialog";
 
@@ -80,6 +80,7 @@ function SessionSettings(props) {
             >
               <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
                 <TextField
+                  variant="standard"
                   style={{ width: "100%" }}
                   value={newSessionData.name}
                   onChange={(e) =>
@@ -90,11 +91,11 @@ function SessionSettings(props) {
               </Grid>
               <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
                 <TextField
+                  variant="standard"
                   style={{ width: "100%" }}
                   value={newSessionData.description}
                   rows={2}
                   label={t("info.description")}
-                  maxRows={6}
                   onChange={(e) =>
                     handleInfoChange(
                       "description",
@@ -112,7 +113,7 @@ function SessionSettings(props) {
                     .fill()
                     .map((e, i) => (e = i))}
                   renderInput={(params) => (
-                    <TextField {...params} label={"Tags"} />
+                    <TextField {...params} variant="standard" label={"Tags"} />
                   )}
                   onChange={(e, v) => handleInfoChange("tags", v)}
                   value={newSessionData.tags}
@@ -240,6 +241,7 @@ function SessionSettings(props) {
                 <div className="break" />
 
                 <Select
+                  variant="standard"
                   native
                   defaultValue={newSessionData.root}
                   onChange={(e) => handleInfoChange("root", e.target.value)}
@@ -251,6 +253,7 @@ function SessionSettings(props) {
                   ))}
                 </Select>
                 <Select
+                  variant="standard"
                   native
                   defaultValue={newSessionData.scale}
                   onChange={(e) => handleInfoChange("scale", e.target.value)}
