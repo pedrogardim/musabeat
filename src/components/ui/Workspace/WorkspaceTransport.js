@@ -7,15 +7,7 @@ import { useHistory } from "react-router-dom";
 
 import * as Tone from "tone";
 
-import {
-  Icon,
-  IconButton,
-  Typography,
-  Tooltip,
-  Avatar,
-  Chip,
-  Button,
-} from "@mui/material";
+import { Icon, IconButton, Box, Typography } from "@mui/material";
 
 import { Skeleton } from "@mui/material";
 
@@ -59,37 +51,59 @@ function WorkspaceTransport(props) {
   }, [props.editorProfiles]); */
 
   return (
-    <div
+    <Box
       className="ws-transport"
       onClick={() => setExpanded(true)}
       tabIndex="-1"
     >
-      <div style={{ width: 88 }}>
+      <Box style={{ width: 88 }}>
         {props.selectedTrack !== null && (
           <IconButton onClick={() => props.setSelectedTrack(null)}>
             <Icon>arrow_back</Icon>
           </IconButton>
         )}
-      </div>
+      </Box>
 
-      <div style={{ margin: "auto", fontSize: 40 }}>
-        <span style={{ width: 24 }}>{time[1] && time[1][0]}</span>
-        <span>|</span>
-        <span style={{ width: 24 }}>{time[1] && time[1][1]}</span>
-        <span>|</span>
-        <span style={{ width: 24 }}>{time[1] && time[1][2]}</span>
-      </div>
-      <div className="ws-transport-info">
-        <div>
-          <Icon style={{ opacity: 0.5 }}>timer</Icon>
-          <span>{props.sessionSize}</span>
-        </div>
-        <div>
-          <Icon style={{ opacity: 0.5 }}>calendar_view_week</Icon>
-          <span>{"1 / " + props.gridSize}</span>
-        </div>
-      </div>
-    </div>
+      <Box sx={{ typography: { fontSize: 40 }, margin: "auto" }}>
+        {time[1] &&
+          time[1].map((e, i) => (
+            <>
+              <Typography color="textPrimary" variant="h4" sx={{ width: 24 }}>
+                {e}
+              </Typography>
+              {i !== 2 && (
+                <Typography color="textPrimary" variant="h4">
+                  |
+                </Typography>
+              )}
+            </>
+          ))}
+      </Box>
+      <Box className="ws-transport-info">
+        <Box>
+          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>
+            straighten
+          </Icon>
+          <Typography variant="body1" color="textPrimary">
+            {props.sessionSize}
+          </Typography>
+        </Box>
+        <Box>
+          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>
+            calendar_view_week
+          </Icon>
+          <Typography variant="body1" color="textPrimary">
+            {"1 / " + props.gridSize}
+          </Typography>
+        </Box>
+        <Box>
+          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>timer</Icon>
+          <Typography variant="body1" color="textPrimary">
+            {props.sessionData && props.sessionData.bpm}
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

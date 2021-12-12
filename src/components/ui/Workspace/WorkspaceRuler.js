@@ -3,11 +3,11 @@ import * as Tone from "tone";
 
 import "./WorkspaceGrid.css";
 
-import Draggable from "react-draggable";
-
 import { colors } from "../../../utils/materialPalette";
 
-import { IconButton, Icon, Tooltip, TextField, Slider } from "@mui/material";
+import Draggable from "react-draggable";
+
+import { Box } from "@mui/material";
 
 function WorkspaceRuler(props) {
   const rulerRef = useRef(null);
@@ -214,9 +214,12 @@ function WorkspaceRuler(props) {
 
       {props.tracks &&
         props.tracks.map((track, trackIndex) => (
-          <div
+          <Box
             className="ws-ruler-track"
-            style={{ backgroundColor: colors[track.color][300] }}
+            sx={(theme) => ({
+              bgcolor:
+                colors[track.color][theme.palette.mode === "dark" ? 200 : 600],
+            })}
           />
         ))}
     </div>

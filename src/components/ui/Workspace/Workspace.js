@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Divider } from "@mui/material";
+import { Icon, IconButton, Snackbar, Divider, Box } from "@mui/material";
 
 import "./Workspace.css";
 
@@ -1160,7 +1160,7 @@ function Workspace(props) {
   /*================================================================ */
 
   return tracks !== undefined ? (
-    <div
+    <Box
       className="workspace"
       tabIndex={0}
       style={{
@@ -1229,6 +1229,8 @@ function Workspace(props) {
             setGridSize={setGridSize}
             selectedTrack={selectedTrack}
             setSelectedTrack={setSelectedTrack}
+            sessionData={sessionData}
+            setSessionData={setSessionData}
           />
 
           <WorkspaceRuler
@@ -1527,7 +1529,7 @@ function Workspace(props) {
         onClose={() => setSessionDupDialog(false)}
         action={handleSessionCopy}
       />
-    </div>
+    </Box>
   ) : (
     <NotFoundPage
       type="workspace"

@@ -9,7 +9,7 @@ html {
 body {
   height: 100vh;
   overflow: hidden;
-  background-color: white;
+  /*  background-color: white; */
 }
 
 body *::-webkit-scrollbar {

@@ -5,7 +5,7 @@ import { colors } from "../../../utils/materialPalette";
 
 import "./Keyboard.css";
 
-import { Typography, IconButton, Icon } from "@mui/material";
+import { Typography, IconButton, Icon, Paper, Box } from "@mui/material";
 
 function Keyboard(props) {
   const [octaveState, setOctaveState] = useState(
@@ -29,7 +29,7 @@ function Keyboard(props) {
       );
   };
 
-  const color = colors[props.color ? props.color : 2];
+  const color = colors[typeof props.color === "number" ? props.color : 2];
 
   const octaves = props.octaves ? props.octaves : 7;
 
@@ -41,64 +41,70 @@ function Keyboard(props) {
   }, [octaveState]);
 
   return (
-    <div className="keyboard" style={{ ...props.style }}>
+    <Paper className="keyboard" style={{ ...props.style }}>
       {Array(Math.floor(octaves * 12))
         .fill(1)
-        .map((e, i) => (
-          <div
-            onMouseDown={() => handleKeyClick(i)}
-            onMouseUp={() => handleKeyUp(i)}
-            onMouseLeave={() => handleKeyUp(i)}
-            onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
-            style={{
-              left: (i * 100) / (octaves * 12) + "%",
-              backgroundColor:
-                !!props.activeNotes.length &&
-                props.activeNotes
-                  .map((note) => Tone.Frequency(note, "midi").toMidi() - 24)
-                  .includes(i + octave * 12)
-                  ? color["A700"]
-                  : i % 12 === 1 ||
-                    i % 12 === 3 ||
-                    i % 12 === 6 ||
-                    i % 12 === 8 ||
-                    i % 12 === 10
-                  ? color[900]
-                  : color[100],
-              outline: `solid 1px ${color[900]}`,
-              width:
-                i % 12 === 1 ||
-                i % 12 === 3 ||
-                i % 12 === 6 ||
-                i % 12 === 8 ||
-                i % 12 === 10
-                  ? 100 / ((78 / 7) * octaves) + "%"
-                  : 100 / ((49 / 7) * octaves) + "%",
-            }}
-            className={`keyboard-key ${
-              i % 12 === 1 ||
-              i % 12 === 3 ||
-              i % 12 === 6 ||
-              i % 12 === 8 ||
-              i % 12 === 10
-                ? "keyboard-black-key"
-                : "keyboard-white-key"
-            } ${
-              !!props.activeNotes.length &&
-              props.activeNotes
-                .map((e) => Tone.Frequency(e).toMidi() - 24)
-                .includes(i) &&
-              "keyboard-key-active"
-            }`}
-          >
-            <span className={"up"}>
-              {props.notesLabel && props.notesLabel[i]}
-            </span>
-            <span className={"up"} style={{ opacity: 0.5 }}>
-              {Tone.Frequency(i + octave * 12 + 24, "midi").toNote()}
-            </span>
-          </div>
-        ))}
+        .map((e, i) => {
+          let isBlackKey =
+            i % 12 === 1 ||
+            i % 12 === 3 ||
+            i % 12 === 6 ||
+            i % 12 === 8 ||
+            i % 12 === 10;
+          let isActive =
+            props.activeNotes.length > 0 &&
+            props.activeNotes
+              .map((note) => Tone.Frequency(note, "midi").toMidi() - 24)
+              .includes(i + octave * 12);
+          return (
+            <Box
+              onMouseDown={() => handleKeyClick(i)}
+              onMouseUp={() => handleKeyUp(i)}
+              onMouseLeave={() => handleKeyUp(i)}
+              onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
+              elevation={isActive ? 1 : 3}
+              sx={(theme) => {
+                let dark = theme.palette.mode === "dark";
+                return {
+                  left: (i * 100) / (octaves * 12) + "%",
+                  borderRadius: 0,
+                  bgcolor: isActive
+                    ? color[dark ? 900 : "A700"]
+                    : isBlackKey
+                    ? dark
+                      ? "#AAAAAA"
+                      : color[900]
+                    : dark
+                    ? "background.default"
+                    : color[100],
+                  outline: `solid 1px ${dark ? "#ffffff80" : color[900]}`,
+                  width: isBlackKey
+                    ? 100 / ((78 / 7) * octaves) + "%"
+                    : 100 / ((49 / 7) * octaves) + "%",
+                };
+              }}
+              className={`keyboard-key ${
+                isBlackKey ? "keyboard-black-key" : "keyboard-white-key"
+              } ${"keyboard-key-active"}`}
+            >
+              <Typography
+                sx={{
+                  color: isBlackKey ? "background.default" : "text.secondary",
+                }}
+              >
+                {props.notesLabel && props.notesLabel[i]}
+              </Typography>
+              <Typography
+                sx={{
+                  color: isBlackKey ? "background.default" : "text.secondary",
+                }}
+                style={{ opacity: 0.5 }}
+              >
+                {Tone.Frequency(i + octave * 12 + 24, "midi").toNote()}
+              </Typography>
+            </Box>
+          );
+        })}
       {props.variableOctave && (
         <>
           {octave < 6 && (
@@ -141,7 +147,7 @@ function Keyboard(props) {
           </Typography>
         </>
       )}
-    </div>
+    </Paper>
   );
 }
 

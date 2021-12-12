@@ -8,7 +8,14 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
 
-import { IconButton, Icon, Tooltip, TextField, Slider } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Icon,
+  Tooltip,
+  TextField,
+  Slider,
+} from "@mui/material";
 
 function WorkspaceGrid(props) {
   const gridRef = useRef(null);
@@ -157,9 +164,10 @@ function WorkspaceGrid(props) {
             i % props.gridSize !== 0 && props.selectedTrack === null ? (
               ""
             ) : (
-              <div
+              <Box
                 key={i + "gd"}
                 className="ws-grid-line"
+                sx={{ bgcolor: "text.primary" }}
                 style={{
                   opacity:
                     i % props.gridSize === 0
@@ -174,7 +182,7 @@ function WorkspaceGrid(props) {
                     {i / props.gridSize + 1 + props.zoomPosition[0]}
                   </span>
                 )}
-              </div>
+              </Box>
             )
           )}
 
@@ -198,10 +206,10 @@ function WorkspaceGrid(props) {
           bounds=".ws-grid-line-cont"
           style={{ pointerEvents: props.isMouseDown && "none" }}
         >
-          <div
+          <Box
             className={"ws-grid-cursor"}
+            sx={{ bgcolor: props.isRecording ? "secondary" : "text.primary" }}
             style={{
-              backgroundColor: props.isRecording && "#f50057",
               pointerEvents: props.isMouseDown && "none",
             }}
           />

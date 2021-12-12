@@ -6,12 +6,15 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../utils/materialPalette";
 
+import { alpha } from "@mui/material/styles";
+
 import {
   IconButton,
   Icon,
   Tooltip,
   TextField,
   Typography,
+  Box,
 } from "@mui/material";
 
 import {
@@ -524,7 +527,7 @@ function Track(props) {
         cursor: props.cursorMode === "edit" && deletableNote && "not-allowed",
       }}
     >
-      <div
+      <Box
         className="track-grid-row"
         ref={rowRef}
         onMouseMove={handleHover}
@@ -533,29 +536,21 @@ function Track(props) {
         onClick={handleMouseUp}
         onMouseUp={handleMouseUp}
         disabled
-        style={{
-          /* 
-          width: `${
-            (props.sessionSize * 100) /
-            (props.zoomPosition[1] - props.zoomPosition[0] + 1)
-          }%`,
-           */
-          border:
-            trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
-        }}
       >
         {trackRows.map((row, rowIndex) => (
-          <div
+          <Box
             className="track-inner-row"
-            style={{
+            sx={{
               //borderTop: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
-              borderBottom:
-                trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
-              margin: props.selectedTrack === null && "8px 0",
+              borderBottom: trackType === 1 && 1,
+              borderColor: (t) =>
+                t.palette.mode === "dark"
+                  ? "rgba(255, 255, 255,0.2)"
+                  : "rgba(0, 0, 0,0.2)",
+
               minHeight: trackType === 1 && "6.66666%",
-              background:
+              bgcolor:
                 trackType === 1 &&
-                isSelected &&
                 (rowIndex % 12 === 2 ||
                   rowIndex % 12 === 4 ||
                   rowIndex % 12 === 6 ||
@@ -566,22 +561,27 @@ function Track(props) {
             }}
             key={rowIndex + "ri"}
           >
-            <span
+            <Typography
               className="track-inner-row-label"
               onClick={() => setShowingAll((prev) => !prev)}
-              style={{
+              sx={(theme) => ({
                 color:
                   trackType === 0 && !props.instrument.has(row.note)
                     ? "lightgrey"
+                    : theme.palette.mode === "dark"
+                    ? "white"
                     : colors[props.track.color][900],
-              }}
+              })}
             >
               {row.lbl}
-            </span>
+            </Typography>
             {(trackType === 0 || trackType === 2) && (
-              <div className="track-inner-row-line" />
+              <Box
+                sx={{ bgcolor: "text.primary" }}
+                className="track-inner-row-line"
+              />
             )}
-          </div>
+          </Box>
         ))}
         {rowRef.current &&
           props.track.score.length > 0 &&
@@ -721,7 +721,7 @@ function Track(props) {
             )}
           </>
         )}
-      </div>
+      </Box>
       <FileUploader
         open={uploadingFiles.length > 0}
         files={uploadingFiles}

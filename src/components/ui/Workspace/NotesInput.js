@@ -60,13 +60,20 @@ function NotesInput(props) {
                       prev.filter((note) => note !== i)
                     )
                   }
-                  style={{
-                    backgroundColor: props.pressedKeys.includes(i)
+                  elevation={
+                    props.trackRows[i] &&
+                    !props.instrument.has(props.trackRows[i].note)
+                      ? 1
+                      : 4
+                  }
+                  sx={(theme) => ({
+                    bgcolor: props.pressedKeys.includes(i)
                       ? "darkgray"
-                      : props.trackRows[i] &&
+                      : theme.palette.mode !== "dark" &&
+                        props.trackRows[i] &&
                         !props.instrument.has(props.trackRows[i].note) &&
                         "lightgray",
-                  }}
+                  })}
                 >
                   {/* <Tooltip title={filesName && filesName[i]}>
                 <svg
@@ -91,8 +98,8 @@ function NotesInput(props) {
                   )}
                 </svg> 
               </Tooltip> */}
-                  <span
-                    className="up"
+                  <Typography
+                    variant="body1"
                     style={{
                       position: "absolute",
                       left: 4,
@@ -101,10 +108,10 @@ function NotesInput(props) {
                     }}
                   >
                     {e}
-                  </span>
-                  <span className="up">
+                  </Typography>
+                  <Typography variant="body1" color={"textSecondary"}>
                     {props.trackRows[i] && drumMapping[props.trackRows[i].note]}
-                  </span>
+                  </Typography>
                 </Paper>
                 {i === 9 && <div className="break" />}
               </>

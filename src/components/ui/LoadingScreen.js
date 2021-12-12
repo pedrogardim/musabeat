@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-import { Fade } from "@mui/material";
+import { Box, Fade } from "@mui/material";
 
 import AppLogo from "./AppLogo";
 
@@ -13,9 +13,12 @@ function LoadingScreen(props) {
 
   return (
     <Fade in={props.open} timeout={{ enter: 0, exit: 200 }}>
-      <div className="loading-screen-background">
+      <Box
+        className="loading-screen-background"
+        sx={{ bgcolor: "background.default" }}
+      >
         <AppLogo className="loading-screen-logo" animated />
-      </div>
+      </Box>
     </Fade>
   );
 }

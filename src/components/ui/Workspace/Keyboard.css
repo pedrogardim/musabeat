@@ -15,19 +15,12 @@
 }
 .keyboard-black-key {
   height: 60%;
-  position: absolute;
+  position: absolute !important;
   width: calc(100% / 78);
   justify-content: center;
-}
-.keyboard-black-key > span {
-  color: white !important;
 }
 
 .keyboard-white-key {
   width: calc(100% / 49);
   justify-content: flex-end;
-}
-
-.keyboard-key-active {
-  background-color: blue;
 }

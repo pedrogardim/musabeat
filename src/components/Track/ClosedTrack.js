@@ -98,14 +98,10 @@ function ClosedTrack(props) {
       ref={rowRef}
       onClick={() => props.loaded && props.setSelectedTrack(props.index)}
       disabled
-      style={{
-        /* width: `${
-          (props.sessionSize * 100) /
-          (props.zoomPosition[1] - props.zoomPosition[0] + 1)
-        }%`, */
-        border: trackType === 1 && isSelected && "1px solid rgba(0, 0, 0,0.2)",
-        backgroundColor: colors[props.track.color][400],
-      }}
+      sx={(theme) => ({
+        bgcolor:
+          colors[props.track.color][theme.palette.mode === "dark" ? 200 : 600],
+      })}
     >
       <div
         style={{
@@ -145,11 +141,26 @@ function ClosedTrack(props) {
             />
           ))
         ) : (
-          <CircularProgress style={{ color: colors[props.track.color][900] }} />
+          <CircularProgress
+            sx={(theme) => ({
+              color:
+                colors[props.track.color][
+                  theme.palette.mode === "dark" ? 200 : 600
+                ],
+            })}
+          />
         )}
       </div>
-      <IconButton className={"closed-track-button"}>
-        <Icon style={{ color: colors[props.track.color][900] }}>
+      <IconButton
+        sx={(theme) => ({
+          color:
+            colors[props.track.color][
+              theme.palette.mode === "dark" ? 200 : 600
+            ],
+        })}
+        className={"closed-track-button"}
+      >
+        <Icon>
           {props.track.type === 0
             ? "grid_on"
             : props.track.type === 1

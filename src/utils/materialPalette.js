@@ -17,3 +17,5 @@ export const colors = [
   MUIcolors.orange,
   MUIcolors.deepOrange,
 ];
+
+console.log(MUIcolors);

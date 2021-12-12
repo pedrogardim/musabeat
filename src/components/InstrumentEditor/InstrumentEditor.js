@@ -11,7 +11,7 @@ import {
   Tooltip,
   LinearProgress,
   Fab,
-  Icon,
+  Box,
   Grid,
   Select,
   SvgIcon,
@@ -669,7 +669,8 @@ function InstrumentEditor(props) {
   }, [filesId, filesName]); */
 
   return (
-    <div
+    <Box
+      sx={{ bgcolor: "background.default" }}
       className="instrument-editor"
       onDragEnter={() => {
         setDraggingOver(true);
@@ -843,7 +844,7 @@ function InstrumentEditor(props) {
           onClose={() => setDeletingItem(null)}
         />
       )}
-    </div>
+    </Box>
   );
 }
 

@@ -29,13 +29,11 @@
   position: relative;
   height: calc(100% - 8px);
   flex: 1 1 1px;
-  outline: 1px solid rgba(0, 0, 0, 0.377);
   margin: 4px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
 }
 
 .ws-note-input-options {

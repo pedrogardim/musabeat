@@ -125,9 +125,9 @@ function DrumElement(props) {
           </div>
         )}
 
-        <span
-          className="up"
-          style={{ color: "rgba(0,0,0,0.8)" }}
+        <Typography
+          variant="body1"
+          color="textPrimary"
           /* onClick={() =>
           props.instrument.name === "Players" &&
           props.setRenamingLabel(props.index)
@@ -138,7 +138,7 @@ function DrumElement(props) {
             : props.isDrum
             ? drumMapping[props.index]
             : "Empty"}
-        </span>
+        </Typography>
 
         <Tooltip title="Remove file from instrument">
           <IconButton

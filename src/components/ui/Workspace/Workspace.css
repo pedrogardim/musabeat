@@ -1,7 +1,6 @@
 .workspace {
   position: relative;
   /* background: radial-gradient(#ffffff, #fafaed); */
-  background: white;
   width: calc(100% - 16px);
   max-width: 1200px;
   display: flex;
@@ -67,7 +66,7 @@
 }
 
 .ws-transport-info > div {
-  height: 24px;
+  height: 16px;
   align-items: center;
   display: flex;
 }

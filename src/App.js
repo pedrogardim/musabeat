@@ -1,11 +1,12 @@
 import "./App.css";
 
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Helmet } from "react-helmet";
 
 import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
 import {
+  Box,
   Icon,
   IconButton,
   Avatar,
@@ -17,7 +18,10 @@ import {
   Fade,
   ThemeProvider,
   createTheme,
+  useMediaQuery,
 } from "@mui/material";
+
+import * as MUIColors from "@mui/material/colors";
 
 import * as Tone from "tone";
 
@@ -50,12 +54,25 @@ import { createNewSession } from "./utils/sessionUtils";
 
 import { createChordProgression } from "./assets/musicutils";
 
-const theme = createTheme({
-  palette: {
-    primary: { main: "#3F51B5" },
-    secondary: { main: "#ED254E" },
-  },
-});
+const colors = [
+  MUIColors.red,
+  MUIColors.purple,
+  MUIColors.deepPurple,
+  MUIColors.indigo,
+  MUIColors.blue,
+  MUIColors.lightBlue,
+  MUIColors.cyan,
+  MUIColors.teal,
+  MUIColors.green,
+  MUIColors.lightGreen,
+  MUIColors.lime,
+  MUIColors.yellow,
+  MUIColors.amber,
+  MUIColors.orange,
+  MUIColors.deepOrange,
+];
+
+const defaultTheme = createTheme();
 
 const pageLabels = {
   explore: "Explore",
@@ -70,6 +87,50 @@ const pageLabels = {
 function App() {
   const { t, i18n } = useTranslation();
   const history = useHistory();
+
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? "dark" : "light",
+          primary: { main: "#3F51B5" },
+          secondary: { main: "#ED254E" },
+        },
+        typography: {
+          h4: {
+            fontFamily: '"Barlow Semi Condensed", sans-serif',
+            fontSize: "2rem",
+            lineHeight: 1,
+          },
+          body1: {
+            fontSize: 12,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+          },
+        },
+        components: {
+          MuiTypography: {
+            defaultProps: {
+              variantMapping: {
+                h1: "h2",
+                h2: "h2",
+                h3: "h2",
+                h4: "span",
+                h5: "h2",
+                h6: "h2",
+                subtitle1: "h2",
+                subtitle2: "h2",
+                body1: "span",
+                body2: "span",
+              },
+            },
+          },
+        },
+      }),
+    [prefersDarkMode]
+  );
 
   const wrapperRef = useRef(null);
 
@@ -215,10 +276,11 @@ function App() {
           </Helmet>
         )}
       </AppBar>
-      <div
+      <Box
         className="app-wrapper"
         onMouseDown={() => Tone.start()}
         onScroll={(e) => detectScrollToBottom(e)}
+        sx={{ bgcolor: "background.default" }}
       >
         <Menu
           style={{ marginTop: 48 }}
@@ -392,7 +454,7 @@ function App() {
             />
           </Route>
         </Switch>
-      </div>
+      </Box>
       {newSessionDialog && (
         <NewSessionDialog
           newSessionDialog={newSessionDialog}
