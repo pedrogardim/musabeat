@@ -41,11 +41,7 @@ function Keyboard(props) {
   }, [octaveState]);
 
   return (
-    <Paper
-      className="keyboard"
-      style={{ ...props.style }}
-      sx={(theme) => ({ opacity: theme.palette.mode === "dark" && 0.5 })}
-    >
+    <Paper className="keyboard" style={{ ...props.style }}>
       {Array(Math.floor(octaves * 12))
         .fill(1)
         .map((e, i) => {
@@ -61,27 +57,26 @@ function Keyboard(props) {
               .map((note) => Tone.Frequency(note, "midi").toMidi() - 24)
               .includes(i + octave * 12);
           return (
-            <Box
+            <Paper
               onMouseDown={() => handleKeyClick(i)}
               onMouseUp={() => handleKeyUp(i)}
               onMouseLeave={() => handleKeyUp(i)}
               onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
-              elevation={isActive ? 1 : 3}
+              elevation={isBlackKey ? 48 : 8}
               sx={(theme) => {
                 let dark = theme.palette.mode === "dark";
                 return {
+                  boxShadow: dark ? 4 : 0,
                   left: (i * 100) / (octaves * 12) + "%",
                   borderRadius: 0,
                   bgcolor: isActive
                     ? color[dark ? 900 : "A700"]
-                    : isBlackKey
-                    ? dark
-                      ? "#ffffff"
-                      : color[900]
                     : dark
                     ? "background.default"
+                    : isBlackKey
+                    ? color[900]
                     : color[100],
-                  outline: `solid 1px ${dark ? "#ffffff" : color[900]}`,
+                  outline: !dark && `solid 1px ${color[900]}`,
                   width: isBlackKey
                     ? 100 / ((78 / 7) * octaves) + "%"
                     : 100 / ((49 / 7) * octaves) + "%",
@@ -106,7 +101,7 @@ function Keyboard(props) {
               >
                 {Tone.Frequency(i + octave * 12 + 24, "midi").toNote()}
               </Typography>
-            </Box>
+            </Paper>
           );
         })}
       {props.variableOctave && (
