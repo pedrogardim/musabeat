@@ -1,6 +1,6 @@
 .track-picker {
   z-index: 2;
-  background-color: white;
+
   padding: 8px;
   display: flex;
   flex-direction: column;

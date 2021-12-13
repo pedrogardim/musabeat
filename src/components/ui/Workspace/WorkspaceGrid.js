@@ -8,14 +8,7 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
 
-import {
-  Box,
-  IconButton,
-  Icon,
-  Tooltip,
-  TextField,
-  Slider,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 function WorkspaceGrid(props) {
   const gridRef = useRef(null);
@@ -178,9 +171,12 @@ function WorkspaceGrid(props) {
                 }}
               >
                 {i % props.gridSize === 0 && !props.hiddenNumbers && (
-                  <span className="ws-grid-line-mesure-num">
+                  <Typography
+                    className="ws-grid-line-mesure-num"
+                    color="textPrimary"
+                  >
                     {i / props.gridSize + 1 + props.zoomPosition[0]}
-                  </span>
+                  </Typography>
                 )}
               </Box>
             )
@@ -219,8 +215,8 @@ function WorkspaceGrid(props) {
       {props.children}
 
       {props.selection.length > 0 && !props.selection.includes(null) && (
-        <div
-          style={{
+        <Box
+          sx={{
             position: "absolute",
             height: "100%",
             transform: `translateX(${
@@ -238,7 +234,7 @@ function WorkspaceGrid(props) {
                   (zoomSize * props.gridSize)) *
                   gridRef.current.offsetWidth
             ),
-            backgroundColor: "rgb(0, 0, 0,0.5)",
+            bgcolor: "text.secondary",
             opacity: 0.7,
             /* border:
                 props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
@@ -254,7 +250,7 @@ function WorkspaceGrid(props) {
             onMouseDown={() => setResizingHandle("right")}
             style={{ right: 0, opacity: 0 }}
           />
-        </div>
+        </Box>
       )}
 
       {/* <div style={{ position: "absolute", right: -64 }}>

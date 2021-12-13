@@ -10,7 +10,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   align-content: center;
-  background-color: white;
+
   overflow-x: hidden;
   overflow-y: hidden;
   padding: 0px 0 128px 0;
@@ -21,7 +21,7 @@
   max-width: 1200px;
   width: calc(100% - 32px);
   flex: 1 0;
-  background-color: white;
+
   overflow-x: hidden;
   overflow-y: hidden;
   max-width: 1200px;

@@ -27,6 +27,7 @@ import {
   TextField,
   Fab,
   Dialog,
+  Box,
 } from "@mui/material";
 
 import { Skeleton, Autocomplete, useAutocomplete } from "@mui/material";
@@ -905,11 +906,12 @@ function FileExplorer(props) {
       {mainContent}
     </Dialog>
   ) : (
-    <div
+    <Box
       className={`file-explorer ${props.compact && "file-explorer-compact"}`}
+      sx={{ bgcolor: "background.default" }}
     >
       {mainContent}
-    </div>
+    </Box>
   );
 }
 

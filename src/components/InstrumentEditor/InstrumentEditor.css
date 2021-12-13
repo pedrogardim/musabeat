@@ -121,7 +121,6 @@
   flex-wrap: wrap;
   align-content: space-evenly;
   z-index: 1;
-  background-color: white;
 }
 
 .turnonoff-button {

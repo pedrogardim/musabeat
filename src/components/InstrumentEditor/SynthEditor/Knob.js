@@ -135,7 +135,6 @@ function Knob(props) {
             position: "absolute",
             minWidth: "100%",
             top: 0,
-            backgroundColor: "white",
             outline: "black",
             textAlign: "center",
           }}

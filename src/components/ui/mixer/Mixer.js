@@ -2,7 +2,7 @@ import "./Mixer.css";
 import ChannelStrip from "./ChannelStrip";
 import React from "react";
 
-import { Icon, IconButton } from "@mui/material";
+import { Icon, IconButton, Box } from "@mui/material";
 
 function Mixer(props) {
   const handleSliderMove = (index, value) => {
@@ -28,7 +28,7 @@ function Mixer(props) {
   };
 
   return (
-    <div className="mixer" tabIndex={-1} style={props.style}>
+    <Box className="mixer" tabIndex={-1} sx={{ bgcolor: "background.default" }}>
       {props.tracks.map((track, index) => (
         <ChannelStrip
           index={index}
@@ -47,7 +47,7 @@ function Mixer(props) {
       >
         <Icon>close</Icon>
       </IconButton>
-    </div>
+    </Box>
   );
 }
 

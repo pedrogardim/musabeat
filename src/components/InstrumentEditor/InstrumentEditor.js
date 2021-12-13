@@ -299,7 +299,8 @@ function InstrumentEditor(props) {
           });
 
           !props.patchPage
-            ? props.setTracks((prev) => {
+            ? props.setTracks &&
+              props.setTracks((prev) => {
                 let newTracks = [...prev];
                 newTracks[props.index].instrument = { urls: urlsObj };
 
@@ -338,7 +339,8 @@ function InstrumentEditor(props) {
       });
 
       !props.patchPage
-        ? props.setTracks((prev) => {
+        ? props.setTracks &&
+          props.setTracks((prev) => {
             let newTracks = [...prev];
             newTracks[props.index].instrument = { urls: urlsObj };
 
@@ -381,7 +383,6 @@ function InstrumentEditor(props) {
       : {
           name: !!name ? name : "Untitled Drum Patch",
           urls: props.track.instrument.urls,
-          lbls: props.track.lbls,
         };
 
     let patch = Object.assign({}, clearInfo, patchInfo);
@@ -395,17 +396,18 @@ function InstrumentEditor(props) {
     const userRef = firebase.firestore().collection("users").doc(user.uid);
 
     newPatchRef.add(patch).then((r) => {
-      props.setTracks((previous) =>
-        previous.map((track, i) => {
-          if (i === props.index) {
-            let newTrack = { ...track };
-            newTrack.instrument = r.id;
-            return newTrack;
-          } else {
-            return track;
-          }
-        })
-      );
+      props.setTracks &&
+        props.setTracks((previous) =>
+          previous.map((track, i) => {
+            if (i === props.index) {
+              let newTrack = { ...track };
+              newTrack.instrument = r.id;
+              return newTrack;
+            } else {
+              return track;
+            }
+          })
+        );
 
       userRef.update(
         !trackType
@@ -454,30 +456,22 @@ function InstrumentEditor(props) {
       !isRemoving
         ? (patch.urls[props.track.type === 0 ? soundindex : name] = fileId)
         : delete patch.urls[props.track.type === 0 ? soundindex : name];
-      if (props.track.type === 0) {
-        //console.log(patch.lbls, soundindex);
 
-        !isRemoving
-          ? (patch.lbls[soundindex] = name)
-          : delete patch.lbls[soundindex];
-      }
-
-      props.setTracks((prev) => {
-        let newTracks = [...prev];
-        newTracks[props.index].instrument = { ...patch };
-        if (props.track.type === 0) {
-          newTracks[props.index].lbls = { ...patch.lbls };
-        }
-        return newTracks;
-      });
+      props.setTracks &&
+        props.setTracks((prev) => {
+          let newTracks = [...prev];
+          newTracks[props.index].instrument = { ...patch };
+          return newTracks;
+        });
     } else {
-      props.setTracks((prev) => {
-        let newTracks = [...prev];
-        newTracks[props.index].instrument = props.instrument.get();
-        return newTracks;
-      });
+      props.setTracks &&
+        props.setTracks((prev) => {
+          let newTracks = [...prev];
+          newTracks[props.index].instrument = props.instrument.get();
+          return newTracks;
+        });
     }
-    props.resetUndoHistory();
+    props.resetUndoHistory && props.resetUndoHistory();
   };
 
   const updateFilesStatsOnChange = async () => {
@@ -818,7 +812,6 @@ function InstrumentEditor(props) {
         (props.track.type === 0 ? (
           <NameInput
             select
-            defaultValue={props.track.lbls[renamingLabel]}
             open={true}
             onClose={() => setRenamingLabel(null)}
             onSubmit={(i) => renamePlayersLabel(renamingLabel, i)}

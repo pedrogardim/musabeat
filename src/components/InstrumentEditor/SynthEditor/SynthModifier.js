@@ -8,6 +8,7 @@ import {
   Paper,
   Grow,
   Select,
+  Box,
 } from "@mui/material";
 
 import { waveTypes } from "../../../assets/musicutils";
@@ -168,7 +169,7 @@ function SynthModifier(props) {
 
   return props.expanded ? (
     <Grow in={props.expanded} timeout={200}>
-      <div className="ie-synth-fs-item">
+      <Box className="ie-synth-fs-item" sx={{ bgcolor: "background.default" }}>
         <IconButton
           onClick={() => props.setExpanded(null)}
           className="mp-closebtn"
@@ -192,7 +193,7 @@ function SynthModifier(props) {
           ))}
         </Select>
         {mainContent}
-      </div>
+      </Box>
     </Grow>
   ) : (
     <Paper

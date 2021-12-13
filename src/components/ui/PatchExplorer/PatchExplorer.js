@@ -27,6 +27,7 @@ import {
   OutlinedInput,
   InputAdornment,
   Fab,
+  Box,
 } from "@mui/material";
 
 import { Skeleton, Autocomplete } from "@mui/material";
@@ -666,9 +667,10 @@ function PatchExplorer(props) {
   }, [props.isScrollBottom]); */
 
   return (
-    <div
+    <Box
       className={`patch-explorer ${props.compact && "patch-explorer-compact"}`}
       style={{ marginTop: props.userPatches && 32 }}
+      sx={{ bgcolor: "background.default" }}
     >
       {props.compact || props.explore ? (
         <>
@@ -745,11 +747,6 @@ function PatchExplorer(props) {
                         alignItems: "center",
                       }}
                     >
-                      <Typography variant="overline">
-                        {selectedPatchInfo
-                          ? selectedPatchInfo.name
-                          : "Save Instrument"}
-                      </Typography>
                       {selectedPatchInfo &&
                         selectedPatchInfo.base === "Sampler" && (
                           <Tooltip arrow placement="top" title="Sampler">
@@ -787,6 +784,11 @@ function PatchExplorer(props) {
                             />
                           </Tooltip>
                         )}
+                      <Typography variant="overline">
+                        {selectedPatchInfo
+                          ? selectedPatchInfo.name
+                          : "Save Instrument"}
+                      </Typography>
                     </div>
                   </TableCell>
                   <TableCell className="pet-collapsable-column">
@@ -837,6 +839,30 @@ function PatchExplorer(props) {
                             alignItems: "center",
                           }}
                         >
+                          {patchesUserData[patch.creator] &&
+                            (!props.userPatches ||
+                              (props.userPatches && showingLiked)) && (
+                              <Tooltip
+                                title={patchesUserData[patch.creator].username}
+                              >
+                                <Avatar
+                                  style={{
+                                    height: 24,
+                                    width: 24,
+                                    marginLeft: 8,
+                                  }}
+                                  alt={patchesUserData[patch.creator].username}
+                                  src={patchesUserData[patch.creator].photoURL}
+                                  onClick={(ev) =>
+                                    props.handlePageNav(
+                                      "user",
+                                      patchesUserData[patch.creator].username,
+                                      ev
+                                    )
+                                  }
+                                />
+                              </Tooltip>
+                            )}
                           <Typography
                             variant="overline"
                             className="fe-filename"
@@ -864,30 +890,6 @@ function PatchExplorer(props) {
                               >
                                 <Icon>edit</Icon>
                               </IconButton>
-                            )}
-                          {patchesUserData[patch.creator] &&
-                            (!props.userPatches ||
-                              (props.userPatches && showingLiked)) && (
-                              <Tooltip
-                                title={patchesUserData[patch.creator].username}
-                              >
-                                <Avatar
-                                  style={{
-                                    height: 24,
-                                    width: 24,
-                                    marginLeft: 8,
-                                  }}
-                                  alt={patchesUserData[patch.creator].username}
-                                  src={patchesUserData[patch.creator].photoURL}
-                                  onClick={(ev) =>
-                                    props.handlePageNav(
-                                      "user",
-                                      patchesUserData[patch.creator].username,
-                                      ev
-                                    )
-                                  }
-                                />
-                              </Tooltip>
                             )}
                           {patch.of && (
                             <Tooltip arrow placement="top" title="Official">
@@ -1116,7 +1118,7 @@ function PatchExplorer(props) {
           onSubmit={props.saveUserPatch}
         />
       )}
-    </div>
+    </Box>
   );
 }
 

@@ -11,7 +11,7 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-content: center;
-  background-color: white;
+
   overflow-y: scroll;
   padding: 0px 0 128px 0;
 }

@@ -41,7 +41,11 @@ function Keyboard(props) {
   }, [octaveState]);
 
   return (
-    <Paper className="keyboard" style={{ ...props.style }}>
+    <Paper
+      className="keyboard"
+      style={{ ...props.style }}
+      sx={(theme) => ({ opacity: theme.palette.mode === "dark" && 0.5 })}
+    >
       {Array(Math.floor(octaves * 12))
         .fill(1)
         .map((e, i) => {
@@ -72,12 +76,12 @@ function Keyboard(props) {
                     ? color[dark ? 900 : "A700"]
                     : isBlackKey
                     ? dark
-                      ? "#AAAAAA"
+                      ? "#ffffff"
                       : color[900]
                     : dark
                     ? "background.default"
                     : color[100],
-                  outline: `solid 1px ${dark ? "#ffffff80" : color[900]}`,
+                  outline: `solid 1px ${dark ? "#ffffff" : color[900]}`,
                   width: isBlackKey
                     ? 100 / ((78 / 7) * octaves) + "%"
                     : 100 / ((49 / 7) * octaves) + "%",
@@ -89,14 +93,14 @@ function Keyboard(props) {
             >
               <Typography
                 sx={{
-                  color: isBlackKey ? "background.default" : "text.secondary",
+                  color: isBlackKey ? "background.default" : "text.primary",
                 }}
               >
                 {props.notesLabel && props.notesLabel[i]}
               </Typography>
               <Typography
                 sx={{
-                  color: isBlackKey ? "background.default" : "text.secondary",
+                  color: isBlackKey ? "background.default" : "text.primary",
                 }}
                 style={{ opacity: 0.5 }}
               >

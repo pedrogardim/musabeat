@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from "react";
 
-import { Icon, IconButton, Paper, Grow } from "@mui/material";
+import { Icon, IconButton, Paper, Grow, Box } from "@mui/material";
 
 import "../InstrumentEditor.css";
 
@@ -44,7 +44,7 @@ function SynthOutput(props) {
 
   return props.expanded ? (
     <Grow in={props.expanded} timeout={200}>
-      <div className="ie-synth-fs-item">
+      <Box className="ie-synth-fs-item" sx={{ bgcolor: "background.default" }}>
         <IconButton
           onClick={() => props.setExpanded(null)}
           className="mp-closebtn"
@@ -53,7 +53,7 @@ function SynthOutput(props) {
           <Icon>close</Icon>
         </IconButton>
         {mainContent}
-      </div>
+      </Box>
     </Grow>
   ) : (
     <Paper
