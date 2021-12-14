@@ -3,30 +3,16 @@ import * as Tone from "tone";
 
 import { colors } from "../../utils/materialPalette";
 
-function ClosedTrackNote(props) {
-  const [isResizing, setIsResizing] = useState(false);
-  const [isMoving, setIsMoving] = useState(false);
+import { Box, Paper } from "@mui/material";
 
+function ClosedTrackNote(props) {
   const trackType = props.track.type;
 
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
-  /* 
-
-  useEffect(() => {
-    console.log("isResizing", isResizing);
-  }, [isResizing]);
-
-  useEffect(() => {
-    console.log("isMoving", isMoving);
-  }, [isMoving]);
-
-
- */
-
   return (
-    <div
-      className={`track-score-note`}
+    <Box
+      className="track-score-note"
       style={{
         height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
         width: props.note.duration
@@ -54,22 +40,25 @@ function ClosedTrackNote(props) {
       }}
     >
       {trackType === 0 ? (
-        <div
-          style={{
+        <Paper
+          sx={(theme) => ({
+            boxShadow: 0,
             position: "absolute",
-            height: 8,
-            top: "calc(50% - 4px)",
-            width: 8,
-            left: -3,
+            height: 4,
+            top: "calc(50% - 2px)",
+            width: 4,
+            left: -2,
             backgroundColor: props.selected
               ? "white"
+              : theme.palette.mode === "dark"
+              ? colors[props.track.color][900]
               : colors[props.track.color][900],
-            transform: "rotate(45deg)",
-          }}
+          })}
         />
       ) : (
-        <div
-          style={{
+        <Paper
+          sx={(theme) => ({
+            boxShadow: 0,
             position: "absolute",
             maxHeight: 8,
             height: "50%",
@@ -78,11 +67,13 @@ function ClosedTrackNote(props) {
             left: 1,
             backgroundColor: props.selected
               ? "white"
+              : theme.palette.mode === "dark"
+              ? colors[props.track.color][900]
               : colors[props.track.color][900],
-          }}
+          })}
         />
       )}
-    </div>
+    </Box>
   );
 }
 

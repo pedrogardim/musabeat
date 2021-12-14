@@ -218,7 +218,7 @@ function WorkspaceRuler(props) {
             className="ws-ruler-track"
             sx={(theme) => ({
               bgcolor:
-                colors[track.color][theme.palette.mode === "dark" ? 200 : 600],
+                colors[track.color][theme.palette.mode === "dark" ? 200 : 400],
             })}
           />
         ))}

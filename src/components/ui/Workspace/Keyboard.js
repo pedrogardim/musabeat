@@ -62,7 +62,7 @@ function Keyboard(props) {
               onMouseUp={() => handleKeyUp(i)}
               onMouseLeave={() => handleKeyUp(i)}
               onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
-              elevation={isBlackKey ? 48 : 8}
+              elevation={isBlackKey ? 24 : 8}
               sx={(theme) => {
                 let dark = theme.palette.mode === "dark";
                 return {

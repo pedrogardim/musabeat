@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
   Box,
+  Paper,
 } from "@mui/material";
 
 import {
@@ -540,11 +541,14 @@ function Track(props) {
         {trackRows.map((row, rowIndex) => (
           <Box
             className="track-inner-row"
-            sx={{
+            sx={(theme) => ({
               //borderTop: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
+              boxShadow: theme.palette.mode === "light" && 0,
+              borderRadius: 0,
+              zIndex: 0,
               borderBottom: trackType === 1 && 1,
-              borderColor: (t) =>
-                t.palette.mode === "dark"
+              borderColor:
+                theme.palette.mode === "dark"
                   ? "rgba(255, 255, 255,0.2)"
                   : "rgba(0, 0, 0,0.2)",
 
@@ -556,9 +560,10 @@ function Track(props) {
                   rowIndex % 12 === 6 ||
                   rowIndex % 12 === 9 ||
                   rowIndex % 12 === 11) &&
-                //"#0000001a",
-                colors[props.track.color][800] + "3a",
-            }}
+                (theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.08)"
+                  : colors[props.track.color][800] + "3a"),
+            })}
             key={rowIndex + "ri"}
           >
             <Typography

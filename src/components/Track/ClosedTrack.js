@@ -80,7 +80,7 @@ function ClosedTrack(props) {
 
   useEffect(() => {
     loadTrackRows();
-  }, [props.instrument, props.track, props.isLoaded, props.selectedTrack]);
+  }, [props.instrument, props.track, props.selectedTrack]);
 
   useEffect(() => {
     scheduleNotes();
@@ -100,7 +100,7 @@ function ClosedTrack(props) {
       disabled
       sx={(theme) => ({
         bgcolor:
-          colors[props.track.color][theme.palette.mode === "dark" ? 200 : 600],
+          colors[props.track.color][theme.palette.mode === "dark" ? 200 : 400],
       })}
     >
       <div
@@ -110,46 +110,40 @@ function ClosedTrack(props) {
           padding: 0,
           position: "absolute",
           overflow: "hidden",
-          display: !props.loaded && "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        {props.loaded ? (
-          rowRef.current &&
+        {!props.loaded && (
+          <CircularProgress
+            sx={(theme) => ({
+              position: "absolute",
+              left: "calc(50% - 20px)",
+              top: "calc(50% - 20px)",
+              color:
+                colors[props.track.color][
+                  theme.palette.mode === "dark" ? 900 : 900
+                ],
+            })}
+          />
+        )}
+        {rowRef.current &&
           props.track.score.length > 0 &&
           props.track.score.map((note, noteIndex) => (
             <ClosedTrackNote
               rowRef={rowRef}
               trackRows={trackRows}
               note={note}
-              drawingNote={drawingNote}
               track={props.track}
               sessionSize={props.sessionSize}
-              gridSize={props.gridSize}
-              gridPos={gridPos}
-              deletableNote={deletableNote}
-              setDrawingNote={setDrawingNote}
               index={noteIndex}
-              setTracks={props.setTracks}
-              isMouseDown={isMouseDown}
-              selectedTrack={props.selectedTrack}
               zoomPosition={props.zoomPosition}
               selected={
                 props.selectedNotes && props.selectedNotes.includes(noteIndex)
               }
+              key={noteIndex}
             />
-          ))
-        ) : (
-          <CircularProgress
-            sx={(theme) => ({
-              color:
-                colors[props.track.color][
-                  theme.palette.mode === "dark" ? 200 : 600
-                ],
-            })}
-          />
-        )}
+          ))}
       </div>
       <IconButton
         sx={(theme) => ({

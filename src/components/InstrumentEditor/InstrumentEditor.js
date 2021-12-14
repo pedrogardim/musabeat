@@ -554,11 +554,11 @@ function InstrumentEditor(props) {
       mainContent = (
         <Grid
           container
+          columns={{ xs: 12, sm: 12, md: 12 }}
           direction="row"
           justifyContent="center"
           alignItems="stretch"
           className="ie-drum-cont"
-          columns={{ xs: 4, sm: 4, md: 4 }}
           spacing={1}
         >
           {Array(20)

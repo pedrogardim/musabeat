@@ -18,6 +18,7 @@ import {
   Paper,
   Grid,
   ButtonBase,
+  Box,
 } from "@mui/material";
 
 import { useTranslation } from "react-i18next";
@@ -88,7 +89,14 @@ function DrumElement(props) {
           <span className="dc-slot-indicator">{props.index + 1}</span>
         ) : (
           props.exists && (
-            <img className="dc-img-corner" src={drumImgMag[props.index]} />
+            <Box
+              component="img"
+              sx={(theme) => ({
+                filter: theme.palette.mode === "dark" && "invert(1)",
+              })}
+              className="dc-img-corner"
+              src={drumImgMag[props.index]}
+            />
           )
         )}
 
@@ -116,8 +124,12 @@ function DrumElement(props) {
               </svg>
             ) : (
               props.isDrum && (
-                <img
-                  className={"dc-img-centered"}
+                <Box
+                  component="img"
+                  sx={(theme) => ({
+                    filter: theme.palette.mode === "dark" && "invert(1)",
+                  })}
+                  className="dc-img-centered"
                   src={drumImgMag[props.index]}
                 />
               )
