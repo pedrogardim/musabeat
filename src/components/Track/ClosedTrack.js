@@ -101,6 +101,9 @@ function ClosedTrack(props) {
       sx={(theme) => ({
         bgcolor:
           colors[props.track.color][theme.palette.mode === "dark" ? 200 : 400],
+        [theme.breakpoints.down("md")]: {
+          margin: "2px 0 2px 48px",
+        },
       })}
     >
       <div

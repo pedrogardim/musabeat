@@ -6,7 +6,7 @@
   display: flex;
   flex-direction: column;
   flex: 1 0;
-  height: 100%;
+  height: calc(100% - 8px);
   margin: 0 auto;
   align-items: center;
   justify-content: center;
@@ -31,7 +31,8 @@
   align-items: center;
   justify-content: flex-start;
   flex-direction: row;
-  flex-wrap: wrap;
+  /*   flex-wrap: wrap;
+ */
   text-transform: uppercase;
 }
 
@@ -83,8 +84,8 @@
   flex-direction: column;
   flex-wrap: wrap;
   height: 32px;
-  min-height: 16px;
   width: 100%;
+  min-height: 16px;
   /* transition: height 0.2s; */
   /* filter: brightness(0.9); */
 }
@@ -161,16 +162,4 @@
 
 .ws-track-selector > button {
   height: 64px;
-}
-
-@media only screen and (max-height: 800px) {
-  .ws-transport {
-    margin: 8px !important;
-  }
-}
-
-@media only screen and (max-height: 540px) {
-  .ws-header {
-    height: 40px;
-  }
 }

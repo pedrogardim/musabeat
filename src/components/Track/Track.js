@@ -523,8 +523,7 @@ function Track(props) {
       className="track-grid-row-wrapper"
       ref={rowWrapperRef}
       style={{
-        overflowY: trackType === 1 && isSelected && "overlay",
-        maxHeight: !isSelected && "10%",
+        overflowY: trackType === 1 && "scroll",
         cursor: props.cursorMode === "edit" && deletableNote && "not-allowed",
       }}
     >
@@ -552,7 +551,7 @@ function Track(props) {
                   ? "rgba(255, 255, 255,0.2)"
                   : "rgba(0, 0, 0,0.2)",
 
-              minHeight: trackType === 1 && "6.66666%",
+              height: trackType === 1 && "6.66666%",
               bgcolor:
                 trackType === 1 &&
                 (rowIndex % 12 === 2 ||

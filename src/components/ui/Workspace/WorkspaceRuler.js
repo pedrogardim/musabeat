@@ -141,13 +141,18 @@ function WorkspaceRuler(props) {
   }, [props.zoomPosition]);
 
   return (
-    <div
+    <Box
       className="ws-ruler"
       disabled
       //onMouseMove={handleHover}
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
       ref={rulerRef}
+      sx={(theme) => ({
+        [theme.breakpoints.down("md")]: {
+          height: "16px",
+        },
+      })}
     >
       {rulerRef.current && (
         <div
@@ -222,7 +227,7 @@ function WorkspaceRuler(props) {
             })}
           />
         ))}
-    </div>
+    </Box>
   );
 }
 

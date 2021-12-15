@@ -41,8 +41,6 @@ body *::-webkit-scrollbar-thumb {
 } */
 
 .app-bar {
-  height: 64px !important;
-  min-height: 64px !important;
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-left: env(safe-area-inset-left);
@@ -168,13 +166,5 @@ body *::-webkit-scrollbar-thumb {
   }
   100% {
     color: rgba(0, 0, 0, 0.493);
-  }
-}
-
-@media only screen and (max-height: 540px) {
-  .app-bar {
-    height: 40px !important;
-    min-height: 40px !important;
-    max-height: 40px !important;
   }
 }

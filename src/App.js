@@ -243,8 +243,26 @@ function App() {
           </Typography>
         </div>
       </Fade>
-      <AppBar position="sticky">
-        <Toolbar className="app-bar">
+      <AppBar
+        sx={(theme) => ({
+          [theme.breakpoints.down("md")]: {
+            height: "40px",
+            maxHeight: "40px",
+            minHeight: "40px",
+          },
+        })}
+        position="sticky"
+      >
+        <Toolbar
+          className="app-bar"
+          sx={(theme) => ({
+            [theme.breakpoints.down("md")]: {
+              height: "40px",
+              maxHeight: "40px",
+              minHeight: "40px",
+            },
+          })}
+        >
           <IconButton
             className="side-menu-icon"
             onClick={() => setSideMenu(true)}
@@ -265,6 +283,12 @@ function App() {
           </IconButton>
           <IconButton className="main-avatar" onClick={handleAvatarClick}>
             <Avatar
+              sx={(theme) => ({
+                [theme.breakpoints.down("md")]: {
+                  height: 32,
+                  width: 32,
+                },
+              })}
               alt={user && user.displayName}
               src={user && user.photoURL && user.photoURL}
             />

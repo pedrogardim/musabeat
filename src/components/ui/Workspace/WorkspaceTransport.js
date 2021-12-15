@@ -55,6 +55,12 @@ function WorkspaceTransport(props) {
       className="ws-transport"
       onClick={() => setExpanded(true)}
       tabIndex="-1"
+      sx={(theme) => ({
+        [theme.breakpoints.down("md")]: {
+          marginY: 1,
+          height: 32,
+        },
+      })}
     >
       <Box style={{ width: 88 }}>
         {props.selectedTrack !== null && (
@@ -80,28 +86,39 @@ function WorkspaceTransport(props) {
           ))}
       </Box>
       <Box className="ws-transport-info">
-        <Box>
-          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>
-            straighten
-          </Icon>
-          <Typography variant="body1" color="textPrimary">
-            {props.sessionSize}
-          </Typography>
-        </Box>
-        <Box>
-          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>
-            calendar_view_week
-          </Icon>
-          <Typography variant="body1" color="textPrimary">
-            {"1 / " + props.gridSize}
-          </Typography>
-        </Box>
-        <Box>
-          <Icon sx={{ color: "text.primary", fontSize: "1rem" }}>timer</Icon>
-          <Typography variant="body1" color="textPrimary">
-            {props.sessionData && props.sessionData.bpm}
-          </Typography>
-        </Box>
+        {[
+          { i: "calendar_view_week", t: props.sessionSize },
+          { i: "straighten", t: "1/" + props.gridSize },
+          {
+            i: "timer",
+            t: props.sessionData && props.sessionData.bpm,
+          },
+        ].map((e) => (
+          <Box key={e.i}>
+            <Icon
+              sx={(theme) => ({
+                color: "text.primary",
+                fontSize: "1rem",
+                [theme.breakpoints.down("md")]: {
+                  fontSize: 12,
+                },
+              })}
+            >
+              {e.i}
+            </Icon>
+            <Typography
+              variant="body1"
+              color="textPrimary"
+              sx={(theme) => ({
+                [theme.breakpoints.down("md")]: {
+                  fontSize: 8,
+                },
+              })}
+            >
+              {e.t}
+            </Typography>
+          </Box>
+        ))}
       </Box>
     </Box>
   );

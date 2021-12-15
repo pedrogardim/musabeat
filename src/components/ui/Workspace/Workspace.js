@@ -3,10 +3,19 @@ import { Helmet } from "react-helmet";
 import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
+import { useSprings, animated } from "react-spring";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Divider, Box } from "@mui/material";
+import {
+  Icon,
+  IconButton,
+  Snackbar,
+  Divider,
+  Box,
+  Fab,
+  Backdrop,
+} from "@mui/material";
 
 import "./Workspace.css";
 
@@ -105,13 +114,33 @@ function Workspace(props) {
 
   const [fileListOpen, setFileListOpen] = useState(false);
 
-  const [menuOpen, setMenuOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
   const [gridSize, setGridSize] = useState(4);
   const [zoomPosition, setZoomPosition] = useState([0, 3]);
 
   const [IEOpen, setIEOpen] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
+  //for mobile devices
+  const [expanded, setExpanded] = useState({
+    btn: false,
+    instr: false,
+    opt: false,
+  });
+
+  const expSprings = useSprings(1, [
+    {
+      bottom: expanded.btn ? 16 : -20,
+      right: expanded.btn ? 16 : selectedTrack !== null ? -68 : -20,
+      config: { tension: 200, friction: 13 },
+    },
+    {
+      bottom: !expanded.instr && "-128px",
+      config: { tension: 200, friction: 13 },
+    },
+  ]);
+
+  const AnimatedBox = animated(Box);
 
   const [premiumMode, setPremiumMode] = useState(false);
 
@@ -133,8 +162,6 @@ function Workspace(props) {
   const [editorProfiles, setEditorProfiles] = useState(null);
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
-
-  const [optionsOpen, setOptionsOpen] = useState(false);
 
   const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -1178,7 +1205,14 @@ function Workspace(props) {
       onMouseMove={(e) => setMousePosition([e.pageX, e.pageY])}
     >
       <LoadingScreen open={tracks === null} />
-      <div className="ws-header">
+      <Box
+        className="ws-header"
+        sx={(theme) => ({
+          [theme.breakpoints.down("md")]: {
+            height: "40px",
+          },
+        })}
+      >
         {sessionKey && (
           <WorkspaceTitle
             sessionData={sessionData}
@@ -1217,7 +1251,7 @@ function Workspace(props) {
             <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
           </IconButton>
         </div>
-      </div>
+      </Box>
 
       {!IEOpen && !mixerOpen && (
         <>
@@ -1369,7 +1403,16 @@ function Workspace(props) {
       {/* ================================================ */}
       {/* ================================================ */}
       {/* ================================================ */}
-      <div className="ws-note-input-options">
+
+      <Box
+        className="ws-options-btns"
+        sx={(theme) => ({
+          [theme.breakpoints.down("md")]: {
+            position: !expanded.opt && "fixed",
+            bottom: !expanded.opt && "-64px",
+          },
+        })}
+      >
         <IconButton
           onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
         >
@@ -1415,13 +1458,96 @@ function Workspace(props) {
             )}
           </>
         )}
-      </div>
+        <IconButton
+          onClick={() => setExpanded((prev) => ({ ...prev, opt: false }))}
+          sx={(theme) => ({
+            display: "none",
+            marginLeft: "auto",
+            [theme.breakpoints.down("md")]: {
+              display: "block",
+            },
+          })}
+        >
+          <Icon>close</Icon>
+        </IconButton>
+      </Box>
+
+      <AnimatedBox
+        onClick={(prev) =>
+          !expanded.btn && setExpanded((prev) => ({ ...prev, btn: true }))
+        }
+        style={{ ...expSprings[0] }}
+        sx={(theme) => ({
+          display: "none",
+          position: "fixed",
+          zIndex: 2,
+          [theme.breakpoints.down("md")]: {
+            display: "flex",
+          },
+        })}
+      >
+        <Backdrop
+          open={expanded.btn}
+          onClick={() => setExpanded((prev) => ({ ...prev, btn: false }))}
+        />
+        <Fab
+          color={expanded.opt || !expanded.btn ? "primary" : "default"}
+          onClick={() =>
+            expanded.btn &&
+            setExpanded((prev) => ({ ...prev, opt: !prev.opt, btn: false }))
+          }
+          size={"small"}
+        >
+          <Icon>tune</Icon>
+        </Fab>
+        {selectedTrack !== null && (
+          <Fab
+            color={expanded.instr ? "primary" : "default"}
+            onClick={() =>
+              expanded.btn &&
+              setExpanded((prev) => ({
+                ...prev,
+                instr: !prev.instr,
+                btn: false,
+              }))
+            }
+            size={"small"}
+            sx={{ ml: 1 }}
+          >
+            <Icon>piano</Icon>
+          </Fab>
+        )}
+      </AnimatedBox>
+
+      {/* <Fab
+        sx={(theme) => ({
+          position: "fixed",
+          bottom: -20,
+          right: -20,
+        })}
+        color="primary"
+        onClick={() => setExpanded("options")}
+        size={"small"}
+      >
+        <Icon>tune</Icon>
+      </Fab> */}
+
       {/* ================================================ */}
       {/* ================================================ */}
       {/* ================================================ */}
 
-      <div className="ws-note-input">
-        {selectedTrack !== null && tracks[selectedTrack].type !== 2 && (
+      {selectedTrack !== null && tracks[selectedTrack].type !== 2 && (
+        <Box
+          className="ws-note-input"
+          sx={(theme) => ({
+            [theme.breakpoints.down("md")]: {
+              position: !expanded.instr && "fixed",
+              bottom: !expanded.instr && "-128px",
+
+              margin: "4px 0 0 0",
+            },
+          })}
+        >
           <NotesInput
             keyMapping={keyMapping}
             track={tracks && tracks[selectedTrack]}
@@ -1436,8 +1562,8 @@ function Workspace(props) {
             instrumentInfo={instrumentsInfo[selectedTrack]}
             isMouseDown={isMouseDown}
           />
-        )}
-      </div>
+        </Box>
+      )}
       {trackPicker && (
         <TrackPicker
           tabIndex={-1}

@@ -104,12 +104,15 @@ function WorkspaceTitle(props) {
       <span
         /* onClick={() => setExpanded((prev) => !prev)} */
         style={{
-          maxWidth: "20vw",
           textOverflow: "ellipsis",
           overflow: "hidden",
           color: "white",
           fontSize: "2rem",
           lineHeight: 1,
+          marginRight: 8,
+          display: "inline-block",
+          whiteSpace: "nowrap",
+          maxWidth: "20vw",
         }}
       >
         {props.sessionData
@@ -146,14 +149,53 @@ function WorkspaceTitle(props) {
 
       */}
 
-      {props.editorProfiles !== null &&
+      <Tooltip
+        title={
+          props.editorProfiles &&
+          props.editorProfiles[props.sessionData.creator].profile.username
+        }
+      >
+        <Avatar
+          sx={(theme) => ({
+            marginRight: 8,
+            [theme.breakpoints.down("md")]: {
+              height: 32,
+              width: 32,
+            },
+          })}
+          src={
+            props.editorProfiles &&
+            props.editorProfiles[props.sessionData.creator].profile.photoURL
+          }
+          alt={
+            props.editorProfiles &&
+            props.editorProfiles[props.sessionData.creator].profile.username
+          }
+          onClick={(ev) =>
+            props.editorProfiles &&
+            props.handlePageNav(
+              "user",
+              props.editorProfiles[props.sessionData.creator].profile.username,
+              ev
+            )
+          }
+        />
+      </Tooltip>
+
+      {/* props.editorProfiles !== null &&
       Object.values(props.editorProfiles).length > 0 ? (
         Object.values(props.editorProfiles).map(
           (e) =>
             e && (
               <Tooltip title={e.profile.username}>
                 <Avatar
-                  style={{ marginRight: 8 }}
+                  sx={(theme) => ({
+                    marginRight: 8,
+                    [theme.breakpoints.down("md")]: {
+                      height: 32,
+                      width: 32,
+                    },
+                  })}
                   src={e.profile.photoURL}
                   alt={e.profile.username}
                   onClick={(ev) =>
@@ -165,9 +207,9 @@ function WorkspaceTitle(props) {
         )
       ) : (
         <Avatar />
-      )}
+      ) */}
 
-      <div className="break" style={{ margin: 0 }} />
+      {/* <div className="break" style={{ margin: 0 }} /> */}
 
       {props.sessionData && expanded && (
         <>
