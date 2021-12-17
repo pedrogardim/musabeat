@@ -523,7 +523,7 @@ function Track(props) {
       className="track-grid-row-wrapper"
       ref={rowWrapperRef}
       style={{
-        overflowY: trackType === 1 && "scroll",
+        overflowY: trackType === 1 && "overlay",
         cursor: props.cursorMode === "edit" && deletableNote && "not-allowed",
       }}
     >

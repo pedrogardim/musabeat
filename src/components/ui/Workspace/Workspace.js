@@ -40,6 +40,7 @@ import FileList from "./FileList";
 
 import LoadingScreen from "../LoadingScreen";
 import ActionConfirm from "../Dialogs/ActionConfirm";
+import AuthDialog from "../Dialogs/AuthDialog";
 import FileUploader from "../Dialogs/FileUploader/FileUploader";
 
 import NotFoundPage from "../NotFoundPage";
@@ -130,8 +131,8 @@ function Workspace(props) {
 
   const expSprings = useSprings(1, [
     {
-      bottom: expanded.btn ? 16 : -20,
-      right: expanded.btn ? 16 : selectedTrack !== null ? -68 : -20,
+      bottom: expanded.btn ? 16 : -10,
+      right: expanded.btn ? 16 : selectedTrack !== null ? -58 : -10,
       config: { tension: 200, friction: 13 },
     },
     {
@@ -696,17 +697,19 @@ function Workspace(props) {
     e.preventDefault();
     //console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
     if (
-      Tone.Transport.state !== "started" //&&
-      //isLoaded &&
+      Tone.Transport.state !== "started" &&
+      isLoaded
+      //&&
       //!instrumentsLoaded.includes(false)
     ) {
       Tone.Transport.start();
       setIsPlaying(true);
     } else {
       Tone.Transport.pause();
-      instruments.forEach((e) =>
-        e.name === "Players" ? e.stopAll() : e.releaseAll()
-      );
+      isLoaded &&
+        instruments.forEach((e) =>
+          e.name === "Players" ? e.stopAll() : e.releaseAll()
+        );
       setIsRecording(false);
       setIsPlaying(false);
     }
@@ -777,14 +780,16 @@ function Workspace(props) {
     if (!selection || selection.length < 0) return;
     if (action === "delete") {
       setTracks((prev) =>
-        prev.map((mod, modIndex) => {
-          let newTrack = { ...mod };
-          let notesToRemove = selectedNotes[modIndex];
-          newTrack.score = newTrack.score.filter(
-            (note, noteIndex) => !notesToRemove.includes(noteIndex)
-          );
-          return newTrack;
-        })
+        prev.map((track, trackIndex) => ({
+          ...track,
+          score:
+            selectedNotes[trackIndex] && selectedNotes[trackIndex].length > 0
+              ? track.score.filter(
+                  (note, noteIndex) =>
+                    !selectedNotes[trackIndex].includes(noteIndex)
+                )
+              : track.score,
+        }))
       );
       setSelectedNotes([]);
     }
@@ -1242,14 +1247,16 @@ function Workspace(props) {
               {isPlaying ? "pause" : "play_arrow"}
             </Icon>
           </IconButton>
-          <IconButton
-            size="large"
-            tabIndex="-1"
-            color="secondary"
-            onClick={toggleRecording}
-          >
-            <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
-          </IconButton>
+          {editMode && (
+            <IconButton
+              size="large"
+              tabIndex="-1"
+              color="secondary"
+              onClick={toggleRecording}
+            >
+              <Icon style={{ fontSize: 36 }}>fiber_manual_record</Icon>
+            </IconButton>
+          )}
         </div>
       </Box>
 
@@ -1472,6 +1479,10 @@ function Workspace(props) {
         </IconButton>
       </Box>
 
+      {/*==========================================================*/}
+      {/*==========================================================*/}
+      {/*==========================================================*/}
+
       <AnimatedBox
         onClick={(prev) =>
           !expanded.btn && setExpanded((prev) => ({ ...prev, btn: true }))
@@ -1480,7 +1491,7 @@ function Workspace(props) {
         sx={(theme) => ({
           display: "none",
           position: "fixed",
-          zIndex: 2,
+          zIndex: 6,
           [theme.breakpoints.down("md")]: {
             display: "flex",
           },
@@ -1498,7 +1509,7 @@ function Workspace(props) {
           }
           size={"small"}
         >
-          <Icon>tune</Icon>
+          <Icon>{expanded.btn ? "tune" : ""}</Icon>
         </Fab>
         {selectedTrack !== null && (
           <Fab
@@ -1611,7 +1622,7 @@ function Workspace(props) {
         saveSession={() => setAreUnsavedChanges(false)}
       /> */}
 
-      {uploadingFiles.length > 0 && (
+      {props.user && uploadingFiles.length > 0 && (
         <FileUploader
           workspace
           open={uploadingFiles.length > 0}
@@ -1627,6 +1638,10 @@ function Workspace(props) {
             setPendingUploadFiles([]);
           }}
         />
+      )}
+
+      {props.user === null && tracks !== null && (
+        <AuthDialog persistent authDialog={true} setUser={props.setUser} />
       )}
 
       <Snackbar

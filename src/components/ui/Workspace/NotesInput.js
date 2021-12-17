@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 
 import * as Tone from "tone";
 
-import { Paper, IconButton, Typography, Icon } from "@mui/material";
+import { Paper, IconButton, Typography, Icon, Box } from "@mui/material";
 
 import "./NotesInput.css";
 
@@ -31,7 +31,14 @@ function NotesInput(props) {
   useEffect(() => {}, [props.pressedKeys]);
 
   return (
-    <div className="ws-note-input-key-cont">
+    <Box
+      className="ws-note-input-key-cont"
+      sx={(theme) => ({
+        [theme.breakpoints.down("md")]: {
+          height: 64,
+        },
+      })}
+    >
       {props.track &&
         props.instrument &&
         props.trackRows.length > 0 &&
@@ -161,7 +168,7 @@ function NotesInput(props) {
             />
           </>
         ))}
-    </div>
+    </Box>
   );
 }
 

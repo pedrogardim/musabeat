@@ -62,12 +62,13 @@ function DrumElement(props) {
   const [wavePath, setWavePath] = useState("");
 
   const handleClick = (e) => {
-    if (
+    if (props.exists) props.instrument.player(props.index).start();
+    /* if (
       e.target.className.includes &&
-      e.target.className.includes("drum-component")
+      !e.target.className.includes("Typography")
     ) {
       if (props.exists) props.instrument.player(props.index).start();
-    }
+    } */
   };
 
   useEffect(
@@ -76,7 +77,7 @@ function DrumElement(props) {
   );
 
   return (
-    <Grid xs={3} sm={3} md={3} lg={3} item>
+    <Grid xs={4} sm={4} md={4} lg={4} item>
       <ButtonBase
         fullWidth={true}
         elevation={!props.exists ? 0 : 2}
@@ -86,7 +87,13 @@ function DrumElement(props) {
         style={{ backgroundColor: !props.exists && "rgba(0,0,0,0.05)" }}
       >
         {!props.isDrum ? (
-          <span className="dc-slot-indicator">{props.index + 1}</span>
+          <Typography
+            variant="body1"
+            color="textPrimary"
+            className="dc-slot-indicator"
+          >
+            {props.index + 1}
+          </Typography>
         ) : (
           props.exists && (
             <Box
@@ -101,25 +108,27 @@ function DrumElement(props) {
         )}
 
         {(props.exists || props.isDrum) && (
-          <div
+          <Box
             style={{
               position: "relative",
               width: 128,
               height: 64,
               minHeight: 64,
               marginBottom: 16,
-              display: "flex",
               justifyContent: "center",
               alignItems: "center",
               flex: "0 0",
+              display: "flex",
             }}
+            /* sx={(theme) => ({
+              display: "flex",
+              [theme.breakpoints.down("md")]: {
+                display: "none",
+              },
+            })} */
           >
             {props.exists ? (
-              <svg
-                onClick={props.openFilePage}
-                className="dc-audio-file-item-waveform"
-                viewBow="0 0 64 32"
-              >
+              <svg className="dc-audio-file-item-waveform" viewBow="0 0 64 32">
                 <path d={wavePath} stroke="#3f51b5" fill="none" />
               </svg>
             ) : (
@@ -134,16 +143,13 @@ function DrumElement(props) {
                 />
               )
             )}
-          </div>
+          </Box>
         )}
 
         <Typography
           variant="body1"
           color="textPrimary"
-          /* onClick={() =>
-          props.instrument.name === "Players" &&
-          props.setRenamingLabel(props.index)
-        } */
+          /* onClick={() => props.exists && props.openFilePage()} */
         >
           {props.exists
             ? props.fileInfo.name + "." + fileExtentions[props.fileInfo.type]

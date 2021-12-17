@@ -259,7 +259,7 @@ function AuthDialog(props) {
         open={props.authDialog}
         maxWidth="sm"
         fullWidth={true}
-        onClose={() => props.setAuthDialog(false)}
+        onClose={() => !props.persistent && props.setAuthDialog(false)}
       >
         <DialogTitle>
           {" "}

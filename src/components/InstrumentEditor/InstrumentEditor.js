@@ -554,7 +554,7 @@ function InstrumentEditor(props) {
       mainContent = (
         <Grid
           container
-          columns={{ xs: 12, sm: 12, md: 12 }}
+          columns={{ xs: 20, sm: 20, md: 20, lg: 20 }}
           direction="row"
           justifyContent="center"
           alignItems="stretch"
@@ -578,9 +578,13 @@ function InstrumentEditor(props) {
                 fileInfo={props.instrumentInfo.filesInfo[i]}
                 setRenamingLabel={setRenamingLabel}
                 openFilePage={(ev) =>
-                  props.handlePageNav("file", filesId[i], ev)
+                  props.handlePageNav(
+                    "file",
+                    props.instrumentInfo.patch.urls[i],
+                    ev
+                  )
                 }
-                fileId={filesId[i]}
+                fileId={props.instrumentInfo.patch.urls[i]}
                 isDrum={isDrum}
               />
             ))}
@@ -593,7 +597,7 @@ function InstrumentEditor(props) {
       );
       //console.log(bufferObjects, filesName);
       mainContent = (
-        <div style={{ overflowY: "scroll", height: "100%", width: "100%" }}>
+        <div style={{ overflowY: "overlay", height: "100%", width: "100%" }}>
           <Select
             variant="standard"
             native
@@ -715,7 +719,7 @@ function InstrumentEditor(props) {
         {trackType === 0 ? (
           <>
             <IconButton
-              color={isDrum ? "primary" : "disabled"}
+              color={isDrum ? "primary" : "default"}
               onClick={toggleSamplerMode}
             >
               <SvgIcon viewBox="0 0 351 322.7">{drumIcon}</SvgIcon>

@@ -452,6 +452,7 @@ function App() {
               setOpenedSession={setOpenedSession}
               session={openedSession}
               user={user}
+              setUser={setUser}
               createNewSession={handleCreateNewSession}
               setUnsavedChanges={setUnsavedChanges}
               setNewSessionDialog={setNewSessionDialog}
