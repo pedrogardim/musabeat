@@ -145,6 +145,8 @@ function ClosedTrack(props) {
                 props.selectedNotes && props.selectedNotes.includes(noteIndex)
               }
               key={noteIndex}
+              gridSize={props.gridSize}
+              movingSelDelta={props.movingSelDelta}
             />
           ))}
       </div>

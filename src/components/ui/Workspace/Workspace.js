@@ -163,6 +163,7 @@ function Workspace(props) {
   const [editorProfiles, setEditorProfiles] = useState(null);
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
+  const [movingSelDelta, setMovingSelDelta] = useState(null);
 
   const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -1162,7 +1163,7 @@ function Workspace(props) {
   }, [metronomeState]);
 
   useEffect(() => {
-    tracks && updateSelectedNotes();
+    tracks && movingSelDelta === null && updateSelectedNotes();
   }, [selection]);
 
   useEffect(() => {
@@ -1317,11 +1318,15 @@ function Workspace(props) {
           isRecording={isRecording}
           selection={selection}
           setSelection={setSelection}
+          selectedNotes={selectedNotes}
           cursorMode={cursorMode}
           zoomPosition={zoomPosition}
           selectedTrack={selectedTrack}
           hiddenNumbers={IEOpen || mixerOpen}
           isMouseDown={isMouseDown}
+          movingSelDelta={movingSelDelta}
+          setMovingSelDelta={setMovingSelDelta}
+          setTracks={setTracks}
         >
           {selectedTrack !== null ? (
             <Track
@@ -1361,6 +1366,7 @@ function Workspace(props) {
               setTrackRows={setTrackRows}
               setIsMouseDown={setIsMouseDown}
               setPendingUploadFiles={setPendingUploadFiles}
+              movingSelDelta={movingSelDelta}
             />
           ) : (
             <>
@@ -1394,6 +1400,7 @@ function Workspace(props) {
                     gridSize={gridSize}
                     isRecording={isRecording}
                     zoomPosition={zoomPosition}
+                    movingSelDelta={movingSelDelta}
                   />
                 ))}
               <IconButton

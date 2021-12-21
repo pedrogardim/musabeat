@@ -323,8 +323,10 @@ function AudioClip(props) {
         transform: `translate(${
           Tone.Time(noteTime).toSeconds() *
             (props.rowRef.current.offsetWidth /
-              (zoomSize * Tone.Time("1m").toSeconds())) -
-          props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
+              (zoomSize * Tone.Time("1m").toSeconds())) +
+          ((isSelected ? props.movingSelDelta / props.gridSize : 0) -
+            props.zoomPosition[0]) *
+            (props.rowRef.current.offsetWidth / zoomSize)
         }px,${props.rowRef.current.scrollHeight / 4}px)`,
         opacity: props.ghost && 0.5,
         backgroundColor: props.recording

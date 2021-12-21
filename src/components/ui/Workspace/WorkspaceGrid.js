@@ -8,7 +8,7 @@ import Draggable from "react-draggable";
 
 import { colors } from "../../../utils/materialPalette";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, IconButton, Icon } from "@mui/material";
 
 function WorkspaceGrid(props) {
   const gridRef = useRef(null);
@@ -19,6 +19,7 @@ function WorkspaceGrid(props) {
   const [initialSelectionPos, setInitialSelectionPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
+  const [isMovingSelected, setIsMovingSelected] = useState(false);
 
   const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
@@ -36,17 +37,20 @@ function WorkspaceGrid(props) {
   const handleCursorDragStop = (event, element) => {};
 
   const handleMouseDown = (e) => {
+    setIsMouseDown(true);
+
     if (e.target.className.includes("handle")) {
       return;
     }
 
     let isClickOnNote = e.target.className.includes("note");
+    let isClickOnButton =
+      e.target.className.includes("MuiIcon") ||
+      e.target.className.includes("MuiButton");
 
-    if (isClickOnNote) return;
+    if (isClickOnNote || isClickOnButton) return;
 
     props.setSelection([]);
-
-    setIsMouseDown(true);
 
     if (!props.cursorMode && !isClickOnNote) {
       Tone.Transport.seconds =
@@ -79,18 +83,20 @@ function WorkspaceGrid(props) {
     setIsMouseDown(false);
     setResizingHandle(null);
     setInitialSelectionPos(null);
+    setIsMovingSelected(false);
+    if (props.movingSelDelta !== null) commitNotesDrag();
     //props.setSelection([]);
   };
 
   const onGridPosChange = () => {
     //drag note input
     if (isMouseDown && !resizingHandle) {
-      if (props.cursorMode === "edit") {
-        //handleMouseDown();
-      } else {
-        props.setSelection((prev) =>
-          [initialSelectionPos, gridPos].sort((a, b) => a - b)
-        );
+      if (props.cursorMode !== "edit") {
+        if (isMovingSelected === false)
+          props.setSelection((prev) =>
+            [initialSelectionPos, gridPos].sort((a, b) => a - b)
+          );
+        else handleSelectedNotesDrag();
       }
     }
     if (resizingHandle) {
@@ -107,6 +113,31 @@ function WorkspaceGrid(props) {
         return newSelection;
       });
     }
+  };
+
+  const commitNotesDrag = () => {
+    props.setTracks((prev) =>
+      prev.map((track, trackIndex) => ({
+        ...track,
+        score: track.score.map((note, noteIndex) => ({
+          ...note,
+          time: Tone.Time(
+            Tone.Time(note.time).toSeconds() +
+              (props.selectedNotes[trackIndex].includes(noteIndex) &&
+                (props.movingSelDelta / props.gridSize) *
+                  Tone.Time("1m").toSeconds())
+          ).toBarsBeatsSixteenths(),
+        })),
+      }))
+    );
+
+    props.setSelection((prev) => prev.map((e) => e + props.movingSelDelta));
+
+    props.setMovingSelDelta(null);
+  };
+
+  const handleSelectedNotesDrag = () => {
+    props.setMovingSelDelta(gridPos - isMovingSelected);
   };
   /* 
   useEffect(() => {
@@ -220,7 +251,8 @@ function WorkspaceGrid(props) {
             position: "absolute",
             height: "100%",
             transform: `translateX(${
-              ((props.selection.sort((a, b) => a - b)[0] -
+              ((props.selection.sort((a, b) => a - b)[0] +
+                (props.movingSelDelta && props.movingSelDelta) -
                 props.zoomPosition[0] * props.gridSize) /
                 (zoomSize * props.gridSize)) *
                 gridRef.current.offsetWidth +
@@ -236,6 +268,9 @@ function WorkspaceGrid(props) {
             ),
             bgcolor: "text.secondary",
             opacity: 0.7,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
             /* border:
                 props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
           }}
@@ -250,6 +285,13 @@ function WorkspaceGrid(props) {
             onMouseDown={() => setResizingHandle("right")}
             style={{ right: 0, opacity: 0 }}
           />
+          <IconButton onMouseDown={() => setIsMovingSelected(gridPos)}>
+            <Icon
+              sx={{ transform: "rotate(45deg)", color: "background.default" }}
+            >
+              open_in_full
+            </Icon>
+          </IconButton>
         </Box>
       )}
 

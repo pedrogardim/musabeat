@@ -24,8 +24,10 @@ function ClosedTrackNote(props) {
         transform: `translate(${
           Tone.Time(props.note.time).toSeconds() *
             (props.rowRef.current.offsetWidth /
-              (zoomSize * Tone.Time("1m").toSeconds())) -
-          props.zoomPosition[0] * (props.rowRef.current.offsetWidth / zoomSize)
+              (zoomSize * Tone.Time("1m").toSeconds())) +
+          ((props.selected ? props.movingSelDelta / props.gridSize : 0) -
+            props.zoomPosition[0]) *
+            (props.rowRef.current.offsetWidth / zoomSize)
         }px,${
           props.trackRows
             .sort((a, b) =>

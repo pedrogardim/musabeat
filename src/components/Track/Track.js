@@ -606,6 +606,7 @@ function Track(props) {
                   selectedTrack={props.selectedTrack}
                   selectedNotes={props.selectedNotes}
                   zoomPosition={props.zoomPosition}
+                  movingSelDelta={props.movingSelDelta}
                   a={rowRef.current}
                   exists={props.instrument.has(note.note)}
                 />
@@ -629,6 +630,7 @@ function Track(props) {
                   selectedNotes={props.selectedNotes}
                   setSelectedNotes={props.setSelectedNotes}
                   zoomPosition={props.zoomPosition}
+                  movingSelDelta={props.movingSelDelta}
                   a={rowRef.current}
                 />
               ) : (
@@ -655,6 +657,7 @@ function Track(props) {
                     setSelectedNotes={props.setSelectedNotes}
                     zoomPosition={props.zoomPosition}
                     fileInfo={props.instrumentInfo.filesInfo[note.clip]}
+                    movingSelDelta={props.movingSelDelta}
                     floatPos={floatPos}
                     loaded={true}
                   />
