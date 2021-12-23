@@ -76,6 +76,19 @@
   margin-right: 8px;
 }
 
+.ws-transport-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.ws-transport-box:hover {
+  background-color: rgba(150, 150, 150, 0.2);
+}
+
 .ws-ruler {
   display: flex;
   position: relative;

@@ -1273,6 +1273,9 @@ function Workspace(props) {
             setSelectedTrack={setSelectedTrack}
             sessionData={sessionData}
             setSessionData={setSessionData}
+            mousePosition={mousePosition}
+            isMouseDown={isMouseDown}
+            setIsMouseDown={setIsMouseDown}
           />
 
           <WorkspaceRuler
