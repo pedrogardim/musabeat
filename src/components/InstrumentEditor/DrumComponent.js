@@ -62,13 +62,14 @@ function DrumElement(props) {
   const [wavePath, setWavePath] = useState("");
 
   const handleClick = (e) => {
-    if (props.exists) props.instrument.player(props.index).start();
-    /* if (
-      e.target.className.includes &&
-      !e.target.className.includes("Typography")
+    if (
+      ((e.target.className.includes &&
+        !e.target.className.includes("audio-file-item-label")) ||
+        !e.target.className.includes) &&
+      props.exists
     ) {
-      if (props.exists) props.instrument.player(props.index).start();
-    } */
+      props.instrument.player(props.index).start();
+    }
   };
 
   useEffect(
@@ -109,23 +110,13 @@ function DrumElement(props) {
 
         {(props.exists || props.isDrum) && (
           <Box
-            style={{
-              position: "relative",
-              width: 128,
-              height: 64,
-              minHeight: 64,
-              marginBottom: 16,
-              justifyContent: "center",
-              alignItems: "center",
-              flex: "0 0",
-              display: "flex",
-            }}
-            /* sx={(theme) => ({
+            className="drum-component-waveform"
+            sx={(theme) => ({
               display: "flex",
               [theme.breakpoints.down("md")]: {
                 display: "none",
               },
-            })} */
+            })}
           >
             {props.exists ? (
               <svg className="dc-audio-file-item-waveform" viewBow="0 0 64 32">
@@ -149,7 +140,8 @@ function DrumElement(props) {
         <Typography
           variant="body1"
           color="textPrimary"
-          /* onClick={() => props.exists && props.openFilePage()} */
+          className="audio-file-item-label"
+          onClick={props.handleFileClick}
         >
           {props.exists
             ? props.fileInfo.name + "." + fileExtentions[props.fileInfo.type]

@@ -28,6 +28,7 @@ import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
 import NameInput from "../ui/Dialogs/NameInput";
 import NoteInput from "../ui/Dialogs/NoteInput";
 import ActionConfirm from "../ui/Dialogs/ActionConfirm";
+import FileEditor from "./FileEditor";
 
 import NotFoundPage from "../ui/NotFoundPage";
 
@@ -70,6 +71,7 @@ function InstrumentEditor(props) {
 
   const [renamingLabel, setRenamingLabel] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
+  const [editingFile, setEditingFile] = useState(null);
 
   const [patchSize, setPatchSize] = useState(0);
 
@@ -82,7 +84,7 @@ function InstrumentEditor(props) {
 
   const isDrum = trackType === 0 && props.instrumentInfo.patch.dr;
 
-  const setIntrument = (newInstrument) => {
+  const setInstrument = (newInstrument) => {
     //console.log("instrument set", newInstrument._dummyVoice);
     props.setInstruments((prev) => {
       let newInstruments = [...prev];
@@ -92,6 +94,13 @@ function InstrumentEditor(props) {
       return newInstruments;
     });
   };
+
+  const setInstrumentLoaded = (state) =>
+    props.setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[props.index] = state;
+      return a;
+    });
 
   const changeInstrumentType = async (e) => {
     let newType = e.target.value;
@@ -128,7 +137,7 @@ function InstrumentEditor(props) {
 
     setSelectedPatch("Custom");
 
-    setIntrument(newInstrument);
+    setInstrument(newInstrument);
 
     props.setTracks &&
       props.setTracks((prev) => {
@@ -183,8 +192,14 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
-    setIntrument(newInstrument);
+    setInstrument(newInstrument);
     onInstrumentMod(fileId, fileName, soundindex, true);
+
+    props.setInstrumentsInfo((prev) => {
+      let newInfo = [...prev];
+      delete newInfo[props.index].filesInfo.soundindex;
+      return newInfo;
+    });
 
     firebase
       .firestore()
@@ -203,7 +218,7 @@ function InstrumentEditor(props) {
 
     props.instrument.dispose();
 
-    setIntrument(newInstrument);
+    setInstrument(newInstrument);
 
     onInstrumentMod(
       fileId,
@@ -474,6 +489,114 @@ function InstrumentEditor(props) {
     props.resetUndoHistory && props.resetUndoHistory();
   };
 
+  /* const updateOnFileLoaded = (dur) => {
+    //console.log(props.instrument);
+    props.setModules((previousModules) => {
+      let newmodules = [...previousModules];
+      if (props.instrument.buffer)
+        newmodules[props.index].score[0].duration = parseFloat(
+          (dur ? dur : props.instrument.buffer.duration).toFixed(2)
+        );
+      return newmodules;
+    });
+    props.resetUndoHistory();
+  }; */
+
+  const onFileClick = (fileId, fileUrl, audiobuffer, index, data) => {
+    let isDrum = props.track.type === 0;
+    if (props.track.type === 3) {
+      setInstrumentLoaded(false);
+      props.instrument.dispose();
+      let newPlayer = new Tone.GrainPlayer(
+        audiobuffer ? audiobuffer : fileUrl,
+        () => setInstrumentLoaded(true)
+      ).toDestination();
+
+      setInstrument(newPlayer);
+      //updateOnFileLoaded();
+      onInstrumentMod(fileId);
+      //setModulePage(null);
+    } else {
+      setInstrumentLoaded(false);
+
+      let labelOnInstrument = isDrum
+        ? index
+        : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
+
+      if (typeof props.track.instrument === "string") {
+        firebase
+          .firestore()
+          .collection(isDrum ? "drumpatches" : "patches")
+          .doc(props.track.instrument)
+          .get()
+          .then((r) => {
+            if (props.instrument.has(labelOnInstrument)) {
+              let newInstrument = new Tone.Players().toDestination();
+
+              props.instrument._buffers._buffers.forEach((value, key) => {
+                if (JSON.stringify(index) !== key)
+                  newInstrument.add(key, value);
+              });
+
+              newInstrument.add(
+                labelOnInstrument,
+                audiobuffer ? audiobuffer : fileUrl,
+                () => setInstrumentLoaded(true)
+              );
+
+              props.instrument.dispose();
+
+              setInstrument(newInstrument);
+            } else {
+              props.instrument.add(
+                labelOnInstrument,
+                audiobuffer ? audiobuffer : fileUrl,
+                () => setInstrumentLoaded(true)
+              );
+            }
+
+            props.setInstrumentsInfo((prev) => {
+              let a = [...prev];
+              a[props.index].filesInfo[index] = data;
+              return a;
+            });
+
+            onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+          });
+      } else {
+        //console.log(Object.keys(props.track.instrument.urls), labelOnInstrument);
+
+        if (props.instrument.has(labelOnInstrument)) {
+          let newInstrument = new Tone.Players().toDestination();
+
+          props.instrument._buffers._buffers.forEach((value, key) => {
+            if (JSON.stringify(index) !== key) newInstrument.add(key, value);
+          });
+
+          newInstrument.add(
+            labelOnInstrument,
+            audiobuffer ? audiobuffer : fileUrl,
+            () => setInstrumentLoaded(true)
+          );
+
+          props.instrument.dispose();
+
+          setInstrument(newInstrument);
+        } else {
+          props.instrument.add(
+            labelOnInstrument,
+            audiobuffer ? audiobuffer : fileUrl,
+            () => setInstrumentLoaded(true)
+          );
+        }
+
+        //console.log(props.instrument);
+
+        onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+      }
+    }
+  };
+
   const updateFilesStatsOnChange = async () => {
     //when change the instrument, update file "in" stat by -1
     /*
@@ -586,6 +709,7 @@ function InstrumentEditor(props) {
                 }
                 fileId={props.instrumentInfo.patch.urls[i]}
                 isDrum={isDrum}
+                handleFileClick={() => setEditingFile(i)}
               />
             ))}
         </Grid>
@@ -679,7 +803,7 @@ function InstrumentEditor(props) {
       {/* {fileExplorer && (
         <FileExplorer
           compact
-          setInstrumentLoaded={setIntrumentLoaded}
+          setInstrumentLoaded={setInstrumentLoaded}
           onFileClick={props.handleFileClick}
           setFileExplorer={setFileExplorer}
           setSnackbarMessage={props.setSnackbarMessage}
@@ -782,7 +906,7 @@ function InstrumentEditor(props) {
         onInstrumentMod={onInstrumentMod}
         track={props.track}
         instrument={props.instrument}
-        setInstrumentLoaded={setIntrumentLoaded}
+        setInstrumentLoaded={setInstrumentLoaded}
         setFilesName={setFilesName}
         setFilesId={setFilesId}
         renamePlayersLabel={renamePlayersLabel}
@@ -839,6 +963,36 @@ function InstrumentEditor(props) {
           }
           open={deletingItem}
           onClose={() => setDeletingItem(null)}
+        />
+      )}
+
+      {editingFile !== null && (
+        <FileEditor
+          open={editingFile !== null}
+          onClose={() => setEditingFile(null)}
+          exists={props.instrument._buffers._buffers.has(
+            JSON.stringify(editingFile)
+          )}
+          index={editingFile}
+          instrument={props.instrument}
+          handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
+          buffer={props.instrument._buffers._buffers.get(
+            JSON.stringify(editingFile)
+          )}
+          fileInfo={props.instrumentInfo.filesInfo[editingFile]}
+          setRenamingLabel={setRenamingLabel}
+          openFilePage={(ev) =>
+            props.handlePageNav(
+              "file",
+              props.instrumentInfo.patch.urls[editingFile],
+              ev
+            )
+          }
+          fileId={props.instrumentInfo.patch.urls[editingFile]}
+          isDrum={isDrum}
+          handlePageNav={props.handlePageNav}
+          setInstrumentLoaded={setInstrumentLoaded}
+          onFileClick={onFileClick}
         />
       )}
     </Box>

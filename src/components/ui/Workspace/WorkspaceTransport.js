@@ -167,7 +167,9 @@ function WorkspaceTransport(props) {
     <>
       <Box
         className="ws-transport"
-        onClick={() => setExpanded(true)}
+        onClick={(e) =>
+          !e.target.className.includes("wstr-back") && setExpanded(true)
+        }
         tabIndex="-1"
         sx={(theme) => ({
           [theme.breakpoints.down("md")]: {
@@ -178,8 +180,11 @@ function WorkspaceTransport(props) {
       >
         <Box style={{ width: 88 }}>
           {props.selectedTrack !== null && (
-            <IconButton onClick={() => props.setSelectedTrack(null)}>
-              <Icon>arrow_back</Icon>
+            <IconButton
+              className="wstr-back"
+              onClick={() => props.setSelectedTrack(null)}
+            >
+              <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
           )}
         </Box>

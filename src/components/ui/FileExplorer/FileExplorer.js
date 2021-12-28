@@ -44,8 +44,8 @@ import NotFoundPage from "../NotFoundPage";
 
 import { fileExtentions, fileTags } from "../../../assets/musicutils";
 
-const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
-const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
+const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 20);
+const fileTagDrumGenres = fileTags.filter((_, i) => i >= 20 && i < 24);
 
 function FileExplorer(props) {
   const { t } = useTranslation();
@@ -73,7 +73,7 @@ function FileExplorer(props) {
 
   const [showingLiked, setShowingLiked] = useState(false);
 
-  const [searchTags, setSearchTags] = useState([]);
+  const [searchTags, setSearchTags] = useState(props.tags ? props.tags : []);
   const [searchValue, setSearchValue] = useState("");
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
@@ -141,9 +141,10 @@ function FileExplorer(props) {
           fileIdList[index],
           filesUrl[index],
           players[index] !== undefined && players[index].buffer,
-          filedata[index].name
+          props.item,
+          filedata[index]
         );
-        props.setFileExplorer && props.setFileExplorer(false);
+        props.onClose && props.onClose();
       }
     }
   };
@@ -464,12 +465,12 @@ function FileExplorer(props) {
   }, [filedata]);
 
   useEffect(() => {
-    if (props.userFiles && props.user) {
+    if (props.userFiles && user) {
       clearFiles();
       //setIsLoading(false);
       getUserFilesList(showingLiked);
     }
-  }, [props.userFiles, props.user, showingLiked]);
+  }, [props.userFiles, user, showingLiked]);
 
   useEffect(() => {
     user && getUserLikes();
@@ -607,6 +608,28 @@ function FileExplorer(props) {
                         alignItems: "center",
                       }}
                     >
+                      {filesUserData[filedata[index].user] && (
+                        <Tooltip
+                          title={filesUserData[filedata[index].user].username}
+                        >
+                          <Avatar
+                            style={{
+                              height: 24,
+                              width: 24,
+                              marginRight: 8,
+                            }}
+                            alt={filesUserData[filedata[index].user].username}
+                            src={filesUserData[filedata[index].user].photoURL}
+                            onClick={(ev) =>
+                              props.handlePageNav(
+                                "user",
+                                filesUserData[filedata[index].user].username,
+                                ev
+                              )
+                            }
+                          />
+                        </Tooltip>
+                      )}
                       <Typography
                         variant="overline"
                         className="fe-filename"
@@ -644,77 +667,57 @@ function FileExplorer(props) {
                           <Icon>edit</Icon>
                         </IconButton>
                       )}
-                      {filesUserData[filedata[index].user] && (
-                        <Tooltip
-                          title={filesUserData[filedata[index].user].username}
-                        >
-                          <Avatar
-                            style={{
-                              height: 24,
-                              width: 24,
-                              marginLeft: 8,
-                            }}
-                            alt={filesUserData[filedata[index].user].username}
-                            src={filesUserData[filedata[index].user].photoURL}
-                            onClick={(ev) =>
-                              props.handlePageNav(
-                                "user",
-                                filesUserData[filedata[index].user].username,
-                                ev
-                              )
-                            }
-                          />
-                        </Tooltip>
-                      )}
                     </div>
                   </TableCell>
-                  <TableCell className="fet-collapsable-column-667">
-                    <div className="fet-chip-cell">
-                      {filedata && props.userFiles
-                        ? [
-                            filedata[index].categ[0],
-                            filedata[index].categ[1]
-                              ? filedata[index].categ[1]
-                              : "/",
-                            filedata[index].categ[2]
-                              ? filedata[index].categ[2]
-                              : "/",
-                          ].map((chip, chipIndex) => (
-                            <Chip
-                              clickable={!!props.userFiles && chipIndex !== 0}
-                              onClick={(e) =>
-                                !!props.userFiles
-                                  ? chipIndex !== 0 &&
-                                    setTagSelectionTarget([
-                                      e.target,
-                                      index,
-                                      chipIndex,
-                                    ])
-                                  : setSearchTags([fileTags[chip]])
-                              }
-                              className={"file-tag-chip"}
-                              label={chip === "/" ? "..." : fileTags[chip]}
-                            />
-                          ))
-                        : filedata[index].categ.map((chip, chipIndex) => (
-                            <Chip
-                              clickable={chipIndex !== 0}
-                              onClick={(e) =>
-                                !!props.userFiles
-                                  ? chipIndex !== 0 &&
-                                    setTagSelectionTarget([
-                                      e.target,
-                                      index,
-                                      chipIndex,
-                                    ])
-                                  : setSearchTags([fileTags[chip]])
-                              }
-                              className={"file-tag-chip"}
-                              label={chip === "/" ? "..." : fileTags[chip]}
-                            />
-                          ))}
-                    </div>
-                  </TableCell>
+                  {!props.fileEditor && (
+                    <TableCell className="fet-collapsable-column-667">
+                      <div className="fet-chip-cell">
+                        {filedata && props.userFiles
+                          ? [
+                              filedata[index].categ[0],
+                              filedata[index].categ[1]
+                                ? filedata[index].categ[1]
+                                : "/",
+                              filedata[index].categ[2]
+                                ? filedata[index].categ[2]
+                                : "/",
+                            ].map((chip, chipIndex) => (
+                              <Chip
+                                clickable={!!props.userFiles && chipIndex !== 0}
+                                onClick={(e) =>
+                                  !!props.userFiles
+                                    ? chipIndex !== 0 &&
+                                      setTagSelectionTarget([
+                                        e.target,
+                                        index,
+                                        chipIndex,
+                                      ])
+                                    : setSearchTags([fileTags[chip]])
+                                }
+                                className={"file-tag-chip"}
+                                label={chip === "/" ? "..." : fileTags[chip]}
+                              />
+                            ))
+                          : filedata[index].categ.map((chip, chipIndex) => (
+                              <Chip
+                                clickable={chipIndex !== 0}
+                                onClick={(e) =>
+                                  !!props.userFiles
+                                    ? chipIndex !== 0 &&
+                                      setTagSelectionTarget([
+                                        e.target,
+                                        index,
+                                        chipIndex,
+                                      ])
+                                    : setSearchTags([fileTags[chip]])
+                                }
+                                className={"file-tag-chip"}
+                                label={chip === "/" ? "..." : fileTags[chip]}
+                              />
+                            ))}
+                      </div>
+                    </TableCell>
+                  )}
 
                   <>
                     {(props.explore || props.compact || !!showingLiked) && (
@@ -776,17 +779,19 @@ function FileExplorer(props) {
                           <Skeleton variant="text" />
                         </Typography>
                       </TableCell>
-                      <TableCell className="fet-collapsable-column-667">
-                        <div className="fet-chip-cell">
-                          {["    ", "    ", "    "].map((chip, chipIndex) => (
-                            <Chip
-                              clickable={false}
-                              className={"file-tag-chip"}
-                              label={chip}
-                            />
-                          ))}
-                        </div>
-                      </TableCell>
+                      {!props.fileEditor && (
+                        <TableCell className="fet-collapsable-column-667">
+                          <div className="fet-chip-cell">
+                            {["    ", "    ", "    "].map((chip, chipIndex) => (
+                              <Chip
+                                clickable={false}
+                                className={"file-tag-chip"}
+                                label={chip}
+                              />
+                            ))}
+                          </div>
+                        </TableCell>
+                      )}
                       <>
                         {props.explore && (
                           <TableCell style={{ width: 50 }} align="center">
@@ -828,7 +833,7 @@ function FileExplorer(props) {
 
       <div className="break" />
 
-      {props.compact && (
+      {/* props.compact && (
         <BottomNavigation
           className="file-explorer-compact-bottom-nav"
           value={showingLiked}
@@ -840,7 +845,7 @@ function FileExplorer(props) {
           <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
           <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
         </BottomNavigation>
-      )}
+      ) */}
 
       {!props.compact && props.userFiles && (
         <Fab
@@ -895,7 +900,7 @@ function FileExplorer(props) {
     </>
   );
 
-  return props.compact ? (
+  return props.compact && !props.fileEditor ? (
     <Dialog
       open={true}
       onClose={() => props.setFileExplorer(false)}
@@ -908,7 +913,7 @@ function FileExplorer(props) {
   ) : (
     <Box
       className={`file-explorer ${props.compact && "file-explorer-compact"}`}
-      sx={{ bgcolor: "background.default" }}
+      sx={{ bgcolor: !props.compact && "background.default" }}
     >
       {mainContent}
     </Box>

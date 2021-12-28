@@ -1120,7 +1120,7 @@ function Workspace(props) {
   }, [instruments]);
 
   useEffect(() => {
-    //console.log(instrumentsInfo);
+    console.log(instrumentsInfo);
   }, [instrumentsInfo]);
 
   useEffect(() => {
@@ -1302,6 +1302,7 @@ function Workspace(props) {
             resetUndoHistory={() => handleUndo("RESET")}
             index={selectedTrack}
             setIEOpen={setIEOpen}
+            setInstrumentsLoaded={setInstrumentsLoaded}
             handlePageNav={props.handlePageNav}
           />
         )}

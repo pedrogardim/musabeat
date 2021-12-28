@@ -73,9 +73,9 @@ function Track(props) {
       let array = isSelected
         ? showingAll
           ? Object.keys(Array(20).fill(0)).map((e) => parseInt(e))
-          : [...props.instrument._buffers._buffers.keys()].map((e) =>
-              parseInt(e)
-            )
+          : [...props.instrument._buffers._buffers.keys()]
+              .map((e) => parseInt(e))
+              .sort((a, b) => a - b)
         : [...new Set(props.track.score.map((item) => item.note))].sort(
             (a, b) => a - b
           );

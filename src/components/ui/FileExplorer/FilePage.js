@@ -394,7 +394,7 @@ function FilePage(props) {
               component={Paper}
             >
               <div className="file-info-card">
-                <Typography variant="overline">
+                <Typography variant="body1">
                   {soundChannels[player._buffer.numberOfChannels] ||
                     player._buffer.numbesrOfChannels ||
                     "Multichannel"}
@@ -405,21 +405,19 @@ function FilePage(props) {
               <Divider orientation="vertical" flexItem />
 
               <div className="file-info-card">
-                <Typography variant="overline">
+                <Typography variant="body1">
                   {formatBytes(fileInfo.size)}
                 </Typography>
               </div>
               <Divider orientation="vertical" flexItem />
 
               <div className="file-info-card">
-                <Typography variant="overline">
-                  {fileInfo.dur + " s"}
-                </Typography>
+                <Typography variant="body1">{fileInfo.dur + " s"}</Typography>
               </div>
               <Divider orientation="vertical" flexItem />
 
               <div className="file-info-card">
-                <Typography variant="overline">{uploadDateString}</Typography>
+                <Typography variant="body1">{uploadDateString}</Typography>
               </div>
             </Grid>
           )}
