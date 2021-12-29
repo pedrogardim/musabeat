@@ -29,7 +29,9 @@ function SamplerNote(props) {
               Tone.Time(props.note.time).toSeconds() *
                 (props.rowRef.current.offsetWidth /
                   (zoomSize * Tone.Time("1m").toSeconds())) +
-              ((isSelected ? props.movingSelDelta / props.gridSize : 0) -
+              ((isSelected && props.movingSelDelta
+                ? props.movingSelDelta / props.gridSize
+                : 0) -
                 props.zoomPosition[0]) *
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${

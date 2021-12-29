@@ -120,7 +120,6 @@ function FilterEditor(props) {
         onChange={(v) => handleParameterChange("frequency", v)}
         onChangeCommited={registerToSynth}
         label={"Frequency"}
-        mousePosition={props.mousePosition}
         style={{ margin: "0 16px" }}
       />
 
@@ -133,7 +132,6 @@ function FilterEditor(props) {
         onChange={(v) => handleParameterChange("Q", v)}
         onChangeCommited={registerToSynth}
         label={"Reso"}
-        mousePosition={props.mousePosition}
         style={{ margin: "0 16px" }}
       />
       <div className="break" />
@@ -142,7 +140,6 @@ function FilterEditor(props) {
         onInstrumentMod={props.onInstrumentMod}
         instrument={props.instrument}
         type={"filter"}
-        mousePosition={props.mousePosition}
         label={props.expanded}
       />
     </>

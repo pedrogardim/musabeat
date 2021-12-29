@@ -91,6 +91,8 @@ function Workspace(props) {
 
   const [selectedTrack, setSelectedTrack] = useState(null);
 
+  const [trackOptions, setTrackOptions] = useState({ showingAll: false });
+
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
   const [instrumentsInfo, setInstrumentsInfo] = useState([]);
@@ -1183,8 +1185,8 @@ function Workspace(props) {
   }, [zoomPosition]);
 
   useEffect(() => {
-    //console.log(selectedNotes);
-  }, [selectedNotes]);
+    //console.log(movingSelDelta);
+  }, [movingSelDelta]);
 
   /*================================================================ */
   /*================================================================ */
@@ -1371,6 +1373,7 @@ function Workspace(props) {
               setIsMouseDown={setIsMouseDown}
               setPendingUploadFiles={setPendingUploadFiles}
               movingSelDelta={movingSelDelta}
+              trackOptions={trackOptions}
             />
           ) : (
             <>
@@ -1461,9 +1464,30 @@ function Workspace(props) {
           <>
             <Divider orientation="vertical" flexItem />
             {tracks[selectedTrack].type !== 2 ? (
-              <IconButton onClick={() => setIEOpen((prev) => !prev)}>
-                <Icon>piano</Icon>
-              </IconButton>
+              <>
+                <IconButton
+                  color={IEOpen ? "primary" : "default"}
+                  onClick={() => setIEOpen((prev) => !prev)}
+                >
+                  <Icon>piano</Icon>
+                </IconButton>
+                {tracks[selectedTrack].type === 0 && (
+                  <IconButton
+                    onClick={() =>
+                      setTrackOptions((prev) => ({
+                        ...prev,
+                        showingAll: !prev.showingAll,
+                      }))
+                    }
+                  >
+                    <Icon>
+                      {trackOptions.showingAll
+                        ? "visibility_off"
+                        : "visibility"}
+                    </Icon>
+                  </IconButton>
+                )}
+              </>
             ) : (
               <>
                 <IconButton onClick={() => setFileListOpen((prev) => !prev)}>

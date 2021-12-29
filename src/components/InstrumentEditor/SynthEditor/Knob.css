@@ -3,20 +3,19 @@
   position: relative;
 }
 
-.hidden-slider-cont {
-  position: absolute;
-  height: 24px;
-  top: 12px;
-  padding: 0 12px;
-  z-index: 9999 !important;
+.track-knob > * {
+  pointer-events: none !important;
 }
 
 .knob-backdrop {
   width: 100vw;
   height: 100vh;
-  position: fixed;
+  position: fixed !important;
+  top: 0;
+  left: 0;
   z-index: 9999 !important;
-  background-color: aqua;
+  /* background-color: blue;
+  opacity: 0.3; */
 }
 
 .knob-mark-cont {

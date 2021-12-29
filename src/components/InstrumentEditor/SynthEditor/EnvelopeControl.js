@@ -51,7 +51,11 @@ function EnvelopeControl(props) {
       }}
     >
       {props.label !== false && (
-        <span className="ie-envelope-label">
+        <Typography
+          color="textPrimary"
+          variant="body1"
+          className="ie-envelope-label"
+        >
           {envelope.hasOwnProperty("octaves") && (
             <IconButton
               color={envelope.octaves !== 0 ? "primary" : "default"}
@@ -63,7 +67,7 @@ function EnvelopeControl(props) {
             </IconButton>
           )}
           {envelopeType.toUpperCase()}
-        </span>
+        </Typography>
       )}
       <div className="break" />
 
@@ -76,7 +80,6 @@ function EnvelopeControl(props) {
           defaultValue={envelope[e]}
           onChange={(v) => handleChange(e, v)}
           label={e[0]}
-          mousePosition={props.mousePosition}
           style={{ margin: "0 8px" }}
         />
       ))}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, Fragment, useRef } from "react";
 
 import { useTranslation } from "react-i18next";
 
-import { Paper, Slider, TextField } from "@mui/material";
+import { Paper, Slider, TextField, Typography } from "@mui/material";
 
 import "./Knob.css";
 
@@ -13,7 +13,11 @@ function Knob(props) {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [input, setInput] = useState(false);
+  const [mousePosition, setMousePosition] = useState([]);
+
   const [value, setValue] = useState(props.defaultValue);
+  const [valueAtClick, setValueAtClick] = useState(0);
+
   const [angle, setAngle] = useState(
     ((props.defaultValue - props.min) / (props.max - props.min)) *
       (135 - -135) -
@@ -28,37 +32,61 @@ function Knob(props) {
         knobRef.current.getBoundingClientRect().height / 2,
     ];
     let deltaXY = [
-      props.mousePosition[0] - centerPosition[0],
-      centerPosition[1] - props.mousePosition[1],
+      mousePosition[0] - centerPosition[0],
+      centerPosition[1] - mousePosition[1],
     ];
 
     if (
+      props.rotatory &&
       Math.abs(deltaXY[0]) < props.size / 2 &&
       Math.abs(deltaXY[1]) < props.size / 2
     )
       return;
 
-    let angle = (Math.atan2(...deltaXY) * 180) / Math.PI;
+    if (props.rotatory) {
+      let angle = (Math.atan2(...deltaXY) * 180) / Math.PI;
 
-    angle = angle >= 135 ? 135 : angle < -135 ? -135 : angle;
+      angle = angle >= 135 ? 135 : angle < -135 ? -135 : angle;
 
-    setAngle(Math.floor(angle));
+      setAngle(Math.floor(angle));
 
-    let value =
-      ((angle - -135) / (135 - -135)) * (props.max - props.min) + props.min;
+      let value =
+        ((angle - -135) / (135 - -135)) * (props.max - props.min) + props.min;
 
-    value = props.logScale
-      ? props.min === 0
-        ? linearToLogScale(value, props.min + 1, props.max + 1) - 1
-        : linearToLogScale(value, props.min, props.max)
-      : value;
-
-    value =
-      typeof props.step === "number"
-        ? Math.round(value / props.step) * props.step
+      value = props.logScale
+        ? props.min === 0
+          ? linearToLogScale(value, props.min + 1, props.max + 1) - 1
+          : linearToLogScale(value, props.min, props.max)
         : value;
 
-    setValue(value);
+      value =
+        typeof props.step === "number"
+          ? Math.round(value / props.step) * props.step
+          : value;
+
+      setValue(value);
+    } else {
+      let valueDelta =
+        (deltaXY[1] / (window.innerHeight / 2)) * (props.max - props.min);
+
+      let value = valueAtClick + valueDelta;
+
+      value =
+        value < props.min ? props.min : value > props.max ? props.max : value;
+
+      value = props.logScale
+        ? props.min === 0
+          ? linearToLogScale(value, props.min + 1, props.max + 1) - 1
+          : linearToLogScale(value, props.min, props.max)
+        : value;
+
+      value =
+        typeof props.step === "number"
+          ? Math.round(value / props.step) * props.step
+          : value;
+
+      setValue(value);
+    }
   };
 
   const handleValueInput = (v) => {
@@ -78,83 +106,100 @@ function Knob(props) {
 
   useEffect(() => {
     if (typeof value === "number") props.onChange(value);
+    if (!props.rotatory)
+      setAngle(
+        ((value - props.min) / (props.max - props.min)) * (135 - -135) - 135
+      );
   }, [value]);
 
   useEffect(() => {
+    if (open && !props.rotatory) setValueAtClick(value);
     if (!open && typeof value === "number" && props.onChangeCommited)
       props.onChangeCommited(value);
   }, [open]);
 
   useEffect(() => {
-    !props.mousePosition && setOpen(false);
-    if (props.mousePosition && open) handleKnobMove();
-  }, [props.mousePosition]);
-  /* 
+    !mousePosition && setOpen(false);
+    if (mousePosition && open) handleKnobMove();
+  }, [mousePosition]);
+
   useEffect(() => {
-    console.log(input);
-  }, [input]); */
+    console.log(valueAtClick);
+  }, [valueAtClick]);
 
   return (
-    <Paper
-      className="track-knob"
-      style={{
-        height: props.size,
-        width: props.size,
-        backgroundColor: props.color ? props.color : "#3f51b5",
-        filter: props.disabled && "saturate(0)",
-        pointerEvents: props.disabled && "none",
-        ...props.style,
-      }}
-      onMouseDown={() => setOpen(true)}
-      onClick={(e) => e.detail === 2 && setInput(true)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      ref={knobRef}
-    >
-      {(open || hovered) && !props.hideValue && (
-        <div className="knob-value-label">
-          {value.toString().split(".")[1] &&
-          value.toString().split(".")[1].length > 2
-            ? value.toFixed(2)
-            : value}
-        </div>
-      )}
-      <div
-        className="knob-mark-cont"
+    <>
+      <Paper
+        className="track-knob"
         style={{
-          transform: `rotate(${angle}deg)`,
+          height: props.size,
+          width: props.size,
+          backgroundColor: props.color ? props.color : "#3f51b5",
+          filter: props.disabled && "saturate(0)",
+          pointerEvents: props.disabled && "none",
+          ...props.style,
         }}
+        onMouseDown={() => setOpen(true)}
+        onClick={(e) => e.detail === 2 && setInput(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        ref={knobRef}
       >
-        <div />
-      </div>
-
-      {input && (
-        <TextField
-          autoFocus
+        {(open || hovered) && !props.hideValue && (
+          <div className="knob-value-label">
+            {value.toString().split(".")[1] &&
+            value.toString().split(".")[1].length > 2
+              ? value.toFixed(2)
+              : value}
+          </div>
+        )}
+        <div
+          className="knob-mark-cont"
           style={{
-            position: "absolute",
-            minWidth: "100%",
-            top: 0,
-            outline: "black",
-            textAlign: "center",
+            transform: `rotate(${angle}deg)`,
           }}
-          defaultValue={value}
-          type="number"
-          inputProps={{ min: props.min, max: props.max, step: props.step }}
-          onBlur={(e) => {
-            handleValueInput(e.target.value);
-            setInput(false);
-          }}
-          onKeyDown={(e) => {
-            if (e.keyCode === 13) {
+        >
+          <div />
+        </div>
+
+        {input && (
+          <TextField
+            autoFocus
+            style={{
+              position: "absolute",
+              minWidth: "100%",
+              top: 0,
+              outline: "black",
+              textAlign: "center",
+            }}
+            defaultValue={value}
+            type="number"
+            inputProps={{ min: props.min, max: props.max, step: props.step }}
+            onBlur={(e) => {
               handleValueInput(e.target.value);
               setInput(false);
-            }
-          }}
+            }}
+            onKeyDown={(e) => {
+              if (e.keyCode === 13) {
+                handleValueInput(e.target.value);
+                setInput(false);
+              }
+            }}
+          />
+        )}
+        <Typography color="textPrimary" variant="body1" className="knob-lbl">
+          {props.label && props.label}
+        </Typography>
+      </Paper>
+      {open && (
+        <div
+          className="knob-backdrop"
+          onMouseMove={(e) => setMousePosition([e.pageX, e.pageY])}
+          onMouseUp={() => setOpen(false)}
+          onMouseOut={() => setOpen(false)}
         />
       )}
-      <span className="knob-lbl">{props.label && props.label}</span>
-    </Paper>
+    </>
   );
 }
 

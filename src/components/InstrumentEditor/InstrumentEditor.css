@@ -120,7 +120,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-content: space-evenly;
-  z-index: 1;
+  z-index: 10;
 }
 
 .turnonoff-button {

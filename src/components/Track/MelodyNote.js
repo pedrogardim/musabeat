@@ -188,7 +188,9 @@ function MelodyNote(props) {
               Tone.Time(noteTime).toSeconds() *
                 (props.rowRef.current.offsetWidth /
                   (zoomSize * Tone.Time("1m").toSeconds())) +
-              ((isSelected ? props.movingSelDelta[0] / props.gridSize : 0) -
+              ((isSelected && props.movingSelDelta
+                ? props.movingSelDelta / props.gridSize
+                : 0) -
                 props.zoomPosition[0]) *
                 (props.rowRef.current.offsetWidth / zoomSize)
             }px,${

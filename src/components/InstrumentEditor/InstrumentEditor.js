@@ -7,6 +7,7 @@ import {
   List,
   Divider,
   IconButton,
+  Icon,
   MenuItem,
   Tooltip,
   LinearProgress,
@@ -995,6 +996,14 @@ function InstrumentEditor(props) {
           onFileClick={onFileClick}
         />
       )}
+      <IconButton
+        onClick={() => props.setIEOpen(false)}
+        className="mp-closebtn"
+        color="primary"
+        sx={{ zIndex: 9 }}
+      >
+        <Icon>close</Icon>
+      </IconButton>
     </Box>
   );
 }

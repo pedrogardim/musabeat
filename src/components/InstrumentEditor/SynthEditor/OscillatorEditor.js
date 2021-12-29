@@ -173,7 +173,6 @@ function OscillatorEditor(props) {
             size={36}
             step={1}
             label={"Mod"}
-            mousePosition={props.mousePosition}
           />
         )}
     </>
@@ -213,7 +212,6 @@ function OscillatorEditor(props) {
             size={36}
             step={1}
             label={"Count"}
-            mousePosition={props.mousePosition}
           />
           <Knob
             defaultValue={props.instrument.get().oscillator.spread}
@@ -225,7 +223,6 @@ function OscillatorEditor(props) {
             size={36}
             step={1}
             label={"Spread"}
-            mousePosition={props.mousePosition}
           />
         </>
       )}
@@ -273,7 +270,6 @@ function OscillatorEditor(props) {
             max={50}
             size={36}
             label={t(`instrumentEditor.synthEditor.parameters.harmonicity`)}
-            mousePosition={props.mousePosition}
           />
         </>
       )}
@@ -287,7 +283,6 @@ function OscillatorEditor(props) {
           max={50}
           size={36}
           label={"Mod.index"}
-          mousePosition={props.mousePosition}
         />
       )}
       {oscType === "pwm" && (
@@ -301,7 +296,6 @@ function OscillatorEditor(props) {
           size={36}
           step={0.1}
           label={"Mod.Frec"}
-          mousePosition={props.mousePosition}
         />
       )}
 
@@ -315,7 +309,6 @@ function OscillatorEditor(props) {
           max={0}
           size={36}
           label={"Width"}
-          mousePosition={props.mousePosition}
         />
       )}
     </>
@@ -328,6 +321,7 @@ function OscillatorEditor(props) {
           onClick={() => props.setExpanded(null)}
           className="mp-closebtn"
           color="primary"
+          style={{ zIndex: 10 }}
         >
           <Icon>close</Icon>
         </IconButton>

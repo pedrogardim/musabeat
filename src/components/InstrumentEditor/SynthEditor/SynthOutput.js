@@ -29,7 +29,6 @@ function SynthOutput(props) {
         defaultValue={props.instrument.get().volume}
         onChange={(v) => handleChange("volume", v)}
         label={"Volume"}
-        mousePosition={props.mousePosition}
         step={1}
       />
       <div className="break" />
@@ -37,7 +36,6 @@ function SynthOutput(props) {
         onInstrumentMod={props.onInstrumentMod}
         instrument={props.instrument}
         type={"envelope"}
-        mousePosition={props.mousePosition}
       />
     </>
   );
@@ -49,6 +47,7 @@ function SynthOutput(props) {
           onClick={() => props.setExpanded(null)}
           className="mp-closebtn"
           color="primary"
+          style={{ zIndex: 10 }}
         >
           <Icon>close</Icon>
         </IconButton>

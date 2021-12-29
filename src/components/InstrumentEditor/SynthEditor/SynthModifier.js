@@ -99,7 +99,6 @@ function SynthModifier(props) {
           defaultValue={instrumentParamenters[parameter]}
           onChange={(v) => handleChange(parameter, v)}
           label={t(`instrumentEditor.synthEditor.parameters.${parameter}`)}
-          mousePosition={props.mousePosition}
           style={{ margin: "0 16px" }}
         />
       ))}
@@ -174,6 +173,7 @@ function SynthModifier(props) {
           onClick={() => props.setExpanded(null)}
           className="mp-closebtn"
           color="primary"
+          style={{ zIndex: 10 }}
         >
           <Icon>close</Icon>
         </IconButton>

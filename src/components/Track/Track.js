@@ -52,8 +52,6 @@ function Track(props) {
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
-  const [showingAll, setShowingAll] = useState(false);
-
   const [recTools, setRecTools] = useState(null);
   const [meterLevel, setMeterLevel] = useState(0);
   const [uploadingFiles, setUploadingFiles] = useState([]);
@@ -71,7 +69,7 @@ function Track(props) {
 
     if (trackType === 0) {
       let array = isSelected
-        ? showingAll
+        ? props.trackOptions.showingAll
           ? Object.keys(Array(20).fill(0)).map((e) => parseInt(e))
           : [...props.instrument._buffers._buffers.keys()]
               .map((e) => parseInt(e))
@@ -454,7 +452,7 @@ function Track(props) {
     props.track,
     props.isLoaded,
     props.selectedTrack,
-    showingAll,
+    props.trackOptions.showingAll,
   ]);
 
   useEffect(() => {
@@ -567,7 +565,6 @@ function Track(props) {
           >
             <Typography
               className="track-inner-row-label"
-              onClick={() => setShowingAll((prev) => !prev)}
               sx={(theme) => ({
                 color:
                   trackType === 0 && !props.instrument.has(row.note)
