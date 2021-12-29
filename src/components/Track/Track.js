@@ -48,6 +48,7 @@ function Track(props) {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [deletableNote, setDeletableNote] = useState(false);
+  const [zoomY, setZoomY] = useState(1);
 
   const [selection, setSelection] = useState([]);
   const [selectedNotes, setSelectedNotes] = useState([]);
@@ -344,6 +345,7 @@ function Track(props) {
 
         return newTracks;
       });
+      return;
     } else {
       let newNote = {
         note: 108 - gridPos[0],
@@ -375,6 +377,7 @@ function Track(props) {
         //console.log("drawingNote");
         setDrawingNote(newNote);
       }
+      return;
     }
   };
 
@@ -412,6 +415,35 @@ function Track(props) {
       });
       setDrawingNote(null);
     }
+  };
+
+  const handleWheel = (e) => {
+    /* console.log(e); */
+    /* e.preventDefault();
+    e.nativeEvent.preventDefault();
+    e.stopPropagation(); */
+    if (!e.metaKey && !e.ctrlKey) return;
+
+    let minZoom = rowWrapperRef.current.offsetHeight / (88 * 18);
+
+    setZoomY((prev) => {
+      let value =
+        prev + e.deltaY / 50 > 10
+          ? 10
+          : prev + e.deltaY / 50 < minZoom
+          ? minZoom
+          : prev + e.deltaY / 50;
+
+      let newScrollTop = (rowWrapperRef.current.scrollTop * value) / prev;
+
+      rowWrapperRef.current.scrollTop = newScrollTop;
+
+      return value;
+    });
+
+    /*  e.preventDefault();
+    e.nativeEvent.preventDefault();
+    e.stopPropagation(); */
   };
 
   const onGridPosChange = () => {
@@ -482,7 +514,7 @@ function Track(props) {
     rowWrapperRef.current.scrollTop =
       rowWrapperRef.current.scrollHeight / 2 -
       rowWrapperRef.current.offsetHeight / 2;
-  }, [props.selectedTrack, rowWrapperRef.current]);
+  }, [props.selectedTrack]);
 
   useEffect(() => {
     props.setIsMouseDown(isMouseDown);
@@ -510,6 +542,10 @@ function Track(props) {
     }
   }, []);
 
+  useEffect(() => {
+    //console.log(zoomY);
+  }, [zoomY]);
+
   /* ================================================================================== */
   /* ================================================================================== */
   /* ================================JSX=============================================== */
@@ -520,6 +556,7 @@ function Track(props) {
     <div
       className="track-grid-row-wrapper"
       ref={rowWrapperRef}
+      onWheel={handleWheel}
       style={{
         overflowY: trackType === 1 && "overlay",
         cursor: props.cursorMode === "edit" && deletableNote && "not-allowed",
@@ -534,6 +571,8 @@ function Track(props) {
         onClick={handleMouseUp}
         onMouseUp={handleMouseUp}
         disabled
+        /*         style={{ maxHeight: trackType === 1 && trackRows.length * 17 * zoomY }}
+         */
       >
         {trackRows.map((row, rowIndex) => (
           <Box
@@ -549,7 +588,7 @@ function Track(props) {
                   ? "rgba(255, 255, 255,0.2)"
                   : "rgba(0, 0, 0,0.2)",
 
-              height: trackType === 1 && "6.66666%",
+              minHeight: trackType === 1 && 16 * zoomY,
               bgcolor:
                 trackType === 1 &&
                 (rowIndex % 12 === 2 ||
@@ -561,7 +600,7 @@ function Track(props) {
                   ? "rgba(255,255,255,0.08)"
                   : colors[props.track.color][800] + "3a"),
             })}
-            key={rowIndex + "ri"}
+            key={rowIndex}
           >
             <Typography
               className="track-inner-row-label"
@@ -629,6 +668,7 @@ function Track(props) {
                   zoomPosition={props.zoomPosition}
                   movingSelDelta={props.movingSelDelta}
                   a={rowRef.current}
+                  zoomY={zoomY}
                 />
               ) : (
                 props.instrument &&

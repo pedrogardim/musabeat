@@ -7,36 +7,37 @@ function SamplerNote(props) {
   const isSelected =
     props.selectedNotes && props.selectedNotes.includes(props.index);
 
+  const attr = {
+    parentHeight: props.rowRef.current.scrollHeight,
+    parentWidth: props.rowRef.current.offsetWidth,
+  };
+
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
   return (
     <div
       className="track-score-note"
       style={{
-        height: props.rowRef.current.scrollHeight / props.trackRows.length,
+        height: attr.parentHeight / props.trackRows.length,
         width: 0,
         transform: props.ghost
           ? `translate(${
               props.gridPos[1] *
-                (props.rowRef.current.offsetWidth /
-                  (zoomSize * props.gridSize)) -
-              props.zoomPosition[0] *
-                (props.rowRef.current.offsetWidth / zoomSize)
+                (attr.parentWidth / (zoomSize * props.gridSize)) -
+              props.zoomPosition[0] * (attr.parentWidth / zoomSize)
             }px,${
-              props.gridPos[0] *
-              (props.rowRef.current.scrollHeight / props.trackRows.length)
+              props.gridPos[0] * (attr.parentHeight / props.trackRows.length)
             }px)`
           : `translate(${
               Tone.Time(props.note.time).toSeconds() *
-                (props.rowRef.current.offsetWidth /
-                  (zoomSize * Tone.Time("1m").toSeconds())) +
+                (attr.parentWidth / (zoomSize * Tone.Time("1m").toSeconds())) +
               ((isSelected && props.movingSelDelta
                 ? props.movingSelDelta / props.gridSize
                 : 0) -
                 props.zoomPosition[0]) *
-                (props.rowRef.current.offsetWidth / zoomSize)
+                (attr.parentWidth / zoomSize)
             }px,${
               props.trackRows.findIndex((e) => e.note === props.note.note) *
-              (props.rowRef.current.scrollHeight / props.trackRows.length)
+              (attr.parentHeight / props.trackRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
         /* backgroundColor:

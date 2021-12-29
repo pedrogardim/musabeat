@@ -19,6 +19,14 @@ function MelodyNote(props) {
 
   let zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
 
+  const attr = {
+    parentHeight: props.rowRef.current.scrollHeight,
+    //parentHeight2: props.trackRows.length * 17 * props.zoomY,
+    parentWidth: props.rowRef.current.offsetWidth,
+  };
+
+  //console.log(attr.parentHeight / (props.trackRows.length * props.zoomY));
+
   const commitChanges = () => {
     if (props.ghost) return;
 
@@ -155,51 +163,46 @@ function MelodyNote(props) {
       } ${props.track.type === 1 && "track-score-note-melody"}`}
       onMouseDown={handleMouseDown}
       style={{
-        height: props.rowRef.current.scrollHeight / props.trackRows.length - 1,
+        height: attr.parentHeight / props.trackRows.length - 1,
         width:
           (props.ghost
             ? props.drawingNote
               ? (props.gridPos[1] + 1) *
-                  (props.rowRef.current.offsetWidth /
-                    (zoomSize * props.gridSize)) -
+                  (attr.parentWidth / (zoomSize * props.gridSize)) -
                 Tone.Time(props.drawingNote.time).toSeconds() *
-                  (props.rowRef.current.offsetWidth /
-                    (zoomSize * Tone.Time("1m").toSeconds()))
-              : props.rowRef.current.offsetWidth / (zoomSize * props.gridSize)
+                  (attr.parentWidth / (zoomSize * Tone.Time("1m").toSeconds()))
+              : attr.parentWidth / (zoomSize * props.gridSize)
             : (Tone.Time(noteDuration).toSeconds() /
                 Tone.Time("1m").toSeconds()) *
-              (props.rowRef.current.offsetWidth / zoomSize)) - 2,
+              (attr.parentWidth / zoomSize)) - 2,
         transform: props.ghost
           ? `translate(${
               (props.drawingNote
                 ? Tone.Time(props.drawingNote.time).toSeconds() *
-                  (props.rowRef.current.offsetWidth /
-                    (zoomSize * Tone.Time("1m").toSeconds()))
+                  (attr.parentWidth / (zoomSize * Tone.Time("1m").toSeconds()))
                 : props.gridPos[1] *
-                  (props.rowRef.current.offsetWidth /
-                    (zoomSize * props.gridSize))) -
-              props.zoomPosition[0] *
-                (props.rowRef.current.offsetWidth / zoomSize)
+                  (attr.parentWidth / (zoomSize * props.gridSize))) -
+              props.zoomPosition[0] * (attr.parentWidth / zoomSize)
             }px,${
-              props.gridPos[0] *
-              (props.rowRef.current.scrollHeight / props.trackRows.length)
+              props.gridPos[0] * (attr.parentHeight / props.trackRows.length)
             }px)`
           : `translate(${
               Tone.Time(noteTime).toSeconds() *
-                (props.rowRef.current.offsetWidth /
-                  (zoomSize * Tone.Time("1m").toSeconds())) +
+                (attr.parentWidth / (zoomSize * Tone.Time("1m").toSeconds())) +
               ((isSelected && props.movingSelDelta
                 ? props.movingSelDelta / props.gridSize
                 : 0) -
                 props.zoomPosition[0]) *
-                (props.rowRef.current.offsetWidth / zoomSize)
+                (attr.parentWidth / zoomSize)
             }px,${
               props.trackRows.findIndex((e) => e.note === noteNote) *
-              (props.rowRef.current.scrollHeight / props.trackRows.length)
+              (attr.parentHeight / props.trackRows.length)
             }px)`,
         opacity: props.ghost && 0.5,
         backgroundColor: colors[props.track.color][isSelected ? 800 : 300],
         outline: `solid 1px ${colors[props.track.color][800]}`,
+        top: 0,
+        left: 0,
         //borderRadius: 4,
         //margin: "-2px -2px 0 0",
       }}

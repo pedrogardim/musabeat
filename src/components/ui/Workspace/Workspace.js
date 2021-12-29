@@ -112,7 +112,6 @@ function Workspace(props) {
   ]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [mousePosition, setMousePosition] = useState([0, 0]);
-
   const [trackRows, setTrackRows] = useState([]);
 
   const [fileListOpen, setFileListOpen] = useState(false);
@@ -924,7 +923,6 @@ function Workspace(props) {
 
   const handleKeyDown = (e) => {
     Tone.start();
-    //console.log(e);
     if (e.ctrlKey || e.metaKey) {
       switch (e.keyCode) {
         case 67:
@@ -945,6 +943,9 @@ function Workspace(props) {
     playNote(e);
 
     switch (e.keyCode) {
+      case 18:
+        setCursorMode("edit");
+        break;
       case 32:
         togglePlaying(e);
         break;
@@ -968,6 +969,12 @@ function Workspace(props) {
   };
 
   const handleKeyUp = (e) => {
+    switch (e.keyCode) {
+      case 18:
+        setCursorMode(null);
+        break;
+    }
+
     Tone.start();
     releaseNote(e);
   };
@@ -1460,7 +1467,7 @@ function Workspace(props) {
           tracksInstruments={instruments}
         />
 
-        {typeof selectedTrack === "number" && (
+        {selectedTrack !== null && (
           <>
             <Divider orientation="vertical" flexItem />
             {tracks[selectedTrack].type !== 2 ? (

@@ -113,7 +113,7 @@ function Knob(props) {
   }, [value]);
 
   useEffect(() => {
-    if (open && !props.rotatory) setValueAtClick(value);
+    if (!props.rotatory) setValueAtClick(value);
     if (!open && typeof value === "number" && props.onChangeCommited)
       props.onChangeCommited(value);
   }, [open]);
@@ -124,7 +124,7 @@ function Knob(props) {
   }, [mousePosition]);
 
   useEffect(() => {
-    console.log(valueAtClick);
+    //console.log(valueAtClick);
   }, [valueAtClick]);
 
   return (
