@@ -2,21 +2,9 @@ import React, { useState, useEffect, useRef, Fragment } from "react";
 import * as Tone from "tone";
 import "./Track.css";
 
-import Draggable from "react-draggable";
-
 import { colors } from "../../utils/materialPalette";
 
-import { alpha } from "@mui/material/styles";
-
-import {
-  IconButton,
-  Icon,
-  Tooltip,
-  TextField,
-  Typography,
-  Box,
-  Paper,
-} from "@mui/material";
+import { Typography, Box } from "@mui/material";
 
 import {
   scheduleSampler,
@@ -25,16 +13,12 @@ import {
   clearEvents,
 } from "../../utils/TransportSchedule";
 
-import {
-  drumMapping,
-  drumAbbreviations,
-  encodeAudioFile,
-} from "../../assets/musicutils";
+import { drumAbbreviations } from "../../assets/musicutils";
 
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
 import AudioClip from "./AudioClip";
-import FileUploader from "../ui/Dialogs/FileUploader/FileUploader";
+import FileEditor from "../InstrumentEditor/FileEditor";
 
 function Track(props) {
   const rowRef = useRef(null);
@@ -55,7 +39,6 @@ function Track(props) {
 
   const [recTools, setRecTools] = useState(null);
   const [meterLevel, setMeterLevel] = useState(0);
-  const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const trackType = props.track.type;
   const isSelected = props.selectedTrack === props.index;
@@ -64,6 +47,12 @@ function Track(props) {
 
   const trackInstrument = props.instruments[props.selectedTrack];
 
+  const setInstrumentLoaded = (state) =>
+    props.setInstrumentsLoaded((prev) => {
+      let a = [...prev];
+      a[props.index] = state;
+      return a;
+    });
   const loadTrackRows = () => {
     if (!props.instrument) return;
     let rows = [];
@@ -210,7 +199,6 @@ function Track(props) {
           drawingNote.clip +
           1;
         let file = new File([blob], filename);
-        //setUploadingFiles((prev) => [...prev, file]);
         blob.arrayBuffer().then((arrayBuffer) => {
           Tone.getContext().rawContext.decodeAudioData(
             arrayBuffer,
@@ -249,6 +237,43 @@ function Track(props) {
         });
       });
     }
+  };
+
+  const onFileClick = (fileId, fileUrl, audiobuffer, index, data) => {
+    let newAudioIndex = 0;
+    while (props.instrument.has(newAudioIndex)) {
+      newAudioIndex++;
+    }
+
+    props.instrument.add(newAudioIndex, audiobuffer);
+
+    props.setTracks((prev) => {
+      let newTracks = [...prev];
+      let newNote = {
+        time: Tone.Transport.position,
+        clip: newAudioIndex,
+        duration: parseFloat(audiobuffer.duration.toFixed(3)),
+        offset: 0,
+      };
+
+      newTracks[props.index].score = [...newTracks[props.index].score, newNote];
+
+      newTracks[props.index].instrument.urls[newAudioIndex] = fileId;
+      return newTracks;
+    });
+
+    props.setInstrumentsInfo((prev) => {
+      let newII = [...prev];
+      newII[props.index].filesInfo[newAudioIndex] = data;
+      if (!newII[props.index].patch) {
+        newII[props.index].patch = { urls: { [newAudioIndex]: fileId } };
+      } else {
+        newII[props.index].patch.urls[newAudioIndex] = fileId;
+      }
+      return newII;
+    });
+
+    props.setAddFileDialog(null);
   };
 
   /* ================================================================================== */
@@ -766,20 +791,18 @@ function Track(props) {
           </>
         )}
       </Box>
-      <FileUploader
-        open={uploadingFiles.length > 0}
-        files={uploadingFiles}
-        setUploadingFiles={setUploadingFiles}
-        track={props.track}
-        instrument={props.instrument}
-        setInstrumentsInfo={props.setInstrumentsInfo}
-        setTracks={props.setTracks}
-        drawingNote={drawingNote}
-        index={props.index}
-        /* setInstrumentLoaded={props.setInstrumentLoaded}
-        onInstrumentMod={props.onInstrumentMod} 
-        updateOnFileLoaded={props.updateOnFileLoaded}*/
-      />
+
+      {trackType === 2 && props.addFileDialog && (
+        <FileEditor
+          audioTrack
+          open={props.addFileDialog}
+          onClose={() => props.setAddFileDialog(false)}
+          exists={false}
+          instrument={props.instrument}
+          onFileClick={onFileClick}
+          setInstrumentLoaded={setInstrumentLoaded}
+        />
+      )}
     </div>
   );
 }

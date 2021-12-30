@@ -1,7 +1,5 @@
 import React from "react";
 
-import { useTranslation } from "react-i18next";
-
 import "./AppLogo.css";
 
 function AppLogo(props) {

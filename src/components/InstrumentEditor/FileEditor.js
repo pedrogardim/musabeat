@@ -127,6 +127,7 @@ function FileEditor(props) {
             <FileExplorer
               compact
               fileEditor
+              audioTrack={props.audioTrack}
               setInstrumentLoaded={props.setInstrumentLoaded}
               handlePageNav={props.handlePageNav}
               tags={

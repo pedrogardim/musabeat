@@ -1,18 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { labels } from "../../assets/drumkits";
-
 import { drumMapping, fileExtentions } from "../../assets/musicutils";
-
-import * as Tone from "tone";
 
 import "./DrumComponent.css";
 
 import {
-  ListItem,
-  ListItemText,
   IconButton,
   Icon,
-  ListItemSecondaryAction,
   Typography,
   Tooltip,
   Paper,

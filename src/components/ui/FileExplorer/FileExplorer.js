@@ -7,30 +7,24 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableHead,
   InputAdornment,
   TableRow,
   CircularProgress,
   Icon,
   IconButton,
-  Divider,
-  List,
-  ListItem,
   Typography,
   Chip,
   Menu,
   MenuItem,
   Tooltip,
   Avatar,
-  BottomNavigationAction,
-  BottomNavigation,
   TextField,
   Fab,
   Dialog,
   Box,
 } from "@mui/material";
 
-import { Skeleton, Autocomplete, useAutocomplete } from "@mui/material";
+import { Skeleton, Autocomplete } from "@mui/material";
 
 import "./FileExplorer.css";
 
@@ -107,7 +101,10 @@ function FileExplorer(props) {
 
       props.setInstrumentLoaded(false);
 
-      if (props.compact && props.instrument.name === "Sampler") {
+      if (
+        (props.compact && props.instrument.name === "Sampler") ||
+        props.audioTrack
+      ) {
         let url = filesUrl[index];
         //console.log(url);
         var xhr = new XMLHttpRequest();

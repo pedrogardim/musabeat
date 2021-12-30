@@ -5,14 +5,10 @@ import {
   IconButton,
   Icon,
   Dialog,
-  Paper,
   Typography,
-  Input,
   Slider,
   Grid,
   TextField,
-  Tabs,
-  Tab,
   Checkbox,
   FormControlLabel,
   Tooltip,
@@ -33,10 +29,8 @@ import "./SessionSettings.css";
 function SessionSettings(props) {
   const { t } = useTranslation();
 
-  const btnRef = useRef(null);
   const [newSessionData, setNewSessionData] = useState(props.sessionData);
   const [userDialog, setUserDialog] = useState(false);
-  const sessionData = props.sessionData;
 
   const handleBpmChange = (field, value) => {
     Tone.Transport.bpm.value = value;

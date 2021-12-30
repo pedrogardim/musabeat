@@ -115,6 +115,7 @@ function Workspace(props) {
   const [trackRows, setTrackRows] = useState([]);
 
   const [fileListOpen, setFileListOpen] = useState(false);
+  const [addFileDialog, setAddFileDialog] = useState(false);
 
   const [editMode, setEditMode] = useState(false);
   const [cursorMode, setCursorMode] = useState(null);
@@ -1383,6 +1384,8 @@ function Workspace(props) {
               setPendingUploadFiles={setPendingUploadFiles}
               movingSelDelta={movingSelDelta}
               trackOptions={trackOptions}
+              addFileDialog={addFileDialog}
+              setAddFileDialog={setAddFileDialog}
             />
           ) : (
             <>
@@ -1499,7 +1502,7 @@ function Workspace(props) {
               </>
             ) : (
               <>
-                <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
+                <IconButton onClick={() => setAddFileDialog(true)}>
                   <Icon>add</Icon>
                 </IconButton>
                 <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
