@@ -125,7 +125,8 @@ function FileExplorer(props) {
                   fileIdList[index],
                   filesUrl[index],
                   audiobuffer,
-                  filedata[index].name
+                  Tone.Frequency(props.item, "midi").toNote(),
+                  filedata[index]
                 );
                 props.setInstrumentLoaded(true);
 

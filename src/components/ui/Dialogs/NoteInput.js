@@ -10,6 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import * as Tone from "tone";
+
 import { labels } from "../../../assets/drumkits";
 import { useTranslation } from "react-i18next";
 
@@ -21,12 +23,12 @@ function NoteInput(props) {
   const [note, setNote] = useState(props.note);
 
   const handleSubmit = () => {
-    props.onSubmit(note);
+    props.onSubmit(Tone.Frequency(note, "midi").toNote());
     props.onClose();
   };
 
   useEffect(() => {
-    console.log(note);
+    console.log(note, Tone.Frequency(note, "midi").toNote());
   }, [note]);
 
   return (
@@ -45,9 +47,16 @@ function NoteInput(props) {
           justifyContent: "center",
         }}
       >
-        <Typography variant="h5">{note}</Typography>
+        <Typography variant="h4">
+          {Tone.Frequency(note, "midi").toNote()}
+        </Typography>
         <div className="break" style={{ height: 32 }} />
-        <Keyboard color={2} onKeyClick={setNote} activeNotes={[note]} />
+        <Keyboard
+          color={2}
+          onKeyClick={setNote}
+          activeNotes={[note]}
+          style={{ width: "100%", height: 64, flex: "1 0 64px" }}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={props.onClose}>{t("dialogs.cancel")}</Button>

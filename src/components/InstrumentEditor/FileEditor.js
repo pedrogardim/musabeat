@@ -104,7 +104,7 @@ function FileEditor(props) {
     [props.buffer, props.exists, props.instrument]
   );
 
-  //console.log(props.exists);
+  //console.log("props.exists", props.exists);
 
   return (
     <Dialog
@@ -121,20 +121,28 @@ function FileEditor(props) {
       maxWidth="lg"
       fullWidth
     >
-      <Box className="file-editor-column">
-        <FileExplorer
-          compact
-          fileEditor
-          setInstrumentLoaded={props.setInstrumentLoaded}
-          handlePageNav={props.handlePageNav}
-          tags={[fileTags[tagTypeMapping[props.index]]]}
-          instrument={props.instrument}
-          onFileClick={props.onFileClick}
-          onClose={props.onClose}
-          item={props.index}
-        />
-      </Box>
-      <Divider flexItem orientation="vertical" />
+      {!(props.exists && props.instrument.name === "Sampler") && (
+        <>
+          <Box className="file-editor-column">
+            <FileExplorer
+              compact
+              fileEditor
+              setInstrumentLoaded={props.setInstrumentLoaded}
+              handlePageNav={props.handlePageNav}
+              tags={
+                !props.instrument.name === "Sampler" && props.isDrum
+                  ? [fileTags[tagTypeMapping[props.index]]]
+                  : []
+              }
+              instrument={props.instrument}
+              onFileClick={props.onFileClick}
+              onClose={props.onClose}
+              item={props.index}
+            />
+          </Box>
+          <Divider flexItem orientation="vertical" />
+        </>
+      )}
       <Box className="file-editor-column">
         {props.exists && (
           <>
@@ -205,12 +213,14 @@ function FileEditor(props) {
             </Grid>
           </>
         )}
-        <Box>
-          <Button onClick={() => {}}>Upload File</Button>
-          <Button color="secondary" onClick={() => {}}>
-            Record
-          </Button>
-        </Box>
+        {!(props.exists && props.instrument.name === "Sampler") && (
+          <Box>
+            <Button onClick={() => {}}>Upload File</Button>
+            <Button color="secondary" onClick={() => {}}>
+              Record
+            </Button>
+          </Box>
+        )}
       </Box>
       <IconButton
         onClick={props.onClose}

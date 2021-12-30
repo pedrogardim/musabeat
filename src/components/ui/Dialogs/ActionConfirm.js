@@ -30,6 +30,9 @@ function ActionConfirm(props) {
             ? t("dialogs.unsavedChanges")
             : props.instrumentEditor
             ? t("instrumentEditor.removingItemAlert")
+            : //TODO translation
+            props.switchingSampler
+            ? t("instrumentEditor.switchingSampler")
             : ""}
         </DialogContentText>
       </DialogContent>

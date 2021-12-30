@@ -18,7 +18,7 @@ import {
   SvgIcon,
 } from "@mui/material";
 
-import AudioFileItem from "./AudioFileItem";
+import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 
 import PatchExplorer from "../ui/PatchExplorer/PatchExplorer";
@@ -73,6 +73,7 @@ function InstrumentEditor(props) {
   const [renamingLabel, setRenamingLabel] = useState(null);
   const [deletingItem, setDeletingItem] = useState(null);
   const [editingFile, setEditingFile] = useState(null);
+  const [isSwitchingSampler, setIsSwitchingSampler] = useState(false);
 
   const [patchSize, setPatchSize] = useState(0);
 
@@ -104,9 +105,7 @@ function InstrumentEditor(props) {
     });
 
   const changeInstrumentType = async (e) => {
-    let newType = e.target.value;
-
-    console.log(newType);
+    let newType = typeof e === "string" ? e : e.target.value;
 
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
@@ -211,15 +210,18 @@ function InstrumentEditor(props) {
   };
 
   const handleSamplerFileDelete = (fileId, fileName) => {
+    console.log(fileName, props.instrument._buffers._buffers);
     let newInstrument = new Tone.Sampler().toDestination();
 
     props.instrument._buffers._buffers.forEach((value, key) => {
-      if (parseInt(key) !== fileName) newInstrument.add(key, value);
+      if (key !== fileName) newInstrument.add(key, value);
     });
 
     props.instrument.dispose();
 
     setInstrument(newInstrument);
+
+    console.log(newInstrument._buffers._buffers);
 
     onInstrumentMod(
       fileId,
@@ -227,6 +229,7 @@ function InstrumentEditor(props) {
       "",
       true
     );
+
     firebase
       .firestore()
       .collection("files")
@@ -269,13 +272,15 @@ function InstrumentEditor(props) {
     let drumMap = props.instrument._buffers._buffers;
     if (drumMap.has(newNote)) return;
 
+    //TODO:Handle instrument having newNote
+
     //props.instrument.add()
     drumMap.set(
       JSON.stringify(Tone.Frequency(newNote).toMidi()),
-      JSON.stringify(Tone.Frequency(note).toMidi())
+      drumMap.get(JSON.stringify(Tone.Frequency(note).toMidi()))
     );
 
-    console.log(drumMap.delete(JSON.stringify(Tone.Frequency(note).toMidi())));
+    drumMap.delete(JSON.stringify(Tone.Frequency(note).toMidi()));
 
     props.updateFilesStatsOnChange && props.updateFilesStatsOnChange();
 
@@ -314,19 +319,27 @@ function InstrumentEditor(props) {
             setPatchSize(totalSize);
           });
 
-          !props.patchPage
-            ? props.setTracks &&
-              props.setTracks((prev) => {
-                let newTracks = [...prev];
-                newTracks[props.index].instrument = { urls: urlsObj };
-
-                return newTracks;
-              })
-            : props.setPatchInfo((prev) => {
-                let newPatch = { ...prev };
-                newPatch.urls = urlsObj;
-                return newPatch;
-              });
+          if (!props.patchPage) {
+            props.setTracks((prev) => {
+              let newTracks = [...prev];
+              newTracks[props.index].instrument = { urls: urlsObj };
+              return newTracks;
+            });
+            props.setInstrumentsInfo((prev) => {
+              let a = [...prev];
+              a[props.index].patch = { urls: urlsObj };
+              a[props.index].filesInfo[newNote] =
+                a[props.index].filesInfo[note];
+              delete a[props.index].filesInfo[note];
+              return a;
+            });
+          } else {
+            props.setPatchInfo((prev) => {
+              let newPatch = { ...prev };
+              newPatch.urls = urlsObj;
+              return newPatch;
+            });
+          }
         });
     } else {
       /*  setFilesName((prev) => {
@@ -354,20 +367,28 @@ function InstrumentEditor(props) {
         setPatchSize(totalSize);
       });
 
-      !props.patchPage
-        ? props.setTracks &&
-          props.setTracks((prev) => {
-            let newTracks = [...prev];
-            newTracks[props.index].instrument = { urls: urlsObj };
-
-            return newTracks;
-          })
-        : props.setPatchInfo((prev) => {
-            let newPatch = { ...prev };
-            newPatch.urls = urlsObj;
-            return newPatch;
-          });
+      if (!props.patchPage) {
+        props.setTracks((prev) => {
+          let newTracks = [...prev];
+          newTracks[props.index].instrument = { urls: urlsObj };
+          return newTracks;
+        });
+        props.setInstrumentsInfo((prev) => {
+          let a = [...prev];
+          a[props.index].patch = { urls: urlsObj };
+          a[props.index].filesInfo[newNote] = a[props.index].filesInfo[note];
+          delete a[props.index].filesInfo[note];
+          return a;
+        });
+      } else {
+        props.setPatchInfo((prev) => {
+          let newPatch = { ...prev };
+          newPatch.urls = urlsObj;
+          return newPatch;
+        });
+      }
     }
+
     setRenamingLabel(null);
   };
 
@@ -505,96 +526,92 @@ function InstrumentEditor(props) {
 
   const onFileClick = (fileId, fileUrl, audiobuffer, index, data) => {
     let isDrum = props.track.type === 0;
-    if (props.track.type === 3) {
-      setInstrumentLoaded(false);
-      props.instrument.dispose();
-      let newPlayer = new Tone.GrainPlayer(
-        audiobuffer ? audiobuffer : fileUrl,
-        () => setInstrumentLoaded(true)
-      ).toDestination();
 
-      setInstrument(newPlayer);
-      //updateOnFileLoaded();
-      onInstrumentMod(fileId);
-      //setModulePage(null);
-    } else {
-      setInstrumentLoaded(false);
+    setInstrumentLoaded(false);
 
-      let labelOnInstrument = isDrum
-        ? index
-        : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
+    let labelOnInstrument = isDrum
+      ? index
+      : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
 
-      if (typeof props.track.instrument === "string") {
-        firebase
-          .firestore()
-          .collection(isDrum ? "drumpatches" : "patches")
-          .doc(props.track.instrument)
-          .get()
-          .then((r) => {
-            if (props.instrument.has(labelOnInstrument)) {
-              let newInstrument = new Tone.Players().toDestination();
+    if (typeof props.track.instrument === "string") {
+      firebase
+        .firestore()
+        .collection(isDrum ? "drumpatches" : "patches")
+        .doc(props.track.instrument)
+        .get()
+        .then((r) => {
+          if (props.instrument.has(labelOnInstrument)) {
+            let newInstrument = new Tone.Players().toDestination();
 
-              props.instrument._buffers._buffers.forEach((value, key) => {
-                if (JSON.stringify(index) !== key)
-                  newInstrument.add(key, value);
-              });
-
-              newInstrument.add(
-                labelOnInstrument,
-                audiobuffer ? audiobuffer : fileUrl,
-                () => setInstrumentLoaded(true)
-              );
-
-              props.instrument.dispose();
-
-              setInstrument(newInstrument);
-            } else {
-              props.instrument.add(
-                labelOnInstrument,
-                audiobuffer ? audiobuffer : fileUrl,
-                () => setInstrumentLoaded(true)
-              );
-            }
-
-            props.setInstrumentsInfo((prev) => {
-              let a = [...prev];
-              a[props.index].filesInfo[index] = data;
-              return a;
+            props.instrument._buffers._buffers.forEach((value, key) => {
+              if (JSON.stringify(index) !== key) newInstrument.add(key, value);
             });
 
-            onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+            newInstrument.add(
+              labelOnInstrument,
+              audiobuffer ? audiobuffer : fileUrl,
+              () => setInstrumentLoaded(true)
+            );
+
+            props.instrument.dispose();
+
+            setInstrument(newInstrument);
+          } else {
+            props.instrument.add(
+              labelOnInstrument,
+              audiobuffer ? audiobuffer : fileUrl,
+              () => setInstrumentLoaded(true)
+            );
+          }
+
+          props.setInstrumentsInfo((prev) => {
+            let a = [...prev];
+            a[props.index].filesInfo[labelOnInstrument] = data;
+            return a;
           });
+
+          onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+        });
+    } else {
+      //console.log(Object.keys(props.track.instrument.urls), labelOnInstrument);
+
+      if (
+        props.instrument.name === "Players" &&
+        props.instrument.has(labelOnInstrument)
+      ) {
+        let newInstrument = new Tone.Players().toDestination();
+
+        props.instrument._buffers._buffers.forEach((value, key) => {
+          if (JSON.stringify(index) !== key) newInstrument.add(key, value);
+        });
+
+        newInstrument.add(
+          labelOnInstrument,
+          audiobuffer ? audiobuffer : fileUrl,
+          () => setInstrumentLoaded(true)
+        );
+
+        props.instrument.dispose();
+
+        setInstrument(newInstrument);
       } else {
-        //console.log(Object.keys(props.track.instrument.urls), labelOnInstrument);
-
-        if (props.instrument.has(labelOnInstrument)) {
-          let newInstrument = new Tone.Players().toDestination();
-
-          props.instrument._buffers._buffers.forEach((value, key) => {
-            if (JSON.stringify(index) !== key) newInstrument.add(key, value);
-          });
-
-          newInstrument.add(
-            labelOnInstrument,
-            audiobuffer ? audiobuffer : fileUrl,
-            () => setInstrumentLoaded(true)
-          );
-
-          props.instrument.dispose();
-
-          setInstrument(newInstrument);
-        } else {
-          props.instrument.add(
-            labelOnInstrument,
-            audiobuffer ? audiobuffer : fileUrl,
-            () => setInstrumentLoaded(true)
-          );
-        }
-
-        //console.log(props.instrument);
-
-        onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+        props.instrument.add(
+          labelOnInstrument,
+          audiobuffer ? audiobuffer : fileUrl,
+          () => setInstrumentLoaded(true)
+        );
       }
+
+      props.setInstrumentsInfo((prev) => {
+        let a = [...prev];
+        a[props.index].filesInfo[labelOnInstrument] = data;
+        return a;
+      });
+
+      //console.log(props.instrument);
+
+      onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+      setEditingFile(null);
     }
   };
 
@@ -718,60 +735,56 @@ function InstrumentEditor(props) {
     } else if (props.instrument.name === "Sampler") {
       let bufferObjects = [];
       props.instrument._buffers._buffers.forEach((e, i, a) =>
-        bufferObjects.push([e, i])
+        bufferObjects.push({ buffer: e, midi: i })
       );
+      //console.log(props.instrument._buffers._buffers);
       //console.log(bufferObjects, filesName);
       mainContent = (
-        <div style={{ overflowY: "overlay", height: "100%", width: "100%" }}>
-          <Select
-            variant="standard"
-            native
-            value={
-              props.instrument._dummyVoice
-                ? props.instrument._dummyVoice.name
-                : props.instrument.name
-            }
-            onChange={changeInstrumentType}
-            className="instrument-editor-type-select"
-          >
-            {["MonoSynth", "Sampler", "FMSynth", "AMSynth"].map((e, i) => (
-              <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
-            ))}
-          </Select>
-          {bufferObjects.length > 0 ? (
-            <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-              {bufferObjects
-                .sort((a, b) => a[1] - b[1])
-                .map((e, i) => (
-                  <>
-                    <AudioFileItem
-                      key={i}
-                      index={i}
-                      instrument={props.instrument}
-                      handleSamplerFileDelete={(a, b) =>
-                        setDeletingItem([a, b])
-                      }
-                      buffer={e[0]}
-                      fileLabel={Tone.Frequency(e[1], "midi").toNote()}
-                      fileName={
-                        filesName[Tone.Frequency(e[1], "midi").toNote()]
-                      }
-                      fileId={filesId[i]}
-                      openFilePage={(ev) =>
-                        props.handlePageNav("file", filesId[i], ev)
-                      }
-                      setRenamingLabel={setRenamingLabel}
-                    />
-                    <Divider />
-                  </>
-                ))}
-            </List>
-          ) : (
-            <NotFoundPage
-              type="emptySequencer"
-              handlePageNav={() => setFileExplorer(true)}
+        <div className="ie-synth-cont" style={{ overflowY: "overlay" }}>
+          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
+            <div style={{ height: 48 }} />
+            {bufferObjects
+              .sort((a, b) => a[1] - b[1])
+              .map((e, i) => (
+                <>
+                  <SamplerFileItem
+                    exists={props.instrument._buffers._buffers.has(
+                      JSON.stringify(e.midi)
+                    )}
+                    key={i}
+                    index={e.midi}
+                    instrument={props.instrument}
+                    handleSamplerFileDelete={(a, b) => setDeletingItem([a, b])}
+                    buffer={e.buffer}
+                    fileInfo={
+                      props.instrumentInfo &&
+                      props.instrumentInfo.filesInfo[
+                        Tone.Frequency(e.midi, "midi").toNote()
+                      ]
+                    }
+                    fileLabel={e.midi}
+                    fileId={
+                      props.instrumentInfo &&
+                      props.instrumentInfo.patch.urls[
+                        Tone.Frequency(e.midi, "midi").toNote()
+                      ]
+                    }
+                    handlePageNav={props.handlePageNav}
+                    setRenamingLabel={setRenamingLabel}
+                    handleFileClick={() => setEditingFile(parseInt(e.midi))}
+                  />
+                  <Divider />
+                </>
+              ))}
+            <SamplerFileItem
+              empty
+              instrument={props.instrument}
+              handleSamplerFileDelete={(a, b) => setDeletingItem([a, b])}
+              handlePageNav={props.handlePageNav}
+              setRenamingLabel={setRenamingLabel}
+              handleFileClick={() => setEditingFile(9999)}
             />
-          )}
+          </List>
         </div>
       );
     } else {
@@ -849,6 +862,24 @@ function InstrumentEditor(props) {
             >
               <SvgIcon viewBox="0 0 351 322.7">{drumIcon}</SvgIcon>
             </IconButton>
+          </>
+        ) : trackType === 1 ? (
+          <>
+            <Tooltip
+              title={`Switch to ${
+                props.instrument.name === "Sampler" ? "Synth" : "Sampler"
+              }`}
+            >
+              <IconButton
+                style={{ width: 48 }}
+                color="default"
+                onClick={() => setIsSwitchingSampler(true)}
+              >
+                <Icon>
+                  {props.instrument.name === "Sampler" ? "cable" : "graphic_eq"}
+                </Icon>
+              </IconButton>
+            </Tooltip>
           </>
         ) : (
           <></>
@@ -950,7 +981,12 @@ function InstrumentEditor(props) {
             open={true}
             onClose={() => setRenamingLabel(null)}
             note={renamingLabel}
-            onSubmit={(i) => changeSamplerNote(renamingLabel, i)}
+            onSubmit={(i) =>
+              changeSamplerNote(
+                Tone.Frequency(renamingLabel, "midi").toNote(),
+                i
+              )
+            }
           />
         ))}
 
@@ -967,6 +1003,19 @@ function InstrumentEditor(props) {
         />
       )}
 
+      {isSwitchingSampler && (
+        <ActionConfirm
+          switchingSampler
+          action={() =>
+            changeInstrumentType(
+              props.instrument.name === "Sampler" ? "MonoSynth" : "Sampler"
+            )
+          }
+          open={isSwitchingSampler}
+          onClose={() => setIsSwitchingSampler(false)}
+        />
+      )}
+
       {editingFile !== null && (
         <FileEditor
           open={editingFile !== null}
@@ -980,7 +1029,15 @@ function InstrumentEditor(props) {
           buffer={props.instrument._buffers._buffers.get(
             JSON.stringify(editingFile)
           )}
-          fileInfo={props.instrumentInfo.filesInfo[editingFile]}
+          fileInfo={
+            props.instrumentInfo &&
+            props.instrumentInfo.filesInfo &&
+            props.instrumentInfo.filesInfo[
+              props.instrument.name === "Sampler"
+                ? Tone.Frequency(editingFile, "midi").toNote()
+                : editingFile
+            ]
+          }
           setRenamingLabel={setRenamingLabel}
           openFilePage={(ev) =>
             props.handlePageNav(
@@ -989,7 +1046,14 @@ function InstrumentEditor(props) {
               ev
             )
           }
-          fileId={props.instrumentInfo.patch.urls[editingFile]}
+          fileId={
+            props.instrumentInfo &&
+            props.instrumentInfo.patch.urls[
+              props.instrument.name === "Sampler"
+                ? Tone.Frequency(editingFile, "midi").toNote()
+                : editingFile
+            ]
+          }
           isDrum={isDrum}
           handlePageNav={props.handlePageNav}
           setInstrumentLoaded={setInstrumentLoaded}

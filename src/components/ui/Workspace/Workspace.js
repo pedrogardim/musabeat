@@ -361,7 +361,8 @@ function Workspace(props) {
             setInstrumentsLoaded,
             trackIndex,
             () => {},
-            setNotifications
+            setNotifications,
+            setInstrumentsInfo
           ).then((r) =>
             setInstruments((prev) => {
               let a = [...prev];
@@ -498,7 +499,8 @@ function Workspace(props) {
           setInstrumentsLoaded,
           index,
           () => {},
-          setNotifications
+          setNotifications,
+          setInstrumentsInfo
         ).then((r) =>
           setInstruments((prev) => {
             let a = [...prev];
@@ -1633,14 +1635,14 @@ function Workspace(props) {
 
       {/*setTracksVolume={setTracksVolume}*/}
 
-      <FileList
+      {/*  <FileList
         onClose={() => setFileListOpen(false)}
         open={fileListOpen}
         instrumentsInfo={instrumentsInfo}
         instruments={instruments}
         selectedTrack={selectedTrack}
         tracks={tracks}
-      />
+      /> */}
 
       {sessionData && (
         <SessionSettings

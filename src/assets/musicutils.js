@@ -914,7 +914,9 @@ export const patchLoader = async (
       patch,
       setInstrumentsLoaded,
       trackIndex,
-      setNotifications
+      () => {},
+      setNotifications,
+      setInstrumentsInfo
     );
   } else {
     instrumentLoaded(true);
@@ -992,7 +994,8 @@ export const loadSamplerFromObject = async (
   setInstrumentsLoaded,
   trackIndex,
   nowLoaded,
-  setNotifications
+  setNotifications,
+  setInstrumentsInfo
 ) => {
   let instrumentLoaded = (isLoaded, sampler) => {
     setInstrumentsLoaded((prev) => {
@@ -1026,6 +1029,37 @@ export const loadSamplerFromObject = async (
   );
 
   //console.log(urlArray);
+
+  let filesInfo = await Promise.all(
+    Object.keys(obj.urls).map(async (e, i) => {
+      try {
+        return [
+          e,
+          (
+            await firebase
+              .firestore()
+              .collection("files")
+              .doc(obj.urls[e])
+              .get()
+          ).data(),
+        ];
+      } catch (er) {
+        setNotifications((prev) => [
+          ...prev,
+          ["fileInfo", obj.urls[e], trackIndex],
+        ]);
+      }
+    })
+  );
+
+  setInstrumentsInfo((prev) => {
+    let newInfo = [...prev];
+    newInfo[trackIndex] = {
+      patch: obj,
+      filesInfo: Object.fromEntries(filesInfo),
+    };
+    return newInfo;
+  });
 
   let urls = Object.fromEntries(
     urlArray
