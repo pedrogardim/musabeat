@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import * as Tone from "tone";
 
@@ -6,7 +6,7 @@ import "./style.css";
 
 import Draggable from "react-draggable";
 
-import { colors } from "../../../utils/Pallete";
+import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
 
 import { Box, Typography, IconButton, Icon } from "@mui/material";
 
@@ -18,14 +18,28 @@ function Grid(props) {
   const [gridPos, setGridPos] = useState(null);
   const [initialSelectionPos, setInitialSelectionPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
-  const [isMouseDown, setIsMouseDown] = useState(false);
   const [isMovingSelected, setIsMovingSelected] = useState(false);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const {
+    sessionSize,
+    gridSize,
+    isRecording,
+    cursorMode,
+    zoomPosition,
+    selectedTrack,
+    IEOpen,
+    mixerOpen,
+    setTracks,
+    setMovingSelDelta,
+    setSelection,
+  } = useContext(SessionWorkspaceContext);
 
-  const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+  const { selection, selectedNotes, movingSelDelta } = props;
 
+  const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
+  const hiddenNumbers = IEOpen || mixerOpen;
   const handleCursorDrag = (event, element) => {
-    Tone.Transport.seconds =
-      (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
+    Tone.Transport.seconds = (gridPos * Tone.Time("1m").toSeconds()) / gridSize;
 
     setCursorPosition(element.x);
   };
@@ -38,7 +52,6 @@ function Grid(props) {
 
   const handleMouseDown = (e) => {
     setIsMouseDown(true);
-
     if (e.target.className.includes("handle")) {
       return;
     }
@@ -50,14 +63,14 @@ function Grid(props) {
 
     if (isClickOnNote || isClickOnButton) return;
 
-    props.setSelection([]);
+    setSelection([]);
 
-    if (!props.cursorMode && !isClickOnNote) {
+    if (!cursorMode && !isClickOnNote) {
       Tone.Transport.seconds =
-        (gridPos * Tone.Time("1m").toSeconds()) / props.gridSize;
+        (gridPos * Tone.Time("1m").toSeconds()) / gridSize;
 
       setInitialSelectionPos(gridPos);
-      props.setSelection([gridPos, null]);
+      setSelection([gridPos, null]);
     }
   };
 
@@ -65,13 +78,13 @@ function Grid(props) {
     let hoveredPos =
       event.pageX -
       gridRef.current.getBoundingClientRect().left +
-      gridRef.current.offsetWidth / (zoomSize * props.gridSize * 2);
+      gridRef.current.offsetWidth / (zoomSize * gridSize * 2);
 
     let gridPos = Math.floor(
       Math.abs(
-        (hoveredPos / gridRef.current.offsetWidth) * zoomSize * props.gridSize
+        (hoveredPos / gridRef.current.offsetWidth) * zoomSize * gridSize
       ) +
-        props.zoomPosition[0] * props.gridSize
+        zoomPosition[0] * gridSize
     );
 
     setGridPos((prev) =>
@@ -84,28 +97,28 @@ function Grid(props) {
     setResizingHandle(null);
     setInitialSelectionPos(null);
     setIsMovingSelected(false);
-    if (props.movingSelDelta !== null) commitNotesDrag();
-    //props.setSelection([]);
+    if (movingSelDelta !== null) commitNotesDrag();
+    //setSelection([]);
   };
 
   const onGridPosChange = () => {
     //drag note input
     if (isMouseDown && !resizingHandle) {
-      if (props.cursorMode !== "edit") {
+      if (cursorMode !== "edit") {
         if (isMovingSelected === false)
-          props.setSelection((prev) =>
+          setSelection((prev) =>
             [initialSelectionPos, gridPos].sort((a, b) => a - b)
           );
         else handleSelectedNotesDrag();
       }
     }
     if (resizingHandle) {
-      props.setSelection((prev) => {
+      setSelection((prev) => {
         let newSelection = [...prev];
         let handleSide = resizingHandle === "left";
         if (
           (resizingHandle === "left" && newSelection < 0) ||
-          (resizingHandle === "right" && newSelection + 1 > props.sessionSize)
+          (resizingHandle === "right" && newSelection + 1 > sessionSize)
         )
           return prev;
         newSelection[handleSide ? 0 : 1] = gridPos;
@@ -116,33 +129,32 @@ function Grid(props) {
   };
 
   const commitNotesDrag = () => {
-    props.setTracks((prev) =>
+    setTracks((prev) =>
       prev.map((track, trackIndex) => ({
         ...track,
         score: track.score.map((note, noteIndex) => ({
           ...note,
           time: Tone.Time(
             Tone.Time(note.time).toSeconds() +
-              (props.selectedNotes[trackIndex].includes(noteIndex) &&
-                (props.movingSelDelta / props.gridSize) *
-                  Tone.Time("1m").toSeconds())
+              (selectedNotes[trackIndex].includes(noteIndex) &&
+                (movingSelDelta / gridSize) * Tone.Time("1m").toSeconds())
           ).toBarsBeatsSixteenths(),
         })),
       }))
     );
 
-    props.setSelection((prev) => prev.map((e) => e + props.movingSelDelta));
+    setSelection((prev) => prev.map((e) => e + movingSelDelta));
 
-    props.setMovingSelDelta(null);
+    setMovingSelDelta(null);
   };
 
   const handleSelectedNotesDrag = () => {
-    props.setMovingSelDelta(gridPos - isMovingSelected);
+    setMovingSelDelta(gridPos - isMovingSelected);
   };
   /* 
   useEffect(() => {
-    setTLinputSessionSize(props.sessionSize);
-  }, [props.sessionSize]); */
+    setTLinputSessionSize(sessionSize);
+  }, [sessionSize]); */
 
   useEffect(() => {
     //toggleCursor(Tone.Transport.state);
@@ -155,21 +167,16 @@ function Grid(props) {
           Tone.Transport.seconds >= 0 &&
           setCursorPosition(
             (Tone.Transport.seconds -
-              props.zoomPosition[0] * Tone.Time("1m").toSeconds()) /
+              zoomPosition[0] * Tone.Time("1m").toSeconds()) /
               (zoomSize * Tone.Time("1m").toSeconds())
           );
       }, 16)
     );
-  }, [props.zoomPosition]);
+  }, [zoomPosition]);
 
   useEffect(() => {
     onGridPosChange();
-    //console.log(gridPos);
   }, [gridPos]);
-
-  /* useEffect(() => {
-    console.log(props.isMouseDown);
-  }, [props.isMouseDown]); */
 
   return (
     <div
@@ -180,12 +187,13 @@ function Grid(props) {
       onMouseLeave={handleMouseUp}
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
+      tabIndex={-1}
     >
       <div ref={gridRef} className="ws-grid-line-cont">
-        {Array(zoomSize * props.gridSize)
+        {Array(zoomSize * gridSize)
           .fill(0)
           .map((e, i) =>
-            i % props.gridSize !== 0 && props.selectedTrack === null ? (
+            i % gridSize !== 0 && selectedTrack === null ? (
               ""
             ) : (
               <Box
@@ -194,19 +202,19 @@ function Grid(props) {
                 sx={{ bgcolor: "text.primary" }}
                 style={{
                   opacity:
-                    i % props.gridSize === 0
+                    i % gridSize === 0
                       ? 0.4
-                      : i % props.gridSize === props.gridSize / 2
+                      : i % gridSize === gridSize / 2
                       ? 0.3
                       : 0.2,
                 }}
               >
-                {i % props.gridSize === 0 && !props.hiddenNumbers && (
+                {i % gridSize === 0 && !hiddenNumbers && (
                   <Typography
                     className="ws-grid-line-mesure-num"
                     color="textPrimary"
                   >
-                    {i / props.gridSize + 1 + props.zoomPosition[0]}
+                    {i / gridSize + 1 + zoomPosition[0]}
                   </Typography>
                 )}
               </Box>
@@ -216,9 +224,9 @@ function Grid(props) {
         <div className="ws-grid-line" />
       </div>
 
-      {(props.selection.length === 0 ||
-        props.selection.includes(null) ||
-        props.selection[0] === props.selection[1]) && (
+      {(selection.length === 0 ||
+        selection.includes(null) ||
+        selection[0] === selection[1]) && (
         <Draggable
           axis="x"
           onDrag={handleCursorDrag}
@@ -229,15 +237,15 @@ function Grid(props) {
             x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
             y: 0,
           }}
-          disabled={props.isMouseDown}
+          disabled={isMouseDown}
           bounds=".ws-grid-line-cont"
-          style={{ pointerEvents: props.isMouseDown && "none" }}
+          style={{ pointerEvents: isMouseDown && "none" }}
         >
           <Box
             className={"ws-grid-cursor"}
-            sx={{ bgcolor: props.isRecording ? "secondary" : "text.primary" }}
+            sx={{ bgcolor: isRecording ? "secondary" : "text.primary" }}
             style={{
-              pointerEvents: props.isMouseDown && "none",
+              pointerEvents: isMouseDown && "none",
             }}
           />
         </Draggable>
@@ -245,25 +253,23 @@ function Grid(props) {
 
       {props.children}
 
-      {props.selection.length > 0 && !props.selection.includes(null) && (
+      {selection.length > 0 && !selection.includes(null) && (
         <Box
           sx={{
             position: "absolute",
             height: "100%",
             transform: `translateX(${
-              ((props.selection.sort((a, b) => a - b)[0] +
-                (props.movingSelDelta && props.movingSelDelta) -
-                props.zoomPosition[0] * props.gridSize) /
-                (zoomSize * props.gridSize)) *
+              ((selection.sort((a, b) => a - b)[0] +
+                (movingSelDelta && movingSelDelta) -
+                zoomPosition[0] * gridSize) /
+                (zoomSize * gridSize)) *
                 gridRef.current.offsetWidth +
               48
             }px)`,
             width: Math.abs(
-              (props.selection.sort((a, b) => a - b)[1] /
-                (zoomSize * props.gridSize)) *
+              (selection.sort((a, b) => a - b)[1] / (zoomSize * gridSize)) *
                 gridRef.current.offsetWidth -
-                (props.selection.sort((a, b) => a - b)[0] /
-                  (zoomSize * props.gridSize)) *
+                (selection.sort((a, b) => a - b)[0] / (zoomSize * gridSize)) *
                   gridRef.current.offsetWidth
             ),
             bgcolor: "text.secondary",
@@ -272,7 +278,7 @@ function Grid(props) {
             justifyContent: "center",
             alignItems: "center",
             /* border:
-                props.cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
+                cursorMode === "edit" && "solid 1px rgba(0,0,0,0.5)", */
           }}
         >
           <div
@@ -303,7 +309,7 @@ function Grid(props) {
             shrink: true,
           }}
           inputProps={{ min: 1, max: 128 }}
-          defaultValue={props.sessionSize}
+          defaultValue={sessionSize}
           onKeyDown={(e) => e.keyCode === 13 && handleSessionSizeChange(e)}
           onBlur={(e) => handleSessionSizeChange(e)}
           onMouseUp={(e) => handleSessionSizeChange(e)}

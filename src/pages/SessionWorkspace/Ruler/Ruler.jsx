@@ -14,6 +14,7 @@ function Ruler(props) {
   const [gridPos, setGridPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
   const [handlePosition, setHandlePosition] = useState(props.zoomPosition);
+  const [mousePosition, setMousePosition] = useState([0, 0]);
 
   const grid = 1;
 
@@ -125,13 +126,8 @@ function Ruler(props) {
   };
 
   useEffect(() => {
-    //console.log(props.isMouseDown);
-    if (!props.isMouseDown) handleMouseUp();
-  }, [props.isMouseDown]);
-
-  useEffect(() => {
-    handleHover(props.mousePosition[0]);
-  }, [props.mousePosition]);
+    handleHover(mousePosition[0]);
+  }, [mousePosition]);
 
   useEffect(() => {
     //console.log(props.zoomPosition);
@@ -225,6 +221,15 @@ function Ruler(props) {
             })}
           />
         ))}
+
+      {(resizingHandle || isMoving) && (
+        <div
+          className="knob-backdrop"
+          onMouseMove={(e) => handleHover(e.pageX)}
+          onMouseUp={handleMouseUp}
+          onMouseOut={handleMouseUp}
+        />
+      )}
     </Box>
   );
 }

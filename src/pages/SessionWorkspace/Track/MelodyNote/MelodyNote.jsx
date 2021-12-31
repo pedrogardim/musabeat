@@ -17,6 +17,7 @@ function MelodyNote(props) {
     ghost,
     gridPos,
     deletableNote,
+    isMouseDown,
   } = props;
 
   const [isResizing, setIsResizing] = useState(false);
@@ -30,7 +31,6 @@ function MelodyNote(props) {
     tracks,
     gridSize,
     setTracks,
-    isMouseDown,
     selectedNotes,
     setSelectedNotes,
     movingSelDelta,

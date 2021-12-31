@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Helmet } from "react-helmet";
 import * as Tone from "tone";
 import firebase from "firebase";
@@ -66,7 +66,7 @@ const userSubmitedSessionProps = [
   "timeline",
 ];
 
-function Workspace(props) {
+function SessionWorkspace(props) {
   const { t } = useTranslation();
 
   const [savingMode, setSavingMode] = useState("simple");
@@ -99,8 +99,6 @@ function Workspace(props) {
     () => {},
     () => {},
   ]);
-  const [isMouseDown, setIsMouseDown] = useState(false);
-  const [mousePosition, setMousePosition] = useState([0, 0]);
   const [trackRows, setTrackRows] = useState([]);
 
   const [fileListOpen, setFileListOpen] = useState(false);
@@ -174,7 +172,7 @@ function Workspace(props) {
 
   const { user, handlePageNav } = props;
 
-  const WSContextValue = {
+  const WSContextValue = useMemo(() => ({
     tracks,
     setTracks,
     sessionData,
@@ -193,16 +191,6 @@ function Workspace(props) {
     setInstrumentsInfo,
     isLoaded,
     setIsLoaded,
-    pressedKeys,
-    setPressedKeys,
-    playingOctave,
-    setPlayingOctave,
-    playNoteFunction,
-    setPlayNoteFunction,
-    isMouseDown,
-    setIsMouseDown,
-    mousePosition,
-    setMousePosition,
     trackRows,
     setTrackRows,
     editMode,
@@ -219,12 +207,6 @@ function Workspace(props) {
     setIsPlaying,
     isRecording,
     setIsRecording,
-    selection,
-    setSelection,
-    selectedNotes,
-    setSelectedNotes,
-    movingSelDelta,
-    setMovingSelDelta,
     sessionKey,
     user,
     premiumMode,
@@ -234,7 +216,12 @@ function Workspace(props) {
     setAddFileDialog,
     pendingUploadFiles,
     setPendingUploadFiles,
-  };
+    mixerOpen,
+    setSelectedTrack,
+    setSelection,
+    setSelectedNotes,
+    setMovingSelDelta,
+  }));
 
   /*========================================================================================*/
   /*========================================================================================*/
@@ -1285,10 +1272,6 @@ function Workspace(props) {
         }}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
-        onMouseDown={() => setIsMouseDown(true)}
-        onMouseUp={() => setIsMouseDown(false)}
-        onMouseLeave={() => setIsMouseDown(false)}
-        onMouseMove={(e) => setMousePosition([e.pageX, e.pageY])}
       >
         <LoadingScreen open={tracks === null} />
         <Box
@@ -1355,9 +1338,6 @@ function Workspace(props) {
               setSelectedTrack={setSelectedTrack}
               sessionData={sessionData}
               setSessionData={setSessionData}
-              mousePosition={mousePosition}
-              isMouseDown={isMouseDown}
-              setIsMouseDown={setIsMouseDown}
             />
 
             <Ruler
@@ -1365,9 +1345,6 @@ function Workspace(props) {
               sessionSize={sessionSize}
               zoomPosition={zoomPosition}
               setZoomPosition={setZoomPosition}
-              mousePosition={mousePosition}
-              isMouseDown={isMouseDown}
-              setIsMouseDown={setIsMouseDown}
             />
           </>
         )}
@@ -1397,57 +1374,25 @@ function Workspace(props) {
             />
           )}
           <Grid
-            tracks={tracks}
-            sessionSize={sessionSize}
-            setSessionSize={setSessionSize}
-            gridSize={gridSize}
-            isRecording={isRecording}
             selection={selection}
-            setSelection={setSelection}
             selectedNotes={selectedNotes}
-            cursorMode={cursorMode}
-            zoomPosition={zoomPosition}
-            selectedTrack={selectedTrack}
-            hiddenNumbers={IEOpen || mixerOpen}
-            isMouseDown={isMouseDown}
             movingSelDelta={movingSelDelta}
-            setMovingSelDelta={setMovingSelDelta}
-            setTracks={setTracks}
           >
             {selectedTrack !== null ? (
-              <Track />
+              <Track
+                selectedNotes={selectedNotes}
+                movingSelDelta={movingSelDelta}
+              />
             ) : (
               <>
                 {tracks &&
                   tracks.map((track, trackIndex) => (
                     <ClosedTrack
-                      tabIndex={-1}
                       key={track.id}
-                      index={trackIndex}
-                      selectedTrack={selectedTrack}
-                      setSelectedTrack={setSelectedTrack}
+                      trackIndex={trackIndex}
                       track={track}
-                      instrument={instruments[trackIndex]}
-                      setInstruments={setInstruments}
-                      loaded={instrumentsLoaded[trackIndex]}
-                      setInstrumentsLoaded={setInstrumentsLoaded}
-                      sessionData={sessionData}
-                      sessionSize={sessionSize}
-                      setTracks={setTracks}
-                      editMode={editMode}
-                      resetUndoHistory={() => handleUndo("RESET")}
                       selection={selection}
-                      setSelection={setSelection}
-                      selectedNotes={selectedNotes[trackIndex]}
-                      duplicateTrack={duplicateTrack}
-                      setSnackbarMessage={setSnackbarMessage}
-                      isLoaded={isLoaded}
-                      handlePageNav={handlePageNav}
-                      setAreUnsavedChanges={setAreUnsavedChanges}
-                      cursorMode={cursorMode}
-                      gridSize={gridSize}
-                      isRecording={isRecording}
-                      zoomPosition={zoomPosition}
+                      selectedNotes={selectedNotes}
                       movingSelDelta={movingSelDelta}
                     />
                   ))}
@@ -1647,7 +1592,6 @@ function Workspace(props) {
               setPlayingOctave={setPlayingOctave}
               trackRows={trackRows}
               instrumentInfo={instrumentsInfo[selectedTrack]}
-              isMouseDown={isMouseDown}
             />
           </Box>
         )}
@@ -1751,7 +1695,7 @@ function Workspace(props) {
   );
 }
 
-export default Workspace;
+export default SessionWorkspace;
 
 const deepCopy = (a) => JSON.parse(JSON.stringify(a));
 

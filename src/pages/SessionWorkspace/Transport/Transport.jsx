@@ -22,6 +22,7 @@ function WorkspaceTransport(props) {
     1: props.gridSize,
     2: props.sessionData && props.sessionData.bpm,
   });
+  const [mousePosition, setMousePosition] = useState([0, 0]);
 
   //t: value only for display when closed
   const sessionParams = [
@@ -97,13 +98,9 @@ function WorkspaceTransport(props) {
   };
 
   const commitValue = () => {
-    selecting === 0
-      ? props.setSessionSize(paramsValue[0])
-      : selecting === 1
-      ? props.setGridSize(paramsValue[1])
-      : props.setSessionData((prev) => ({ ...prev, bpm: paramsValue[2] }));
-
-    setSelecting(null);
+    props.setSessionSize(paramsValue[0]);
+    props.setGridSize(paramsValue[1]);
+    props.setSessionData((prev) => ({ ...prev, bpm: paramsValue[2] }));
   };
 
   useEffect(() => {
@@ -147,11 +144,13 @@ function WorkspaceTransport(props) {
   useEffect(() => {
     if (typeof selecting === "number")
       handleParameterChange(props.mousePosition[1]);
-  }, [props.mousePosition]);
+  }, [mousePosition]);
 
   useEffect(() => {
-    if (!props.isMouseDown) commitValue();
-  }, [props.isMouseDown]);
+    if (selecting === null) {
+      commitValue();
+    }
+  }, [selecting]);
 
   return (
     <>
@@ -160,7 +159,7 @@ function WorkspaceTransport(props) {
         onClick={(e) =>
           !e.target.className.includes("wstr-back") && setExpanded(true)
         }
-        tabIndex="-1"
+        tabIndex={-1}
         sx={(theme) => ({
           [theme.breakpoints.down("md")]: {
             marginY: 1,
@@ -251,7 +250,6 @@ function WorkspaceTransport(props) {
                 onMouseDown={(e) => {
                   if (e.target.className.includes("material-icons")) return;
                   setSelecting(i);
-                  props.setIsMouseDown(true);
                 }}
               >
                 <Icon onClick={() => handleArrowClick(i, true)}>
@@ -273,6 +271,14 @@ function WorkspaceTransport(props) {
           ))}
         </Grid>
       </Dialog>
+      {selecting !== null && (
+        <div
+          className="knob-backdrop"
+          onMouseMove={(e) => setMousePosition([e.pageX, e.pageY])}
+          onMouseUp={() => setSelecting(null)}
+          onMouseOut={() => setSelecting(null)}
+        />
+      )}
     </>
   );
 }

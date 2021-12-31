@@ -11,6 +11,7 @@ function Keyboard(props) {
   const [octaveState, setOctaveState] = useState(
     props.initialOctave ? props.initialOctave : props.octave ? props.octave : 0
   );
+  const [isMouseDown, setIsMouseDown] = useState(false);
 
   const handleKeyClick = (key) => {
     let note = key + 24 + octave * 12;
@@ -41,7 +42,13 @@ function Keyboard(props) {
   }, [octaveState]);
 
   return (
-    <Paper className="keyboard" style={{ ...props.style }}>
+    <Paper
+      className="keyboard"
+      style={{ ...props.style }}
+      onMouseDown={() => setIsMouseDown(true)}
+      onMouseUp={() => setIsMouseDown(false)}
+      onMouseLeave={() => setIsMouseDown(false)}
+    >
       {Array(Math.floor(octaves * 12))
         .fill(1)
         .map((e, i) => {
@@ -61,7 +68,7 @@ function Keyboard(props) {
               onMouseDown={() => handleKeyClick(i)}
               onMouseUp={() => handleKeyUp(i)}
               onMouseLeave={() => handleKeyUp(i)}
-              onMouseEnter={() => props.isMouseDown && handleKeyClick(i)}
+              onMouseEnter={() => isMouseDown && handleKeyClick(i)}
               elevation={isBlackKey ? 24 : 8}
               sx={(theme) => {
                 let dark = theme.palette.mode === "dark";

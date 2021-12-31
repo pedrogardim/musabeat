@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import * as Tone from "tone";
 import { colors } from "../../../../utils/Pallete";
+
+import { SessionWorkspaceContext } from "../../../../context/SessionWorkspaceContext";
 
 import { IconButton, Icon, Paper, CircularProgress } from "@mui/material";
 
@@ -17,20 +19,30 @@ function ClosedTrack(props) {
   const rowRef = useRef(null);
 
   const [trackRows, setTrackRows] = useState([]);
-  const [gridPos, setGridPos] = useState([]);
-  const [drawingNote, setDrawingNote] = useState(null);
 
-  const [isMouseDown, setIsMouseDown] = useState(false);
-  const [deletableNote, setDeletableNote] = useState(false);
+  const { trackIndex, track, selectedNotes, movingSelDelta } = props;
 
-  const trackType = props.track.type;
-  const isSelected = props.selectedTrack === props.index;
+  const {
+    instruments,
+    instrumentsLoaded,
+    sessionSize,
+    isLoaded,
+    gridSize,
+    zoomPosition,
+    setSelectedTrack,
+  } = useContext(SessionWorkspaceContext);
+
+  const trackType = track.type;
+
+  const instrument = instruments[trackIndex];
+  const loaded = instrumentsLoaded[trackIndex];
+  const selectedTrackNotes = selectedNotes[trackIndex];
 
   const loadTrackRows = () => {
     let rows = [];
-    if (!props.instrument) return;
+    if (!instrument) return;
 
-    let array = [...new Set(props.track.score.map((item) => item.note))].sort(
+    let array = [...new Set(track.score.map((item) => item.note))].sort(
       (a, b) => a - b
     );
 
@@ -38,7 +50,7 @@ function ClosedTrack(props) {
       return {
         note: e,
         index: e,
-        //player: props.instrument.player(e),
+        //player: instrument.player(e),
       };
     });
 
@@ -46,28 +58,13 @@ function ClosedTrack(props) {
   };
 
   const scheduleNotes = () => {
-    !props.track.muted
+    !track.muted
       ? trackType === 0
-        ? scheduleSampler(
-            props.track.score,
-            props.instrument,
-            Tone.Transport,
-            props.track.id
-          )
+        ? scheduleSampler(track.score, instrument, Tone.Transport, track.id)
         : trackType === 1
-        ? scheduleMelody(
-            props.track.score,
-            props.instrument,
-            Tone.Transport,
-            props.track.id
-          )
-        : scheduleAudioTrack(
-            props.track.score,
-            props.instrument,
-            Tone.Transport,
-            props.track.id
-          )
-      : clearEvents(props.track.id);
+        ? scheduleMelody(track.score, instrument, Tone.Transport, track.id)
+        : scheduleAudioTrack(track.score, instrument, Tone.Transport, track.id)
+      : clearEvents(track.id);
   };
 
   /* ================================================================================== */
@@ -78,11 +75,11 @@ function ClosedTrack(props) {
 
   useEffect(() => {
     loadTrackRows();
-  }, [props.instrument, props.track, props.selectedTrack]);
+  }, [instrument, track]);
 
   useEffect(() => {
     scheduleNotes();
-  }, [props.instrument, props.track, props.track.score, props.isLoaded]);
+  }, [instrument, track, track.score, isLoaded]);
 
   /* ================================================================================== */
   /* ================================================================================== */
@@ -94,11 +91,10 @@ function ClosedTrack(props) {
     <Paper
       className="closed-track"
       ref={rowRef}
-      onClick={() => props.loaded && props.setSelectedTrack(props.index)}
+      onClick={() => loaded && setSelectedTrack(trackIndex)}
       disabled
       sx={(theme) => ({
-        bgcolor:
-          colors[props.track.color][theme.palette.mode === "dark" ? 200 : 400],
+        bgcolor: colors[track.color][theme.palette.mode === "dark" ? 200 : 400],
         [theme.breakpoints.down("md")]: {
           margin: "2px 0 2px 48px",
         },
@@ -115,52 +111,47 @@ function ClosedTrack(props) {
           justifyContent: "center",
         }}
       >
-        {!props.loaded && (
+        {!loaded && (
           <CircularProgress
             sx={(theme) => ({
               position: "absolute",
               left: "calc(50% - 20px)",
               top: "calc(50% - 20px)",
               color:
-                colors[props.track.color][
-                  theme.palette.mode === "dark" ? 900 : 900
-                ],
+                colors[track.color][theme.palette.mode === "dark" ? 900 : 900],
             })}
           />
         )}
         {rowRef.current &&
-          props.track.score.length > 0 &&
-          props.track.score.map((note, noteIndex) => (
+          track.score.length > 0 &&
+          track.score.map((note, noteIndex) => (
             <Note
               rowRef={rowRef}
               trackRows={trackRows}
               note={note}
-              track={props.track}
-              sessionSize={props.sessionSize}
+              track={track}
+              sessionSize={sessionSize}
               index={noteIndex}
-              zoomPosition={props.zoomPosition}
+              zoomPosition={zoomPosition}
               selected={
-                props.selectedNotes && props.selectedNotes.includes(noteIndex)
+                selectedTrackNotes && selectedTrackNotes.includes(noteIndex)
               }
               key={noteIndex}
-              gridSize={props.gridSize}
-              movingSelDelta={props.movingSelDelta}
+              gridSize={gridSize}
+              movingSelDelta={movingSelDelta}
             />
           ))}
       </div>
       <IconButton
         sx={(theme) => ({
-          color:
-            colors[props.track.color][
-              theme.palette.mode === "dark" ? 200 : 600
-            ],
+          color: colors[track.color][theme.palette.mode === "dark" ? 200 : 600],
         })}
         className={"closed-track-button"}
       >
         <Icon>
-          {props.track.type === 0
+          {track.type === 0
             ? "grid_on"
-            : props.track.type === 1
+            : track.type === 1
             ? "piano"
             : "graphic_eq"}
         </Icon>

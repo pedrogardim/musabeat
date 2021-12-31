@@ -35,6 +35,8 @@ function Track(props) {
   const [deletableNote, setDeletableNote] = useState(false);
   const [zoomY, setZoomY] = useState(1);
 
+  const [isMouseDown, setIsMouseDown] = useState(false);
+
   const [recTools, setRecTools] = useState(null);
   const [meterLevel, setMeterLevel] = useState(0);
 
@@ -58,14 +60,12 @@ function Track(props) {
     isLoaded,
     trackRows,
     setTrackRows,
-    isMouseDown,
-    setIsMouseDown,
     setPlayNoteFunction,
-    movingSelDelta,
     addFileDialog,
-    selectedNotes,
     setSelectedNotes,
   } = useContext(SessionWorkspaceContext);
+
+  const { selectedNotes, movingSelDelta } = props;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
@@ -362,8 +362,6 @@ function Track(props) {
       cursorMode !== "edit"
     )
       return;
-
-    //console.log("mousedown triggered");
 
     if (trackType === 0) {
       let newNote = {
@@ -685,6 +683,7 @@ function Track(props) {
                   deletableNote={deletableNote}
                   setDrawingNote={setDrawingNote}
                   index={noteIndex}
+                  isMouseDown={isMouseDown}
                 />
               ) : (
                 trackInstrument &&
@@ -718,7 +717,6 @@ function Track(props) {
               )
             )}
         {rowRef.current &&
-          selectedTrack !== null &&
           cursorMode === "edit" &&
           !deletableNote &&
           (trackType === 0 ? (
@@ -737,18 +735,9 @@ function Track(props) {
             <MelodyNote
               ghost
               rowRef={rowRef}
-              trackRows={trackRows}
-              gridPos={gridPos}
               drawingNote={drawingNote}
-              track={track}
-              sessionSize={sessionSize}
               gridPos={gridPos}
-              gridSize={gridSize}
-              setTracks={setTracks}
-              selectedNotes={[]}
-              selectedTrack={selectedTrack}
-              setDrawingNote={setDrawingNote}
-              zoomPosition={zoomPosition}
+              isMouseDown={isMouseDown}
             />
           ) : (
             <></>
