@@ -31,7 +31,7 @@ import { useTranslation } from "react-i18next";
 import logo from "./assets/img/logo.svg";
 
 import HomePage from "./components/ui/HomePage";
-import Workspace from "./components/ui/Workspace/Workspace";
+import Workspace from "./components/Workspace/Workspace";
 
 import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
 import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
@@ -48,7 +48,7 @@ import NewSessionDialog from "./components/ui/Dialogs/NewSessionDialog";
 
 import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
 
-import ActionConfirm from "./components/ui/Dialogs/ActionConfirm";
+import ActionConfirm from "./components/Dialogs/ActionConfirm";
 
 import { createNewSession } from "./utils/sessionUtils";
 
