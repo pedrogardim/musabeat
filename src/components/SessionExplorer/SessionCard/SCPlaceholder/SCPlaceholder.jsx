@@ -1,11 +1,9 @@
 import React from "react";
 import { Grid, Paper } from "@mui/material";
 
-import "./SessionGalleryItem.css";
-
 import { Skeleton } from "@mui/material";
 
-function PlaceholderSGI(props) {
+function SCPlaceholder(props) {
   return (
     <Grid item xs={12} sm={6} md={3} xl={!props.compact ? 2 : 3}>
       <Paper className={"session-gallery-item"}>
@@ -40,4 +38,4 @@ function PlaceholderSGI(props) {
   );
 }
 
-export default PlaceholderSGI;
+export default SCPlaceholder;

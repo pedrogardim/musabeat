@@ -2,14 +2,14 @@ import {
   scheduleSampler,
   scheduleMelody,
   scheduleAudioTrack,
-} from "./TransportSchedule";
-import { audioBufferToWav } from "audiobuffer-to-wav";
+} from "../services/Schedule";
 
 import {
   loadSynthFromGetObject,
   loadEffect,
-  encodeAudioFile,
-} from "../assets/musicutils";
+} from "../../../services/Instruments";
+
+import { encodeAudioFile } from "../../../services/Audio";
 
 import * as Tone from "tone";
 

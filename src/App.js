@@ -1,7 +1,7 @@
-import "./App.css";
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Helmet } from "react-helmet";
+
+import "./App.css";
 
 import { Switch, Route, withRouter, useHistory } from "react-router-dom";
 
@@ -21,8 +21,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-import * as MUIColors from "@mui/material/colors";
-
 import * as Tone from "tone";
 
 import firebase from "firebase";
@@ -30,49 +28,26 @@ import { useTranslation } from "react-i18next";
 
 import logo from "./assets/img/logo.svg";
 
-import HomePage from "./components/ui/HomePage";
-import Workspace from "./components/Workspace/Workspace";
+import HomePage from "./pages/HomePage";
+import SessionWorkspace from "./pages/SessionWorkspace";
 
-import SessionExplorer from "./components/ui/SessionExplorer/SessionExplorer";
-import FileExplorer from "./components/ui/FileExplorer/FileExplorer";
-import FilePage from "./components/ui/FileExplorer/FilePage";
-import PatchExplorer from "./components/ui/PatchExplorer/PatchExplorer";
-import PatchPage from "./components/ui/PatchExplorer/PatchPage";
-import UserPage from "./components/ui/UserPage/UserPage";
-import AppLogo from "./components/ui/AppLogo";
-import NotFoundPage from "./components/ui/NotFoundPage";
+import SessionExplorer from "./components/SessionExplorer";
+import FileExplorer from "./components/FileExplorer";
+import PatchExplorer from "./components/PatchExplorer";
+import FilePage from "./pages/FilePage";
+import PatchPage from "./pages/PatchPage";
+import UserPage from "./pages/UserPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
-import SideMenu from "./components/ui/SideMenu";
-import AuthDialog from "./components/ui/Dialogs/AuthDialog";
-import NewSessionDialog from "./components/ui/Dialogs/NewSessionDialog";
+import AppLogo from "./components/AppLogo";
+import SideMenu from "./components/SideMenu";
+import Admin from "./pages/Admin";
 
-import AdminDashboard from "./components/AdminDashboard/AdminDashboard";
+import AuthDialog from "./components/dialogs/Auth";
+import NewSessionDialog from "./components/dialogs/NewSession";
+import Confirm from "./components/dialogs/Confirm";
 
-import ActionConfirm from "./components/Dialogs/ActionConfirm";
-
-import { createNewSession } from "./utils/sessionUtils";
-
-import { createChordProgression } from "./assets/musicutils";
-
-const colors = [
-  MUIColors.red,
-  MUIColors.purple,
-  MUIColors.deepPurple,
-  MUIColors.indigo,
-  MUIColors.blue,
-  MUIColors.lightBlue,
-  MUIColors.cyan,
-  MUIColors.teal,
-  MUIColors.green,
-  MUIColors.lightGreen,
-  MUIColors.lime,
-  MUIColors.yellow,
-  MUIColors.amber,
-  MUIColors.orange,
-  MUIColors.deepOrange,
-];
-
-const defaultTheme = createTheme();
+import { createNewSession } from "./pages/SessionWorkspace/services/Session";
 
 const pageLabels = {
   explore: "Explore",
@@ -448,7 +423,7 @@ function App() {
           </Route>
 
           <Route exact path="/session/:key">
-            <Workspace
+            <SessionWorkspace
               setOpenedSession={setOpenedSession}
               session={openedSession}
               user={user}
@@ -468,9 +443,7 @@ function App() {
           </Route>
 
           <Route exact path="/admin">
-            {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && (
-              <AdminDashboard />
-            )}
+            {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && <Admin />}
           </Route>
           <Route>
             <NotFoundPage
@@ -495,7 +468,7 @@ function App() {
         />
       )}
 
-      <ActionConfirm
+      <Confirm
         unsavedChanges
         open={Boolean(followingRoute)}
         onClose={() => setFollowingRoute(null)}

@@ -20,16 +20,17 @@ import firebase from "firebase";
 
 import { useTranslation } from "react-i18next";
 import {
-  fileTags,
   detectPitch,
   fileTypes,
   fileExtentions,
   encodeAudioFile,
-} from "../../../assets/musicutils";
+} from "../../services/Audio";
 
-import { WSContext } from "../../Workspace/Workspace";
+import { fileTags } from "../../services/MiscData";
 
-import "./FileUploader.css";
+import { SessionWorkspaceContext } from "../../context/SessionWorkspaceContext";
+
+import "./style.css";
 
 function FileUploader(props) {
   const { t } = useTranslation();
@@ -64,7 +65,7 @@ function FileUploader(props) {
     tracks,
     instruments,
     setInstrumentsInfo,
-  } = useContext(WSContext);
+  } = useContext(SessionWorkspaceContext);
 
   const onClose = () => {
     setUploadingFiles([]);
