@@ -7,10 +7,21 @@ import * as Tone from "tone";
 
 import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
 
-function WorkspaceTransport(props) {
+import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import { useContext } from "react";
+
+function Transport(props) {
   const { t } = useTranslation();
 
   const boxRefs = [useRef(null), useRef(null), useRef(null)];
+
+  const { params, paramSetter, setSessionData, sessionData } = useContext(
+    SessionWorkspaceContext
+  );
+
+  const { gridSize, sessionSize } = params;
+
+  const { bpm } = sessionData ? sessionData : {};
 
   const [expanded, setExpanded] = useState(false);
   const [time, setTime] = useState([]);
@@ -18,9 +29,9 @@ function WorkspaceTransport(props) {
   const [selecting, setSelecting] = useState(null);
   const [inputDelta, setInputDelta] = useState(null);
   const [paramsValue, setParamsValue] = useState({
-    0: props.sessionSize,
-    1: props.gridSize,
-    2: props.sessionData && props.sessionData.bpm,
+    0: sessionSize,
+    1: gridSize,
+    2: bpm,
   });
   const [mousePosition, setMousePosition] = useState([0, 0]);
 
@@ -28,14 +39,14 @@ function WorkspaceTransport(props) {
   const sessionParams = [
     {
       i: "calendar_view_week",
-      t: props.sessionSize,
+      t: params.sessionSize,
       lbl: "Session Size",
       range: [1, 128],
       sens: 30,
     },
     {
       i: "straighten",
-      t: "1/" + props.gridSize,
+      t: "1/" + params.gridSize,
       lbl: "Grid",
       range: [1, 32],
       sens: 64,
@@ -50,7 +61,6 @@ function WorkspaceTransport(props) {
   ];
 
   const handleParameterChange = (pageY) => {
-    let inputValue = pageY / document.body.scrollHeight;
     let valueDelta = -Math.floor(
       (pageY -
         boxRefs[0].current.getBoundingClientRect().top -
@@ -90,17 +100,16 @@ function WorkspaceTransport(props) {
     ) {
       setParamsValue((prev) => ({ ...prev, [param]: value }));
       param === 0
-        ? props.setSessionSize(value)
+        ? paramSetter("sessionSize", value)
         : param === 1
-        ? props.setGridSize(value)
+        ? paramSetter("gridSize", value)
         : props.setSessionData((prev) => ({ ...prev, bpm: value }));
     }
   };
 
   const commitValue = () => {
-    props.setSessionSize(paramsValue[0]);
-    props.setGridSize(paramsValue[1]);
-    props.setSessionData((prev) => ({ ...prev, bpm: paramsValue[2] }));
+    paramSetter("sessionSize", paramsValue[0], "gridSize", paramsValue[1]);
+    setSessionData((prev) => ({ ...prev, bpm: paramsValue[2] }));
   };
 
   useEffect(() => {
@@ -283,4 +292,4 @@ function WorkspaceTransport(props) {
   );
 }
 
-export default WorkspaceTransport;
+export default Transport;

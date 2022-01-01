@@ -41,29 +41,32 @@ function Track(props) {
   const [meterLevel, setMeterLevel] = useState(0);
 
   const {
-    selectedTrack,
     tracks,
-    trackOptions,
     instruments,
-    setInstrumentsLoaded,
-    instrumentsInfo,
-    zoomPosition,
-    gridSize,
-    sessionSize,
     setTracks,
-    isPlaying,
-    isRecording,
     setPendingUploadFiles,
     setInstrumentsInfo,
     setAddFileDialog,
-    cursorMode,
-    isLoaded,
-    trackRows,
     setTrackRows,
     setPlayNoteFunction,
     addFileDialog,
-    setSelectedNotes,
+    params,
+    setParams,
   } = useContext(SessionWorkspaceContext);
+
+  const {
+    selectedTrack,
+    trackOptions,
+    instrInfo,
+    zoomPosition,
+    gridSize,
+    sessionSize,
+    isPlaying,
+    isRecording,
+    cursorMode,
+    trackRows,
+    isLoaded,
+  } = params;
 
   const { selectedNotes, movingSelDelta } = props;
 
@@ -73,14 +76,14 @@ function Track(props) {
   const trackInstrument = instruments[selectedTrack];
   const trackType = track.type;
 
-  const instrumentInfo = instrumentsInfo[selectedTrack];
+  const instrumentInfo = instrInfo[selectedTrack];
 
   const setInstrumentLoaded = (state) =>
-    setInstrumentsLoaded((prev) => {
-      let a = [...prev];
-      a[selectedTrack] = state;
-      return a;
-    });
+    setParams((prev) => ({
+      ...prev,
+      instrLoaded: { ...prev.instrLoaded, [selectedTrack]: state },
+    }));
+
   const loadTrackRows = () => {
     if (!trackInstrument) return;
 
@@ -354,7 +357,7 @@ function Track(props) {
     let isClickOnNote = e && e.target.className.includes("track-score-note");
 
     if (!isClickOnNote) {
-      setSelectedNotes([]);
+      setParams((prev) => ({ ...prev, selNotes: [] }));
     }
 
     if (
@@ -706,7 +709,6 @@ function Track(props) {
                     isMouseDown={isMouseDown}
                     selectedTrack={selectedTrack}
                     selectedNotes={selectedNotes}
-                    setSelectedNotes={setSelectedNotes}
                     zoomPosition={zoomPosition}
                     fileInfo={instrumentInfo.filesInfo[note.clip]}
                     movingSelDelta={movingSelDelta}

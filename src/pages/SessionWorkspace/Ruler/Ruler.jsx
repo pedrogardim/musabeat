@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import * as Tone from "tone";
 
 import { colors } from "../../../utils/Pallete";
+
+import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
 
 import Draggable from "react-draggable";
 
@@ -10,15 +12,19 @@ import { Box } from "@mui/material";
 function Ruler(props) {
   const rulerRef = useRef(null);
 
+  const { params, paramSetter, tracks } = useContext(SessionWorkspaceContext);
+
+  const { zoomPosition, sessionSize } = params;
+
   const [isMoving, setIsMoving] = useState(false);
   const [gridPos, setGridPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
-  const [handlePosition, setHandlePosition] = useState(props.zoomPosition);
+  const [handlePosition, setHandlePosition] = useState(zoomPosition);
   const [mousePosition, setMousePosition] = useState([0, 0]);
 
   const grid = 1;
 
-  const zoomSize = props.zoomPosition[1] - props.zoomPosition[0] + 1;
+  const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
   //const [sessionPreview, setPessionPreview] = useState([]);
 
@@ -41,8 +47,8 @@ function Ruler(props) {
       setIsMoving(
         ((e.pageX - rulerRef.current.getBoundingClientRect().left) /
           rulerRef.current.offsetWidth) *
-          props.sessionSize -
-          props.zoomPosition[0]
+          sessionSize -
+          zoomPosition[0]
       );
     }
   };
@@ -60,16 +66,16 @@ function Ruler(props) {
         let handleSide = resizingHandle === "left";
         if (
           (resizingHandle === "left" && hoveredPos < 0) ||
-          (resizingHandle === "right" && hoveredPos + 1 > props.sessionSize)
+          (resizingHandle === "right" && hoveredPos + 1 > sessionSize)
         )
           return prev;
         newHandlePos[handleSide ? 0 : 1] =
-          hoveredPos * props.sessionSize - (handleSide ? 0 : 1);
+          hoveredPos * sessionSize - (handleSide ? 0 : 1);
 
-        props.setZoomPosition((prev) => {
+        paramSetter("zoomPosition", (prev) => {
           let newSessionZoom = [...prev];
           newSessionZoom[handleSide ? 0 : 1] = parseInt(
-            hoveredPos * props.sessionSize + (handleSide ? 0.5 : -0.5)
+            hoveredPos * sessionSize + (handleSide ? 0.5 : -0.5)
           );
           if (
             newSessionZoom[0] > newSessionZoom[1] ||
@@ -89,14 +95,12 @@ function Ruler(props) {
         let newHandlePos = [...prev];
         newHandlePos = newHandlePos.map(
           (pos, posIndex) =>
-            hoveredPos * props.sessionSize +
-            posIndex * (zoomSize - 1) -
-            isMoving
+            hoveredPos * sessionSize + posIndex * (zoomSize - 1) - isMoving
         );
-        if (newHandlePos[0] < 0 || newHandlePos[1] + 1 > props.sessionSize)
+        if (newHandlePos[0] < 0 || newHandlePos[1] + 1 > sessionSize)
           return prev;
 
-        props.setZoomPosition((prev) => {
+        paramSetter("zoomPosition", (prev) => {
           let newSessionZoom = [...prev];
           newSessionZoom = newHandlePos.map((e, i) => parseInt(e + 0.5));
           if (JSON.stringify(newSessionZoom) === JSON.stringify(prev))
@@ -109,7 +113,7 @@ function Ruler(props) {
       });
     }
 
-    let gridPos = Math.floor(Math.abs(hoveredPos * props.sessionSize));
+    let gridPos = Math.floor(Math.abs(hoveredPos * sessionSize));
 
     setGridPos((prev) =>
       JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
@@ -122,7 +126,7 @@ function Ruler(props) {
     setIsMoving(false);
     if (resizingHandle || isMoving) {
     }
-    setHandlePosition([props.zoomPosition[0], props.zoomPosition[1]]);
+    setHandlePosition([zoomPosition[0], zoomPosition[1]]);
   };
 
   useEffect(() => {
@@ -130,9 +134,9 @@ function Ruler(props) {
   }, [mousePosition]);
 
   useEffect(() => {
-    //console.log(props.zoomPosition);
-    setHandlePosition([props.zoomPosition[0], props.zoomPosition[1]]);
-  }, [props.zoomPosition]);
+    //console.log(zoomPosition);
+    setHandlePosition([zoomPosition[0], zoomPosition[1]]);
+  }, [zoomPosition]);
 
   return (
     <Box
@@ -155,11 +159,10 @@ function Ruler(props) {
           style={{
             width:
               (handlePosition[1] - handlePosition[0] + 1) *
-              (rulerRef.current.offsetWidth / props.sessionSize),
+              (rulerRef.current.offsetWidth / sessionSize),
 
             transform: `translateX(${
-              handlePosition[0] *
-              (rulerRef.current.offsetWidth / props.sessionSize)
+              handlePosition[0] * (rulerRef.current.offsetWidth / sessionSize)
             }px`,
 
             //borderRadius: 4,
@@ -196,14 +199,14 @@ function Ruler(props) {
         />
       </Draggable> */}
 
-      {Array(props.sessionSize)
+      {Array(sessionSize)
         .fill(0)
         .map((e, i) => (
           <div
             style={{
               position: "absolute",
               height: "100%",
-              left: (1 / props.sessionSize) * i * 100 + "%",
+              left: (1 / sessionSize) * i * 100 + "%",
               width: 2,
               backgroundColor: "black",
               opacity: 0.4,
@@ -211,8 +214,8 @@ function Ruler(props) {
           />
         ))}
 
-      {props.tracks &&
-        props.tracks.map((track, trackIndex) => (
+      {tracks &&
+        tracks.map((track, trackIndex) => (
           <Box
             className="ws-ruler-track"
             sx={(theme) => ({

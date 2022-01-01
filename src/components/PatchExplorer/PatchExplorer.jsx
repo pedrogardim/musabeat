@@ -37,11 +37,7 @@ import NameInput from "../dialogs/NameInput";
 import SavePatch from "../dialogs/SavePatch";
 import NotFoundPage from "../../pages/NotFoundPage";
 
-import {
-  loadSynthFromGetObject,
-  loadSamplerFromObject,
-  loadDrumPatch,
-} from "../../services/Instruments";
+import { loadInstrument } from "../../services/Instruments";
 
 import { instrumentsCategories, drumCategories } from "../../services/MiscData";
 
@@ -133,13 +129,12 @@ function PatchExplorer(props) {
       }
 
       //load patch
-
+      /* 
       if (props.isDrum) {
-        loadDrumPatch(
+        loadSequencerInstrument(
           patchdata[index],
           props.compact ? props.setInstrumentsLoaded : () => {},
           props.index,
-          () => {},
           () => {},
           () => {},
           setNotifications
@@ -159,7 +154,7 @@ function PatchExplorer(props) {
       } else {
         let instr = loadSynthFromGetObject(patchdata[index]);
         setTrackIntrument(instr);
-      }
+      } */
 
       props.setTracks((previous) =>
         previous.map((track, i) => {
@@ -455,7 +450,7 @@ function PatchExplorer(props) {
   };
 
   const playPatch = (index) => {
-    if (instruments[index] !== undefined) {
+    /*  if (instruments[index] !== undefined) {
       let instr = instruments[index];
       setCurrentPlaying(index);
 
@@ -464,7 +459,7 @@ function PatchExplorer(props) {
       setLoadingPlay(index);
 
       if (props.isDrum) {
-        loadDrumPatch(
+        loadSequencerInstrument(
           patchdata[index],
           () => {},
           index,
@@ -509,7 +504,7 @@ function PatchExplorer(props) {
         setCurrentPlaying(index);
         setLoadingPlay(null);
       }
-    }
+    } */
   };
 
   const stopPatch = (index) => {

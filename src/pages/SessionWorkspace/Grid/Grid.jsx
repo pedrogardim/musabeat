@@ -20,24 +20,28 @@ function Grid(props) {
   const [resizingHandle, setResizingHandle] = useState(false);
   const [isMovingSelected, setIsMovingSelected] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
-  const {
-    sessionSize,
-    gridSize,
-    isRecording,
-    cursorMode,
-    zoomPosition,
-    selectedTrack,
-    IEOpen,
-    mixerOpen,
-    setTracks,
-    setMovingSelDelta,
-    setSelection,
-  } = useContext(SessionWorkspaceContext);
 
-  const { selection, selectedNotes, movingSelDelta } = props;
+  const { setTracks, params, paramSetter } = useContext(
+    SessionWorkspaceContext
+  );
+
+  const {
+    zoomPosition,
+    openSubPage,
+    gridSize,
+    cursorMode,
+    selectedTrack,
+    playing,
+    selection,
+    selNotes,
+    movingSelDelta,
+    sessionSize,
+  } = params;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
-  const hiddenNumbers = IEOpen || mixerOpen;
+
+  const hiddenNumbers = openSubPage === "IE" || openSubPage === "mixer";
+
   const handleCursorDrag = (event, element) => {
     Tone.Transport.seconds = (gridPos * Tone.Time("1m").toSeconds()) / gridSize;
 
@@ -63,14 +67,14 @@ function Grid(props) {
 
     if (isClickOnNote || isClickOnButton) return;
 
-    setSelection([]);
+    paramSetter("selection", []);
 
     if (!cursorMode && !isClickOnNote) {
       Tone.Transport.seconds =
         (gridPos * Tone.Time("1m").toSeconds()) / gridSize;
 
       setInitialSelectionPos(gridPos);
-      setSelection([gridPos, null]);
+      paramSetter("selection", [gridPos, null]);
     }
   };
 
@@ -106,14 +110,15 @@ function Grid(props) {
     if (isMouseDown && !resizingHandle) {
       if (cursorMode !== "edit") {
         if (isMovingSelected === false)
-          setSelection((prev) =>
+          paramSetter(
+            "selection",
             [initialSelectionPos, gridPos].sort((a, b) => a - b)
           );
         else handleSelectedNotesDrag();
       }
     }
     if (resizingHandle) {
-      setSelection((prev) => {
+      paramSetter("selection", (prev) => {
         let newSelection = [...prev];
         let handleSide = resizingHandle === "left";
         if (
@@ -136,20 +141,23 @@ function Grid(props) {
           ...note,
           time: Tone.Time(
             Tone.Time(note.time).toSeconds() +
-              (selectedNotes[trackIndex].includes(noteIndex) &&
+              (selNotes[trackIndex].includes(noteIndex) &&
                 (movingSelDelta / gridSize) * Tone.Time("1m").toSeconds())
           ).toBarsBeatsSixteenths(),
         })),
       }))
     );
 
-    setSelection((prev) => prev.map((e) => e + movingSelDelta));
-
-    setMovingSelDelta(null);
+    paramSetter(
+      "selection",
+      (prev) => prev.map((e) => e + movingSelDelta),
+      "movingDelta",
+      null
+    );
   };
 
   const handleSelectedNotesDrag = () => {
-    setMovingSelDelta(gridPos - isMovingSelected);
+    paramSetter("movingSelDelta", gridPos - isMovingSelected);
   };
   /* 
   useEffect(() => {
@@ -232,18 +240,16 @@ function Grid(props) {
           onDrag={handleCursorDrag}
           onStart={handleCursorDragStart}
           onStop={handleCursorDragStop}
-          onMouseDown={handleMouseDown}
           position={{
             x: gridRef.current && cursorPosition * gridRef.current.offsetWidth,
             y: 0,
           }}
           disabled={isMouseDown}
           bounds=".ws-grid-line-cont"
-          style={{ pointerEvents: isMouseDown && "none" }}
         >
           <Box
             className={"ws-grid-cursor"}
-            sx={{ bgcolor: isRecording ? "secondary" : "text.primary" }}
+            sx={{ bgcolor: playing === "rec" ? "secondary" : "text.primary" }}
             style={{
               pointerEvents: isMouseDown && "none",
             }}

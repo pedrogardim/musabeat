@@ -26,21 +26,22 @@ function MelodyNote(props) {
   const [noteNote, setNoteNote] = useState(note && note.note);
   const [noteDuration, setNoteDuration] = useState(note && note.duration);
 
+  const { tracks, setTracks, params, setParams } = useContext(
+    SessionWorkspaceContext
+  );
+
   const {
     trackRows,
-    tracks,
     gridSize,
-    setTracks,
-    selectedNotes,
-    setSelectedNotes,
+    selNotes,
     movingSelDelta,
     zoomPosition,
     selectedTrack,
-  } = useContext(SessionWorkspaceContext);
+  } = params;
 
   const track = tracks[selectedTrack];
 
-  const isSelected = selectedNotes && selectedNotes.includes(index);
+  const isSelected = selNotes && selNotes.includes(index);
 
   let zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
@@ -83,11 +84,13 @@ function MelodyNote(props) {
           (gridSize * Tone.Time(noteTime).toSeconds()) /
             Tone.Time("1m").toSeconds()
       );
-      setSelectedNotes(() => {
+
+      setParams((prev) => {
+        let newParams = { ...prev };
         let newNotes = [];
         newNotes[selectedTrack] = [index];
-        //console.log(newNotes);
-        return newNotes;
+        newParams.selNotes = newNotes;
+        return newParams;
       });
     }
 
@@ -227,7 +230,7 @@ function MelodyNote(props) {
         />
       )}
 
-      {isSelected && selectedNotes.length === 1 && (
+      {isSelected && selNotes.length === 1 && (
         <>
           <IconButton
             onMouseDown={deleteNote}

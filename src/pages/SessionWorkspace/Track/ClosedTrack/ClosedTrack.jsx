@@ -22,20 +22,16 @@ function ClosedTrack(props) {
 
   const { trackIndex, track, selectedNotes, movingSelDelta } = props;
 
-  const {
-    instruments,
-    instrumentsLoaded,
-    sessionSize,
-    isLoaded,
-    gridSize,
-    zoomPosition,
-    setSelectedTrack,
-  } = useContext(SessionWorkspaceContext);
+  const { instruments, params, paramsSetter } = useContext(
+    SessionWorkspaceContext
+  );
+
+  const { zoomPosition, gridSize, isLoaded, instrLoaded, sessionSize } = params;
 
   const trackType = track.type;
 
   const instrument = instruments[trackIndex];
-  const loaded = instrumentsLoaded[trackIndex];
+  const loaded = instrLoaded[trackIndex];
   const selectedTrackNotes = selectedNotes[trackIndex];
 
   const loadTrackRows = () => {
@@ -91,7 +87,7 @@ function ClosedTrack(props) {
     <Paper
       className="closed-track"
       ref={rowRef}
-      onClick={() => loaded && setSelectedTrack(trackIndex)}
+      onClick={() => loaded && paramsSetter("selectedTrack", trackIndex)}
       disabled
       sx={(theme) => ({
         bgcolor: colors[track.color][theme.palette.mode === "dark" ? 200 : 400],

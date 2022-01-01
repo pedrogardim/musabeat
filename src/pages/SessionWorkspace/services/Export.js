@@ -4,10 +4,7 @@ import {
   scheduleAudioTrack,
 } from "../services/Schedule";
 
-import {
-  loadSynthFromGetObject,
-  loadEffect,
-} from "../../../services/Instruments";
+import { loadInstrument, loadEffect } from "../../../services/Instruments";
 
 import { encodeAudioFile } from "../../../services/Audio";
 
@@ -67,13 +64,13 @@ export const bounceSessionExport = async (
               instrumentBuffers[trackIndex];
             offlineInstruments[trackIndex].volume.value = track.volume;
 
-            scheduleSampler(
+            /* scheduleSampler(
               track.score,
               offlineInstruments[trackIndex],
               transport,
               track.id,
               sessionSize
-            );
+            ); */
             break;
           case 1:
             if (originalInstrument.name === "Sampler") {
@@ -82,9 +79,9 @@ export const bounceSessionExport = async (
               offlineInstruments[trackIndex]._buffers =
                 instrumentBuffers[trackIndex];
             } else {
-              offlineInstruments[trackIndex] = loadSynthFromGetObject(
+              /* offlineInstruments[trackIndex] = loadInstrument(
                 originalInstrument.get()
-              );
+              );*/
             }
             offlineInstruments[trackIndex].volume.value = track.volume;
 
@@ -101,12 +98,12 @@ export const bounceSessionExport = async (
               instrumentBuffers[trackIndex];
             offlineInstruments[trackIndex].volume.value = track.volume;
 
-            scheduleAudioTrack(
+            /* scheduleAudioTrack(
               track.score,
               offlineInstruments[trackIndex],
               transport,
               track.id
-            );
+            ); */
             break;
         }
         offlineInstruments[trackIndex].chain(

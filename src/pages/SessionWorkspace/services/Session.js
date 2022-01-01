@@ -2,6 +2,10 @@ import firebase from "firebase";
 
 import { useLocation } from "react-router-dom";
 
+import * as Tone from "tone";
+
+import { loadInstrument } from "../../../services/Instruments";
+
 export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   let userId = firebase.auth().currentUser
     ? firebase.auth().currentUser.uid
@@ -83,4 +87,90 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     }
     handlePageNav("session", ref.id);
   });
+};
+
+export const loadSession = (
+  setSessionData,
+  setTracks,
+  sessionKey,
+  hidden,
+  user,
+  setDBSessionRef,
+  session,
+  setInstruments,
+  paramSetter
+) => {
+  const loadSessionInstruments = (tracks) => {
+    let array = Array(tracks.length).fill(false);
+
+    setInstruments(array);
+
+    tracks.forEach((track, trackIndex) =>
+      loadInstrument(track, trackIndex, null, setInstruments, paramSetter)
+    );
+  };
+
+  console.log("loading session: ", sessionKey);
+  if (hidden) {
+    let thisSessionData = { ...session };
+    delete thisSessionData.tracks;
+    setSessionData(thisSessionData);
+    setTracks(session.tracks);
+    Tone.Transport.bpm.value = session.bpm;
+    paramSetter("editMode", true);
+    loadSessionInstruments(session.tracks);
+  } else if (sessionKey === null) {
+    console.log("session is null!");
+  }
+  //
+  else if (typeof sessionKey === "string") {
+    let sessionRef = firebase
+      .firestore()
+      .collection("sessions")
+      .doc(sessionKey);
+
+    setDBSessionRef(!sessionRef ? null : sessionRef);
+    //Check for editMmode and get title
+    sessionRef.get().then((snapshot) => {
+      if (!snapshot.exists) {
+        setTracks(undefined);
+        return;
+      }
+
+      let data = snapshot.data();
+
+      let sessionInfo = { ...data };
+      delete sessionInfo.tracks;
+      setSessionData(sessionInfo);
+      paramSetter("zoomPosition", [0, sessionInfo.size - 1]);
+
+      if (data.hasOwnProperty("tracks")) {
+        loadSessionInstruments(data.tracks);
+        setTracks(data.tracks);
+        if (data.tracks.length === 0) paramSetter("isLoaded", true);
+      }
+
+      Tone.Transport.bpm.value = data.bpm;
+
+      user && data.editors.includes(user.uid) && paramSetter("editMode", true);
+    });
+
+    sessionRef.update({
+      opened: firebase.firestore.FieldValue.increment(1),
+      played: firebase.firestore.FieldValue.increment(1),
+    });
+  } /* else if (typeof sessionKey === "object") {
+      setTracks(sessionKey.tracks);
+      Tone.Transport.bpm.value = sessionKey.bpm;
+      if (
+        (!hidden &&
+          user &&
+          sessionKey.editors.includes(user.uid)) ||
+        !sessionKey.creator
+      ) {
+        setEditMode(true);
+        setSessionEditors(session.creator);
+      }
+      loadSessionInstruments(sessionKey.tracks);
+    } */
 };

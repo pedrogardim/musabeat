@@ -23,11 +23,7 @@ import "./style.css";
 
 import { detectPitch } from "../../services/Audio";
 
-import {
-  loadSynthFromGetObject,
-  loadSamplerFromObject,
-  loadDrumPatch,
-} from "../../services/Instruments";
+import { loadInstrument } from "../../services/Instruments";
 
 import { drumCategories, instrumentsCategories } from "../../services/MiscData";
 
@@ -138,16 +134,15 @@ function PatchPage(props) {
   };
 
   const loadInstrument = (patchdata) => {
-    if (props.isDrum) {
-      loadDrumPatch(
+    /*  if (props.isDrum) {
+      loadSequencerInstrument(
         patchdata,
         () => {},
         0,
         () => {
           setIsLoaded(true);
         },
-        "",
-        setDrumLabels,
+        () => {},
         setNotifications
       ).then((instr) => {
         setInstrument(instr);
@@ -169,7 +164,7 @@ function PatchPage(props) {
 
       setInstrument(instr);
       setIsLoaded(true);
-    }
+    } */
   };
 
   const playSequence = () => {

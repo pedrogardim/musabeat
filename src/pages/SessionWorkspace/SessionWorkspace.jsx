@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
-import { useSprings, animated } from "react-spring";
+import { useSpring, animated } from "react-spring";
 
 import { useParams } from "react-router-dom";
 
@@ -40,188 +40,120 @@ import Auth from "../../components/dialogs/Auth";
 
 import NotFoundPage from "../NotFoundPage";
 
-import {
-  patchLoader,
-  loadDrumPatch,
-  loadSynthFromGetObject,
-  loadSamplerFromObject,
-  loadAudioTrack,
-} from "../../services/Instruments";
+import useUndo from "../../hooks/useUndo";
+import useMetronome from "./hooks/useMetronome";
+import useFirebaseConnection from "./hooks/useFirebaseConnection";
+
+import { loadInstrument } from "../../services/Instruments";
 
 import { keySamplerMapping, keyboardMapping } from "../../services/MiscData";
 
 import { SessionWorkspaceContext } from "../../context/SessionWorkspaceContext";
-
-const userSubmitedSessionProps = [
-  "alwcp",
-  "bpm",
-  "description",
-  "editors",
-  "hid",
-  "name",
-  "root",
-  "rte",
-  "scale",
-  "tags",
-  "timeline",
-];
+import { loadSession } from "./services/Session";
 
 function SessionWorkspace(props) {
   const { t } = useTranslation();
 
-  const [savingMode, setSavingMode] = useState("simple");
-  const [autosaver, setAutosaver] = useState(null);
-  const [areUnsavedChanges, setAreUnsavedChanges] = useState(false);
-
   const [DBSessionRef, setDBSessionRef] = useState(null);
 
   const [tracks, setTracks] = useState(null);
-  const [sessionData, setSessionData] = useState(null);
-  const [sessionSize, setSessionSize] = useState(0);
-
-  const [selectedTrack, setSelectedTrack] = useState(null);
-
-  const [trackOptions, setTrackOptions] = useState({ showingAll: false });
-
+  const [sessionData, setSessionData] = useState({});
   const [instruments, setInstruments] = useState([]);
-  const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
-  const [instrumentsInfo, setInstrumentsInfo] = useState([]);
 
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [params, setParams] = useState({
+    isLoaded: false,
+    playing: false,
+    selectedTrack: null,
+    pressedKeys: [],
+    playingOctave: 3,
+    trackRows: [],
+    editMode: false,
+    cursorMode: null,
+    gridSize: 4,
+    zoomPosition: [0, 3],
+    selection: [],
+    selNotes: [],
+    movingSelDelta: null,
+    instrLoaded: {},
+    instrInfo: {},
+    notifications: [],
+    trackOptions: { showingAll: false },
+    expanded: {
+      btn: false,
+      instr: false,
+      opt: false,
+    },
+    openDialog: null,
+    openSubPage: null,
+    sessionSize: 0,
+  });
 
-  const [metronome, setMetronome] = useState(null);
-  const [metronomeState, setMetronomeState] = useState(false);
-  const [metronomeEvent, setMetronomeEvent] = useState(null);
+  const [premiumMode, setPremiumMode] = useState(false);
+  const [clipboard, setClipboard] = useState(null);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
-  const [pressedKeys, setPressedKeys] = useState([]);
-  const [playingOctave, setPlayingOctave] = useState(3);
+  const [editorProfiles, setEditorProfiles] = useState(null);
+  const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState([]);
+
   const [playNoteFunction, setPlayNoteFunction] = useState([
     () => {},
     () => {},
   ]);
-  const [trackRows, setTrackRows] = useState([]);
 
-  const [fileListOpen, setFileListOpen] = useState(false);
-  const [addFileDialog, setAddFileDialog] = useState(false);
-
-  const [editMode, setEditMode] = useState(false);
-  const [cursorMode, setCursorMode] = useState(null);
-  const [gridSize, setGridSize] = useState(4);
-  const [zoomPosition, setZoomPosition] = useState([0, 3]);
-
-  const [IEOpen, setIEOpen] = useState(false);
-  const [optionsOpen, setOptionsOpen] = useState(false);
-  //for mobile devices
-  const [expanded, setExpanded] = useState({
-    btn: false,
-    instr: false,
-    opt: false,
+  const expSpring = useSpring({
+    bottom: params.expanded.btn ? 16 : -10,
+    right: params.expanded.btn ? 16 : params.selectedTrack !== null ? -58 : -10,
+    config: { tension: 200, friction: 13 },
   });
-
-  const expSprings = useSprings(1, [
-    {
-      bottom: expanded.btn ? 16 : -10,
-      right: expanded.btn ? 16 : selectedTrack !== null ? -58 : -10,
-      config: { tension: 200, friction: 13 },
-    },
-    {
-      bottom: !expanded.instr && "-128px",
-      config: { tension: 200, friction: 13 },
-    },
-  ]);
 
   const AnimatedBox = animated(Box);
 
-  const [premiumMode, setPremiumMode] = useState(false);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-
-  const [trackPicker, setTrackPicker] = useState(false);
-  const [mixerOpen, setMixerOpen] = useState(false);
-  const [sessionDupDialog, setSessionDupDialog] = useState(false);
-
-  const [clipboard, setClipboard] = useState(null);
-  const [snackbarMessage, setSnackbarMessage] = useState(null);
-  const [sessionHistory, setSessionHistory] = useState({
-    past: [],
-    present: null,
-    future: [],
-  });
-
-  const [editorProfiles, setEditorProfiles] = useState(null);
-  const [selection, setSelection] = useState([]);
-  const [selectedNotes, setSelectedNotes] = useState([]);
-  const [movingSelDelta, setMovingSelDelta] = useState(null);
-
-  const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
-  const [uploadingFiles, setUploadingFiles] = useState([]);
-
-  const [notifications, setNotifications] = useState([]);
-
-  const [DBlistener, setDBListener] = useState(() => () => {});
-  const [isLastChangeFromServer, setIsLastChangeFromServer] = useState(false);
-
   const sessionKey = useParams().key;
-  const autoSaverTime = 5 * 60 * 1000; //5min
 
   const keyMapping =
-    selectedTrack !== null && tracks[selectedTrack].type === 0
+    params.selectedTrack !== null && tracks[params.selectedTrack].type === 0
       ? keySamplerMapping
       : keyboardMapping;
 
-  const { user, handlePageNav } = props;
+  const { user, handlePageNav, hidden } = props;
 
-  const WSContextValue = useMemo(() => ({
+  const [Undo, Redo, updateUndoHistory, resetHistory] = useUndo(setTracks);
+
+  const setMetronomeState = useMetronome();
+
+  const paramSetter = (key, value, key2, value2) =>
+    setParams((prev) => ({
+      ...prev,
+      [key]: typeof value === "function" ? value(prev[key]) : value,
+      [key2]: typeof value2 === "function" ? value2(prev[key]) : value2,
+    }));
+
+  const ctxData = useMemo(() => ({
     tracks,
     setTracks,
     sessionData,
     setSessionData,
-    sessionSize,
-    setSessionSize,
-    selectedTrack,
-    setSelectedTrack,
-    trackOptions,
-    setTrackOptions,
     instruments,
     setInstruments,
-    instrumentsLoaded,
-    setInstrumentsLoaded,
-    instrumentsInfo,
-    setInstrumentsInfo,
-    isLoaded,
-    setIsLoaded,
-    trackRows,
-    setTrackRows,
-    editMode,
-    setEditMode,
-    cursorMode,
-    setCursorMode,
-    gridSize,
-    setGridSize,
-    zoomPosition,
-    setZoomPosition,
-    IEOpen,
-    setIEOpen,
-    isPlaying,
-    setIsPlaying,
-    isRecording,
-    setIsRecording,
     sessionKey,
     user,
     premiumMode,
     setPremiumMode,
     handlePageNav,
-    addFileDialog,
-    setAddFileDialog,
     pendingUploadFiles,
     setPendingUploadFiles,
-    mixerOpen,
-    setSelectedTrack,
-    setSelection,
-    setSelectedNotes,
-    setMovingSelDelta,
+    uploadingFiles,
+    setUploadingFiles,
+    hidden,
+    setPlayNoteFunction,
+    setSnackbarMessage,
+    params,
+    paramSetter,
   }));
+
+  const [save, setSavingMode, areUnsavedChanges] =
+    useFirebaseConnection(ctxData);
 
   /*========================================================================================*/
   /*========================================================================================*/
@@ -231,337 +163,43 @@ function SessionWorkspace(props) {
   /*========================================================================================*/
   /*========================================================================================*/
 
-  const loadSession = () => {
-    //TODO: optimize this, avoid call from server for each session load
-    console.log("loading session: ", sessionKey);
-    if (props.hidden) {
-      let thisSessionData = { ...props.session };
-      delete thisSessionData.tracks;
-      setSessionData(thisSessionData);
-      setTracks(props.session.tracks);
-      Tone.Transport.bpm.value = props.session.bpm;
-      setEditMode(true);
-      loadSessionInstruments(props.session.tracks);
-    } else if (sessionKey === null) {
-      console.log("session is null!");
-    }
-    //
-    else if (typeof sessionKey === "string") {
-      let sessionRef = firebase
-        .firestore()
-        .collection("sessions")
-        .doc(sessionKey);
-
-      setDBSessionRef(!sessionRef ? null : sessionRef);
-      //Check for editMmode and get title
-      sessionRef.get().then((snapshot) => {
-        if (!snapshot.exists) {
-          setSessionData(undefined);
-          setTracks(undefined);
-          return;
-        }
-
-        let data = snapshot.data();
-
-        let sessionInfo = { ...data };
-        delete sessionInfo.tracks;
-        setSessionData(sessionInfo);
-        setZoomPosition([0, sessionInfo.size - 1]);
-
-        if (data.hasOwnProperty("tracks")) {
-          loadSessionInstruments(data.tracks);
-          setTracks(data.tracks);
-          if (data.tracks.length === 0) setIsLoaded(true);
-        }
-
-        Tone.Transport.bpm.value = data.bpm;
-
-        user && data.editors.includes(user.uid) && setEditMode(true);
-      });
-
-      sessionRef.update({
-        opened: firebase.firestore.FieldValue.increment(1),
-        played: firebase.firestore.FieldValue.increment(1),
-      });
-    } /* else if (typeof sessionKey === "object") {
-      setTracks(sessionKey.tracks);
-      Tone.Transport.bpm.value = sessionKey.bpm;
-      if (
-        (!props.hidden &&
-          user &&
-          sessionKey.editors.includes(user.uid)) ||
-        !sessionKey.creator
-      ) {
-        setEditMode(true);
-        setSessionEditors(props.session.creator);
-      }
-      loadSessionInstruments(sessionKey.tracks);
-    } */
+  const initSession = () => {
+    Tone.Transport.loop = true;
+    Tone.Transport.loopStart = 0;
+    Tone.Transport.seconds = 0;
+    instruments.forEach((e) => e.dispose());
+    loadSession(
+      setSessionData,
+      setTracks,
+      sessionKey,
+      hidden,
+      user,
+      setDBSessionRef,
+      props.session,
+      setInstruments,
+      paramSetter
+    );
   };
 
   const onSessionReady = () => {
     instruments.forEach((e, i) => {
-      //console.log(tracks[i].name, 1, e.volume.value);
       e.volume.value = tracks[i].volume;
       e._volume.mute = tracks[i].muted;
-      //console.log(tracks[i].name, 2, e.volume.value);
     });
 
-    props.hidden &&
+    hidden &&
       props.setPlayingLoadingProgress(
         Math.floor(
-          (instrumentsLoaded.filter((e) => e !== false).length /
-            instrumentsLoaded.length) *
+          (Object.values(params.instrLoaded).filter((e) => e !== false).length /
+            Object.values(params.instrLoaded).length) *
             100
         )
       );
 
-    //TODO, realtime collaborative editing. Must activate only when multiple editors are in the same session
-    /* if (!props.hidden && DBSessionRef !== null) {
-      DBSessionRef.onSnapshot((snapshot) => {
-        updateFromDatabase(snapshot.data());
-      });
-    } */
-
-    Tone.Transport.seconds = 0;
-    props.hidden ? Tone.Transport.start() : Tone.Transport.pause();
+    hidden ? Tone.Transport.start() : Tone.Transport.pause();
     console.log("=====session ready!=====");
-    setIsLoaded(true);
+    paramSetter("isLoaded", true);
     setSavingMode(sessionData.rte ? "rte" : "simple");
-  };
-
-  const loadSessionInstruments = (sessionTracks) => {
-    console.log("session instr loading");
-    let array = Array(sessionTracks.length).fill(false);
-
-    setInstruments(array);
-
-    sessionTracks.forEach((track, trackIndex) => {
-      //console.log(instrument)
-      //sequencer
-      if (track.type === 0) {
-        //console.log(`loading drums: ${track.instrument}`);
-        loadDrumPatch(
-          track.instrument,
-          setInstrumentsLoaded,
-          trackIndex,
-          "",
-          setTracks,
-          () => {},
-          setInstrumentsInfo,
-          setNotifications
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[trackIndex] = r;
-            return a;
-          })
-        );
-      }
-
-      //player
-      else if (track.type === 2) {
-        loadAudioTrack(
-          track.instrument,
-          setInstrumentsLoaded,
-          trackIndex,
-          setNotifications,
-          setInstrumentsInfo
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[trackIndex] = r;
-            return a;
-          })
-        );
-      }
-      //load from patch id
-      else if (typeof track.instrument === "string") {
-        patchLoader(
-          track.instrument,
-          setInstrumentsLoaded,
-          trackIndex,
-          setNotifications,
-          setInstrumentsInfo
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[trackIndex] = r;
-            return a;
-          })
-        );
-      } //load from obj
-      else if (typeof track.instrument === "object") {
-        //console.log(track.instrument);
-
-        if (track.instrument.hasOwnProperty("urls")) {
-          loadSamplerFromObject(
-            track.instrument,
-            setInstrumentsLoaded,
-            trackIndex,
-            () => {},
-            setNotifications,
-            setInstrumentsInfo
-          ).then((r) =>
-            setInstruments((prev) => {
-              let a = [...prev];
-              a[trackIndex] = r;
-              return a;
-            })
-          );
-        } else {
-          let instrument = loadSynthFromGetObject(track.instrument);
-
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[trackIndex] = instrument;
-            return a;
-          });
-          setInstrumentsLoaded((prev) => {
-            let a = [...prev];
-            a[trackIndex] = true;
-            return a;
-          });
-        }
-      }
-    });
-
-    //loadMetromome
-
-    if (!props.compact) {
-      let metro = new Tone.FMSynth({
-        envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.2 },
-        oscillator: { type: "sine" },
-        modulationIndex: 10,
-        harmonicity: 10,
-        modulationEnvelope: {
-          attack: 0.001,
-          decay: 0.3,
-          sustain: 0,
-          release: 0.01,
-        },
-      }).toDestination();
-
-      metro.volume.value = -9999;
-
-      setMetronome((prev) => {
-        prev && prev.dispose();
-        return metro;
-      });
-
-      metronomeEvent && metronomeEvent.forEach((e) => Tone.Transport.clear(e));
-
-      let events = [];
-
-      for (let mse = -1; mse < 128; mse++) {
-        for (let qtr = 0; qtr < 4; qtr++) {
-          events.push(
-            Tone.Transport.schedule((time) => {
-              metro.triggerAttackRelease(qtr === 0 ? "C5" : "C4", "4n", time);
-            }, `${mse}:${qtr}:0`)
-          );
-        }
-      }
-
-      setMetronomeEvent(events);
-    }
-  };
-
-  const loadNewTrackInstrument = (track, index, buffers) => {
-    let instrument;
-
-    //console.log("inserting new instrument on" + index);
-    if (track.type === 0) {
-      if (buffers) {
-        instrument = new Tone.Players(
-          {},
-          setInstrumentsLoaded((prev) =>
-            prev.map((e, i) => (i === index ? true : e))
-          )
-        ).toDestination();
-        instrument._buffers = buffers;
-      } else {
-        loadDrumPatch(
-          track.instrument,
-          setInstrumentsLoaded,
-          index,
-          "",
-          setTracks,
-          () => {},
-          setInstrumentsInfo,
-          setNotifications
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[index] = r;
-            return a;
-          })
-        );
-      }
-    }
-    //player
-    else if (track.type === 2) {
-      loadAudioTrack(
-        track.instrument,
-        setInstrumentsLoaded,
-        index,
-        setNotifications,
-        setInstrumentsInfo
-      ).then((r) =>
-        setInstruments((prev) => {
-          let a = [...prev];
-          a[index] = r;
-          return a;
-        })
-      );
-    }
-    //load from patch id
-    else if (typeof track.instrument === "string") {
-      patchLoader(
-        track.instrument,
-        setInstrumentsLoaded,
-        index,
-        setNotifications,
-        setInstrumentsInfo
-      ).then((r) =>
-        setInstruments((prev) => {
-          let a = [...prev];
-          a[index] = r;
-          return a;
-        })
-      );
-    } //load from obj
-    else if (typeof track.instrument === "object" && !instruments[index]) {
-      if (track.instrument.hasOwnProperty("urls")) {
-        loadSamplerFromObject(
-          track.instrument,
-          setInstrumentsLoaded,
-          index,
-          () => {},
-          setNotifications,
-          setInstrumentsInfo
-        ).then((r) =>
-          setInstruments((prev) => {
-            let a = [...prev];
-            a[index] = r;
-            return a;
-          })
-        );
-      } else {
-        instrument = loadSynthFromGetObject(track.instrument);
-        setInstrumentsLoaded((prev) => {
-          let a = [...prev];
-          a[index] = true;
-          return a;
-        });
-      }
-    }
-
-    setInstruments((prev) => {
-      let a = [...prev];
-      a[index] = instrument;
-      return a;
-    });
   };
 
   /*========================================================================================*/
@@ -572,132 +210,6 @@ function SessionWorkspace(props) {
   /*========================================================================================*/
   /*========================================================================================*/
 
-  const triggerSave = (tracks, sessionData) => {
-    //first, upload files and filter unwanted
-    if (pendingUploadFiles.length > 0) {
-      setUploadingFiles(
-        pendingUploadFiles.filter(
-          (file) =>
-            tracks[file.track].score.findIndex((e) => e.clip === file.index) !==
-            -1
-        )
-      );
-    } else {
-      saveToDatabase(tracks, sessionData);
-    }
-  };
-
-  const saveToDatabase = (mod, data, a) => {
-    //console.log("isLoaded", isLoaded);
-    if (DBSessionRef !== null) {
-      savingMode === "simple" && setSnackbarMessage(t("misc.changesSaved"));
-
-      let newSessionData = data ? deepCopy(data) : {};
-
-      let newTracks = mod ? deepCopy(mod) : {};
-
-      //temp fix: delete properties to avoid overwrites
-      if (data) {
-        delete newSessionData.createdOn;
-        delete newSessionData.creator;
-        delete newSessionData.opened;
-        delete newSessionData.played;
-        delete newSessionData.copied;
-        delete newSessionData.likes;
-      }
-
-      if (mod) {
-        newSessionData.tracks = newTracks;
-      }
-
-      //console.log("write");
-
-      DBSessionRef.update({
-        ...newSessionData,
-      });
-    }
-  };
-
-  const updateSavingMode = (input) => {
-    //console.log("inin", input);
-    if (input === "simple") {
-      DBlistener();
-      setDBListener(() => () => {});
-      clearInterval(autosaver);
-      //console.log("autosaver initialized");
-
-      let intervalId = setInterval(() => {
-        setAreUnsavedChanges((prev) => (prev ? false : prev));
-      }, autoSaverTime);
-
-      setAutosaver(intervalId);
-    } else {
-      //console.log(DBSessionRef);
-      if (!props.hidden && DBSessionRef !== null) {
-        //console.log("RTE Activated");
-        DBlistener();
-        setAreUnsavedChanges(false);
-        saveToDatabase(tracks, sessionData);
-        let listener = DBSessionRef.onSnapshot(
-          (snapshot) => {
-            !snapshot.metadata.hasPendingWrites &&
-              updateFromDatabase(snapshot.data());
-          },
-          (er) => {
-            console.log("onSnapshot Error:", er);
-          }
-        );
-
-        setDBListener(() => () => listener());
-      }
-    }
-  };
-
-  const updateFromDatabase = (sessionSnapshot) => {
-    setIsLastChangeFromServer(true);
-    //console.log("read");
-    setTracks((prev) => {
-      let index = sessionSnapshot.tracks.length - 1;
-      if (prev.length < sessionSnapshot.tracks.length)
-        loadNewTrackInstrument(sessionSnapshot.tracks[index], index);
-      //console.log("inside setter");
-      return sessionSnapshot.tracks;
-    });
-
-    let data = { ...sessionSnapshot };
-    delete data.tracks;
-
-    setSessionData((prev) => {
-      let check = !compareObjectProperties(data, prev);
-      //console.log(check ? "It's different data" : "It's the same data");
-      return check ? data : prev;
-    });
-  };
-
-  const resetWorkspace = () => {
-    setSavingMode("simple");
-    setAutosaver(null);
-    setAreUnsavedChanges(false);
-
-    setDBSessionRef(null);
-
-    setTracks(null);
-    setSessionData(null);
-    setSessionSize(0);
-
-    setInstruments([]);
-    setInstrumentsLoaded([]);
-    setIsLoaded(false);
-    setEditMode(false);
-
-    setIsPlaying(false);
-
-    setTrackPicker(false);
-    setMixerOpen(false);
-
-    //true: timeline ; false: loopmode
-  };
-
   const handleSessionCopy = () => {
     props.setNewSessionDialog({ ...sessionData, tracks: [...tracks] });
   };
@@ -705,13 +217,11 @@ function SessionWorkspace(props) {
   const duplicateTrack = (index) => {
     let newTrackId = parseInt(Math.max(...tracks.map((e) => e.id))) + 1;
     let trackToCopy = tracks[tracks.length - 1];
-    setInstrumentsLoaded((prev) => [...prev, false]);
+    paramSetter("instrLoaded", (prev) => ({ ...prev, [tracks.length]: false }));
+
     let instrumentBuffers = trackToCopy.type === 0 && trackToCopy._buffers;
-    loadNewTrackInstrument(
-      tracks[tracks.length - 1],
-      tracks.length,
-      instrumentBuffers
-    );
+    loadInstrument(trackToCopy, tracks.length, instrumentBuffers, paramSetter);
+
     setTracks((prev) => [
       ...prev,
       {
@@ -719,7 +229,7 @@ function SessionWorkspace(props) {
         id: newTrackId,
       },
     ]);
-    handleUndo("RESET");
+    resetHistory();
   };
 
   const handleSnackbarClose = () => {
@@ -737,8 +247,7 @@ function SessionWorkspace(props) {
         return newTracks;
       });
     }
-    saveToDatabase(tracks, sessionData);
-    setAreUnsavedChanges(false);
+    save(tracks, sessionData);
     setPendingUploadFiles([]);
   };
 
@@ -754,60 +263,55 @@ function SessionWorkspace(props) {
     //console.log(Tone.Transport.state);
     Tone.start();
     e.preventDefault();
-    //console.log(Tone.Transport.state, isLoaded, instrumentsLoaded);
-    if (
-      Tone.Transport.state !== "started" &&
-      isLoaded
-      //&&
-      //!instrumentsLoaded.includes(false)
-    ) {
+    if (Tone.Transport.state !== "started" && params.isLoaded) {
       Tone.Transport.start();
-      setIsPlaying(true);
+      paramSetter("playState", true);
     } else {
       Tone.Transport.pause();
-      isLoaded &&
+      params.isLoaded &&
         instruments.forEach((e) =>
           e.name === "Players" ? e.stopAll() : e.releaseAll()
         );
-      setIsRecording(false);
-      setIsPlaying(false);
+      paramSetter("playState", false);
     }
   };
 
   const toggleRecording = (e) => {
-    if (!isRecording) {
-      Tone.Transport.pause();
-      let newTime = `${
-        Tone.Time(Tone.Transport.seconds)
-          .toBarsBeatsSixteenths()
-          .split(":")[0] - 1
-      }:0:0`;
+    if (params.playState !== "rec") {
+      if (params.playState) {
+        Tone.Transport.pause();
+        let newTime = `${
+          Tone.Time(Tone.Transport.seconds)
+            .toBarsBeatsSixteenths()
+            .split(":")[0] - 1
+        }:0:0`;
 
-      newTime = Tone.Time(newTime).toSeconds() < 0 ? "0:0:0" : newTime;
+        newTime = Tone.Time(newTime).toSeconds() < 0 ? "0:0:0" : newTime;
 
-      Tone.Transport.position = newTime;
+        Tone.Transport.position = newTime;
 
-      Tone.Transport.start();
-      setIsPlaying(true);
-      setIsRecording(true);
+        Tone.Transport.start();
+      }
+
+      paramSetter("playState", "rec");
     } else {
       Tone.Transport.pause();
-      setIsPlaying(false);
-      setIsRecording(false);
+      paramSetter("playState", false);
     }
   };
 
   const playNote = (e) => {
     let sampleIndex = keyMapping[e.code];
 
-    if (sampleIndex === undefined || selectedTrack === null) return;
+    if (sampleIndex === undefined || params.selectedTrack === null) return;
 
     let note =
-      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
+      sampleIndex +
+      (tracks[params.selectedTrack].type === 1 ? params.playingOctave * 12 : 0);
 
-    if (pressedKeys.includes(note)) return;
+    if (params.pressedKeys.includes(note)) return;
 
-    setPressedKeys((prev) => [...prev, note]);
+    paramSetter("pressedKeys", (prev) => [...prev, note]);
 
     playNoteFunction[0](note);
   };
@@ -815,14 +319,15 @@ function SessionWorkspace(props) {
   const releaseNote = (e) => {
     let sampleIndex = keyMapping[e.code];
 
-    if (sampleIndex === undefined || selectedTrack === null) return;
+    if (sampleIndex === undefined || params.selectedTrack === null) return;
 
     let note =
-      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
+      sampleIndex +
+      (tracks[params.selectedTrack].type === 1 ? params.playingOctave * 12 : 0);
 
-    if (!pressedKeys.includes(note)) return;
+    if (!params.pressedKeys.includes(note)) return;
 
-    setPressedKeys((prev) => prev.filter((e) => e !== note));
+    paramSetter("pressedKeys", (prev) => prev.filter((e) => e !== note));
 
     playNoteFunction[1](note);
   };
@@ -836,26 +341,27 @@ function SessionWorkspace(props) {
   /*========================================================================================*/
 
   const selectionAction = (action) => {
-    if (!selection || selection.length < 0) return;
+    if (!params.selection || params.selection.length < 0) return;
     if (action === "delete") {
       setTracks((prev) =>
         prev.map((track, trackIndex) => ({
           ...track,
           score:
-            selectedNotes[trackIndex] && selectedNotes[trackIndex].length > 0
+            params.selNotes[trackIndex] &&
+            params.selNotes[trackIndex].length > 0
               ? track.score.filter(
                   (note, noteIndex) =>
-                    !selectedNotes[trackIndex].includes(noteIndex)
+                    !params.selNotes[trackIndex].includes(noteIndex)
                 )
               : track.score,
         }))
       );
-      setSelectedNotes([]);
+      paramSetter("setNotes", []);
     }
   };
 
   const handleCopy = () => {
-    setClipboard({ cont: [...selectedNotes], sel: [...selection] });
+    setClipboard({ cont: [...params.selNotes], sel: [...params.selection] });
   };
 
   const handlePaste = () => {
@@ -865,7 +371,7 @@ function SessionWorkspace(props) {
         prev.map((track, trackIndex) => ({
           ...track,
           score:
-            selectedTrack === trackIndex || selectedTrack === null
+            params.selectedTrack === trackIndex || params.selectedTrack === null
               ? [
                   ...track.score,
                   ...clipboard.cont[trackIndex]
@@ -876,7 +382,7 @@ function SessionWorkspace(props) {
                       time: Tone.Time(
                         Tone.Time(note.time).toSeconds() +
                           Tone.Transport.seconds -
-                          (clipboard.sel[0] / gridSize) *
+                          (clipboard.sel[0] / params.gridSize) *
                             Tone.Time("1m").toSeconds()
                       ).toBarsBeatsSixteenths(),
                     })),
@@ -884,84 +390,35 @@ function SessionWorkspace(props) {
               : track.score,
         }))
       );
-    setSelection((prev) =>
+
+    paramSetter("selection", (prev) =>
       prev.map(
         (e) =>
-          e + (Tone.Transport.seconds / Tone.Time("1m").toSeconds()) * gridSize
+          e +
+          (Tone.Transport.seconds / Tone.Time("1m").toSeconds()) *
+            params.gridSize
       )
     );
   };
 
-  const handleUndo = (action) => {
-    let currentTracks = deepCopy(tracks);
-
-    //console.log(action);
-
-    setSessionHistory((prev) => {
-      let { past, present, future } = { ...prev };
-
-      let cleanHistory = {
-        past: [],
-        present: currentTracks,
-        future: [],
-      };
-
-      switch (action) {
-        case "UNDO":
-          if (past.length === 0 || past[past.length - 1] === null) return prev;
-          let previous = past[past.length - 1];
-          let newPast = past.slice(0, past.length - 1);
-          setTracks(deepCopy(previous));
-          return {
-            past: newPast,
-            present: previous,
-            future: [present, ...future],
-          };
-
-        case "REDO":
-          if (future.length === 0) return prev;
-          let next = future[0];
-          let newFuture = future.slice(1);
-          setTracks(deepCopy(next));
-          return {
-            past: [...past, present],
-            present: next,
-            future: newFuture,
-          };
-        case "RESET":
-          return cleanHistory;
-        default:
-          let areDifferent =
-            JSON.stringify(present) !== JSON.stringify(currentTracks);
-
-          //TEMP Solution: (currentTracks.length < past[past.length - 1].length) ===> Reset undo to prevent bringing back deleted tracks
-
-          return areDifferent
-            ? {
-                past: [...past, present],
-                present: deepCopy(currentTracks),
-                future: [],
-              }
-            : prev;
-      }
-    });
-    //newObject && setSessionHistory(newObject);
-  };
-
   const updateSelectedNotes = () => {
-    setSelectedNotes(
+    paramSetter(
+      "selNotes",
       tracks.map((mod, modIndex) => {
-        if (selectedTrack !== null && selectedTrack !== modIndex) return [];
+        if (params.selectedTrack !== null && params.selectedTrack !== modIndex)
+          return [];
         let notes = [];
         for (let x = 0; x < mod.score.length; x++) {
           let note = mod.score[x];
           if (
             Tone.Time(note.time).toSeconds() +
               (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
-              (selection[0] / gridSize) * Tone.Time("1m").toSeconds() +
+              (params.selection[0] / params.gridSize) *
+                Tone.Time("1m").toSeconds() +
                 (note.duration ? 0.0001 : 0) &&
             Tone.Time(note.time).toSeconds() <
-              (selection[1] / gridSize) * Tone.Time("1m").toSeconds()
+              (params.selection[1] / params.gridSize) *
+                Tone.Time("1m").toSeconds()
           )
             notes.push(x);
         }
@@ -989,7 +446,7 @@ function SessionWorkspace(props) {
           handlePaste();
           break;
         case 90:
-          !e.shiftKey ? handleUndo("UNDO") : handleUndo("REDO");
+          !e.shiftKey ? Undo() : Redo();
           break;
 
         default:
@@ -1001,13 +458,13 @@ function SessionWorkspace(props) {
 
     switch (e.keyCode) {
       case 18:
-        setCursorMode("edit");
+        paramSetter("cursorMode", "edit");
         break;
       case 32:
         togglePlaying(e);
         break;
       case 8:
-        !optionsOpen && selectionAction("delete");
+        !params.openDialog === "options" && selectionAction("delete");
         break;
       case 65:
         break;
@@ -1028,7 +485,7 @@ function SessionWorkspace(props) {
   const handleKeyUp = (e) => {
     switch (e.keyCode) {
       case 18:
-        setCursorMode(null);
+        paramSetter("cursorMode", null);
         break;
     }
 
@@ -1039,16 +496,16 @@ function SessionWorkspace(props) {
   const handleArrowKey = (event) => {
     event.preventDefault();
     if (event.keyCode === 38) {
-      setSessionSize((prev) => (prev === 128 ? prev : prev + 1));
+      paramSetter("sessionSize", (prev) => (prev === 128 ? prev : prev + 1));
     }
     if (event.keyCode === 40) {
-      setSessionSize((prev) => (prev === 1 ? prev : prev - 1));
+      paramSetter("sessionSize", (prev) => (prev === 1 ? prev : prev - 1));
     }
     if (event.keyCode === 37) {
-      setGridSize((prev) => (prev === 1 ? prev : prev / 2));
+      paramSetter("gridSize", (prev) => (prev === 1 ? prev : prev / 2));
     }
     if (event.keyCode === 39) {
-      setGridSize((prev) => (prev === 32 ? prev : prev * 2));
+      paramSetter("gridSize", (prev) => (prev === 32 ? prev : prev * 2));
     }
   };
 
@@ -1069,108 +526,45 @@ function SessionWorkspace(props) {
     };
   }, []);
 
-  useEffect(() => {
-    //resetWorkspace();
-    Tone.Transport.loop = true;
-    Tone.Transport.loopStart = 0;
-    instruments.forEach((e) => e.dispose());
-    //clearEvents("all");
-    console.log("transport cleared");
-
-    let session = {
-      description: "",
-      tags: [],
-      bpm: Tone.Transport.bpm.value,
-      tracks: tracks,
-    };
-
-    if (user && user.uid !== firebase.auth().currentUser.uid) {
-      props.createNewSession(session);
-      return;
-    }
-
-    loadSession();
-    //!props.session.length && Tone.Transport.start()
-  }, [props.session, sessionKey]);
+  useEffect(() => initSession(), [props.session, sessionKey]);
 
   useEffect(() => {
-    //registerSession();
-    //console.log(isLastChangeFromServer ? "server change" : "local change");
     console.log(tracks);
-    //console.log(tracks, instruments, instrumentsLoaded);
-    if (isLoaded) {
-      savingMode === "simple" && setAreUnsavedChanges(true);
-
-      if (savingMode === "rte") {
-        if (isLastChangeFromServer) {
-        } else {
-          saveToDatabase(tracks, null);
-        }
-      }
-    }
-
-    tracks && handleUndo();
-
-    setIsLastChangeFromServer(false);
+    tracks && updateUndoHistory(tracks);
   }, [tracks]);
 
   useEffect(() => {
-    //console.log("savingMode", savingMode, isLoaded, !!user, editMode);
-    if (isLoaded && !!user && editMode) updateSavingMode(savingMode);
-  }, [isLoaded, editMode, savingMode, DBSessionRef, user]);
-
-  useEffect(() => {
-    sessionData && setSavingMode(sessionData.rte ? "rte" : "simple");
-    if (isLoaded) {
-      savingMode === "simple" && setAreUnsavedChanges(true);
-      savingMode === "rte" && saveToDatabase(null, sessionData);
+    if (sessionData) {
+      setSavingMode(sessionData.rte ? "rte" : "simple");
+      paramSetter("sessionSize", sessionData.size);
     }
-    sessionData &&
-      setSessionSize((prev) =>
-        sessionData.size === prev ? prev : sessionData.size
-      );
+
+    if (params.isLoaded) save(tracks, sessionData);
   }, [sessionData]);
 
   useEffect(() => {
-    if (
-      user &&
-      sessionData &&
-      sessionData.editors &&
-      sessionData.editors.includes(user.uid)
-    )
-      setEditMode(true);
+    if (sessionData.editors && sessionData.editors.includes(user.uid))
+      paramSetter("editMode", true);
   }, [sessionData, user]);
-
-  useEffect(() => {
-    //console.log(cursorMode);
-  }, [cursorMode]);
 
   useEffect(() => {
     Tone.Transport.pause();
     if (
-      tracks &&
-      sessionData &&
-      instrumentsLoaded &&
+      params.instrLoaded &&
       instruments.every((val) => typeof val === "object") &&
       !instruments.includes(undefined) &&
-      instrumentsLoaded.every((val) => val === true) &&
-      !instrumentsLoaded.includes(undefined) &&
-      !isLoaded
+      Object.values(params.instrLoaded).every((val) => val === true) &&
+      !params.isLoaded
     ) {
-      //console.log(instrumentsLoaded, sessionData, instruments);
       onSessionReady();
     }
 
     //temp
-  }, [instrumentsLoaded, sessionData, instruments]);
+  }, [params.instrLoaded, sessionData, instruments]);
 
   useEffect(() => {
     //console.log(notifications);
-  }, [notifications]);
-
-  useEffect(() => {
-    //console.log("listener", DBlistener);
-  }, [DBlistener]);
+  }, [params.notifications]);
 
   useEffect(() => {
     //console.log("WP UseEffect triggerd");
@@ -1184,73 +578,48 @@ function SessionWorkspace(props) {
       //console.log(tracks[i].name, 2, e.volume.value);
     });
   }, [instruments]);
-
+  /* 
   useEffect(() => {
     console.log(instrumentsInfo);
-  }, [instrumentsInfo]);
+  }, [instrumentsInfo]); */
 
   useEffect(() => {
     setSessionData((prev) => {
       let newSesData = { ...prev };
-      newSesData.size = sessionSize;
+      newSesData.size = sessionData.size;
       return newSesData;
     });
-    if (sessionSize < zoomPosition[1] + 1 && sessionSize > 0) {
-      setZoomPosition((prev) => [prev[0], sessionSize - 1]);
+    if (sessionData.size < params.zoomPosition[1] + 1 && sessionData.size > 0) {
+      paramSetter("zoomPosition", (prev) => [prev[0], sessionData.size - 1]);
     }
-
-    //console.log("sessionSize", sessionSize);
-  }, [sessionSize]);
+  }, [sessionData.size]);
 
   useEffect(() => {
     premiumMode && console.log("=====PREMIUM MODE ON=====");
   }, [premiumMode]);
 
   useEffect(() => {
-    //console.log("areUnsavedChanges", areUnsavedChanges);
-
-    if (
-      !props.hidden &&
-      isLoaded &&
-      savingMode === "simple" &&
-      !areUnsavedChanges
-    )
+    /* if (!hidden && isLoaded && savingMode === "simple" && !areUnsavedChanges)
       triggerSave(tracks, sessionData);
-
+ */
     props.setUnsavedChanges && props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
 
   useEffect(() => {
-    //console.log(editorProfiles);
-  }, [editorProfiles]);
+    tracks && params.movingSelDelta === null && updateSelectedNotes();
+  }, [params.selection]);
 
   useEffect(() => {
-    if (metronome) metronome.volume.value = metronomeState ? 0 : -999;
-  }, [metronomeState]);
-
-  useEffect(() => {
-    tracks && movingSelDelta === null && updateSelectedNotes();
-  }, [selection]);
-
-  useEffect(() => {
-    //console.log(sessionHistory);
-  }, [sessionHistory]);
-
-  useEffect(() => {
-    let begin = zoomPosition[0] * Tone.Time("1m").toSeconds();
+    let begin = params.zoomPosition[0] * Tone.Time("1m").toSeconds();
     Tone.Transport.setLoopPoints(
       begin,
-      (zoomPosition[1] + 1) * Tone.Time("1m").toSeconds()
+      (params.zoomPosition[1] + 1) * Tone.Time("1m").toSeconds()
     );
 
     if (Tone.Transport.seconds < begin) {
       Tone.Transport.seconds = begin;
     }
-  }, [zoomPosition]);
-
-  useEffect(() => {
-    //console.log(movingSelDelta);
-  }, [movingSelDelta]);
+  }, [params.zoomPosition]);
 
   /*================================================================ */
   /*================================================================ */
@@ -1259,14 +628,14 @@ function SessionWorkspace(props) {
   /*================================================================ */
 
   return tracks !== undefined ? (
-    <SessionWorkspaceContext.Provider value={WSContextValue}>
+    <SessionWorkspaceContext.Provider value={ctxData}>
       <Box
         className="workspace"
         tabIndex={0}
         style={{
-          display: props.hidden ? "none" : "flex",
+          display: hidden ? "none" : "flex",
           cursor:
-            cursorMode !== null
+            params.cursorMode !== null
               ? "url('edit_black_24dp.svg'),pointer"
               : "default",
         }}
@@ -1287,9 +656,8 @@ function SessionWorkspace(props) {
               sessionData={sessionData}
               setSessionData={setSessionData}
               sessionKey={sessionKey}
-              editMode={editMode}
               user={user}
-              sessionSize={sessionSize}
+              sessionSize={sessionData.size}
               setPremiumMode={setPremiumMode}
               handlePageNav={handlePageNav}
               editorProfiles={editorProfiles}
@@ -1310,10 +678,10 @@ function SessionWorkspace(props) {
             </IconButton>
             <IconButton size="large" tabIndex="-1" onClick={togglePlaying}>
               <Icon style={{ color: "white", fontSize: 36 }}>
-                {isPlaying ? "pause" : "play_arrow"}
+                {params.playing ? "pause" : "play_arrow"}
               </Icon>
             </IconButton>
-            {editMode && (
+            {params.editMode && (
               <IconButton
                 size="large"
                 tabIndex="-1"
@@ -1326,62 +694,57 @@ function SessionWorkspace(props) {
           </div>
         </Box>
 
-        {!IEOpen && !mixerOpen && (
+        {params.openSubPage !== "IE" && params.openSubPage !== "mixer" && (
           <>
             <Transport
               tracks={tracks}
-              sessionSize={sessionSize}
-              setSessionSize={setSessionSize}
-              gridSize={gridSize}
-              setGridSize={setGridSize}
-              selectedTrack={selectedTrack}
-              setSelectedTrack={setSelectedTrack}
+              sessionSize={sessionData.size}
+              gridSize={params.gridSize}
+              selectedTrack={params.selectedTrack}
               sessionData={sessionData}
               setSessionData={setSessionData}
             />
 
             <Ruler
               tracks={tracks}
-              sessionSize={sessionSize}
-              zoomPosition={zoomPosition}
-              setZoomPosition={setZoomPosition}
+              sessionSize={sessionData.size}
+              zoomPosition={params.zoomPosition}
             />
           </>
         )}
 
         <div className="ws-grid-cont" tabIndex="-1">
-          {IEOpen && (
+          {params.openSubPage === "IE" && (
             <InstrumentEditor
-              track={tracks[selectedTrack]}
-              instrument={instruments[selectedTrack]}
-              instrumentInfo={instrumentsInfo[selectedTrack]}
-              setInstrumentsInfo={setInstrumentsInfo}
+              track={tracks[params.selectedTrack]}
+              instrument={instruments[params.selectedTrack]}
+              instrumentInfo={params.instrumentsInfo[params.selectedTrack]}
               setTracks={setTracks}
               setInstruments={setInstruments}
-              resetUndoHistory={() => handleUndo("RESET")}
-              index={selectedTrack}
-              setIEOpen={setIEOpen}
-              setInstrumentsLoaded={setInstrumentsLoaded}
+              resetUndoHistory={() => resetHistory()}
+              index={params.selectedTrack}
               handlePageNav={handlePageNav}
             />
           )}
-          {mixerOpen && (
+          {params.openSubPage === "mixer" && (
             <Mixer
               tracks={tracks}
               instruments={instruments}
               setTracks={setTracks}
-              setMixerOpen={setMixerOpen}
+              setMixerOpen={paramSetter("openSubPage", (prev) =>
+                prev === "mixer" ? null : "mixer"
+              )}
             />
           )}
           <Grid
-            selection={selection}
-            selectedNotes={selectedNotes}
-            movingSelDelta={movingSelDelta}
+            selection={params.selection}
+            selectedNotes={params.selNotes}
+            movingSelDelta={params.movingSelDelta}
           >
-            {selectedTrack !== null ? (
+            {params.selectedTrack !== null ? (
               <Track
-                selectedNotes={selectedNotes}
-                movingSelDelta={movingSelDelta}
+                selectedNotes={params.selNotes}
+                movingSelDelta={params.movingSelDelta}
               />
             ) : (
               <>
@@ -1391,15 +754,15 @@ function SessionWorkspace(props) {
                       key={track.id}
                       trackIndex={trackIndex}
                       track={track}
-                      selection={selection}
-                      selectedNotes={selectedNotes}
-                      movingSelDelta={movingSelDelta}
+                      selection={params.selection}
+                      selectedNotes={params.selNotes}
+                      movingSelDelta={params.movingSelDelta}
                     />
                   ))}
                 <IconButton
                   style={{ width: 48, left: "50%" }}
                   tabIndex="-1"
-                  onClick={() => setTrackPicker(true)}
+                  onClick={() => paramSetter("openDialog", "trackPicker")}
                 >
                   <Icon>add</Icon>
                 </IconButton>
@@ -1415,59 +778,71 @@ function SessionWorkspace(props) {
           className="ws-options-btns"
           sx={(theme) => ({
             [theme.breakpoints.down("md")]: {
-              position: !expanded.opt && "fixed",
-              bottom: !expanded.opt && "-64px",
+              position: !params.expanded.opt && "fixed",
+              bottom: !params.expanded.opt && "-64px",
             },
           })}
         >
           <IconButton
-            onClick={() => setCursorMode((prev) => (!prev ? "edit" : null))}
+            onClick={() =>
+              paramSetter("cursor", (prev) => (!prev ? "edit" : null))
+            }
           >
-            <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
-              {cursorMode ? "edit" : "navigation"}
+            <Icon style={{ transform: !params.cursorMode && "rotate(-45deg)" }}>
+              {params.cursorMode ? "edit" : "navigation"}
             </Icon>
           </IconButton>
-          <IconButton onClick={() => setMixerOpen((prev) => !prev)}>
+          <IconButton
+            onClick={() =>
+              paramSetter("openSubPage", (prev) =>
+                prev === "mixer" ? null : "mixer"
+              )
+            }
+          >
             <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
           </IconButton>
-          <IconButton onClick={() => setOptionsOpen((prev) => !prev)}>
+          <IconButton onClick={() => paramSetter("openDialog", "options")}>
             <Icon>settings</Icon>
           </IconButton>
           <IconButton
             disabled={!areUnsavedChanges}
-            onClick={() => setAreUnsavedChanges(false)}
+            onClick={() => save(tracks, sessionData)}
           >
             <Icon>save</Icon>
           </IconButton>
           <Exporter
-            sessionSize={sessionSize}
+            sessionSize={sessionData.size}
             sessionData={sessionData}
             tracks={tracks}
             tracksInstruments={instruments}
           />
 
-          {selectedTrack !== null && (
+          {params.selectedTrack !== null && (
             <>
               <Divider orientation="vertical" flexItem />
-              {tracks[selectedTrack].type !== 2 ? (
+              {tracks[params.selectedTrack].type !== 2 ? (
                 <>
                   <IconButton
-                    color={IEOpen ? "primary" : "default"}
-                    onClick={() => setIEOpen((prev) => !prev)}
+                    color={params.openSubPage === "IE" ? "primary" : "default"}
+                    onClick={() =>
+                      paramSetter("openSubPage", (prev) =>
+                        prev === "IE" ? null : "IE"
+                      )
+                    }
                   >
                     <Icon>piano</Icon>
                   </IconButton>
-                  {tracks[selectedTrack].type === 0 && (
+                  {tracks[params.selectedTrack].type === 0 && (
                     <IconButton
                       onClick={() =>
-                        setTrackOptions((prev) => ({
-                          ...prev,
+                        paramSetter("trackOptions", (prev) => ({
+                          ...prev.trackOptions,
                           showingAll: !prev.showingAll,
                         }))
                       }
                     >
                       <Icon>
-                        {trackOptions.showingAll
+                        {params.trackOptions.showingAll
                           ? "visibility_off"
                           : "visibility"}
                       </Icon>
@@ -1476,10 +851,14 @@ function SessionWorkspace(props) {
                 </>
               ) : (
                 <>
-                  <IconButton onClick={() => setAddFileDialog(true)}>
+                  <IconButton
+                    onClick={() => paramSetter("openDialog", "addFile")}
+                  >
                     <Icon>add</Icon>
                   </IconButton>
-                  <IconButton onClick={() => setFileListOpen((prev) => !prev)}>
+                  <IconButton
+                    onClick={() => paramSetter("openDialog", "addFile")}
+                  >
                     <Icon>queue_music</Icon>
                   </IconButton>
                 </>
@@ -1487,7 +866,9 @@ function SessionWorkspace(props) {
             </>
           )}
           <IconButton
-            onClick={() => setExpanded((prev) => ({ ...prev, opt: false }))}
+            onClick={() =>
+              paramSetter("expanded", (prev) => ({ ...prev, opt: false }))
+            }
             sx={(theme) => ({
               display: "none",
               marginLeft: "auto",
@@ -1506,9 +887,10 @@ function SessionWorkspace(props) {
 
         <AnimatedBox
           onClick={(prev) =>
-            !expanded.btn && setExpanded((prev) => ({ ...prev, btn: true }))
+            !params.expanded.btn &&
+            paramSetter("expanded", (prev) => ({ ...prev, btn: true }))
           }
-          style={{ ...expSprings[0] }}
+          style={{ ...expSpring }}
           sx={(theme) => ({
             display: "none",
             position: "fixed",
@@ -1519,25 +901,35 @@ function SessionWorkspace(props) {
           })}
         >
           <Backdrop
-            open={expanded.btn}
-            onClick={() => setExpanded((prev) => ({ ...prev, btn: false }))}
+            open={params.expanded.btn}
+            onClick={() =>
+              paramSetter("expanded", (prev) => ({ ...prev, btn: false }))
+            }
           />
           <Fab
-            color={expanded.opt || !expanded.btn ? "primary" : "default"}
+            color={
+              params.expanded.opt || !params.expanded.btn
+                ? "primary"
+                : "default"
+            }
             onClick={() =>
-              expanded.btn &&
-              setExpanded((prev) => ({ ...prev, opt: !prev.opt, btn: false }))
+              params.expanded.btn &&
+              paramSetter("expanded", (prev) => ({
+                ...prev,
+                opt: !prev.opt,
+                btn: false,
+              }))
             }
             size={"small"}
           >
-            <Icon>{expanded.btn ? "tune" : ""}</Icon>
+            <Icon>{params.expanded.btn ? "tune" : ""}</Icon>
           </Fab>
-          {selectedTrack !== null && (
+          {params.selectedTrack !== null && (
             <Fab
-              color={expanded.instr ? "primary" : "default"}
+              color={params.expanded.instr ? "primary" : "default"}
               onClick={() =>
-                expanded.btn &&
-                setExpanded((prev) => ({
+                params.expanded.btn &&
+                paramSetter("expanded", (prev) => ({
                   ...prev,
                   instr: !prev.instr,
                   btn: false,
@@ -1568,43 +960,43 @@ function SessionWorkspace(props) {
         {/* ================================================ */}
         {/* ================================================ */}
 
-        {selectedTrack !== null && tracks[selectedTrack].type !== 2 && (
-          <Box
-            className="ws-note-input"
-            sx={(theme) => ({
-              [theme.breakpoints.down("md")]: {
-                position: !expanded.instr && "fixed",
-                bottom: !expanded.instr && "-128px",
+        {params.selectedTrack !== null &&
+          tracks[params.selectedTrack].type !== 2 && (
+            <Box
+              className="ws-note-input"
+              sx={(theme) => ({
+                [theme.breakpoints.down("md")]: {
+                  position: !params.expanded.instr && "fixed",
+                  bottom: !params.expanded.instr && "-128px",
 
-                margin: "4px 0 0 0",
-              },
-            })}
-          >
-            <PlayInterface
-              keyMapping={keyMapping}
-              track={tracks && tracks[selectedTrack]}
-              instrument={instruments[selectedTrack]}
-              pressedKeys={pressedKeys}
-              setPressedKeys={setPressedKeys}
-              handlePageNav={handlePageNav}
-              playNoteFunction={playNoteFunction}
-              playingOctave={playingOctave}
-              setPlayingOctave={setPlayingOctave}
-              trackRows={trackRows}
-              instrumentInfo={instrumentsInfo[selectedTrack]}
-            />
-          </Box>
-        )}
-        {trackPicker && (
+                  margin: "4px 0 0 0",
+                },
+              })}
+            >
+              <PlayInterface
+                keyMapping={keyMapping}
+                track={tracks && tracks[params.selectedTrack]}
+                instrument={instruments[params.selectedTrack]}
+                pressedKeys={params.pressedKeys}
+                handlePageNav={handlePageNav}
+                playNoteFunction={playNoteFunction}
+                playingOctave={params.playingOctave}
+                trackRows={params.trackRows}
+                instrumentInfo={params.instrumentsInfo[params.selectedTrack]}
+              />
+            </Box>
+          )}
+        {params.openDialog === "trackPicker" && (
           <TrackPicker
             tabIndex={-1}
-            open={trackPicker}
-            onClose={() => setTrackPicker(false)}
-            setTrackPicker={setTrackPicker}
+            open={true}
+            onClose={() => paramSetter("openDialog", null)}
             setTracks={setTracks}
-            loadNewTrackInstrument={loadNewTrackInstrument}
+            loadNewTrackInstrument={(a, b, c) =>
+              loadInstrument(a, b, c, setInstruments, paramSetter)
+            }
             tracks={tracks}
-            sessionSize={sessionSize}
+            sessionSize={sessionData.size}
             sessionData={sessionData}
           />
         )}
@@ -1622,8 +1014,8 @@ function SessionWorkspace(props) {
 
         {sessionData && (
           <SessionSettings
-            open={optionsOpen}
-            onClose={() => setOptionsOpen(false)}
+            open={params.openDialog === "options"}
+            onClose={() => paramSetter("openDialog", null)}
             premiumMode={premiumMode}
             sessionData={sessionData}
             setSessionData={setSessionData}
@@ -1649,7 +1041,6 @@ function SessionWorkspace(props) {
             setUploadingFiles={setUploadingFiles}
             tracks={tracks}
             instruments={instruments}
-            setInstrumentsInfo={setInstrumentsInfo}
             setTracks={setTracks}
             onUploadFinish={onUploadFinish}
           />
@@ -1681,8 +1072,8 @@ function SessionWorkspace(props) {
         />
         <Confirm
           dupSession
-          open={sessionDupDialog}
-          onClose={() => setSessionDupDialog(false)}
+          open={false}
+          onClose={() => paramSetter("openDialog", null)}
           action={handleSessionCopy}
         />
       </Box>
@@ -1696,14 +1087,3 @@ function SessionWorkspace(props) {
 }
 
 export default SessionWorkspace;
-
-const deepCopy = (a) => JSON.parse(JSON.stringify(a));
-
-const compareObjectProperties = (a, b) =>
-  userSubmitedSessionProps
-    .map(
-      (e) =>
-        //e === "name" && console.log(JSON.stringify(a[e]), JSON.stringify(b[e]));
-        JSON.stringify(a[e]) === JSON.stringify(b[e])
-    )
-    .every((e) => e === true);
