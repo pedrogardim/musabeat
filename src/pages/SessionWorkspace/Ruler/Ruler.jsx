@@ -5,8 +5,6 @@ import { colors } from "../../../utils/Pallete";
 
 import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
 
-import Draggable from "react-draggable";
-
 import { Box } from "@mui/material";
 
 function Ruler(props) {
@@ -17,30 +15,10 @@ function Ruler(props) {
   const { zoomPosition, sessionSize } = params;
 
   const [isMoving, setIsMoving] = useState(false);
-  const [gridPos, setGridPos] = useState(null);
   const [resizingHandle, setResizingHandle] = useState(false);
   const [handlePosition, setHandlePosition] = useState(zoomPosition);
-  const [mousePosition, setMousePosition] = useState([0, 0]);
-
-  const grid = 1;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
-
-  //const [sessionPreview, setPessionPreview] = useState([]);
-
-  /*  const handleCursorDrag = (event, element) => {
-    Tone.Transport.seconds =
-      (element.x / rulerRef.current.offsetWidth) *
-      Tone.Time(Tone.Transport.loopEnd).toSeconds();
-
-    setCursorPosition(element.x);
-  };
-
-  const handleCursorDragStart = (event, element) => {
-    Tone.Transport.pause();
-  };
-
-  const handleCursorDragStop = (event, element) => {}; */
 
   const handleZoomContMouseDown = (e) => {
     if (!e.target.className.includes("handle")) {
@@ -57,8 +35,6 @@ function Ruler(props) {
     let hoveredPos =
       (mouseX - rulerRef.current.getBoundingClientRect().left) /
       rulerRef.current.offsetWidth;
-
-    //console.log(hoveredPos);
 
     if (resizingHandle) {
       setHandlePosition((prev) => {
@@ -81,7 +57,6 @@ function Ruler(props) {
             newSessionZoom[0] > newSessionZoom[1] ||
             JSON.stringify(newSessionZoom) === JSON.stringify(prev)
           ) {
-            //console.log("isBigger");
             return prev;
           }
           return newSessionZoom;
@@ -113,15 +88,14 @@ function Ruler(props) {
       });
     }
 
-    let gridPos = Math.floor(Math.abs(hoveredPos * sessionSize));
+    /* let gridPos = Math.floor(Math.abs(hoveredPos * sessionSize));
 
     setGridPos((prev) =>
       JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
-    );
+    ); */
   };
 
   const handleMouseUp = (e) => {
-    //console.log(e);
     setResizingHandle(null);
     setIsMoving(false);
     if (resizingHandle || isMoving) {
@@ -130,19 +104,20 @@ function Ruler(props) {
   };
 
   useEffect(() => {
-    handleHover(mousePosition[0]);
-  }, [mousePosition]);
-
-  useEffect(() => {
-    //console.log(zoomPosition);
     setHandlePosition([zoomPosition[0], zoomPosition[1]]);
+    let begin = params.zoomPosition[0] * Tone.Time("1m").toSeconds();
+    Tone.Transport.setLoopPoints(
+      begin,
+      (params.zoomPosition[1] + 1) * Tone.Time("1m").toSeconds()
+    );
+
+    if (Tone.Transport.seconds < begin) Tone.Transport.seconds = begin;
   }, [zoomPosition]);
 
   return (
     <Box
       className="ws-ruler"
       disabled
-      //onMouseMove={handleHover}
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
       ref={rulerRef}
@@ -164,9 +139,6 @@ function Ruler(props) {
             transform: `translateX(${
               handlePosition[0] * (rulerRef.current.offsetWidth / sessionSize)
             }px`,
-
-            //borderRadius: 4,
-            //margin: "-2px -2px 0 0",
           }}
         >
           <div
@@ -181,23 +153,6 @@ function Ruler(props) {
           />
         </div>
       )}
-      {/* <Draggable
-        axis="x"
-        onDrag={handleCursorDrag}
-        onStart={handleCursorDragStart}
-        onStop={handleCursorDragStop}
-        onMouseDown={handleMouseDown}
-        position={{
-          x: rulerRef.current && cursorPosition * rulerRef.current.offsetWidth,
-          y: 0,
-        }}
-        bounds=".ws-grid-line-cont"
-      >
-        <div
-          className={"ws-grid-cursor"}
-          style={{ backgroundColor: props.isRecording && "#f50057" }}
-        />
-      </Draggable> */}
 
       {Array(sessionSize)
         .fill(0)

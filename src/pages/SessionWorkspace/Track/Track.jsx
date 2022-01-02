@@ -45,13 +45,8 @@ function Track(props) {
     instruments,
     setTracks,
     setPendingUploadFiles,
-    setInstrumentsInfo,
-    setAddFileDialog,
-    setTrackRows,
-    setPlayNoteFunction,
-    addFileDialog,
     params,
-    setParams,
+    paramSetter,
   } = useContext(SessionWorkspaceContext);
 
   const {
@@ -65,10 +60,10 @@ function Track(props) {
     isRecording,
     cursorMode,
     trackRows,
-    isLoaded,
+    openDialog,
   } = params;
 
-  const { selectedNotes, movingSelDelta } = props;
+  const { selectedNotes, movingSelDelta, scheduleTrack } = props;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
@@ -77,12 +72,6 @@ function Track(props) {
   const trackType = track.type;
 
   const instrumentInfo = instrInfo[selectedTrack];
-
-  const setInstrumentLoaded = (state) =>
-    setParams((prev) => ({
-      ...prev,
-      instrLoaded: { ...prev.instrLoaded, [selectedTrack]: state },
-    }));
 
   const loadTrackRows = () => {
     if (!trackInstrument) return;
@@ -126,76 +115,7 @@ function Track(props) {
         },
       ];
     }
-    setTrackRows(rows);
-  };
-
-  const scheduleNotes = () => {
-    !track.muted
-      ? trackType === 0
-        ? scheduleSampler(
-            track.score,
-            trackInstrument,
-            Tone.Transport,
-            track.id
-          )
-        : trackType === 1
-        ? scheduleMelody(track.score, trackInstrument, Tone.Transport, track.id)
-        : scheduleAudioTrack(
-            track.score,
-            trackInstrument,
-            Tone.Transport,
-            track.id
-          )
-      : clearEvents(track.id);
-  };
-
-  const playNote = (note) => {
-    if (trackType === 0) {
-      if (
-        trackRows[note] === undefined ||
-        trackRows[note] === null ||
-        !trackInstrument.has(trackRows[note].note)
-      )
-        return;
-      trackInstrument.player(trackRows[note].note).start();
-    } else {
-      trackInstrument.triggerAttack(Tone.Frequency(note, "midi"));
-    }
-
-    if (!isRecording) return;
-
-    if (trackType === 0) {
-      let newNote = {
-        note: trackRows[note].note,
-        time: Tone.Time(
-          Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`)
-        ).toBarsBeatsSixteenths(),
-      };
-
-      setTracks((prev) => {
-        let newTracks = [...prev];
-        let find = newTracks[selectedTrack].score.findIndex(
-          (e) => e.note === newNote.note && e.time === newNote.time
-        );
-        //console.log(find);
-        if (find !== -1) return prev;
-        newTracks[selectedTrack].score = [...newTracks[0].score, newNote];
-        return newTracks;
-      });
-    } else {
-      let drawingNote = {
-        note: note,
-        time: Tone.Time(Tone.Transport.seconds).quantize(`${gridSize}n`),
-      };
-
-      //setDrawingNote(drawingNote);
-    }
-  };
-
-  const releaseNote = (note) => {
-    if (trackType === 1) {
-      trackInstrument.triggerRelease(Tone.Frequency(note, "midi"));
-    }
+    paramSetter("trackRows", rows);
   };
 
   const toggleAudioRecording = () => {
@@ -226,7 +146,7 @@ function Track(props) {
                 ...prev,
                 { file: file, index: drawingNote.clip, track: selectedTrack },
               ]);
-              /* setInstrumentsInfo((prev) => {
+              /* paramSetter("instrInfo",(prev) => {
                 let newInfo = [...prev];
                 newInfo[selectedTrack].filesInfo[drawingNote.clip] =
                   fileInfo;
@@ -281,7 +201,7 @@ function Track(props) {
       return newTracks;
     });
 
-    setInstrumentsInfo((prev) => {
+    paramSetter("instrInfo", (prev) => {
       let newII = [...prev];
       newII[selectedTrack].filesInfo[newAudioIndex] = data;
       if (!newII[selectedTrack].patch) {
@@ -292,14 +212,10 @@ function Track(props) {
       return newII;
     });
 
-    setAddFileDialog(null);
+    paramSetter("openDialog", null)(null);
   };
 
-  /* ================================================================================== */
-  /* ================================================================================== */
   /* =============================MOUSE EVENTS========================================= */
-  /* ================================================================================== */
-  /* ================================================================================== */
 
   const handleHover = (event) => {
     let hoveredPos = [
@@ -357,7 +273,7 @@ function Track(props) {
     let isClickOnNote = e && e.target.className.includes("track-score-note");
 
     if (!isClickOnNote) {
-      setParams((prev) => ({ ...prev, selNotes: [] }));
+      paramSetter("selNotes", []);
     }
 
     if (
@@ -499,21 +415,17 @@ function Track(props) {
     }
   };
 
-  /* ================================================================================== */
-  /* ================================================================================== */
   /* ================================USEEFFECTS======================================== */
-  /* ================================================================================== */
-  /* ================================================================================== */
 
   useEffect(() => {
     //console.log("change detected on trackRow");
-    scheduleNotes();
-  }, [trackInstrument, track, track.score, isLoaded]);
+    scheduleTrack(selectedTrack);
+  }, [track.score]);
 
   useEffect(() => {
     //console.log("change detected on trackRow");
-    trackType === 2 && scheduleNotes();
-  }, [isPlaying]);
+    trackType === 2 && scheduleTrack(selectedTrack);
+  }, [isPlaying, isMouseDown]);
 
   useEffect(() => {
     loadTrackRows();
@@ -521,7 +433,6 @@ function Track(props) {
     trackInstrument,
     instruments,
     track,
-    isLoaded,
     selectedTrack,
     trackOptions.showingAll,
   ]);
@@ -529,11 +440,6 @@ function Track(props) {
   useEffect(() => {
     onGridPosChange();
   }, [gridPos]);
-
-  useEffect(() => {
-    //console.log("trackInstrument", trackInstrument);
-    setPlayNoteFunction && setPlayNoteFunction([playNote, releaseNote]);
-  }, [trackInstrument, trackRows]);
 
   useEffect(() => {
     //console.log(drawingNote);
@@ -571,15 +477,7 @@ function Track(props) {
     }
   }, []);
 
-  useEffect(() => {
-    //console.log(zoomY);
-  }, [zoomY]);
-
-  /* ================================================================================== */
-  /* ================================================================================== */
   /* ================================JSX=============================================== */
-  /* ================================================================================== */
-  /* ================================================================================== */
 
   return (
     <div
@@ -774,45 +672,19 @@ function Track(props) {
         )}
       </Box>
 
-      {trackType === 2 && addFileDialog && (
+      {trackType === 2 && (
         <FileEditor
           audioTrack
-          open={addFileDialog}
-          onClose={() => setAddFileDialog(false)}
+          open={openDialog === "addFile"}
+          onClose={() => paramSetter("openDialog", null)(false)}
           exists={false}
           instrument={trackInstrument}
           onFileClick={onFileClick}
-          setInstrumentLoaded={setInstrumentLoaded}
+          setInstrumentLoaded={() => {}}
         />
       )}
     </div>
   );
 }
-
-const drawWave = (wavearray, setWavePath) => {
-  if (!wavearray.length) {
-    return;
-  }
-
-  let pathstring = "M 0 16 ";
-
-  let wave = wavearray;
-  let scale = wave.length / 64;
-
-  let yZoom = 2;
-
-  for (let x = 0; x < 64; x++) {
-    if (Math.abs(wave[Math.floor(x * scale)]) > 0.02) {
-      pathstring +=
-        "L " +
-        x +
-        " " +
-        (wave[Math.floor(x * scale)] * 16 + 16 / yZoom) * yZoom +
-        " ";
-    }
-  }
-
-  return pathstring;
-};
 
 export default Track;

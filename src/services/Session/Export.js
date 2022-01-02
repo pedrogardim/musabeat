@@ -4,9 +4,9 @@ import {
   scheduleAudioTrack,
 } from "../services/Schedule";
 
-import { loadInstrument, loadEffect } from "../../../services/Instruments";
+import { loadInstrument, loadEffect } from "../Instruments";
 
-import { encodeAudioFile } from "../../../services/Audio";
+import { encodeAudioFile } from "../Audio";
 
 import * as Tone from "tone";
 

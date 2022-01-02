@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
@@ -8,7 +8,6 @@ import * as Tone from "tone";
 import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
 
 import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
-import { useContext } from "react";
 
 function Transport(props) {
   const { t } = useTranslation();

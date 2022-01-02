@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 
 import * as Tone from "tone";
 
-import { loadInstrument } from "../../../services/Instruments";
+import { loadInstrument } from "../Instruments";
 
 export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   let userId = firebase.auth().currentUser
@@ -95,10 +95,10 @@ export const loadSession = (
   sessionKey,
   hidden,
   user,
-  setDBSessionRef,
   session,
   setInstruments,
-  paramSetter
+  setInstrumentsLoaded,
+  WSparamSetter
 ) => {
   const loadSessionInstruments = (tracks) => {
     let array = Array(tracks.length).fill(false);
@@ -106,7 +106,14 @@ export const loadSession = (
     setInstruments(array);
 
     tracks.forEach((track, trackIndex) =>
-      loadInstrument(track, trackIndex, null, setInstruments, paramSetter)
+      loadInstrument(
+        track,
+        trackIndex,
+        null,
+        setInstruments,
+        setInstrumentsLoaded,
+        WSparamSetter
+      )
     );
   };
 
@@ -117,7 +124,7 @@ export const loadSession = (
     setSessionData(thisSessionData);
     setTracks(session.tracks);
     Tone.Transport.bpm.value = session.bpm;
-    paramSetter("editMode", true);
+    WSparamSetter("editMode", true);
     loadSessionInstruments(session.tracks);
   } else if (sessionKey === null) {
     console.log("session is null!");
@@ -129,7 +136,6 @@ export const loadSession = (
       .collection("sessions")
       .doc(sessionKey);
 
-    setDBSessionRef(!sessionRef ? null : sessionRef);
     //Check for editMmode and get title
     sessionRef.get().then((snapshot) => {
       if (!snapshot.exists) {
@@ -142,17 +148,19 @@ export const loadSession = (
       let sessionInfo = { ...data };
       delete sessionInfo.tracks;
       setSessionData(sessionInfo);
-      paramSetter("zoomPosition", [0, sessionInfo.size - 1]);
+      WSparamSetter("zoomPosition", [0, sessionInfo.size - 1]);
 
       if (data.hasOwnProperty("tracks")) {
         loadSessionInstruments(data.tracks);
         setTracks(data.tracks);
-        if (data.tracks.length === 0) paramSetter("isLoaded", true);
+        if (data.tracks.length === 0) WSparamSetter("isLoaded", true);
       }
 
       Tone.Transport.bpm.value = data.bpm;
 
-      user && data.editors.includes(user.uid) && paramSetter("editMode", true);
+      user &&
+        data.editors.includes(user.uid) &&
+        WSparamSetter("editMode", true);
     });
 
     sessionRef.update({

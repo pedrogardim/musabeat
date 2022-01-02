@@ -76,6 +76,7 @@ export const loadInstrument = (
   index,
   buffers,
   setInstruments,
+  setInstrumentsLoaded,
   paramSetter,
   callBack
 ) => {
@@ -87,14 +88,12 @@ export const loadInstrument = (
     });
 
   const setInstrumentLoaded = (state) =>
-    paramSetter("instrLoaded", (prev) => ({ ...prev, [index]: state }));
+    setInstrumentsLoaded((prev) => ({ ...prev, [index]: state }));
 
   const onLoad = (instrInfo) => {
-    paramSetter(
-      "instrLoaded",
-      (prev) => ({ ...prev, [index]: true }),
-      "instrInfo",
-      (prev) => (instrInfo ? { ...prev, [index]: instrInfo } : prev)
+    setInstrumentLoaded(true);
+    paramSetter("instrInfo", (prev) =>
+      instrInfo ? { ...prev, [index]: instrInfo } : prev
     );
     if (callBack) callBack();
   };
@@ -204,7 +203,7 @@ export const playersLoader = async (
 
   let players = new Tone.Players(urls, () => onLoad(instrInfo)).toDestination();
 
-  players.volume.value = patch.volume;
+  if (patch.volume !== undefined) players.volume.value = patch.volume;
 
   return players;
 };
