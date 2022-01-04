@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 
 import * as Tone from "tone";
 
@@ -14,6 +14,7 @@ function useCopyPaste(ctx) {
   };
 
   const handlePaste = () => {
+    console.log("paste");
     if (clipboard)
       setTracks((prev) =>
         prev.map((track, trackIndex) => ({
@@ -48,6 +49,8 @@ function useCopyPaste(ctx) {
       )
     );
   };
+
+  useEffect(() => console.log(clipboard), [clipboard]);
 
   return [handleCopy, handlePaste];
 }

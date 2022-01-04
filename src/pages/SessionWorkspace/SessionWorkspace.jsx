@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import * as Tone from "tone";
 
 import { useParams } from "react-router-dom";
@@ -39,17 +39,17 @@ import { loadInstrument } from "../../services/Instruments";
 
 import { deleteSelection } from "./services/Edition";
 
-import { SessionWorkspaceContext } from "../../context/SessionWorkspaceContext";
+import wsCtx from "../../context/SessionWorkspaceContext";
 
 function SessionWorkspace(props) {
   const sessionKey = useParams().key;
+
+  const playFn = useRef(null);
 
   const [params, setParams] = useState({
     isLoaded: false,
     playing: false,
     selectedTrack: null,
-    pressedKeys: [],
-    playingOctave: 3,
     trackRows: [],
     editMode: false,
     cursorMode: null,
@@ -68,8 +68,7 @@ function SessionWorkspace(props) {
     openDialog: null,
     openSubPage: null,
     sessionSize: 0,
-    isRecording: true,
-    instrInfo: {},
+    isRecording: false,
   });
 
   const paramSetter = (key, value, key2, value2) =>
@@ -87,6 +86,9 @@ function SessionWorkspace(props) {
     instruments,
     setInstruments,
     instrumentsLoaded,
+    setInstrumentsLoaded,
+    instrumentsInfo,
+    setInstrumentsInfo,
     isLoaded,
     action,
     isPlaying,
@@ -99,8 +101,6 @@ function SessionWorkspace(props) {
   const [editorProfiles, setEditorProfiles] = useState(null);
   const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
-
-  const [[playNote, releaseNote], setPlayFn] = useState([() => {}, () => {}]);
 
   const { user, handlePageNav, hidden } = props;
 
@@ -117,6 +117,9 @@ function SessionWorkspace(props) {
     setInstruments,
     isLoaded,
     instrumentsLoaded,
+    setInstrumentsLoaded,
+    instrumentsInfo,
+    setInstrumentsInfo,
     action,
     sessionKey,
     user,
@@ -131,6 +134,7 @@ function SessionWorkspace(props) {
     setSnackbarMessage,
     params,
     paramSetter,
+    isLoaded,
   }));
 
   const [save, setSavingMode, areUnsavedChanges] =
@@ -205,72 +209,38 @@ function SessionWorkspace(props) {
     }
   };
 
-  /*===================================EDIT=ACTIONS=========================================*/
-
-  const updateSelectedNotes = () => {
-    paramSetter(
-      "selNotes",
-      tracks.map((mod, modIndex) => {
-        if (params.selectedTrack !== null && params.selectedTrack !== modIndex)
-          return [];
-        let notes = [];
-        for (let x = 0; x < mod.score.length; x++) {
-          let note = mod.score[x];
-          if (
-            Tone.Time(note.time).toSeconds() +
-              (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
-              (params.selection[0] / params.gridSize) *
-                Tone.Time("1m").toSeconds() +
-                (note.duration ? 0.0001 : 0) &&
-            Tone.Time(note.time).toSeconds() <
-              (params.selection[1] / params.gridSize) *
-                Tone.Time("1m").toSeconds()
-          )
-            notes.push(x);
-        }
-        return notes;
-      })
-    );
-  };
-
   /*=====================================KEYEVENTS==========================================*/
 
   const handleKeyDown = (e) => {
     Tone.start();
+    let key = e.keyCode;
     if (e.ctrlKey || e.metaKey) {
-      if (e.keyCode === 67) handleCopy();
-      if (e.keyCode === 87) handlePaste();
-      if (e.keyCode === 90) !e.shiftKey ? Undo() : Redo();
+      if (key === 67) handleCopy();
+      if (key === 86) handlePaste();
+      if (key === 90) !e.shiftKey ? Undo() : Redo();
     }
 
-    playNote(e);
+    if (key === 18) paramSetter("cursorMode", "edit");
+    if (key === 32) action("toggle");
+    if (key === 8 && !params.openDialog) deleteSelection(ctxData);
+    if (key >= 37 && key <= 40) handleArrowKey(e);
 
-    if (e.keyCode === 18) paramSetter("cursorMode", "edit");
-    if (e.keyCode === 32) action("toggle");
-    if (e.keyCode === 8)
-      !params.openDialog === "options" && deleteSelection(ctxData);
-    if (e.keyCode >= 37 && e.keyCode <= 40) handleArrowKey(e);
+    playFn.current[0](e);
   };
 
   const handleKeyUp = (e) => {
-    if (e.keyCode === 18) paramSetter("cursorMode", null);
-
-    releaseNote(e);
+    let key = e.keyCode;
+    if (key === 18) paramSetter("cursorMode", null);
+    playFn.current[1](e);
   };
 
-  const handleArrowKey = (event) => {
-    event.preventDefault();
-    if (event.keyCode === 38)
-      paramSetter("sessionSize", (prev) => (prev === 128 ? prev : prev + 1));
-
-    if (event.keyCode === 40)
-      paramSetter("sessionSize", (prev) => (prev === 1 ? prev : prev - 1));
-
-    if (event.keyCode === 37)
-      paramSetter("gridSize", (prev) => (prev === 1 ? prev : prev / 2));
-
-    if (event.keyCode === 39)
-      paramSetter("gridSize", (prev) => (prev === 32 ? prev : prev * 2));
+  const handleArrowKey = (e) => {
+    e.preventDefault();
+    let key = e.keyCode;
+    if (key === 38) paramSetter("sessionSize", (p) => (p === 128 ? p : p + 1));
+    if (key === 40) paramSetter("sessionSize", (p) => (p === 1 ? p : p - 1));
+    if (key === 37) paramSetter("gridSize", (p) => (p === 1 ? p : p / 2));
+    if (key === 39) paramSetter("gridSize", (p) => (p === 32 ? p : p * 2));
   };
 
   /*=====================================USEEFFECTS=========================================*/
@@ -289,8 +259,6 @@ function SessionWorkspace(props) {
       setSavingMode(sessionData.rte ? "rte" : "simple");
       paramSetter("sessionSize", sessionData.size);
     }
-
-    if (isLoaded) save(tracks, sessionData);
   }, [sessionData]);
 
   useEffect(() => {
@@ -315,14 +283,10 @@ function SessionWorkspace(props) {
     props.setUnsavedChanges && props.setUnsavedChanges(areUnsavedChanges);
   }, [areUnsavedChanges]);
 
-  useEffect(() => {
-    tracks && params.movingSelDelta === null && updateSelectedNotes();
-  }, [params.selection]);
-
   /*===============================JSX============================== */
 
   return tracks !== undefined ? (
-    <SessionWorkspaceContext.Provider value={ctxData}>
+    <wsCtx.Provider value={ctxData}>
       <Box
         className="workspace"
         tabIndex={0}
@@ -402,14 +366,10 @@ function SessionWorkspace(props) {
         <div className="ws-grid-cont" tabIndex="-1">
           {params.openSubPage === "IE" && (
             <InstrumentEditor
-              track={tracks[params.selectedTrack]}
-              instrument={instruments[params.selectedTrack]}
-              instrumentInfo={params.instrumentsInfo[params.selectedTrack]}
-              setTracks={setTracks}
-              setInstruments={setInstruments}
+              workspace
               resetUndoHistory={() => resetHistory()}
-              index={params.selectedTrack}
               handlePageNav={handlePageNav}
+              setUploadingFiles={setUploadingFiles}
             />
           )}
           {params.openSubPage === "mixer" && (
@@ -417,9 +377,11 @@ function SessionWorkspace(props) {
               tracks={tracks}
               instruments={instruments}
               setTracks={setTracks}
-              setMixerOpen={paramSetter("openSubPage", (prev) =>
-                prev === "mixer" ? null : "mixer"
-              )}
+              setMixerOpen={() =>
+                paramSetter("openSubPage", (prev) =>
+                  prev === "mixer" ? null : "mixer"
+                )
+              }
             />
           )}
           <Grid
@@ -459,7 +421,7 @@ function SessionWorkspace(props) {
         </div>
         {/* ================================================ */}
 
-        <OptionsBar />
+        <OptionsBar areUnsavedChanges={areUnsavedChanges} save={save} />
 
         <MobileCollapseButtons />
 
@@ -467,7 +429,7 @@ function SessionWorkspace(props) {
 
         {params.selectedTrack !== null &&
           tracks[params.selectedTrack].type !== 2 && (
-            <PlayInterface setPlayFn={setPlayFn} />
+            <PlayInterface playFn={playFn} />
           )}
         {params.openDialog === "trackPicker" && (
           <TrackPicker
@@ -534,12 +496,12 @@ function SessionWorkspace(props) {
         />
         <Confirm
           dupSession
-          open={false}
+          open={params.openDialog === "dupSession"}
           onClose={() => paramSetter("openDialog", null)}
           action={handleSessionCopy}
         />
       </Box>
-    </SessionWorkspaceContext.Provider>
+    </wsCtx.Provider>
   ) : (
     <NotFoundPage
       type="workspace"

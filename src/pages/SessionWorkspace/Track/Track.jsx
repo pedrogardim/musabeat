@@ -5,13 +5,6 @@ import { colors } from "../../../utils/Pallete";
 
 import { Typography, Box } from "@mui/material";
 
-import {
-  scheduleSampler,
-  scheduleMelody,
-  scheduleAudioTrack,
-  clearEvents,
-} from "../services/Schedule";
-
 import "./style.css";
 
 import { drumAbbreviations } from "../../../services/MiscData";
@@ -21,7 +14,7 @@ import MelodyNote from "./MelodyNote";
 import AudioClip from "./AudioClip";
 import FileEditor from "../../../components/InstrumentEditor/FileEditor";
 
-import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../context/SessionWorkspaceContext";
 
 function Track(props) {
   const rowRef = useRef(null);
@@ -47,12 +40,13 @@ function Track(props) {
     setPendingUploadFiles,
     params,
     paramSetter,
-  } = useContext(SessionWorkspaceContext);
+    instrumentsInfo,
+    setInstrumentsInfo,
+  } = useContext(wsCtx);
 
   const {
     selectedTrack,
     trackOptions,
-    instrInfo,
     zoomPosition,
     gridSize,
     sessionSize,
@@ -71,7 +65,7 @@ function Track(props) {
   const trackInstrument = instruments[selectedTrack];
   const trackType = track.type;
 
-  const instrumentInfo = instrInfo[selectedTrack];
+  const instrumentInfo = instrumentsInfo[selectedTrack];
 
   const loadTrackRows = () => {
     if (!trackInstrument) return;
@@ -146,7 +140,7 @@ function Track(props) {
                 ...prev,
                 { file: file, index: drawingNote.clip, track: selectedTrack },
               ]);
-              /* paramSetter("instrInfo",(prev) => {
+              /* setInstrumentsInfo(,(prev) => {
                 let newInfo = [...prev];
                 newInfo[selectedTrack].filesInfo[drawingNote.clip] =
                   fileInfo;
@@ -201,8 +195,8 @@ function Track(props) {
       return newTracks;
     });
 
-    paramSetter("instrInfo", (prev) => {
-      let newII = [...prev];
+    setInstrumentsInfo((prev) => {
+      let newII = { ...prev };
       newII[selectedTrack].filesInfo[newAudioIndex] = data;
       if (!newII[selectedTrack].patch) {
         newII[selectedTrack].patch = { urls: { [newAudioIndex]: fileId } };
@@ -272,9 +266,9 @@ function Track(props) {
 
     let isClickOnNote = e && e.target.className.includes("track-score-note");
 
-    if (!isClickOnNote) {
+    /*  if (!isClickOnNote) {
       paramSetter("selNotes", []);
-    }
+    } */
 
     if (
       (e && e.target.className.includes("track-score-note-handle")) ||
@@ -499,6 +493,7 @@ function Track(props) {
         onClick={handleMouseUp}
         onMouseUp={handleMouseUp}
         disabled
+        tabIndex={-1}
         /*         style={{ maxHeight: trackType === 1 && trackRows.length * 17 * zoomY }}
          */
       >

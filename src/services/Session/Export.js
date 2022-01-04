@@ -2,7 +2,7 @@ import {
   scheduleSampler,
   scheduleMelody,
   scheduleAudioTrack,
-} from "../services/Schedule";
+} from "../Session/Schedule";
 
 import { loadInstrument, loadEffect } from "../Instruments";
 
@@ -17,8 +17,6 @@ export const bounceSessionExport = async (
   setIsReady,
   setExportProgress,
   sessionSize,
-  timeline,
-  timelineMode,
   forceReschedule,
   format
 ) => {

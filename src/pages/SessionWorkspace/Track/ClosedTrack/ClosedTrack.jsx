@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import * as Tone from "tone";
 import { colors } from "../../../../utils/Pallete";
 
-import { SessionWorkspaceContext } from "../../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../../context/SessionWorkspaceContext";
 
 import { IconButton, Icon, Paper, CircularProgress } from "@mui/material";
-
-import {
-  scheduleSampler,
-  scheduleMelody,
-  scheduleAudioTrack,
-  clearEvents,
-} from "../../services/Schedule";
 
 import Note from "./Note";
 
@@ -22,13 +14,10 @@ function ClosedTrack(props) {
 
   const { trackIndex, track, selectedNotes, movingSelDelta } = props;
 
-  const { instruments, params, paramSetter, instrumentsLoaded } = useContext(
-    SessionWorkspaceContext
-  );
+  const { instruments, params, paramSetter, instrumentsLoaded } =
+    useContext(wsCtx);
 
-  const { zoomPosition, gridSize, isLoaded, sessionSize } = params;
-
-  const trackType = track.type;
+  const { zoomPosition, gridSize, sessionSize } = params;
 
   const instrument = instruments[trackIndex];
   const loaded = instrumentsLoaded[trackIndex];
@@ -53,35 +42,13 @@ function ClosedTrack(props) {
     setTrackRows(rows);
   };
 
-  const scheduleNotes = () => {
-    !track.muted
-      ? trackType === 0
-        ? scheduleSampler(track.score, instrument, Tone.Transport, track.id)
-        : trackType === 1
-        ? scheduleMelody(track.score, instrument, Tone.Transport, track.id)
-        : scheduleAudioTrack(track.score, instrument, Tone.Transport, track.id)
-      : clearEvents(track.id);
-  };
-
-  /* ================================================================================== */
-  /* ================================================================================== */
   /* ================================USEEFFECTS======================================== */
-  /* ================================================================================== */
-  /* ================================================================================== */
 
   useEffect(() => {
     loadTrackRows();
   }, [instrument, track]);
 
-  useEffect(() => {
-    scheduleNotes();
-  }, [instrument, track, track.score, isLoaded]);
-
-  /* ================================================================================== */
-  /* ================================================================================== */
   /* ================================JSX=============================================== */
-  /* ================================================================================== */
-  /* ================================================================================== */
 
   return (
     <Paper

@@ -14,20 +14,12 @@ function Keyboard(props) {
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const handleKeyClick = (key) => {
-    let note = key + 24 + octave * 12;
-    props.onKeyClick && props.onKeyClick(note);
-    props.setPressedKeys &&
-      props.setPressedKeys((prev) =>
-        !prev.includes(note) ? [...prev, note] : prev
-      );
+    let note = key - 12 + octave * 12;
+    props.playFn && props.playFn.current[0](null, note);
   };
   const handleKeyUp = (key) => {
-    let note = key + 24 + octave * 12;
-    props.onKeyUp && props.onKeyUp(note);
-    props.setPressedKeys &&
-      props.setPressedKeys((prev) =>
-        prev.includes(note) ? prev.filter((e) => e !== note) : prev
-      );
+    let note = key - 12 + octave * 12;
+    props.playFn && props.playFn.current[1](null, note);
   };
 
   const color = colors[typeof props.color === "number" ? props.color : 2];
@@ -40,6 +32,11 @@ function Keyboard(props) {
     //console.log(props.setPlayingOctave);
     if (props.setPlayingOctave) props.setPlayingOctave(octave);
   }, [octaveState]);
+
+  useEffect(() => {
+    //console.log(props.setPlayingOctave);
+    props.playFn && props.playFn.current[2]();
+  }, [isMouseDown]);
 
   return (
     <Paper
@@ -70,6 +67,7 @@ function Keyboard(props) {
               onMouseLeave={() => handleKeyUp(i)}
               onMouseEnter={() => isMouseDown && handleKeyClick(i)}
               elevation={isBlackKey ? 24 : 8}
+              key={i}
               sx={(theme) => {
                 let dark = theme.palette.mode === "dark";
                 return {

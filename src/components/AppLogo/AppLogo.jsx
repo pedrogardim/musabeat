@@ -20,6 +20,7 @@ function AppLogo(props) {
     >
       {segments.map((e, i) => (
         <path
+          key={e}
           className={`logo-seg ${
             props.animated && "animated-logo-seg animated-logo-seg" + i
           }`}

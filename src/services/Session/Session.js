@@ -92,19 +92,20 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
 export const loadSession = (
   setSessionData,
   setTracks,
-  sessionKey,
+  sessionId,
   hidden,
   user,
-  session,
+  sessionObject,
+  setIsLoaded,
   setInstruments,
   setInstrumentsLoaded,
+  setInstrumentsInfo,
   WSparamSetter
 ) => {
   const loadSessionInstruments = (tracks) => {
     let array = Array(tracks.length).fill(false);
 
     setInstruments(array);
-
     tracks.forEach((track, trackIndex) =>
       loadInstrument(
         track,
@@ -112,29 +113,26 @@ export const loadSession = (
         null,
         setInstruments,
         setInstrumentsLoaded,
+        setInstrumentsInfo,
         WSparamSetter
       )
     );
   };
 
-  console.log("loading session: ", sessionKey);
   if (hidden) {
-    let thisSessionData = { ...session };
+    let thisSessionData = { ...sessionObject };
     delete thisSessionData.tracks;
     setSessionData(thisSessionData);
-    setTracks(session.tracks);
-    Tone.Transport.bpm.value = session.bpm;
+    setTracks(sessionObject.tracks);
+    Tone.Transport.bpm.value = sessionObject.bpm;
     WSparamSetter("editMode", true);
-    loadSessionInstruments(session.tracks);
-  } else if (sessionKey === null) {
+    loadSessionInstruments(sessionObject.tracks);
+  } else if (sessionId === null) {
     console.log("session is null!");
   }
   //
-  else if (typeof sessionKey === "string") {
-    let sessionRef = firebase
-      .firestore()
-      .collection("sessions")
-      .doc(sessionKey);
+  else if (typeof sessionId === "string") {
+    let sessionRef = firebase.firestore().collection("sessions").doc(sessionId);
 
     //Check for editMmode and get title
     sessionRef.get().then((snapshot) => {
@@ -153,7 +151,7 @@ export const loadSession = (
       if (data.hasOwnProperty("tracks")) {
         loadSessionInstruments(data.tracks);
         setTracks(data.tracks);
-        if (data.tracks.length === 0) WSparamSetter("isLoaded", true);
+        if (data.tracks.length === 0) setIsLoaded(true);
       }
 
       Tone.Transport.bpm.value = data.bpm;
@@ -167,18 +165,5 @@ export const loadSession = (
       opened: firebase.firestore.FieldValue.increment(1),
       played: firebase.firestore.FieldValue.increment(1),
     });
-  } /* else if (typeof sessionKey === "object") {
-      setTracks(sessionKey.tracks);
-      Tone.Transport.bpm.value = sessionKey.bpm;
-      if (
-        (!hidden &&
-          user &&
-          sessionKey.editors.includes(user.uid)) ||
-        !sessionKey.creator
-      ) {
-        setEditMode(true);
-        setSessionEditors(session.creator);
-      }
-      loadSessionInstruments(sessionKey.tracks);
-    } */
+  }
 };

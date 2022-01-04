@@ -77,6 +77,7 @@ export const loadInstrument = (
   buffers,
   setInstruments,
   setInstrumentsLoaded,
+  setInstrumentsInfo,
   paramSetter,
   callBack
 ) => {
@@ -92,7 +93,7 @@ export const loadInstrument = (
 
   const onLoad = (instrInfo) => {
     setInstrumentLoaded(true);
-    paramSetter("instrInfo", (prev) =>
+    setInstrumentsInfo((prev) =>
       instrInfo ? { ...prev, [index]: instrInfo } : prev
     );
     if (callBack) callBack();
@@ -238,19 +239,19 @@ export const patchLoader = async (
 
   let options = patch.options;
 
-  if (patch.base !== "Sampler") {
-    onLoad({ patch: patch });
-    return new Tone.PolySynth(
-      Tone[`${patch.base}Synth`],
-      options
-    ).toDestination();
-  } else {
+  if (patch.base === "Sampler") {
     return await loadSamplerInstrument(
       input,
       trackIndex,
       onLoad,
       addNotification
     );
+  } else {
+    onLoad({ patch: patch });
+    return new Tone.PolySynth(
+      Tone[`${patch.base}Synth`],
+      options
+    ).toDestination();
   }
 };
 

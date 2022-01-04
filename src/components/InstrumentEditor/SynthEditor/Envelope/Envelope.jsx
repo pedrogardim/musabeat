@@ -75,50 +75,12 @@ function EnvelopeControl(props) {
           size={32}
           step={0.01}
           max={e === "sustain" ? 1 : e === "attack" ? 4 : e === "decay" ? 4 : 2}
-          defaultValue={envelope[e]}
+          defaultValue={envelope ? envelope[e] : 0}
           onChange={(v) => handleChange(e, v)}
           label={e[0]}
           style={{ margin: "0 8px" }}
         />
       ))}
-
-      {/* {Object.keys(envelope).map(
-        (element, index) =>
-          (element === "attack" ||
-            element === "decay" ||
-            element === "sustain" ||
-            element === "release") && (
-            <div
-              className={
-                "instrument-editor-envelope-slider-container " +
-                (envelope.octaves === 0 && "disabled")
-              }
-              style={{ order: element === "release" ? 2 : 1 }}
-            >
-              <Slider
-                key={index}
-                className={"instrument-editor-vertical-slider"}
-                orientation="vertical"
-                value={envelope[element]}
-                min={0}
-                step={0.01}
-                max={
-                  element === "sustain"
-                    ? 1
-                    : element === "attack"
-                    ? 4
-                    : element === "decay"
-                    ? 4
-                    : 2
-                }
-                onChangeCommitted={() => props.onInstrumentMod()}
-                onChange={(e, v) => handleChange(element, v)}
-                valueLabelDisplay="auto"
-              />
-              <Typography variant="overline">{element[0]}</Typography>
-            </div>
-          )
-      )} */}
     </div>
   );
 }

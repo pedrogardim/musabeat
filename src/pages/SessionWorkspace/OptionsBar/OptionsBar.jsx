@@ -2,23 +2,18 @@ import React, { useContext } from "react";
 
 import { Icon, IconButton, Box, Divider } from "@mui/material";
 
-import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../context/SessionWorkspaceContext";
 
 import Exporter from "../Exporter";
 
 function OptionsBar(props) {
-  const {
-    params,
-    paramSetter,
-    tracks,
-    sessionData,
-    instruments,
-    save,
-    areUnsavedChanges,
-  } = useContext(SessionWorkspaceContext);
+  const { params, paramSetter, tracks, sessionData, instruments } =
+    useContext(wsCtx);
 
   const { expanded, cursorMode, selectedTrack, openSubPage, trackOptions } =
     params;
+
+  const { save, areUnsavedChanges } = props;
 
   return (
     <Box

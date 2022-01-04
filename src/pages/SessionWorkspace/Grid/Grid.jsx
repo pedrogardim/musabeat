@@ -21,7 +21,7 @@ function Grid(props) {
   const [isMovingSelected, setIsMovingSelected] = useState(false);
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const { setTracks, params, paramSetter } = useContext(
+  const { tracks, setTracks, params, paramSetter } = useContext(
     SessionWorkspaceContext
   );
 
@@ -156,6 +156,29 @@ function Grid(props) {
     );
   };
 
+  const updateSelectedNotes = () => {
+    paramSetter(
+      "selNotes",
+      tracks.map((mod, modIndex) => {
+        if (selectedTrack !== null && selectedTrack !== modIndex) return [];
+        let notes = [];
+        for (let x = 0; x < mod.score.length; x++) {
+          let note = mod.score[x];
+          if (
+            Tone.Time(note.time).toSeconds() +
+              (note.duration ? Tone.Time(note.duration).toSeconds() : 0) >=
+              (selection[0] / gridSize) * Tone.Time("1m").toSeconds() +
+                (note.duration ? 0.0001 : 0) &&
+            Tone.Time(note.time).toSeconds() <
+              (selection[1] / gridSize) * Tone.Time("1m").toSeconds()
+          )
+            notes.push(x);
+        }
+        return notes;
+      })
+    );
+  };
+
   const handleSelectedNotesDrag = () => {
     paramSetter("movingSelDelta", gridPos - isMovingSelected);
   };
@@ -181,6 +204,10 @@ function Grid(props) {
       }, 16)
     );
   }, [zoomPosition]);
+
+  useEffect(() => {
+    if (tracks && movingSelDelta === null) updateSelectedNotes();
+  }, [selection]);
 
   useEffect(() => {
     onGridPosChange();

@@ -55,7 +55,7 @@ function useFirebaseConnection(ctx) {
     .collection("sessions")
     .doc(sessionKey);
 
-  const autoSaverTime = 1 * 60 * 1000;
+  const autoSaverTime = 5 * 60 * 1000;
 
   const triggerSave = (tracks, sessionData) => {
     if (pendingUploadFiles.length > 0)
@@ -69,7 +69,9 @@ function useFirebaseConnection(ctx) {
     else save(tracks, sessionData);
   };
 
-  useInterval(() => triggerSave(tracks, sessionData), autoSaverTime);
+  useInterval(() => {
+    if (areUnsavedChanges) triggerSave(tracks, sessionData);
+  }, autoSaverTime);
 
   const changeSavingMode = (input) => {
     if (input === "simple") {

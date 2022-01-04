@@ -47,7 +47,7 @@ import AuthDialog from "./components/dialogs/Auth";
 import NewSessionDialog from "./components/dialogs/NewSession";
 import Confirm from "./components/dialogs/Confirm";
 
-import { createNewSession } from "./pages/SessionWorkspace/services/Session";
+import { createNewSession } from "./services/Session/Session";
 
 const pageLabels = {
   explore: "Explore",

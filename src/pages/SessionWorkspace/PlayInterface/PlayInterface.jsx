@@ -12,36 +12,20 @@ import {
   keyboardMapping,
 } from "../../../services/MiscData";
 
-import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../context/SessionWorkspaceContext";
 
 import Keyboard from "../../../components/Keyboard";
 
 function PlayInterface(props) {
   const [keyPage, setKeyPage] = useState(0);
-  const handleClick = (event, i) => {
-    props.playNoteFunction[0](i);
-    setPressedKeys((prev) => [...prev, i]);
-  };
+  const [playingOctave, setPlayingOctave] = useState(3);
+  const [pressedKeys, setPressedKeys] = useState([]);
 
-  const {
-    params,
-    instruments,
-    tracks,
-    setPressedKeys,
-    paramSetter,
-    setTracks,
-  } = useContext(SessionWorkspaceContext);
+  const { params, instruments, tracks, setTracks } = useContext(wsCtx);
 
-  const { setPlayFn } = props;
+  const { playFn } = props;
 
-  const {
-    expanded,
-    pressedKeys,
-    selectedTrack,
-    trackRows,
-    gridSize,
-    isRecording,
-  } = params;
+  const { expanded, selectedTrack, trackRows, gridSize, isRecording } = params;
 
   const instrument = instruments[selectedTrack];
   const track = tracks[selectedTrack];
@@ -51,18 +35,17 @@ function PlayInterface(props) {
       ? keySamplerMapping
       : keyboardMapping;
 
-  const playNote = (e) => {
-    let sampleIndex = keyMapping[e.code];
+  const playNote = (ev, index) => {
+    let sampleIndex = index !== undefined ? index : keyMapping[ev.code];
 
-    if (sampleIndex === undefined || params.selectedTrack === null) return;
+    if (sampleIndex === undefined || selectedTrack === null) return;
 
     let note =
-      sampleIndex +
-      (tracks[params.selectedTrack].type === 1 ? params.playingOctave * 12 : 0);
+      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
 
-    if (params.pressedKeys.includes(note)) return;
+    if (pressedKeys.includes(note)) return;
 
-    paramSetter("pressedKeys", (prev) => [...prev, note]);
+    setPressedKeys((prev) => [...prev, note]);
 
     if (track.type === 0) {
       if (
@@ -106,27 +89,36 @@ function PlayInterface(props) {
     }
   };
 
-  const releaseNote = (e) => {
-    let sampleIndex = keyMapping[e.code];
+  const releaseNote = (ev, index) => {
+    let sampleIndex = index !== undefined ? index : keyMapping[ev.code];
 
-    if (sampleIndex === undefined || params.selectedTrack === null) return;
+    if (sampleIndex === undefined || selectedTrack === null) return;
 
     let note =
-      sampleIndex +
-      (tracks[params.selectedTrack].type === 1 ? params.playingOctave * 12 : 0);
+      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
 
-    if (!params.pressedKeys.includes(note)) return;
+    if (!pressedKeys.includes(note)) return;
 
-    paramSetter("pressedKeys", (prev) => prev.filter((e) => e !== note));
+    setPressedKeys((prev) => prev.filter((e) => e !== note));
 
     if (track.type === 1) {
       instrument.triggerRelease(Tone.Frequency(note, "midi"));
     }
   };
 
+  const releaseAll = () => {
+    if (track.type === 0) instrument.stopAll();
+    else instrument.releaseAll();
+    setPressedKeys([]);
+  };
+
   useEffect(() => {
-    setPlayFn([playNote, releaseNote]);
-  }, [instrument, trackRows]);
+    playFn.current = [playNote, releaseNote, releaseAll];
+  }, [pressedKeys, playingOctave]);
+
+  useEffect(() => {
+    console.log(pressedKeys);
+  }, [pressedKeys]);
 
   return (
     <Box
@@ -151,31 +143,19 @@ function PlayInterface(props) {
         {track &&
           instrument &&
           trackRows.length > 0 &&
-          (props.track.type === 0 ? (
+          (track.type === 0 ? (
             /* Array(instrument._buffers._buffers.size) */
-            Object.keys(props.keyMapping)
+            Object.keys(keyMapping)
               .filter((e, i) => (!keyPage ? i < 10 : i >= 10))
               .map((e) => e.replace("Key", "").replace("Semicolon", ":"))
               .map((e, i) => (
                 <>
                   <Paper
                     className="ws-note-input-key"
-                    onMouseDown={(event) => handleClick(event, i)}
-                    onMouseLeave={() =>
-                      setPressedKeys((prev) =>
-                        prev.filter((note) => note !== i)
-                      )
-                    }
-                    onMouseLeave={() =>
-                      setPressedKeys((prev) =>
-                        prev.filter((note) => note !== i)
-                      )
-                    }
-                    onClick={() =>
-                      setPressedKeys((prev) =>
-                        prev.filter((note) => note !== i)
-                      )
-                    }
+                    onMouseDown={() => playNote(null, i)}
+                    onMouseLeave={() => releaseNote(null, i)}
+                    onMouseLeave={() => releaseNote(null, i)}
+                    onClick={() => releaseNote(null, i)}
                     elevation={
                       trackRows[i] && !instrument.has(trackRows[i].note) ? 1 : 4
                     }
@@ -219,18 +199,14 @@ function PlayInterface(props) {
               >
                 <IconButton
                   onClick={() =>
-                    props.setPlayingOctave((prev) =>
-                      prev < 6 ? prev + 1 : prev
-                    )
+                    setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
                   }
                 >
                   <Icon>navigate_next</Icon>
                 </IconButton>
                 <IconButton
                   onClick={() =>
-                    props.setPlayingOctave((prev) =>
-                      prev > 0 ? prev - 1 : prev
-                    )
+                    setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
                   }
                 >
                   <Icon>navigate_before</Icon>
@@ -242,16 +218,16 @@ function PlayInterface(props) {
                   height: "100%",
                   zIndex: 0,
                 }}
-                color={props.track.color}
+                color={track.color}
                 octaves={1.42}
-                notesLabel={Object.keys(props.keyMapping).map((e) =>
+                notesLabel={Object.keys(keyMapping).map((e) =>
                   e.replace("Key", "").replace("Semicolon", ":")
                 )}
-                octave={props.playingOctave}
-                onKeyClick={props.playNoteFunction[0]}
-                onKeyUp={props.playNoteFunction[1]}
+                octave={playingOctave}
+                onKeyClick={playNote}
+                onKeyUp={releaseNote}
                 setPressedKeys={setPressedKeys}
-                isMouseDown={props.isMouseDown}
+                playFn={playFn}
               />
             </>
           ))}
@@ -259,31 +235,5 @@ function PlayInterface(props) {
     </Box>
   );
 }
-
-const drawWave = (wavearray, setWavePath) => {
-  if (!wavearray.length) {
-    return;
-  }
-
-  let pathstring = "M 0 16 ";
-
-  let wave = wavearray;
-  let scale = wave.length / 64;
-
-  let yZoom = 2;
-
-  for (let x = 0; x < 64; x++) {
-    if (Math.abs(wave[Math.floor(x * scale)]) > 0.02) {
-      pathstring +=
-        "L " +
-        x +
-        " " +
-        (wave[Math.floor(x * scale)] * 16 + 16 / yZoom) * yZoom +
-        " ";
-    }
-  }
-
-  return pathstring;
-};
 
 export default PlayInterface;

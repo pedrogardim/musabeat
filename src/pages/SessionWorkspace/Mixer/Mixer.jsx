@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import "./style.css";
 import ChannelStrip from "./ChannelStrip";
 
+import wsCtx from "../../../context/SessionWorkspaceContext";
+
 import { Icon, IconButton, Box } from "@mui/material";
 
 function Mixer(props) {
+  const {} = useContext(wsCtx);
   const handleSliderMove = (index, value) => {
     props.instruments[index].volume.value = value;
   };

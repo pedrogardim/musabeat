@@ -7,18 +7,17 @@ import * as Tone from "tone";
 
 import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
 
-import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../context/SessionWorkspaceContext";
 
 function Transport(props) {
   const { t } = useTranslation();
 
   const boxRefs = [useRef(null), useRef(null), useRef(null)];
 
-  const { params, paramSetter, setSessionData, sessionData } = useContext(
-    SessionWorkspaceContext
-  );
+  const { params, paramSetter, setSessionData, sessionData } =
+    useContext(wsCtx);
 
-  const { gridSize, sessionSize } = params;
+  const { gridSize, sessionSize, selectedTrack } = params;
 
   const { bpm } = sessionData ? sessionData : {};
 
@@ -37,22 +36,19 @@ function Transport(props) {
   //t: value only for display when closed
   const sessionParams = [
     {
-      i: "calendar_view_week",
-      t: params.sessionSize,
+      i: "straighten",
       lbl: "Session Size",
       range: [1, 128],
       sens: 30,
     },
     {
-      i: "straighten",
-      t: "1/" + params.gridSize,
+      i: "calendar_view_week",
       lbl: "Grid",
       range: [1, 32],
       sens: 64,
     },
     {
       i: "timer",
-      t: props.sessionData && props.sessionData.bpm,
       lbl: "BPM",
       range: [50, 300],
       sens: 3,
@@ -69,10 +65,10 @@ function Transport(props) {
 
     let value =
       selecting === 0
-        ? props.sessionSize + valueDelta
+        ? sessionSize + valueDelta
         : selecting === 1
-        ? Math.pow(2, Math.log2(props.gridSize) + valueDelta)
-        : props.sessionData.bpm + valueDelta;
+        ? Math.pow(2, Math.log2(gridSize) + valueDelta)
+        : bpm + valueDelta;
 
     //console.log(selecting, valueDelta, value);
 
@@ -88,10 +84,10 @@ function Transport(props) {
     //console.log(param, increment);
     let value =
       param === 0
-        ? props.sessionSize + (increment ? 1 : -1)
+        ? sessionSize + (increment ? 1 : -1)
         : param === 1
-        ? Math.pow(2, Math.log2(props.gridSize) + (increment ? 1 : -1))
-        : props.sessionData.bpm + (increment ? 1 : -1);
+        ? Math.pow(2, Math.log2(gridSize) + (increment ? 1 : -1))
+        : bpm + (increment ? 1 : -1);
 
     if (
       value >= sessionParams[param].range[0] &&
@@ -102,7 +98,7 @@ function Transport(props) {
         ? paramSetter("sessionSize", value)
         : param === 1
         ? paramSetter("gridSize", value)
-        : props.setSessionData((prev) => ({ ...prev, bpm: value }));
+        : setSessionData((prev) => ({ ...prev, bpm: value }));
     }
   };
 
@@ -134,24 +130,21 @@ function Transport(props) {
   }, []);
 
   useEffect(() => {
-    props.sessionSize !== paramsValue[0] &&
-      setParamsValue((prev) => ({ ...prev, 0: props.sessionSize }));
-  }, [props.sessionSize]);
+    sessionSize !== paramsValue[0] &&
+      setParamsValue((prev) => ({ ...prev, 0: sessionSize }));
+  }, [sessionSize]);
 
   useEffect(() => {
-    props.gridSize !== paramsValue[1] &&
-      setParamsValue((prev) => ({ ...prev, 1: props.gridSize }));
-  }, [props.gridSize]);
+    gridSize !== paramsValue[1] &&
+      setParamsValue((prev) => ({ ...prev, 1: gridSize }));
+  }, [gridSize]);
 
   useEffect(() => {
-    props.sessionData &&
-      props.sessionData.bpm !== paramsValue[2] &&
-      setParamsValue((prev) => ({ ...prev, 2: props.sessionData.bpm }));
-  }, [props.sessionData]);
+    bpm !== paramsValue[2] && setParamsValue((prev) => ({ ...prev, 2: bpm }));
+  }, [bpm]);
 
   useEffect(() => {
-    if (typeof selecting === "number")
-      handleParameterChange(props.mousePosition[1]);
+    if (typeof selecting === "number") handleParameterChange(mousePosition[1]);
   }, [mousePosition]);
 
   useEffect(() => {
@@ -176,10 +169,10 @@ function Transport(props) {
         })}
       >
         <Box style={{ width: 88 }}>
-          {props.selectedTrack !== null && (
+          {selectedTrack !== null && (
             <IconButton
               className="wstr-back"
-              onClick={() => props.setSelectedTrack(null)}
+              onClick={() => paramSetter("selectedTrack", null)}
             >
               <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
@@ -202,7 +195,7 @@ function Transport(props) {
             ))}
         </Box>
         <Box className="ws-transport-info">
-          {sessionParams.map((e) => (
+          {sessionParams.map((e, i) => (
             <Box key={e.i}>
               <Icon
                 sx={(theme) => ({
@@ -224,7 +217,7 @@ function Transport(props) {
                   },
                 })}
               >
-                {e.t}
+                {paramsValue[i]}
               </Typography>
             </Box>
           ))}

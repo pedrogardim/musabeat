@@ -8,7 +8,7 @@ import {
   Button,
 } from "@mui/material";
 
-import { bounceSessionExport } from "../services/Export";
+import { bounceSessionExport } from "../../../services/Session/Export";
 
 function Exporter(props) {
   const [isReady, setIsReady] = useState(true);
@@ -27,8 +27,6 @@ function Exporter(props) {
         setIsReady,
         setExportProgress,
         props.sessionSize,
-        props.timeline,
-        props.timelineMode,
         props.forceReschedule,
         format
       );

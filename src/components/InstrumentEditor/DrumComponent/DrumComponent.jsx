@@ -11,6 +11,8 @@ import {
   Box,
 } from "@mui/material";
 
+import "./style.css";
+
 import { useTranslation } from "react-i18next";
 
 import { drumMapping } from "../../../services/MiscData";

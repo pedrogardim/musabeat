@@ -18,6 +18,7 @@ function useSession(options) {
   const [sessionData, setSessionData] = useState({});
   const [instruments, setInstruments] = useState([]);
   const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
+  const [instrumentsInfo, setInstrumentsInfo] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -40,8 +41,10 @@ function useSession(options) {
       hidden,
       user,
       sessionObject,
+      setIsLoaded,
       setInstruments,
       setInstrumentsLoaded,
+      setInstrumentsInfo,
       paramSetter
     );
   };
@@ -124,6 +127,7 @@ function useSession(options) {
   }, [instrumentsLoaded]);
 
   useEffect(() => {
+    console.log(instruments);
     instruments.forEach((e, i) => {
       if (tracks && tracks[i] && e) {
         e.volume.value = tracks[i].volume;
@@ -145,10 +149,13 @@ function useSession(options) {
     instruments,
     setInstruments,
     instrumentsLoaded,
+    setInstrumentsLoaded,
     isLoaded,
     action,
     isPlaying,
     scheduleTrack,
+    instrumentsInfo,
+    setInstrumentsInfo,
   };
 }
 
