@@ -225,13 +225,13 @@ function SessionWorkspace(props) {
     if (key === 8 && !params.openDialog) deleteSelection(ctxData);
     if (key >= 37 && key <= 40) handleArrowKey(e);
 
-    playFn.current[0](e);
+    if (params.selectedTrack !== null) playFn.current[0](e);
   };
 
   const handleKeyUp = (e) => {
     let key = e.keyCode;
     if (key === 18) paramSetter("cursorMode", null);
-    playFn.current[1](e);
+    if (params.selectedTrack !== null) playFn.current[1](e);
   };
 
   const handleArrowKey = (e) => {
@@ -257,7 +257,8 @@ function SessionWorkspace(props) {
   useEffect(() => {
     if (sessionData) {
       setSavingMode(sessionData.rte ? "rte" : "simple");
-      paramSetter("sessionSize", sessionData.size);
+      if (params.sessionSize || sessionData.size)
+        paramSetter("sessionSize", sessionData.size);
     }
   }, [sessionData]);
 
@@ -273,6 +274,8 @@ function SessionWorkspace(props) {
     ) {
       paramSetter("zoomPosition", (prev) => [prev[0], params.sessionSize - 1]);
     }
+    if (params.sessionSize || sessionData.size)
+      setSessionData((prev) => ({ ...prev, size: params.sessionSize }));
   }, [params.sessionSize]);
 
   useEffect(() => {

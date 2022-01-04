@@ -26,8 +26,6 @@ function Exporter(props) {
         sessionData,
         setIsReady,
         setExportProgress,
-        props.sessionSize,
-        props.forceReschedule,
         format
       );
       setOpen(false);
@@ -56,13 +54,6 @@ function Exporter(props) {
       </IconButton>
       {
         <Dialog open={open} onClose={() => setOpen(false)}>
-          {/* <IconButton
-            onClick={() => setOpen(false)}
-            className="mp-closebtn"
-            color="primary"
-          >
-            <Icon>close</Icon>
-          </IconButton> */}
           <div style={{ display: "flex", margin: 24 }}>
             {["mp3", "wav"].map((e, i) => (
               <Button key={e} color="primary" onClick={() => handleDownload(e)}>

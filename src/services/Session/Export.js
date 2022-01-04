@@ -4,7 +4,7 @@ import {
   scheduleAudioTrack,
 } from "../Session/Schedule";
 
-import { loadInstrument, loadEffect } from "../Instruments";
+import { loadEffect } from "../Instruments";
 
 import { encodeAudioFile } from "../Audio";
 
@@ -16,13 +16,13 @@ export const bounceSessionExport = async (
   sessionData,
   setIsReady,
   setExportProgress,
-  sessionSize,
-  forceReschedule,
   format
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
 
   setIsReady(false);
+
+  let sessionSize = sessionData.size;
 
   let exportDuration = sessionSize * Tone.Time("1m").toSeconds();
 
@@ -62,13 +62,13 @@ export const bounceSessionExport = async (
               instrumentBuffers[trackIndex];
             offlineInstruments[trackIndex].volume.value = track.volume;
 
-            /* scheduleSampler(
+            scheduleSampler(
               track.score,
               offlineInstruments[trackIndex],
               transport,
               track.id,
               sessionSize
-            ); */
+            );
             break;
           case 1:
             if (originalInstrument.name === "Sampler") {
@@ -77,9 +77,9 @@ export const bounceSessionExport = async (
               offlineInstruments[trackIndex]._buffers =
                 instrumentBuffers[trackIndex];
             } else {
-              /* offlineInstruments[trackIndex] = loadInstrument(
-                originalInstrument.get()
-              );*/
+              offlineInstruments[trackIndex] = new Tone[
+                originalInstrument.name
+              ](originalInstrument.get()).toDestination();
             }
             offlineInstruments[trackIndex].volume.value = track.volume;
 
@@ -96,12 +96,12 @@ export const bounceSessionExport = async (
               instrumentBuffers[trackIndex];
             offlineInstruments[trackIndex].volume.value = track.volume;
 
-            /* scheduleAudioTrack(
+            scheduleAudioTrack(
               track.score,
               offlineInstruments[trackIndex],
               transport,
               track.id
-            ); */
+            );
             break;
         }
         offlineInstruments[trackIndex].chain(
@@ -126,7 +126,7 @@ export const bounceSessionExport = async (
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
     downloadURI(url, `${sessionData.name}.${format.toLowerCase()}`);
-    forceReschedule();
+    //rescheduleWorkspace && rescheduleWorkspace();
     setIsReady(true);
 
     offlineInstruments.map((e) => e && e.dispose());

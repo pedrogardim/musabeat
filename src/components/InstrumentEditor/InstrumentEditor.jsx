@@ -118,11 +118,10 @@ function InstrumentEditor(props) {
   };
 
   const setInstrumentLoaded = (state) =>
-    setInstrumentsLoaded((prev) => {
-      let a = [...prev];
-      a[index] = state;
-      return a;
-    });
+    setInstrumentsLoaded((prev) => ({
+      ...prev,
+      [index]: state,
+    }));
 
   /* ================================= */
 
@@ -712,11 +711,7 @@ function InstrumentEditor(props) {
           inputProps={{ readOnly: true }}
         >
           <MenuItem value={checkCustomPatch ? "Custom" : track.instrument}>
-            {checkCustomPatch
-              ? "Custom"
-              : instrumentInfo &&
-                instrumentInfo.patch &&
-                instrumentInfo.patch.name}
+            {checkCustomPatch ? "Custom" : selectedPatch}
           </MenuItem>
         </Select>
 

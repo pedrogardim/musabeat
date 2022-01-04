@@ -108,18 +108,11 @@ function useSession(options) {
   }, [sessionData, instruments]);
 
   useEffect(() => {
-    setLoadingProgress(
-      Math.floor(
-        (Object.values(instrumentsLoaded).filter((e) => e !== false).length /
-          Object.values(instrumentsLoaded).length) *
-          100
-      )
-    );
-    if (
-      instrumentsLoaded &&
-      Object.values(instrumentsLoaded).every((val) => val === true) &&
-      !isLoaded
-    ) {
+    let progress =
+      Object.values(instrumentsLoaded).filter((e) => e !== false).length /
+      Object.values(instrumentsLoaded).length;
+    setLoadingProgress(Math.floor(progress * 100));
+    if (progress === 1) {
       hidden ? Tone.Transport.start() : Tone.Transport.pause();
       setIsLoaded(true);
       scheduleAllTracks();

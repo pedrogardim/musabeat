@@ -158,13 +158,13 @@ function useFirebaseConnection(ctx) {
 
       if (savingMode === "rte") {
         if (!isLastChangeFromServer) {
-          save(tracks, null);
+          save(tracks, sessionData);
         }
       }
     }
 
     setIsLastChangeFromServer(false);
-  }, [tracks]);
+  }, [tracks, sessionData]);
 
   useEffect(() => {
     //console.log("savingMode", savingMode, isLoaded, !!user, editMode);

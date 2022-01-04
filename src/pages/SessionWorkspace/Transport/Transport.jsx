@@ -25,7 +25,6 @@ function Transport(props) {
   const [time, setTime] = useState([]);
   const [timeAnimator, setTimeAnimator] = useState(null);
   const [selecting, setSelecting] = useState(null);
-  const [inputDelta, setInputDelta] = useState(null);
   const [paramsValue, setParamsValue] = useState({
     0: sessionSize,
     1: gridSize,
@@ -157,9 +156,6 @@ function Transport(props) {
     <>
       <Box
         className="ws-transport"
-        onClick={(e) =>
-          !e.target.className.includes("wstr-back") && setExpanded(true)
-        }
         tabIndex={-1}
         sx={(theme) => ({
           [theme.breakpoints.down("md")]: {
@@ -173,6 +169,7 @@ function Transport(props) {
             <IconButton
               className="wstr-back"
               onClick={() => paramSetter("selectedTrack", null)}
+              sx={{ width: 48, height: 48 }}
             >
               <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
@@ -194,7 +191,7 @@ function Transport(props) {
               </>
             ))}
         </Box>
-        <Box className="ws-transport-info">
+        <Box className="ws-transport-info" onClick={() => setExpanded(true)}>
           {sessionParams.map((e, i) => (
             <Box key={e.i}>
               <Icon
