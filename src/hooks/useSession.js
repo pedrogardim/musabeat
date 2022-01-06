@@ -149,6 +149,7 @@ function useSession(options) {
     scheduleTrack,
     instrumentsInfo,
     setInstrumentsInfo,
+    scheduleAllTracks,
   };
 }
 

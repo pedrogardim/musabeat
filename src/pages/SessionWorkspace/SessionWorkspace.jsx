@@ -93,6 +93,7 @@ function SessionWorkspace(props) {
     action,
     isPlaying,
     scheduleTrack,
+    scheduleAllTracks,
   } = useSession({ id: sessionKey, paramSetter });
 
   const [premiumMode, setPremiumMode] = useState(false);
@@ -422,7 +423,11 @@ function SessionWorkspace(props) {
         </div>
         {/* ================================================ */}
 
-        <OptionsBar areUnsavedChanges={areUnsavedChanges} save={save} />
+        <OptionsBar
+          areUnsavedChanges={areUnsavedChanges}
+          save={save}
+          scheduleAllTracks={scheduleAllTracks}
+        />
 
         <MobileCollapseButtons />
 
