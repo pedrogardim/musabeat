@@ -89,14 +89,6 @@ function PatchExplorer(props) {
 
   const itemsPerPage = 15;
 
-  const setTrackIntrument = (instr) => {
-    props.setInstruments((prev) => {
-      let newInstruments = [...prev];
-      newInstruments[props.index] = instr;
-      return newInstruments;
-    });
-  };
-
   const handlePatchSelect = (e, index) => {
     if (props.compact && !e.target.classList.contains("MuiIcon-root")) {
       props.updateFilesStatsOnChange();
@@ -414,43 +406,8 @@ function PatchExplorer(props) {
     }
   };
 
-  const playSequence = (input, i) => {
-    let instr = typeof input === "number" ? instruments[input] : input;
-    let index = i ? i : input;
-    setCurrentPlaying(index);
-    if (props.isDrum) {
-      let playerIndex = 0;
-      let keysArray = [];
-      instr._buffers._buffers.forEach((v, key) => {
-        keysArray.push(key);
-      });
-
-      keysArray.forEach((e, i) => {
-        i < 7 && instr.player(e).start("+" + i * 0.2);
-      });
-
-      Tone.Draw.schedule(() => {
-        setCurrentPlaying(null);
-      }, "+1.2");
-    } else {
-      instr
-        .triggerAttackRelease("C3", "8n", "+0:0:2")
-        .triggerAttackRelease("E3", "8n", "+0:1:0")
-        .triggerAttackRelease("G3", "8n", "+0:1:2")
-        .triggerAttackRelease("B3", "8n", "+0:2")
-        .triggerAttackRelease("C4", "8n", "+0:2:2")
-        .triggerAttackRelease("E4", "8n", "+0:3:0")
-        .triggerAttackRelease("G4", "8n", "+0:3:2")
-        .triggerAttackRelease("B4", "8n", "+1:0:0");
-
-      Tone.Draw.schedule(() => {
-        setCurrentPlaying(null);
-      }, "+1:0:2");
-    }
-  };
-
   const playPatch = (index) => {
-    /*  if (instruments[index] !== undefined) {
+    if (instruments[index] !== undefined) {
       let instr = instruments[index];
       setCurrentPlaying(index);
 
@@ -504,7 +461,7 @@ function PatchExplorer(props) {
         setCurrentPlaying(index);
         setLoadingPlay(null);
       }
-    } */
+    }
   };
 
   const stopPatch = (index) => {

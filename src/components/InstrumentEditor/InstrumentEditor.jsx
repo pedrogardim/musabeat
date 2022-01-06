@@ -20,7 +20,7 @@ import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 import SynthEditor from "./SynthEditor";
 import FileEditor from "./FileEditor";
-import PatchExplorer from "../PatchExplorer";
+import ListExplorer from "../ListExplorer";
 
 import NameInput from "../dialogs/NameInput";
 import NoteInput from "../dialogs/NoteInput";
@@ -768,8 +768,9 @@ function InstrumentEditor(props) {
       )}
 
       {patchExplorer && (
-        <PatchExplorer
+        <ListExplorer
           compact
+          type={isDrum ? "seq" : "instr"}
           patchExplorer={patchExplorer}
           index={index}
           track={track}
@@ -780,7 +781,6 @@ function InstrumentEditor(props) {
           setInstrumentLoaded={setInstrumentLoaded}
           setInstrumentsLoaded={setInstrumentsLoaded}
           saveUserPatch={saveUserPatch}
-          isDrum={isDrum}
           updateFilesStatsOnChange={updateFilesStatsOnChange}
         />
       )}
