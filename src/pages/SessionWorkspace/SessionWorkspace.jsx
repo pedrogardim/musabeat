@@ -210,7 +210,8 @@ function SessionWorkspace(props) {
   /*=====================================KEYEVENTS==========================================*/
 
   const handleKeyDown = (e) => {
-    if (params.openDialog === null) e.preventDefault();
+    if (params.openDialog !== null) return;
+    else e.preventDefault();
     Tone.start();
     let key = e.keyCode;
     if (e.ctrlKey || e.metaKey) {
@@ -228,7 +229,8 @@ function SessionWorkspace(props) {
   };
 
   const handleKeyUp = (e) => {
-    if (params.openDialog === null) e.preventDefault();
+    if (params.openDialog !== null) return;
+    else e.preventDefault();
     let key = e.keyCode;
     if (key === 18) paramSetter("cursorMode", null);
     if (params.selectedTrack !== null && playFn.current) playFn.current[1](e);
