@@ -43,7 +43,7 @@ function useFirebaseConnection(ctx) {
     hidden,
     editMode,
     pendingUploadFiles,
-    setUploadFiles,
+    setUploadingFiles,
     setInstrumentsLoaded,
     setInstruments,
     setNotifications,
@@ -59,7 +59,7 @@ function useFirebaseConnection(ctx) {
 
   const triggerSave = (tracks, sessionData) => {
     if (pendingUploadFiles.length > 0)
-      setUploadFiles(
+      setUploadingFiles(
         pendingUploadFiles.filter(
           (file) =>
             tracks[file.track].score.findIndex((e) => e.clip === file.index) !==
@@ -88,9 +88,7 @@ function useFirebaseConnection(ctx) {
           !snapshot.metadata.hasPendingWrites &&
             updateFromDatabase(snapshot.data());
         },
-        (er) => {
-          console.log("onSnapshot Error:", er);
-        }
+        (er) => console.log("onSnapshot Error:", er)
       );
 
       setRTEListener(() => () => listener());

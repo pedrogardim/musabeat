@@ -220,16 +220,6 @@ function SessionSettings(props) {
 
             <Grid container item direction="column" sm={6}>
               <Grid item>
-                <Typography variant="overline">Tempo</Typography>
-                <Slider
-                  min={40}
-                  max={300}
-                  defaultValue={newSessionData.bpm}
-                  valueLabelDisplay="auto"
-                  onChangeCommitted={handleBpmChange}
-                />
-              </Grid>
-              <Grid item>
                 <Typography variant="overline">
                   {t("track.settings.sessionScale")}
                 </Typography>

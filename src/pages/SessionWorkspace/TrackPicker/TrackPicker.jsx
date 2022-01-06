@@ -143,6 +143,7 @@ function TrackPicker(props) {
             label={t(`trackPicker.types.${i}.name`)}
             key={e.name}
             icon={<Icon>{e.icon}</Icon>}
+            style={{ backgroundColor: "transparent" }}
           />
         ))}
       </BottomNavigation>

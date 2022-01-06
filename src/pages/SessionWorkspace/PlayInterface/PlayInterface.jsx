@@ -117,7 +117,7 @@ function PlayInterface(props) {
   }, [pressedKeys, playingOctave]);
 
   useEffect(() => {
-    console.log(pressedKeys);
+    //console.log(pressedKeys);
   }, [pressedKeys]);
 
   return (
@@ -154,8 +154,7 @@ function PlayInterface(props) {
                     className="ws-note-input-key"
                     onMouseDown={() => playNote(null, i)}
                     onMouseLeave={() => releaseNote(null, i)}
-                    onMouseLeave={() => releaseNote(null, i)}
-                    onClick={() => releaseNote(null, i)}
+                    onMouseUp={() => releaseNote(null, i)}
                     elevation={
                       trackRows[i] && !instrument.has(trackRows[i].note) ? 1 : 4
                     }

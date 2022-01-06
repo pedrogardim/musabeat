@@ -39,15 +39,14 @@ function ChannelStrip(props) {
         onChangeCommitted={handleSliderStop}
         orientation="vertical"
         className="channel-strip-fader"
-      />{" "}
+      />
       <IconButton onClick={props.handleMute}>
         <Icon>{props.track.muted ? "volume_off" : "volume_up"}</Icon>
       </IconButton>
-      <Typography variant="overline" style={{ textTransform: "none" }}>
-        {" "}
+      <Typography color="textPrimary" style={{ textTransform: "none" }}>
         {props.track.muted ? "MUTED" : volume + " dB"}
       </Typography>
-      <Typography variant="overline" className="mixer-channel-strip-title">
+      <Typography color="textPrimary" className="mixer-channel-strip-title">
         {props.track.name
           ? props.track.name
           : t(`trackPicker.types.${props.track.type}.name`)}

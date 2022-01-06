@@ -187,23 +187,20 @@ function SessionWorkspace(props) {
   /*===================================PLAYING==============================================*/
 
   const toggleRecording = (e) => {
-    if (params.isRecording !== "rec") {
-      if (isPlaying) {
-        Tone.Transport.pause();
-        let newTime = `${
-          Tone.Time(Tone.Transport.seconds)
-            .toBarsBeatsSixteenths()
-            .split(":")[0] - 1
-        }:0:0`;
+    if (!params.isRecording) {
+      if (isPlaying) action("pause");
 
-        newTime = Tone.Time(newTime).toSeconds() < 0 ? "0:0:0" : newTime;
-        Tone.Transport.position = newTime;
-        Tone.Transport.start();
-      }
+      let newTime = `${
+        Tone.Time(Tone.Transport.seconds)
+          .toBarsBeatsSixteenths()
+          .split(":")[0] - 1
+      }:0:0`;
+      newTime = Tone.Time(newTime).toSeconds() < 0 ? "0:0:0" : newTime;
+      Tone.Transport.position = newTime;
+      action("play");
 
       paramSetter("isRecording", true);
     } else {
-      Tone.Transport.pause();
       paramSetter("isRecording", false);
       action("pause");
     }
@@ -212,6 +209,7 @@ function SessionWorkspace(props) {
   /*=====================================KEYEVENTS==========================================*/
 
   const handleKeyDown = (e) => {
+    if (params.openDialog === null) e.preventDefault();
     Tone.start();
     let key = e.keyCode;
     if (e.ctrlKey || e.metaKey) {
@@ -225,17 +223,17 @@ function SessionWorkspace(props) {
     if (key === 8 && !params.openDialog) deleteSelection(ctxData);
     if (key >= 37 && key <= 40) handleArrowKey(e);
 
-    if (params.selectedTrack !== null) playFn.current[0](e);
+    if (params.selectedTrack !== null && playFn.current) playFn.current[0](e);
   };
 
   const handleKeyUp = (e) => {
+    if (params.openDialog === null) e.preventDefault();
     let key = e.keyCode;
     if (key === 18) paramSetter("cursorMode", null);
-    if (params.selectedTrack !== null) playFn.current[1](e);
+    if (params.selectedTrack !== null && playFn.current) playFn.current[1](e);
   };
 
   const handleArrowKey = (e) => {
-    e.preventDefault();
     let key = e.keyCode;
     if (key === 38) paramSetter("sessionSize", (p) => (p === 128 ? p : p + 1));
     if (key === 40) paramSetter("sessionSize", (p) => (p === 1 ? p : p - 1));

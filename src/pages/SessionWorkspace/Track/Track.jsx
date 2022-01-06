@@ -42,6 +42,7 @@ function Track(props) {
     paramSetter,
     instrumentsInfo,
     setInstrumentsInfo,
+    action,
   } = useContext(wsCtx);
 
   const {
@@ -206,7 +207,7 @@ function Track(props) {
       return newII;
     });
 
-    paramSetter("openDialog", null)(null);
+    paramSetter("openDialog", null);
   };
 
   /* =============================MOUSE EVENTS========================================= */
@@ -478,6 +479,7 @@ function Track(props) {
       className="track-grid-row-wrapper"
       ref={rowWrapperRef}
       onWheel={handleWheel}
+      disabled
       tabIndex={-1}
       style={{
         overflowY: trackType === 1 && "overlay",
@@ -494,12 +496,12 @@ function Track(props) {
         onMouseUp={handleMouseUp}
         disabled
         tabIndex={-1}
-        /*         style={{ maxHeight: trackType === 1 && trackRows.length * 17 * zoomY }}
-         */
       >
         {trackRows.map((row, rowIndex) => (
           <Box
             className="track-inner-row"
+            disabled
+            tabIndex={-1}
             sx={(theme) => ({
               //borderTop: trackType === 1 && "1px solid rgba(0, 0, 0,0.2)",
               boxShadow: theme.palette.mode === "light" && 0,
@@ -515,13 +517,16 @@ function Track(props) {
               bgcolor:
                 trackType === 1 &&
                 (rowIndex % 12 === 2 ||
-                  rowIndex % 12 === 4 ||
-                  rowIndex % 12 === 6 ||
-                  rowIndex % 12 === 9 ||
-                  rowIndex % 12 === 11) &&
-                (theme.palette.mode === "dark"
+                rowIndex % 12 === 4 ||
+                rowIndex % 12 === 6 ||
+                rowIndex % 12 === 9 ||
+                rowIndex % 12 === 11
+                  ? theme.palette.mode === "dark"
+                    ? ""
+                    : colors[track.color][800] + "3a"
+                  : theme.palette.mode === "dark"
                   ? "rgba(255,255,255,0.08)"
-                  : colors[track.color][800] + "3a"),
+                  : ""),
             })}
             key={rowIndex}
           >
@@ -585,28 +590,14 @@ function Track(props) {
                 trackInstrument &&
                 trackInstrument.has(note.clip) && (
                   <AudioClip
-                    key={noteIndex}
                     rowRef={rowRef}
-                    trackRows={trackRows}
-                    note={note}
                     player={trackInstrument.player(note.clip)}
-                    drawingNote={drawingNote}
-                    track={track}
-                    sessionSize={sessionSize}
-                    gridSize={gridSize}
-                    gridPos={gridPos}
                     deletableNote={deletableNote}
                     setDrawingNote={setDrawingNote}
                     index={noteIndex}
-                    setTracks={setTracks}
-                    isMouseDown={isMouseDown}
-                    selectedTrack={selectedTrack}
-                    selectedNotes={selectedNotes}
-                    zoomPosition={zoomPosition}
-                    fileInfo={instrumentInfo.filesInfo[note.clip]}
-                    movingSelDelta={movingSelDelta}
                     floatPos={floatPos}
-                    loaded={true}
+                    note={note}
+                    isMouseDown={isMouseDown}
                   />
                 )
               )
@@ -653,14 +644,10 @@ function Track(props) {
 
             {isRecording && drawingNote && (
               <AudioClip
-                recording
+                isRecClip
                 note={drawingNote}
                 rowRef={rowRef}
-                trackRows={trackRows}
-                zoomPosition={zoomPosition}
                 player={{ buffer: { loaded: "" } }}
-                track={track}
-                fileInfo={{}}
               />
             )}
           </>
@@ -671,7 +658,7 @@ function Track(props) {
         <FileEditor
           audioTrack
           open={openDialog === "addFile"}
-          onClose={() => paramSetter("openDialog", null)(false)}
+          onClose={() => paramSetter("openDialog", null)}
           exists={false}
           instrument={trackInstrument}
           onFileClick={onFileClick}

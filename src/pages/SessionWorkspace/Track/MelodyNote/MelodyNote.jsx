@@ -5,7 +5,7 @@ import { IconButton, Icon } from "@mui/material";
 
 import { colors } from "../../../../utils/Pallete";
 
-import { SessionWorkspaceContext } from "../../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../../context/SessionWorkspaceContext";
 
 function MelodyNote(props) {
   const {
@@ -26,9 +26,7 @@ function MelodyNote(props) {
   const [noteNote, setNoteNote] = useState(note && note.note);
   const [noteDuration, setNoteDuration] = useState(note && note.duration);
 
-  const { tracks, setTracks, params, setParams } = useContext(
-    SessionWorkspaceContext
-  );
+  const { tracks, setTracks, params, paramSetter } = useContext(wsCtx);
 
   const {
     trackRows,
@@ -41,7 +39,10 @@ function MelodyNote(props) {
 
   const track = tracks[selectedTrack];
 
-  const isSelected = selNotes && selNotes.includes(index);
+  const isSelected =
+    selNotes &&
+    selNotes[selectedTrack] &&
+    selNotes[selectedTrack].includes(index);
 
   let zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
@@ -85,12 +86,10 @@ function MelodyNote(props) {
             Tone.Time("1m").toSeconds()
       );
 
-      setParams((prev) => {
-        let newParams = { ...prev };
-        let newNotes = [];
+      paramSetter("selNotes", (prev) => {
+        let newNotes = [...prev];
         newNotes[selectedTrack] = [index];
-        newParams.selNotes = newNotes;
-        return newParams;
+        return newNotes;
       });
     }
 
@@ -230,7 +229,7 @@ function MelodyNote(props) {
         />
       )}
 
-      {isSelected && selNotes.length === 1 && (
+      {isSelected && selNotes[selectedTrack].length === 1 && (
         <>
           <IconButton
             onMouseDown={deleteNote}

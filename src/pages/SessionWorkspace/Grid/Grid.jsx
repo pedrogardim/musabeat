@@ -36,6 +36,7 @@ function Grid(props) {
     selNotes,
     movingSelDelta,
     sessionSize,
+    isRecording,
   } = params;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
@@ -160,7 +161,11 @@ function Grid(props) {
     paramSetter(
       "selNotes",
       tracks.map((mod, modIndex) => {
-        if (selectedTrack !== null && selectedTrack !== modIndex) return [];
+        if (
+          (selectedTrack !== null && selectedTrack !== modIndex) ||
+          selection[1] === null
+        )
+          return [];
         let notes = [];
         for (let x = 0; x < mod.score.length; x++) {
           let note = mod.score[x];
@@ -276,7 +281,7 @@ function Grid(props) {
         >
           <Box
             className={"ws-grid-cursor"}
-            sx={{ bgcolor: playing === "rec" ? "secondary" : "text.primary" }}
+            sx={{ bgcolor: isRecording ? "pallete.secondary" : "text.primary" }}
             style={{
               pointerEvents: isMouseDown && "none",
             }}
