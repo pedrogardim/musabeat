@@ -40,6 +40,8 @@ export const useListQuery = (props) => {
         )
       : [];
 
+    console.log(itemIdList);
+
     const queryRules = () => {
       let rules = firebase.firestore().collection(typeDBMapping[type]);
 
@@ -57,17 +59,19 @@ export const useListQuery = (props) => {
       }
 
       return userPage
-        ? rules.limit(itemsPerPage).get()
-        : Promise.all(
+        ? Promise.all(
             itemIdList.map((e) =>
               firebase.firestore().collection(typeDBMapping[type]).doc(e).get()
             )
-          );
+          )
+        : rules.limit(itemsPerPage).get();
     };
 
     const queryResult = await queryRules();
 
-    const queryDocs = userPage ? queryResult.docs : queryResult;
+    console.log(queryResult);
+
+    const queryDocs = !userPage ? queryResult.docs : queryResult;
 
     if (!userPage) {
       setLastItem(queryDocs[queryDocs.length - 1]);
@@ -148,7 +152,7 @@ export const useListQuery = (props) => {
     if (!isLoading) {
       queryItems("clear");
     }
-    console.log(searchTags, searchValue);
+    //console.log(searchTags, searchValue);
   }, [searchTags, searchValue]);
 
   return { isLoading, isQueryEnd, queryItems };
