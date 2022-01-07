@@ -182,8 +182,7 @@ function ListExplorerRow(props) {
                           clickable={chipIndex !== 0}
                           onClick={(e) =>
                             !!userPage
-                              ? chipIndex !== 0 &&
-                                setTagSelectionTarget([
+                              ? setTagSelectionTarget([
                                   e.target,
                                   index,
                                   chipIndex,

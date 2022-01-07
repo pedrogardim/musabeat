@@ -40,7 +40,7 @@ export const useListQuery = (props) => {
         )
       : [];
 
-    console.log(itemIdList);
+    //console.log(itemIdList);
 
     const queryRules = () => {
       let rules = firebase.firestore().collection(typeDBMapping[type]);
@@ -69,7 +69,7 @@ export const useListQuery = (props) => {
 
     const queryResult = await queryRules();
 
-    console.log(queryResult);
+    //console.log(queryResult);
 
     const queryDocs = !userPage ? queryResult.docs : queryResult;
 
@@ -117,7 +117,7 @@ export const useListQuery = (props) => {
       user: userData[e.data()[type === "files" ? "user" : "creator"]],
     }));
 
-    console.log(queryItems);
+    //console.log(queryItems);
 
     setItems((prev) => (userPage ? [...queryItems] : [...prev, ...queryItems]));
 

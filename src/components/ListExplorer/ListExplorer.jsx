@@ -42,12 +42,12 @@ import {
   selectTag,
 } from "./services/Actions";
 
-const fileTagDrumComponents = Object.keys(fileTags).filter(
+/* const fileTagDrumComponents = Object.keys(fileTags).filter(
   (_, i) => i > 4 && i < 20
 );
 const fileTagDrumGenres = Object.keys(fileTags).filter(
   (_, i) => i >= 20 && i < 24
-);
+); */
 
 const typeDBMapping = {
   files: "files",
@@ -332,24 +332,20 @@ function ListExplorer(props) {
         </Fab>
       )}
 
-      {userPage && (
+      {userPage && tagSelectionTarget && (
         <Menu
           anchorEl={tagSelectionTarget && tagSelectionTarget[0]}
           keepMounted
           open={Boolean(tagSelectionTarget)}
           onClose={() => setTagSelectionTarget(null)}
         >
-          {tagSelectionTarget && tagSelectionTarget[2] === 1
-            ? fileTagDrumComponents.map((e, i) => (
-                <MenuItem key={e} onClick={() => handleTagSelect(e)}>
-                  {fileTags[e]}
-                </MenuItem>
-              ))
-            : fileTagDrumGenres.map((e, i) => (
-                <MenuItem key={e} onClick={() => handleTagSelect(e)}>
-                  {fileTags[e]}
-                </MenuItem>
-              ))}
+          {Object.keys(fileTags)
+            .filter((e) => !items[tagSelectionTarget[1]].data.categ.includes(e))
+            .map((e, i) => (
+              <MenuItem key={e} onClick={() => handleTagSelect(e)}>
+                {fileTags[e]}
+              </MenuItem>
+            ))}
         </Menu>
       )}
 

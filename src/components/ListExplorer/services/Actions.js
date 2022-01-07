@@ -106,25 +106,22 @@ export const handleDownload = (row) => {
 export const deleteItem = (index, items, setItems, collection) => {
   let itemId = items[index].id;
 
-  firebase
-    .storage()
-    .ref(itemId)
-    .delete()
-    .then(() => {
-      setItems((prev) => prev.filter((e, i) => i !== index));
-      firebase.firestore().collection(collection).doc(itemId).delete();
+  firebase.storage().ref(itemId).delete();
 
-      firebase
-        .firestore()
-        .collection("users")
-        .doc(items[index].data.user)
-        .update({
-          [collection]: firebase.firestore.FieldValue.arrayRemove(itemId),
-          sp: firebase.firestore.FieldValue.increment(
-            collection === "files" ? -items[index].data.size : 0
-          ),
-        });
+  firebase.firestore().collection(collection).doc(itemId).delete();
+
+  firebase
+    .firestore()
+    .collection("users")
+    .doc(items[index].data.user)
+    .update({
+      [collection]: firebase.firestore.FieldValue.arrayRemove(itemId),
+      sp: firebase.firestore.FieldValue.increment(
+        collection === "files" ? -items[index].data.size : 0
+      ),
     });
+
+  setItems((prev) => prev.filter((e, i) => i !== index));
 };
 
 export const renameItem = (index, newValue, items, setItems, collection) => {
