@@ -175,7 +175,7 @@ function FilePage(props) {
       usersRef
         .doc(user.uid)
         .get()
-        .then((r) => setIsFileLiked(r.data().likedFiles.includes(fileKey)));
+        .then((r) => setIsFileLiked(r.data().likedfiles.includes(fileKey)));
     }
   };
 
@@ -230,7 +230,7 @@ function FilePage(props) {
         likes: firebase.firestore.FieldValue.increment(1),
       });
       usersRef.doc(user.uid).update({
-        likedFiles: firebase.firestore.FieldValue.arrayUnion(fileKey),
+        likedfiles: firebase.firestore.FieldValue.arrayUnion(fileKey),
       });
     } else {
       setIsFileLiked(false);
@@ -243,7 +243,7 @@ function FilePage(props) {
         likes: firebase.firestore.FieldValue.increment(-1),
       });
       usersRef.doc(user.uid).update({
-        likedFiles: firebase.firestore.FieldValue.arrayRemove(fileKey),
+        likedfiles: firebase.firestore.FieldValue.arrayRemove(fileKey),
       });
     }
   };
@@ -293,7 +293,7 @@ function FilePage(props) {
     <div className="file-page">
       {fileInfo !== undefined ? (
         <>
-          <Typography variant="h4">
+          <Typography variant="h4" color="textPrimary">
             {fileInfo
               ? `${fileInfo.name}.${fileExtentions[fileInfo.type]}`
               : "..."}

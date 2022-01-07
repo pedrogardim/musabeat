@@ -26,6 +26,12 @@ import {
   drumCategories,
 } from "../../../services/MiscData";
 
+const typeURLMapping = {
+  files: "file",
+  seq: "drumset",
+  instr: "instrument",
+};
+
 function ListExplorerRow(props) {
   const {
     row,
@@ -54,7 +60,7 @@ function ListExplorerRow(props) {
   const playRow = () =>
     play(instrument, type, setIsPlaying, row, setInstrument, setIsLoading);
 
-  const stopRow = () => stop(instrument, type, setIsPlaying);
+  const stopRow = () => stop(instrument, setIsPlaying);
 
   useEffect(() => {
     return () => {
@@ -118,7 +124,7 @@ function ListExplorerRow(props) {
               color:
                 row.data.size + props.patchSize >= patchSizeLimit && "darkgrey",
             }} */
-            onClick={(ev) => handlePageNav("file", row.id, ev)}
+            onClick={(ev) => handlePageNav(typeURLMapping[type], row.id, ev)}
           >
             {row.data.name}
           </Typography>

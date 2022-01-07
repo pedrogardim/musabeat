@@ -68,6 +68,7 @@ function ListExplorer(props) {
     setFileExplorer,
     selectedItem,
     saveUserPatch,
+    handlePageNav,
   } = props;
 
   const [items, setItems] = useState([]);
@@ -291,6 +292,7 @@ function ListExplorer(props) {
                   setSearchTags={setSearchTags}
                   setTagSelectionTarget={setTagSelectionTarget}
                   handleLike={handleLike}
+                  handlePageNav={handlePageNav}
                 />
               ))}
               {isLoading &&

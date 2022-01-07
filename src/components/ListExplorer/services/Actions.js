@@ -32,7 +32,7 @@ export const play = async (
 
   if (type === "seq" || type === "instr") {
     if (instrument !== null) {
-      playSequence(instrument, type, setIsPlaying);
+      playSequence(instrument, setIsPlaying);
     } else {
       setIsLoading(true);
       let player = await (type === "seq"
@@ -40,7 +40,7 @@ export const play = async (
         : patchLoader(row.data, row.id, () => {}));
 
       player.onLoad = () => {
-        playSequence(player, type, setIsPlaying);
+        playSequence(player, setIsPlaying);
         setIsLoading(false);
       };
       setInstrument(player);
@@ -48,9 +48,9 @@ export const play = async (
   }
 };
 
-const playSequence = (instr, type, setIsPlaying) => {
+export const playSequence = (instr, setIsPlaying) => {
   setIsPlaying(true);
-  if (type === "seq") {
+  if (instr.name === "Players") {
     let keysArray = [];
     instr._buffers._buffers.forEach((v, key) => {
       keysArray.push(key);
@@ -80,10 +80,10 @@ const playSequence = (instr, type, setIsPlaying) => {
   }
 };
 
-export const stop = (instrument, type, setIsPlaying) => {
-  if (type === "files") instrument.stop();
-  if (type === "instr") instrument.releaseAll();
-  if (type === "seq") instrument.stopAll();
+export const stop = (instr, setIsPlaying) => {
+  if (instr.name === "Player") instr.stop();
+  else if (instr.name === "Players") instr.stopAll();
+  else instr.releaseAll();
   setIsPlaying(false);
 };
 

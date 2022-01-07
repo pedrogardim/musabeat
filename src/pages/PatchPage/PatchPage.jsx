@@ -23,7 +23,12 @@ import "./style.css";
 
 import { detectPitch } from "../../services/Audio";
 
-import { loadInstrument } from "../../services/Instruments";
+import {
+  playSequence,
+  stop,
+} from "../../components/ListExplorer/services/Actions";
+
+import { playersLoader, patchLoader } from "../../services/Instruments";
 
 import { drumCategories, instrumentsCategories } from "../../services/MiscData";
 
@@ -60,6 +65,8 @@ function PatchPage(props) {
 
   const waveformWrapper = useRef(null);
 
+  const { isDrum } = props;
+
   const [instrument, setInstrument] = useState(null);
   const [patchInfo, setPatchInfo] = useState(null);
   const [creatorInfo, setCreatorInfo] = useState(null);
@@ -79,14 +86,21 @@ function PatchPage(props) {
 
   const patchKey = useParams().key;
 
-  const categories = props.isDrum ? drumCategories : instrumentsCategories;
+  const categories = isDrum ? drumCategories : instrumentsCategories;
 
   const usersRef = firebase.firestore().collection("users");
   const patchInfoRef = firebase
     .firestore()
-    .collection(props.isDrum ? "drumpatches" : "patches")
+    .collection(isDrum ? "drumpatches" : "patches")
     .doc(patchKey);
   const user = firebase.auth().currentUser;
+
+  const loadInstrument = async (data) => {
+    const instrument = await (isDrum
+      ? playersLoader(data, 0, () => setIsLoaded(true))
+      : patchLoader(data, 0, () => setIsLoaded(true)));
+    setInstrument(instrument);
+  };
 
   const getPatchInfo = () => {
     patchInfoRef.get().then((r) => {
@@ -125,84 +139,12 @@ function PatchPage(props) {
         .get()
         .then((r) =>
           setIsPatchLiked(
-            props.isDrum
-              ? r.data().likedDrumPatches.includes(patchKey)
-              : r.data().likedPatches.includes(patchKey)
+            isDrum
+              ? r.data().likeddrumpatches.includes(patchKey)
+              : r.data().likedpatches.includes(patchKey)
           )
         );
     }
-  };
-
-  const loadInstrument = (patchdata) => {
-    /*  if (props.isDrum) {
-      loadSequencerInstrument(
-        patchdata,
-        () => {},
-        0,
-        () => {
-          setIsLoaded(true);
-        },
-        () => {},
-        setNotifications
-      ).then((instr) => {
-        setInstrument(instr);
-      });
-    } else if (patchdata.base === "Sampler") {
-      loadSamplerFromObject(
-        patchdata,
-        () => {},
-        0,
-        () => {
-          setIsLoaded(true);
-        },
-        setNotifications
-      ).then((instr) => {
-        setInstrument(instr);
-      });
-    } else {
-      let instr = loadSynthFromGetObject(patchdata);
-
-      setInstrument(instr);
-      setIsLoaded(true);
-    } */
-  };
-
-  const playSequence = () => {
-    setIsPlaying(true);
-    if (props.isDrum) {
-      let playerIndex = 0;
-      let keysArray = [];
-      instrument._buffers._buffers.forEach((v, key) => {
-        keysArray.push(key);
-      });
-
-      keysArray.forEach((e, i) => {
-        i < 7 && instrument.player(e).start("+" + i * 0.2);
-      });
-
-      Tone.Draw.schedule(() => {
-        setIsPlaying(false);
-      }, "+1.2");
-    } else {
-      instrument
-        .triggerAttackRelease("C3", "8n", "+0:0:2")
-        .triggerAttackRelease("E3", "8n", "+0:1:0")
-        .triggerAttackRelease("G3", "8n", "+0:1:2")
-        .triggerAttackRelease("B3", "8n", "+0:2")
-        .triggerAttackRelease("C4", "8n", "+0:2:2")
-        .triggerAttackRelease("E4", "8n", "+0:3:0")
-        .triggerAttackRelease("G4", "8n", "+0:3:2")
-        .triggerAttackRelease("B4", "8n", "+1:0:0");
-
-      Tone.Draw.schedule(() => {
-        setIsPlaying(false);
-      }, "+1:0:2");
-    }
-  };
-
-  const stopSequence = () => {
-    !props.isDrum ? instrument.releaseAll() : instrument.stopAll();
-    setIsPlaying(false);
   };
 
   const handleUserLike = () => {
@@ -218,13 +160,13 @@ function PatchPage(props) {
         likes: firebase.firestore.FieldValue.increment(1),
       });
       usersRef.doc(user.uid).update(
-        props.isDrum
+        isDrum
           ? {
-              likedDrumPatches:
+              likeddrumpatches:
                 firebase.firestore.FieldValue.arrayUnion(patchKey),
             }
           : {
-              likedPatches: firebase.firestore.FieldValue.arrayUnion(patchKey),
+              likedpatches: firebase.firestore.FieldValue.arrayUnion(patchKey),
             }
       );
     } else {
@@ -238,13 +180,13 @@ function PatchPage(props) {
         likes: firebase.firestore.FieldValue.increment(-1),
       });
       usersRef.doc(user.uid).update(
-        props.isDrum
+        isDrum
           ? {
-              likedDrumPatches:
+              likeddrumpatches:
                 firebase.firestore.FieldValue.arrayRemove(patchKey),
             }
           : {
-              likedPatches: firebase.firestore.FieldValue.arrayRemove(patchKey),
+              likedpatches: firebase.firestore.FieldValue.arrayRemove(patchKey),
             }
       );
     }
@@ -268,7 +210,7 @@ function PatchPage(props) {
     let slotToInsetFile = 0;
 
     while (
-      props.isDrum &&
+      isDrum &&
       Object.keys(patchInfo.urls).indexOf(JSON.stringify(slotToInsetFile)) !==
         -1
     ) {
@@ -279,18 +221,18 @@ function PatchPage(props) {
     onInstrumentMod(fileId, labelOnInstrument, slotToInsetFile);
 
     instrument.add(
-      props.isDrum ? slotToInsetFile : labelOnInstrument,
+      isDrum ? slotToInsetFile : labelOnInstrument,
       audiobuffer ? audiobuffer : fileUrl
       //() => setInstrumentLoaded(true)
     );
   };
 
   const onInstrumentMod = (url, name, soundindex, isRemoving) => {
-    if (props.isDrum || instrument.name === "Sampler") {
+    if (isDrum || instrument.name === "Sampler") {
       setPatchInfo((prev) => {
         let newPatchInfo = { ...prev };
 
-        if (props.isDrum) {
+        if (isDrum) {
           !isRemoving
             ? (newPatchInfo.urls[soundindex] = url)
             : delete newPatchInfo.urls[soundindex];
@@ -316,7 +258,7 @@ function PatchPage(props) {
 
   const savePatchChanges = () => {
     // alert confirmation
-    props.isDrum || instrument.name === "Sampler"
+    isDrum || instrument.name === "Sampler"
       ? patchInfoRef.update({
           base:
             instrument.name === "Sampler"
@@ -435,7 +377,7 @@ function PatchPage(props) {
   }, [patchInfo]);
 
   useEffect(() => {
-    !props.isDrum && initializeMidi();
+    !isDrum && initializeMidi();
     console.log(instrument);
   }, [instrument]);
 
@@ -465,7 +407,7 @@ function PatchPage(props) {
     >
       {instrument && patchInfo !== undefined ? (
         <>
-          <Typography variant="h4">
+          <Typography variant="h4" color="textPrimary">
             {patchInfo ? patchInfo.name : "..."}
           </Typography>
           {patchInfo && patchInfo.base === "Sampler" && (
@@ -496,11 +438,12 @@ function PatchPage(props) {
               justifyContent: "center",
             }}
           >
-            {isLoaded ? (
+            {/* TODO */}
+            {/* isLoaded ? (
               <InstrumentEditor
                 patchPage
                 track={{
-                  type: props.isDrum ? 0 : 1,
+                  type: isDrum ? 0 : 1,
                   instrument: { urls: patchInfo.urls, ...patchInfo.options },
                   lbls: patchInfo.lbls,
                 }}
@@ -516,7 +459,7 @@ function PatchPage(props) {
               />
             ) : (
               <CircularProgress />
-            )}
+            ) */}
           </Paper>
 
           <div className="break" />
@@ -531,7 +474,13 @@ function PatchPage(props) {
           <div className="break" />
 
           <div className="player-controls">
-            <IconButton onClick={isPlaying ? stopSequence : playSequence}>
+            <IconButton
+              onClick={() =>
+                isPlaying
+                  ? stop(instrument, setIsPlaying)
+                  : playSequence(instrument, setIsPlaying)
+              }
+            >
               <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
             </IconButton>
 
@@ -575,7 +524,7 @@ function PatchPage(props) {
             </div>
           )}
 
-          {!props.isDrum && (
+          {!isDrum && (
             <Keyboard
               style={{
                 width: "80vw",
@@ -601,7 +550,7 @@ function PatchPage(props) {
         <NotFoundPage
           type="patchPage"
           handlePageNav={() =>
-            props.handlePageNav(props.isDrum ? "drumsets" : "instruments")
+            props.handlePageNav(isDrum ? "drumsets" : "instruments")
           }
         />
       )}
