@@ -32,8 +32,6 @@ import HomePage from "./pages/HomePage";
 import SessionWorkspace from "./pages/SessionWorkspace";
 
 import SessionExplorer from "./components/SessionExplorer";
-//import FileExplorer from "./components/FileExplorer";
-//import PatchExplorer from "./components/PatchExplorer";
 import ListExplorer from "./components/ListExplorer";
 import FilePage from "./pages/FilePage";
 import PatchPage from "./pages/PatchPage";

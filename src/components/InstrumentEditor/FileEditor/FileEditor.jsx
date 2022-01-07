@@ -19,7 +19,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 
-import FileExplorer from "../../FileExplorer";
+import ListExplorer from "../../ListExplorer";
 
 const tagTypeMapping = {
   0: 5,
@@ -84,7 +84,7 @@ function FileEditor(props) {
       {!(props.exists && props.instrument.name === "Sampler") && (
         <>
           <Box className="file-editor-column">
-            <FileExplorer
+            <ListExplorer
               compact
               fileEditor
               audioTrack={props.audioTrack}
