@@ -21,14 +21,19 @@ function PlayInterface(props) {
   const [playingOctave, setPlayingOctave] = useState(3);
   const [pressedKeys, setPressedKeys] = useState([]);
 
-  const { params, instruments, tracks, setTracks } = useContext(wsCtx);
+  const { playFn, workspace } = props;
 
-  const { playFn } = props;
+  const wsCtxData = useContext(wsCtx);
 
-  const { expanded, selectedTrack, trackRows, gridSize, isRecording } = params;
+  const { params, instruments, tracks, setTracks } = workspace
+    ? wsCtxData
+    : props;
 
-  const instrument = instruments[selectedTrack];
-  const track = tracks[selectedTrack];
+  const { expanded, selectedTrack, trackRows, gridSize, isRecording } =
+    workspace ? params : props;
+
+  const instrument = workspace ? instruments[selectedTrack] : props.instrument;
+  const track = workspace ? tracks[selectedTrack] : props.track;
 
   const keyMapping =
     selectedTrack !== null && track.type === 0
@@ -40,8 +45,7 @@ function PlayInterface(props) {
 
     if (sampleIndex === undefined || selectedTrack === null) return;
 
-    let note =
-      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
+    let note = sampleIndex + (track.type === 1 ? playingOctave * 12 : 0);
 
     if (pressedKeys.includes(note)) return;
 
@@ -94,8 +98,7 @@ function PlayInterface(props) {
 
     if (sampleIndex === undefined || selectedTrack === null) return;
 
-    let note =
-      sampleIndex + (tracks[selectedTrack].type === 1 ? playingOctave * 12 : 0);
+    let note = sampleIndex + (track.type === 1 ? playingOctave * 12 : 0);
 
     if (!pressedKeys.includes(note)) return;
 
@@ -125,8 +128,8 @@ function PlayInterface(props) {
       className="ws-note-input"
       sx={(theme) => ({
         [theme.breakpoints.down("md")]: {
-          position: !expanded.instr && "fixed",
-          bottom: !expanded.instr && "-128px",
+          position: expanded && !expanded.instr && "fixed",
+          bottom: expanded && !expanded.instr && "-128px",
 
           margin: "4px 0 0 0",
         },

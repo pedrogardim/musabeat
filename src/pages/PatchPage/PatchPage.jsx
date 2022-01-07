@@ -34,36 +34,16 @@ import { drumCategories, instrumentsCategories } from "../../services/MiscData";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
 import LoadingScreen from "../../components/LoadingScreen";
-import Keyboard from "../../components/Keyboard";
+import PlayInterface from "../SessionWorkspace/PlayInterface";
 
 import NotFoundPage from "../NotFoundPage";
 
 let isSustainPedal = false;
 
-const keyboardNoteMapping = [
-  "a",
-  "w",
-  "s",
-  "e",
-  "d",
-  "f",
-  "t",
-  "g",
-  "y",
-  "h",
-  "u",
-  "j",
-  "k",
-  "o",
-  "l",
-  "p",
-  ":",
-];
-
 function PatchPage(props) {
   const { t } = useTranslation();
 
-  const waveformWrapper = useRef(null);
+  const playFn = useRef(null);
 
   const { isDrum } = props;
 
@@ -75,9 +55,6 @@ function PatchPage(props) {
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  const [activeNotes, setActiveNotes] = useState([]);
-  const [keyPlayingOctave, setKeyPlayingOctave] = useState(2);
 
   const [editMode, setEditMode] = useState(false);
   const [drumLabels, setDrumLabels] = useState(false);
@@ -192,14 +169,6 @@ function PatchPage(props) {
     }
   };
 
-  const setLabels = (index, newName) => {
-    setPatchInfo((prev) => {
-      let newPatch = { ...prev };
-      newPatch.lbls[index] = newName;
-      return newPatch;
-    });
-  };
-
   const handleFileClick = (fileId, fileUrl, audiobuffer, name) => {
     //setInstrumentLoaded(false);
 
@@ -274,50 +243,9 @@ function PatchPage(props) {
         });
   };
 
-  const handleKeyDown = (e) => {
-    if (
-      typeof e === "object" &&
-      keyboardNoteMapping.indexOf(
-        e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
-      ) === -1
-    )
-      return;
+  const handleKeyDown = (e) => playFn.current[0](e);
 
-    let note =
-      typeof e === "object"
-        ? Tone.Frequency(
-            keyboardNoteMapping.indexOf(
-              e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
-            ) +
-              24 +
-              keyPlayingOctave * 12,
-            "midi"
-          ).toNote()
-        : e;
-    if (!activeNotes.includes(note)) {
-      setActiveNotes((prev) => [...prev, note]);
-      instrument.triggerAttack(note);
-    }
-  };
-
-  const handleKeyUp = (e) => {
-    let note =
-      typeof e === "object"
-        ? Tone.Frequency(
-            keyboardNoteMapping.indexOf(
-              e.code.replace("Key", "").replace("Semicolon", ":").toLowerCase()
-            ) +
-              24 +
-              keyPlayingOctave * 12,
-            "midi"
-          ).toNote()
-        : e;
-
-    if (activeNotes.includes(note)) {
-      setActiveNotes((prev) => prev.filter((e) => e !== note));
-      instrument.triggerRelease(note);
-    }
-  };
+  const handleKeyUp = (e) => playFn.current[1](e);
 
   const onMIDIMessage = (event) => {
     if (event.data[0] === 176) {
@@ -523,26 +451,25 @@ function PatchPage(props) {
               </Tooltip>
             </div>
           )}
-
-          {!isDrum && (
-            <Keyboard
-              style={{
-                width: "80vw",
-                minWidth: 400,
-                maxWidth: 1000,
-                height: 72,
-                zIndex: 0,
-              }}
-              onKeyClick={(note) => handleKeyDown(note)}
-              onKeyUp={(note) => handleKeyUp(note)}
-              activeNotes={activeNotes}
-              initialOctave={2}
-              octaves={1.42}
-              notesLabel={keyboardNoteMapping}
-              setKeyPlayingOctave={setKeyPlayingOctave}
-              variableOctave
-            />
-          )}
+          <div style={{ maxWidth: 1200, width: "100%" }}>
+            {patchInfo && (
+              <PlayInterface
+                playFn={playFn}
+                track={{
+                  type: isDrum ? 0 : 1,
+                  instrument: { urls: patchInfo.urls, ...patchInfo.options },
+                }}
+                instrument={instrument}
+                trackRows={
+                  isDrum
+                    ? Object.keys(patchInfo.urls).map((e) => ({
+                        note: e,
+                      }))
+                    : ["a"]
+                }
+              />
+            )}
+          </div>
         </>
       ) : !instrument ? (
         <LoadingScreen open={true} />

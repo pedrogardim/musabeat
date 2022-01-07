@@ -35,7 +35,8 @@ function Keyboard(props) {
 
   useEffect(() => {
     //console.log(props.setPlayingOctave);
-    if (!isMouseDown && props.playFn) props.playFn.current[2]();
+    if (!isMouseDown && props.playFn & props.playFn.current)
+      props.playFn.current[2]();
   }, [isMouseDown]);
 
   return (
