@@ -48,7 +48,7 @@ function PatchPage(props) {
   const { isDrum } = props;
 
   const [instrument, setInstrument] = useState(null);
-  const [patchInfo, setPatchInfo] = useState(null);
+  const [patchInfo, setPatchInfo] = useState({});
   const [creatorInfo, setCreatorInfo] = useState(null);
   const [isPatchLiked, setIsPatchLiked] = useState(null);
   const [uploadDateString, setUploadDateString] = useState(null);
@@ -74,9 +74,15 @@ function PatchPage(props) {
 
   const loadInstrument = async (data) => {
     const instrument = await (isDrum
-      ? playersLoader(data, 0, () => setIsLoaded(true))
-      : patchLoader(data, 0, () => setIsLoaded(true)));
+      ? playersLoader(data, 0, onLoad)
+      : patchLoader(data, 0, onLoad));
     setInstrument(instrument);
+  };
+
+  const onLoad = (info) => {
+    setIsLoaded(true);
+    console.log(info);
+    setPatchInfo((prev) => ({ ...prev, filesInfo: info.filesInfo }));
   };
 
   const getPatchInfo = () => {
@@ -85,7 +91,7 @@ function PatchPage(props) {
         setPatchInfo(undefined);
         return;
       }
-      setPatchInfo(r.data());
+      setPatchInfo((prev) => ({ ...prev, patch: r.data() }));
       loadInstrument(r.data());
 
       /* let date = new Date(r.data().upOn.seconds * 1000);
@@ -180,8 +186,9 @@ function PatchPage(props) {
 
     while (
       isDrum &&
-      Object.keys(patchInfo.urls).indexOf(JSON.stringify(slotToInsetFile)) !==
-        -1
+      Object.keys(patchInfo.patch.urls).indexOf(
+        JSON.stringify(slotToInsetFile)
+      ) !== -1
     ) {
       slotToInsetFile++;
     }
@@ -233,12 +240,12 @@ function PatchPage(props) {
             instrument.name === "Sampler"
               ? "Sampler"
               : firebase.firestore.FieldValue.delete(),
-          urls: patchInfo.urls,
+          urls: patchInfo.patch.urls,
           options: firebase.firestore.FieldValue.delete(),
         })
       : patchInfoRef.update({
-          base: patchInfo.base,
-          options: patchInfo.options,
+          base: patchInfo.patch.base,
+          options: patchInfo.patch.options,
           urls: firebase.firestore.FieldValue.delete(),
         });
   };
@@ -333,12 +340,12 @@ function PatchPage(props) {
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
     >
-      {instrument && patchInfo !== undefined ? (
+      {instrument && Object.keys(patchInfo).length > 0 ? (
         <>
           <Typography variant="h4" color="textPrimary">
-            {patchInfo ? patchInfo.name : "..."}
+            {patchInfo.patch.name}
           </Typography>
-          {patchInfo && patchInfo.base === "Sampler" && (
+          {patchInfo.patch.base === "Sampler" && (
             <Tooltip arrow placement="top" title="Sampler">
               <Icon style={{ marginLeft: 4 }}>graphic_eq</Icon>
             </Tooltip>
@@ -366,39 +373,38 @@ function PatchPage(props) {
               justifyContent: "center",
             }}
           >
-            {/* TODO */}
-            {/* isLoaded ? (
+            {isLoaded ? (
               <InstrumentEditor
                 patchPage
                 track={{
                   type: isDrum ? 0 : 1,
-                  instrument: { urls: patchInfo.urls, ...patchInfo.options },
-                  lbls: patchInfo.lbls,
+                  instrument: {
+                    urls: patchInfo.patch.urls,
+                    ...patchInfo.patch.options,
+                  },
                 }}
+                patchInfo={patchInfo}
+                setPatchInfo={setPatchInfo}
                 instrument={instrument}
-                setInstruments={props.setInstruments}
                 setInstrument={setInstrument}
                 setInstrumentLoaded={setIsLoaded}
                 onInstrumentMod={onInstrumentMod}
-                setLabels={setLabels}
                 handleFileClick={handleFileClick}
-                setPatchInfo={setPatchInfo}
                 handlePageNav={props.handlePageNav}
               />
             ) : (
               <CircularProgress />
-            ) */}
+            )}
           </Paper>
 
           <div className="break" />
 
-          {patchInfo && (
-            <Chip
-              style={{ margin: "0px 4px" }}
-              label={categories[patchInfo.categ]}
-              variant="outlined"
-            />
-          )}
+          <Chip
+            style={{ margin: "0px 4px" }}
+            label={categories[patchInfo.patch.categ]}
+            variant="outlined"
+          />
+
           <div className="break" />
 
           <div className="player-controls">
@@ -412,13 +418,13 @@ function PatchPage(props) {
               <Icon>{isPlaying ? "pause" : "play_arrow"}</Icon>
             </IconButton>
 
-            <Tooltip title={patchInfo && patchInfo.likes}>
+            <Tooltip title={patchInfo.patch.likes}>
               <IconButton onClick={handleUserLike}>
                 <Icon color={isPatchLiked ? "secondary" : "inherit"}>
                   favorite
                 </Icon>
                 <Typography className="like-btn-label" variant="overline">
-                  {patchInfo && patchInfo.likes}
+                  {patchInfo.patch.likes}
                 </Typography>
               </IconButton>
             </Tooltip>
@@ -429,7 +435,7 @@ function PatchPage(props) {
           </div>
           <div className="break" />
 
-          {patchInfo && user && user.uid === patchInfo.creator && (
+          {user && user.uid === patchInfo.patch.creator && (
             <div style={{ position: "absolute", right: 16, bottom: 16 }}>
               <Tooltip title="Save Changes">
                 <Fab
@@ -457,12 +463,15 @@ function PatchPage(props) {
                 playFn={playFn}
                 track={{
                   type: isDrum ? 0 : 1,
-                  instrument: { urls: patchInfo.urls, ...patchInfo.options },
+                  instrument: {
+                    urls: patchInfo.patch.urls,
+                    ...patchInfo.patch.options,
+                  },
                 }}
                 instrument={instrument}
                 trackRows={
                   isDrum
-                    ? Object.keys(patchInfo.urls).map((e) => ({
+                    ? Object.keys(patchInfo.patch.urls).map((e) => ({
                         note: e,
                       }))
                     : ["a"]

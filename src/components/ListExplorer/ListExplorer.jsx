@@ -12,8 +12,9 @@ import {
   MenuItem,
   TextField,
   Fab,
-  Dialog,
   Box,
+  BottomNavigation,
+  BottomNavigationAction,
 } from "@mui/material";
 
 import { Autocomplete } from "@mui/material";
@@ -64,8 +65,7 @@ function ListExplorer(props) {
     setBottomScroll,
     bottomScroll,
     tags,
-    fileEditor,
-    setFileExplorer,
+    setPatchExplorer,
     selectedItem,
     saveUserPatch,
     handlePageNav,
@@ -310,19 +310,24 @@ function ListExplorer(props) {
 
       <div className="break" />
 
-      {/* compact && (
+      {compact && (
         <BottomNavigation
           className="file-explorer-compact-bottom-nav"
           value={showingLiked}
-          onChange={(e, v) =>
-            v === 0 ? getUserFilesList() : getUserFilesList(true)
-          }
+          onChange={(e, v) => v === "ie" && setPatchExplorer(false)}
           showLabels
         >
           <BottomNavigationAction label="User" icon={<Icon>person</Icon>} />
           <BottomNavigationAction label="Liked" icon={<Icon>favorite</Icon>} />
+          {type !== "files" && (
+            <BottomNavigationAction
+              label="Instrument Editor"
+              icon={<Icon>tune</Icon>}
+              value={"ie"}
+            />
+          )}
         </BottomNavigation>
-      ) */}
+      )}
 
       {!compact && userPage && (
         <Fab
@@ -384,20 +389,10 @@ function ListExplorer(props) {
     </>
   );
 
-  return compact && !fileEditor ? (
-    <Dialog
-      open={true}
-      onClose={() => setFileExplorer(false)}
-      maxWidth="xl"
-      fullWidth="true"
-      PaperProps={{ style: { minHeight: "calc(100% - 64px)" } }}
-    >
-      {mainContent}
-    </Dialog>
-  ) : (
+  return (
     <Box
       className={`file-explorer ${compact && "file-explorer-compact"}`}
-      sx={{ bgcolor: !compact && "background.default" }}
+      sx={{ bgcolor: "background.default" }}
     >
       {mainContent}
     </Box>
