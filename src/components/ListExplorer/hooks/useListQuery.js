@@ -29,28 +29,19 @@ export const useListQuery = (props) => {
   const user = firebase.auth().currentUser;
 
   const queryItems = async (clear) => {
-    //TODO: Scroll load in /files/
     const usersRef = firebase.firestore().collection("users");
     const storageRef = firebase.storage();
 
     setIsLoading(true);
 
-    const fileIdList = user
+    const itemIdList = user
       ? (await usersRef.doc(user.uid).get()).get(
           showingLiked ? "liked" + typeDBMapping[type] : typeDBMapping[type]
         )
       : [];
 
-    let queryRules = () => {
+    const queryRules = () => {
       let rules = firebase.firestore().collection(typeDBMapping[type]);
-
-      if (user && (userPage || showingLiked || showingUser)) {
-        rules = rules.where(
-          firebase.firestore.FieldPath.documentId(),
-          "in",
-          fileIdList
-        );
-      }
 
       if (searchValue) {
         rules = rules
@@ -65,21 +56,30 @@ export const useListQuery = (props) => {
         rules = rules.startAfter(lastItem);
       }
 
-      return rules;
+      return userPage
+        ? rules.limit(itemsPerPage).get()
+        : Promise.all(
+            itemIdList.map((e) =>
+              firebase.firestore().collection(typeDBMapping[type]).doc(e).get()
+            )
+          );
     };
 
-    const fileQuery = await queryRules().limit(itemsPerPage).get();
+    const queryResult = await queryRules();
 
-    setLastItem(fileQuery.docs[fileQuery.docs.length - 1]);
+    const queryDocs = userPage ? queryResult.docs : queryResult;
 
-    if (fileQuery.docs.length < itemsPerPage) {
-      setIsQueryEnd(true);
+    if (!userPage) {
+      setLastItem(queryDocs[queryDocs.length - 1]);
+      if (queryDocs.length < itemsPerPage) {
+        setIsQueryEnd(true);
+      }
     }
 
     const filesUrl =
       type === "files"
         ? await Promise.all(
-            fileQuery.docs.map(async (e, i) => {
+            queryDocs.map(async (e, i) => {
               return await storageRef.ref(e.id).getDownloadURL();
             })
           )
@@ -87,7 +87,7 @@ export const useListQuery = (props) => {
 
     const usersToFetch = [
       ...new Set(
-        fileQuery.docs
+        queryDocs
           .map((e) => e.data()[type === "files" ? "user" : "creator"])
           .filter((e) => e)
         //.filter((e) => items.findIndex((x) => x.data.user === e) === -1)
@@ -106,7 +106,7 @@ export const useListQuery = (props) => {
           )
         : [];
 
-    const queryItems = fileQuery.docs.map((e, i) => ({
+    const queryItems = queryDocs.map((e, i) => ({
       id: e.id,
       data: e.data(),
       url: type === "files" ? filesUrl[i] : undefined,
@@ -115,7 +115,7 @@ export const useListQuery = (props) => {
 
     console.log(queryItems);
 
-    setItems((prev) => [...prev, ...queryItems]);
+    setItems((prev) => (userPage ? [...queryItems] : [...prev, ...queryItems]));
 
     setIsFirstQuery(queryItems === false);
   };

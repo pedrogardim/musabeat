@@ -195,12 +195,17 @@ function ListExplorer(props) {
     );
 
   const detectScrollToBottom = (e) => {
-    if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
-      !isQueryEnd && !isLoading && queryItems();
+    if (
+      e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight &&
+      !isQueryEnd &&
+      !isLoading &&
+      !userPage
+    )
+      queryItems();
   };
 
   const onAppWrapperScrollTrigger = () => {
-    !isQueryEnd && !isLoading && explore && queryItems();
+    if (!isQueryEnd && !isLoading && explore && !userPage) queryItems();
     !compact && setBottomScroll(false);
   };
 
@@ -208,7 +213,7 @@ function ListExplorer(props) {
     user && getUserLikes();
   }, [user]);
 
-  useEffect(() => onAppWrapperScrollTrigger(), [bottomScroll]);
+  useEffect(onAppWrapperScrollTrigger, [bottomScroll]);
 
   const mainContent = (
     <>
@@ -336,10 +341,14 @@ function ListExplorer(props) {
         >
           {tagSelectionTarget && tagSelectionTarget[2] === 1
             ? fileTagDrumComponents.map((e, i) => (
-                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                <MenuItem key={e} onClick={() => handleTagSelect(e)}>
+                  {fileTags[e]}
+                </MenuItem>
               ))
             : fileTagDrumGenres.map((e, i) => (
-                <MenuItem onClick={() => handleTagSelect(e)}>{e}</MenuItem>
+                <MenuItem key={e} onClick={() => handleTagSelect(e)}>
+                  {fileTags[e]}
+                </MenuItem>
               ))}
         </Menu>
       )}

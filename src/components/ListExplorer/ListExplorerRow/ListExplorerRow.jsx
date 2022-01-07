@@ -175,19 +175,26 @@ function ListExplorerRow(props) {
               ? Array(3)
                   .fill(0)
                   .map((e, i) => row.data.categ[i])
-                  .map((chip, chipIndex) => (
-                    <Chip
-                      clickable={chipIndex !== 0}
-                      onClick={(e) =>
-                        !!userPage
-                          ? chipIndex !== 0 &&
-                            setTagSelectionTarget([e.target, index, chipIndex])
-                          : setSearchTags([fileTags[chip]])
-                      }
-                      className={"file-tag-chip"}
-                      label={chip ? "..." : fileTags[chip]}
-                    />
-                  ))
+                  .map(
+                    (chip, chipIndex) =>
+                      (!isNaN(chip) || userPage) && (
+                        <Chip
+                          clickable={chipIndex !== 0}
+                          onClick={(e) =>
+                            !!userPage
+                              ? chipIndex !== 0 &&
+                                setTagSelectionTarget([
+                                  e.target,
+                                  index,
+                                  chipIndex,
+                                ])
+                              : setSearchTags([chip])
+                          }
+                          className={"file-tag-chip"}
+                          label={isNaN(chip) ? "..." : fileTags[chip]}
+                        />
+                      )
+                  )
               : (userPage || !isNaN(row.data.categ)) && (
                   <Chip
                     clickable
