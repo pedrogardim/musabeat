@@ -2,6 +2,8 @@ import { playersLoader, patchLoader } from "../../../services/Instruments";
 
 import * as Tone from "tone";
 
+import firebase from "firebase";
+
 export const play = async (
   instrument,
   type,
@@ -101,4 +103,116 @@ export const handleDownload = (row) => {
   xhr.send();
 };
 
-export const deleteItem = () => {};
+export const deleteItem = (index, items, setItems, collection) => {
+  let itemId = items[index].id;
+
+  firebase.storage().ref(itemId).delete();
+
+  firebase.firestore().collection(collection).doc(itemId).delete();
+
+  firebase
+    .firestore()
+    .collection("users")
+    .doc(items[index].data.user)
+    .update({
+      [collection]: firebase.firestore.FieldValue.arrayRemove(itemId),
+      sp: firebase.firestore.FieldValue.increment(
+        collection === "files" ? -items[index].data.size : 0
+      ),
+    });
+
+  setItems((prev) => prev.filter((e, i) => i !== index));
+};
+
+export const renameItem = (index, newValue, items, setItems, collection) => {
+  let itemId = items[index].id;
+
+  firebase
+    .firestore()
+    .collection(collection)
+    .doc(itemId)
+    .update({ name: newValue });
+  setItems((prev) => {
+    let newItems = [...prev];
+    newItems[index].data.name = newValue;
+    return newItems;
+  });
+};
+
+export const likeItem = (
+  index,
+  items,
+  setItems,
+  userLikes,
+  setUserLikes,
+  collection
+) => {
+  const user = firebase.auth().currentUser;
+
+  if (user === null) return;
+
+  let likedFileId = items[index].id;
+
+  const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
+  const dbFileRef = firebase
+    .firestore()
+    .collection(collection)
+    .doc(likedFileId);
+
+  if (!userLikes.includes(likedFileId)) {
+    dbUserRef.update({
+      likedfiles: firebase.firestore.FieldValue.arrayUnion(likedFileId),
+    });
+
+    dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+    setUserLikes((prev) => [...prev, likedFileId]);
+    setItems((prev) => {
+      let newItems = [...prev];
+      newItems[index].data.likes++;
+      return newItems;
+    });
+  } else {
+    dbUserRef.update({
+      likedfiles: firebase.firestore.FieldValue.arrayRemove(likedFileId),
+    });
+
+    dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
+    setUserLikes((prev) => prev.filter((e) => e !== likedFileId));
+    setItems((prev) => {
+      let newItems = [...prev];
+      newItems[index].data.likes--;
+      return newItems;
+    });
+  }
+};
+
+export const selectTag = (
+  tag,
+  tagSelectionTarget,
+  setTagSelectionTarget,
+  items,
+  setItems,
+  collection
+) => {
+  let itemIndex = tagSelectionTarget[1];
+  let tagIndex = tagSelectionTarget[2];
+
+  let hasTag = items[itemIndex].data.categ[tagIndex] === tag;
+
+  if (!hasTag) {
+    let finalCateg;
+    setItems((prev) => {
+      let newUpTags = [...prev];
+      newUpTags[itemIndex].data.categ[tagIndex] = tag;
+      finalCateg = newUpTags[itemIndex].data.categ;
+      return newUpTags;
+    });
+    firebase
+      .firestore()
+      .collection(collection)
+      .doc(items[itemIndex].id)
+      .update({ categ: finalCateg });
+  }
+
+  setTagSelectionTarget(null);
+};

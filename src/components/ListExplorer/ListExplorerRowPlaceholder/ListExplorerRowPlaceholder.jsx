@@ -14,6 +14,8 @@ import {
 import { Skeleton } from "@mui/material";
 
 function ListExplorerRowPlaceholder(props) {
+  const { fileEditor, explore, userPage, type } = props.explorerProps;
+
   return (
     <TableRow style={{ height: 61 }}>
       <TableCell style={{ width: 50 }}>
@@ -26,7 +28,7 @@ function ListExplorerRowPlaceholder(props) {
           <Skeleton variant="text" />
         </Typography>
       </TableCell>
-      {!props.fileEditor && (
+      {!fileEditor && (
         <TableCell className="fet-collapsable-column-667">
           <div className="fet-chip-cell">
             {["    ", "    ", "    "].map((chip, chipIndex) => (
@@ -40,7 +42,7 @@ function ListExplorerRowPlaceholder(props) {
         </TableCell>
       )}
       <>
-        {props.explore && (
+        {explore && (
           <TableCell style={{ width: 50 }} align="center">
             <IconButton>
               <Icon>favorite</Icon>
@@ -48,17 +50,21 @@ function ListExplorerRowPlaceholder(props) {
           </TableCell>
         )}
 
-        <TableCell className="fet-collapsable-column-800" align="center">
-          <Typography variant="overline">
-            <Skeleton variant="text" />
-          </Typography>
-        </TableCell>
-        <TableCell align="center">
-          <IconButton>
-            <Icon>file_download</Icon>
-          </IconButton>
-        </TableCell>
-        {props.userFiles && (
+        {type === "files" && (
+          <>
+            <TableCell className="fet-collapsable-column-800" align="center">
+              <Typography variant="overline">
+                <Skeleton variant="text" />
+              </Typography>
+            </TableCell>
+            <TableCell align="center">
+              <IconButton>
+                <Icon>file_download</Icon>
+              </IconButton>
+            </TableCell>
+          </>
+        )}
+        {userPage && (
           <TableCell align="center">
             <IconButton>
               <Icon>delete</Icon>

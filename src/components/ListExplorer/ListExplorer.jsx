@@ -31,12 +31,21 @@ import ListExplorerRow from "./ListExplorerRow";
 import ListExplorerRowSelected from "./ListExplorerRowSelected";
 import ListExplorerRowPlaceholder from "./ListExplorerRowPlaceholder";
 
+import { useListQuery } from "./hooks/useListQuery";
+
 import { fileTags } from "../../services/MiscData";
 
-const fileTagDrumComponents = Object.values(fileTags).filter(
+import {
+  deleteItem,
+  renameItem,
+  likeItem,
+  selectTag,
+} from "./services/Actions";
+
+const fileTagDrumComponents = Object.keys(fileTags).filter(
   (_, i) => i > 4 && i < 20
 );
-const fileTagDrumGenres = Object.values(fileTags).filter(
+const fileTagDrumGenres = Object.keys(fileTags).filter(
   (_, i) => i >= 20 && i < 24
 );
 
@@ -60,16 +69,11 @@ function ListExplorer(props) {
     selectedItem,
     saveUserPatch,
   } = props;
+
   const [items, setItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [userLikes, setUserLikes] = useState([]);
 
   const [openDialog, setOpenDialog] = useState([]);
-
-  const [isFirstQuery, setIsFirstQuery] = useState(true);
-  const [isQueryEnd, setIsQueryEnd] = useState(false);
-
-  const [lastItem, setLastItem] = useState(null);
 
   const [showingLiked, setShowingLiked] = useState(false);
   const [showingUser, setShowingUser] = useState(false);
@@ -79,13 +83,20 @@ function ListExplorer(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const itemsPerPage = 15;
   const user = firebase.auth().currentUser;
 
   const patchSizeLimit = 5242880;
 
-  //const [userOption, setUserOption] = useState(false);
-  //const [sideMenu, setSideMenu] = useState(false);
+  const { isLoading, isQueryEnd, queryItems } = useListQuery({
+    searchValue,
+    searchTags,
+    showingLiked,
+    showingUser,
+    items,
+    setItems,
+    type,
+    userPage,
+  });
 
   const onItemClick = () => {};
 
@@ -154,105 +165,6 @@ function ListExplorer(props) {
     } */
   };
 
-  const queryItems = async (clear) => {
-    //TODO: Scroll load in /files/
-    const usersRef = firebase.firestore().collection("users");
-    const storageRef = firebase.storage();
-
-    setIsLoading(true);
-
-    const fileIdList = user
-      ? (await usersRef.doc(user.uid).get()).get(
-          showingLiked ? "liked" + typeDBMapping[type] : typeDBMapping[type]
-        )
-      : [];
-
-    let queryRules = () => {
-      let rules = firebase.firestore().collection(typeDBMapping[type]);
-
-      if (user && (userPage || showingLiked || showingUser)) {
-        rules = rules.where(
-          firebase.firestore.FieldPath.documentId(),
-          "in",
-          fileIdList
-        );
-      }
-
-      if (searchValue) {
-        console.log(searchValue);
-        rules = rules
-          .where("name", ">=", searchValue)
-          .where("name", "<=", searchValue + "\uf8ff");
-      }
-      if (searchTags && searchTags.length > 0) {
-        console.log("tags");
-        let tagsIds = searchTags
-          .map((e) => fileTags.indexOf(e))
-          .filter((e) => e !== -1);
-        rules = rules.where("categ", "array-contains-any", tagsIds);
-      }
-      if (!clear && !isFirstQuery && lastItem) {
-        //console.log("next page");
-        rules = rules.startAfter(lastItem);
-      }
-
-      return rules;
-    };
-
-    const fileQuery = await queryRules().limit(itemsPerPage).get();
-
-    setLastItem(fileQuery.docs[fileQuery.docs.length - 1]);
-
-    if (fileQuery.docs.length < itemsPerPage) {
-      setIsQueryEnd(true);
-    }
-
-    setIsLoading(fileQuery === false);
-
-    const filesUrl =
-      type === "files"
-        ? await Promise.all(
-            fileQuery.docs.map(async (e, i) => {
-              return await storageRef.ref(e.id).getDownloadURL();
-            })
-          )
-        : [];
-
-    const usersToFetch = [
-      ...new Set(
-        fileQuery.docs
-          .map((e) => e.data()[type === "files" ? "user" : "creator"])
-          .filter((e) => e)
-        //.filter((e) => items.findIndex((x) => x.data.user === e) === -1)
-      ),
-    ];
-
-    const userData =
-      usersToFetch.length > 0
-        ? Object.fromEntries(
-            await Promise.all(
-              usersToFetch.map(async (e, i) => [
-                e,
-                (await usersRef.doc(e).get()).get("profile"),
-              ])
-            )
-          )
-        : [];
-
-    const queryItems = fileQuery.docs.map((e, i) => ({
-      id: e.id,
-      data: e.data(),
-      url: type === "files" ? filesUrl[i] : undefined,
-      user: userData[e.data()[type === "files" ? "user" : "creator"]],
-    }));
-
-    console.log(queryItems);
-
-    setItems((prev) => [...prev, ...queryItems]);
-
-    setIsFirstQuery(fileQuery === false);
-  };
-
   const getUserLikes = () => {
     firebase
       .firestore()
@@ -262,104 +174,25 @@ function ListExplorer(props) {
       .then((r) => setUserLikes(r.get("liked" + typeDBMapping[type])));
   };
 
-  const handleLike = (index) => {
-    if (user === null) return;
-    let likedFileId = items[index].id;
+  const handleLike = (index) =>
+    likeItem(
+      index,
+      items,
+      setItems,
+      userLikes,
+      setUserLikes,
+      typeDBMapping[type]
+    );
 
-    const dbUserRef = firebase.firestore().collection("users").doc(user.uid);
-    const dbFileRef = firebase.firestore().collection("files").doc(likedFileId);
-
-    if (!userLikes.includes(likedFileId)) {
-      dbUserRef.update({
-        likedfiles: firebase.firestore.FieldValue.arrayUnion(likedFileId),
-      });
-
-      dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
-      setUserLikes((prev) => [...prev, likedFileId]);
-      setItems((prev) => {
-        let newItems = [...prev];
-        newItems[index].data.likes++;
-        return newItems;
-      });
-    } else {
-      dbUserRef.update({
-        likedfiles: firebase.firestore.FieldValue.arrayRemove(likedFileId),
-      });
-
-      dbFileRef.update({ likes: firebase.firestore.FieldValue.increment(-1) });
-      setUserLikes((prev) => prev.filter((e) => e !== likedFileId));
-      setItems((prev) => {
-        let newItems = [...prev];
-        newItems[index].data.likes--;
-        return newItems;
-      });
-    }
-  };
-
-  const handleTagSelect = (tagName) => {
-    let tag = fileTags.indexOf(tagName);
-    let itemIndex = tagSelectionTarget[1];
-    let tagIndex = tagSelectionTarget[2];
-
-    let hasTag = items[itemIndex].data.categ[tagIndex] === tag;
-
-    if (!hasTag) {
-      let finalCateg;
-      setItems((prev) => {
-        let newUpTags = [...prev];
-        newUpTags[itemIndex].data.categ[tagIndex] = tag;
-        finalCateg = newUpTags[itemIndex].data.categ;
-        return newUpTags;
-      });
-      firebase
-        .firestore()
-        .collection("files")
-        .doc(items[itemIndex].id)
-        .update({ categ: finalCateg });
-    }
-
-    setTagSelectionTarget(null);
-  };
-
-  const deleteFile = (index) => {
-    let fileId = items[index].id;
-
-    firebase.storage().ref(fileId).delete();
-
-    firebase.firestore().collection("files").doc(fileId).delete();
-
-    firebase
-      .firestore()
-      .collection("users")
-      .doc(items[index].data.user)
-      .update({
-        files: firebase.firestore.FieldValue.arrayRemove(fileId),
-        sp: firebase.firestore.FieldValue.increment(-items[index].data.size),
-      });
-
-    setItems((prev) => prev.filter((e, i) => i !== index));
-  };
-
-  const renameFile = (newValue) => {
-    let index = openDialog[1];
-    //console.log(fileIdList[index]);
-    firebase
-      .firestore()
-      .collection("files")
-      .doc(items[index].id)
-      .update({ name: newValue });
-    setItems((prev) => {
-      let newItems = [...prev];
-      newItems[index].data.name = newValue;
-      return newItems;
-    });
-  };
-
-  const clearFiles = () => {
-    setLastItem(null);
-    setIsFirstQuery(true);
-    setItems([]);
-  };
+  const handleTagSelect = (tag) =>
+    selectTag(
+      tag,
+      tagSelectionTarget,
+      setTagSelectionTarget,
+      items,
+      setItems,
+      typeDBMapping[type]
+    );
 
   const detectScrollToBottom = (e) => {
     if (e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight)
@@ -372,35 +205,8 @@ function ListExplorer(props) {
   };
 
   useEffect(() => {
-    //clearFiles();
-    queryItems();
-  }, []);
-
-  useEffect(() => {
-    if (items === null || (items && items.length > 0)) setIsLoading(false);
-    if (items && items.length === 0) setIsLoading(true);
-  }, [items]);
-
-  useEffect(() => {
-    if (userPage && user) {
-      clearFiles();
-      //setIsLoading(false);
-      queryItems(showingLiked);
-    }
-  }, [userPage, user, showingLiked]);
-
-  useEffect(() => {
     user && getUserLikes();
   }, [user]);
-
-  useEffect(() => {
-    clearFiles();
-    if (!isLoading && ((searchTags && searchTags.length > 0) || searchValue)) {
-      queryItems("clear");
-    }
-
-    //console.log("change triggered");
-  }, [searchTags, searchValue]);
 
   useEffect(() => onAppWrapperScrollTrigger(), [bottomScroll]);
 
@@ -414,14 +220,14 @@ function ListExplorer(props) {
             className={`file-explorer-searchbar ${
               compact && "file-explorer-searchbar-compact"
             }`}
-            options={fileTags}
+            options={Object.keys(fileTags).map((e) => parseInt(e))}
             onChange={(e, v) => {
               setSearchTags(v);
               setSearchValue("");
             }}
             value={searchTags}
-            /*             getOptionLabel={(option) => option.title}
-             */ renderInput={(params) => (
+            getOptionLabel={(opt) => fileTags[opt]}
+            renderInput={(params) => (
               <TextField
                 {...params}
                 style={{ fontSize: 24 }}
@@ -542,13 +348,23 @@ function ListExplorer(props) {
         delete
         fileExplore
         open={openDialog[0] === "delete"}
-        action={() => deleteFile(openDialog[1])}
+        action={() =>
+          deleteItem(openDialog[1], items, setItems, typeDBMapping[type])
+        }
         onClose={() => setOpenDialog([])}
       />
 
       <NameInput
         open={openDialog[0] === "rename"}
-        onSubmit={(newValue) => renameFile(newValue)}
+        onSubmit={(newValue) =>
+          renameItem(
+            openDialog[1],
+            newValue,
+            items,
+            setItems,
+            typeDBMapping[type]
+          )
+        }
         onClose={() => setOpenDialog([])}
       />
 

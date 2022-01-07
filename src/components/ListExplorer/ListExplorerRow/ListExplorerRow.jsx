@@ -101,6 +101,7 @@ function ListExplorerRow(props) {
             </Tooltip>
           ) : (
             <AppLogo
+              className="app-logo-blue"
               style={{
                 height: 16,
                 width: 16,
@@ -127,7 +128,7 @@ function ListExplorerRow(props) {
               <Icon style={{ fontSize: 16, marginLeft: 4 }}>graphic_eq</Icon>
             </Tooltip>
           )}
-          {type === "files" && (
+          {type === "files" && row.data.type !== -1 && (
             <Tooltip title={fileExtentions[row.data.type]}>
               <Typography
                 variant="overline"
@@ -210,7 +211,7 @@ function ListExplorerRow(props) {
       <>
         <TableCell style={{ width: 50 }} align="center">
           <IconButton onClick={() => handleLike(index)}>
-            <Icon color={liked ? "secondary" : "inherit"}>favorite</Icon>
+            <Icon color={liked ? "secondary" : "text.secondary"}>favorite</Icon>
             <Typography className="like-btn-label" variant="overline">
               {row.data.likes}
             </Typography>
