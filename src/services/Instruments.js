@@ -147,7 +147,7 @@ export const playersLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    addNotification(["patch", input, trackIndex]);
+    if (addNotification) addNotification(["patch", input, trackIndex]);
     patch = demoDrumPatch;
   }
 
@@ -165,7 +165,8 @@ export const playersLoader = async (
       try {
         return await firebase.storage().ref(patch.urls[e]).getDownloadURL();
       } catch (er) {
-        addNotification(["file", patch.urls[e], trackIndex]);
+        if (addNotification)
+          addNotification(["file", patch.urls[e], trackIndex]);
       }
     })
   );
@@ -184,7 +185,8 @@ export const playersLoader = async (
           ).data(),
         ];
       } catch (er) {
-        addNotification(["fileInfo", patch.urls[e], trackIndex]);
+        if (addNotification)
+          addNotification(["fileInfo", patch.urls[e], trackIndex]);
       }
     })
   );
@@ -233,7 +235,7 @@ export const patchLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    addNotification(["patch", input, trackIndex]);
+    if (addNotification) addNotification(["patch", input, trackIndex]);
     patch = demoInstrumentPatch;
   }
 
@@ -270,7 +272,8 @@ export const loadSamplerInstrument = async (
       try {
         return await firebase.storage().ref(input.urls[e]).getDownloadURL();
       } catch (er) {
-        addNotification(["file", input.urls[e], trackIndex]);
+        if (addNotification)
+          addNotification(["file", input.urls[e], trackIndex]);
       }
     })
   );
@@ -289,7 +292,8 @@ export const loadSamplerInstrument = async (
           ).data(),
         ];
       } catch (er) {
-        addNotification(["fileInfo", input.urls[e], trackIndex]);
+        if (addNotification)
+          addNotification(["fileInfo", input.urls[e], trackIndex]);
       }
     })
   );

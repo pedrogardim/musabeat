@@ -20,7 +20,7 @@ import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 import SynthEditor from "./SynthEditor";
 import FileEditor from "./FileEditor";
-import PatchExplorer from "../PatchExplorer";
+import ListExplorer from "../ListExplorer";
 
 import NameInput from "../dialogs/NameInput";
 import NoteInput from "../dialogs/NoteInput";
@@ -45,6 +45,8 @@ function InstrumentEditor(props) {
     setPagePatchInfo,
   } = props;
 
+  const wsCtxData = useContext(wsCtx);
+
   const {
     tracks,
     instruments,
@@ -55,20 +57,22 @@ function InstrumentEditor(props) {
     setInstrumentsInfo,
     params,
     paramSetter,
-  } = useContext(wsCtx);
+  } = workspace ? wsCtxData : props;
 
-  const { selectedTrack } = params;
+  const { selectedTrack } = workspace ? params : props;
 
-  const track = tracks[selectedTrack];
-  const instrument = instruments[selectedTrack];
-  const instrumentInfo = instrumentsInfo[selectedTrack];
+  const track = workspace ? tracks[selectedTrack] : props.track;
+  const instrument = workspace ? instruments[selectedTrack] : props.instrument;
+  const instrumentInfo = workspace
+    ? instrumentsInfo[selectedTrack]
+    : props.patchInfo;
   const index = selectedTrack;
 
   const trackType = track.type;
 
   const [draggingOver, setDraggingOver] = useState(false);
   const [patchExplorer, setPatchExplorer] = useState(
-    trackType === 0 ? false : true
+    trackType === 0 || !workspace ? false : true
   );
 
   const [selectedPatch, setSelectedPatch] = useState(
@@ -91,31 +95,27 @@ function InstrumentEditor(props) {
 
   const isDrum = trackType === 0 && instrumentInfo.patch.dr;
 
-  const setInstrumentInfo = (value) => {
-    setInstrumentsInfo((prev) => ({
-      ...prev,
-      [index]: typeof value === "function" ? value(prev[index]) : value,
-    }));
-  };
-
-  const setPatchInfo = workspace
-    ? (value) =>
-        setInstrumentInfo((prev) => ({
+  const setPatchInfo = (value) =>
+    workspace
+      ? setInstrumentsInfo((prev) => ({
           ...prev,
           patch: typeof value === "function" ? value(prev[index]) : value,
         }))
-    : setPagePatchInfo;
+      : props.setPatchInfo((prev) =>
+          typeof value === "function" ? value(prev) : value
+        );
 
-  const setInstrument = (newInstrument) => {
-    //console.log("instrument set", newInstrument._dummyVoice);
-    setInstruments((prev) => {
-      let newInstruments = [...prev];
-      newInstruments[index].dispose();
-      delete newInstruments[index];
-      newInstruments[index] = newInstrument;
-      return newInstruments;
-    });
-  };
+  const setInstrument = (newInstrument) =>
+    workspace
+      ? //console.log("instrument set", newInstrument._dummyVoice);
+        setInstruments((prev) => {
+          let newInstruments = [...prev];
+          newInstruments[index].dispose();
+          delete newInstruments[index];
+          newInstruments[index] = newInstrument;
+          return newInstruments;
+        })
+      : props.setInstrument(newInstrument);
 
   const setInstrumentLoaded = (state) =>
     setInstrumentsLoaded((prev) => ({
@@ -143,6 +143,8 @@ function InstrumentEditor(props) {
 
   const changeInstrumentType = async (e) => {
     let newType = typeof e === "string" ? e : e.target.value;
+
+    instrument.releaseAll();
 
     updateFilesStatsOnChange && updateFilesStatsOnChange();
 
@@ -226,7 +228,7 @@ function InstrumentEditor(props) {
     setInstrument(newInstrument);
     onInstrumentMod(fileId, fileName, soundindex, true);
 
-    setInstrumentInfo((prev) => {
+    setPatchInfo((prev) => {
       let newInfo = { ...prev };
       delete newInfo.filesInfo.soundindex;
       return newInfo;
@@ -304,16 +306,12 @@ function InstrumentEditor(props) {
         newTracks[index].instrument = { urls: urlsObj };
         return newTracks;
       });
-      setInstrumentInfo((prev) => {
-        let a = [...prev];
-        a[index].filesInfo[newNote] = a[index].filesInfo[note];
-        delete a[index].filesInfo[note];
-        return a;
-      });
     }
     setPatchInfo((prev) => {
       let newPatch = { ...prev };
-      newPatch.urls = urlsObj;
+      newPatch.filesInfo[newNote] = newPatch.filesInfo[note];
+      delete newPatch.filesInfo[note];
+      newPatch.patch.urls = urlsObj;
       return newPatch;
     });
 
@@ -492,10 +490,10 @@ function InstrumentEditor(props) {
             );
           }
 
-          setInstrumentInfo((prev) => {
-            let a = [...prev];
-            a[index].filesInfo[labelOnInstrument] = data;
-            return a;
+          setPatchInfo((prev) => {
+            let newPatch = { ...prev };
+            newPatch.filesInfo[labelOnInstrument] = data;
+            return newPatch;
           });
 
           onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
@@ -527,9 +525,9 @@ function InstrumentEditor(props) {
         );
       }
 
-      setInstrumentInfo((prev) => {
-        let a = [...prev];
-        a[index].filesInfo[labelOnInstrument] = data;
+      setPatchInfo((prev) => {
+        let a = { ...prev };
+        a.filesInfo[labelOnInstrument] = data;
         return a;
       });
 
@@ -598,26 +596,27 @@ function InstrumentEditor(props) {
           className="ie-drum-cont"
           spacing={1}
         >
-          {Array(20)
-            .fill(false)
-            .map((e, i) => (
-              <DrumComponent
-                exists={instrument._buffers._buffers.has(JSON.stringify(i))}
-                key={i}
-                index={i}
-                instrument={instrument}
-                handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
-                buffer={instrument._buffers._buffers.get(JSON.stringify(i))}
-                fileInfo={instrumentInfo.filesInfo[i]}
-                setRenamingLabel={setRenamingLabel}
-                openFilePage={(ev) =>
-                  handlePageNav("file", instrumentInfo.patch.urls[i], ev)
-                }
-                fileId={instrumentInfo.patch.urls[i]}
-                isDrum={isDrum}
-                handleFileClick={() => setEditingFile(i)}
-              />
-            ))}
+          {instrumentInfo.filesInfo &&
+            Array(20)
+              .fill(false)
+              .map((e, i) => (
+                <DrumComponent
+                  exists={instrument._buffers._buffers.has(JSON.stringify(i))}
+                  key={i}
+                  index={i}
+                  instrument={instrument}
+                  handleFileDelete={(a, b, c) => setDeletingItem([a, b, c])}
+                  buffer={instrument._buffers._buffers.get(JSON.stringify(i))}
+                  fileInfo={instrumentInfo.filesInfo[i]}
+                  setRenamingLabel={setRenamingLabel}
+                  openFilePage={(ev) =>
+                    handlePageNav("file", instrumentInfo.patch.urls[i], ev)
+                  }
+                  fileId={instrumentInfo.patch.urls[i]}
+                  isDrum={isDrum}
+                  handleFileClick={() => setEditingFile(i)}
+                />
+              ))}
         </Grid>
       );
     } else if (instrument.name === "Sampler") {
@@ -768,8 +767,9 @@ function InstrumentEditor(props) {
       )}
 
       {patchExplorer && (
-        <PatchExplorer
+        <ListExplorer
           compact
+          type={isDrum ? "seq" : "instr"}
           patchExplorer={patchExplorer}
           index={index}
           track={track}
@@ -780,7 +780,6 @@ function InstrumentEditor(props) {
           setInstrumentLoaded={setInstrumentLoaded}
           setInstrumentsLoaded={setInstrumentsLoaded}
           saveUserPatch={saveUserPatch}
-          isDrum={isDrum}
           updateFilesStatsOnChange={updateFilesStatsOnChange}
         />
       )}
@@ -858,14 +857,16 @@ function InstrumentEditor(props) {
           onFileClick={addFile}
         />
       )}
-      <IconButton
-        onClick={() => paramSetter("openSubPage", null)}
-        className="mp-closebtn"
-        color="primary"
-        sx={{ zIndex: 9 }}
-      >
-        <Icon>close</Icon>
-      </IconButton>
+      {workspace && (
+        <IconButton
+          onClick={() => paramSetter("openSubPage", null)}
+          className="mp-closebtn"
+          color="primary"
+          sx={{ zIndex: 9 }}
+        >
+          <Icon>close</Icon>
+        </IconButton>
+      )}
     </Box>
   );
 }

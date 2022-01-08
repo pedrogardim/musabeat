@@ -9,16 +9,20 @@ import { Typography, IconButton, Icon, Paper } from "@mui/material";
 
 function Keyboard(props) {
   const [octaveState, setOctaveState] = useState(
-    props.initialOctave ? props.initialOctave : props.octave ? props.octave : 0
+    props.initialOctave
+      ? props.initialOctave
+      : !isNaN(props.octave)
+      ? props.octave
+      : 0
   );
   const [isMouseDown, setIsMouseDown] = useState(false);
 
   const handleKeyClick = (key) => {
-    let note = key - 12 + octave * 12;
+    let note = key + 24;
     props.playFn && props.playFn.current[0](null, note);
   };
   const handleKeyUp = (key) => {
-    let note = key - 12 + octave * 12;
+    let note = key + 24;
     props.playFn && props.playFn.current[1](null, note);
   };
 
@@ -26,7 +30,7 @@ function Keyboard(props) {
 
   const octaves = props.octaves ? props.octaves : 7;
 
-  const octave = props.octave !== undefined ? props.octave : octaveState;
+  const octave = !isNaN(props.octave) ? props.octave : octaveState;
 
   useEffect(() => {
     //console.log(props.setPlayingOctave);
@@ -34,8 +38,8 @@ function Keyboard(props) {
   }, [octaveState]);
 
   useEffect(() => {
-    //console.log(props.setPlayingOctave);
-    if (!isMouseDown && props.playFn) props.playFn.current[2]();
+    if (!isMouseDown && props.playFn & props.playFn.current)
+      props.playFn.current[2]();
   }, [isMouseDown]);
 
   return (
@@ -109,48 +113,6 @@ function Keyboard(props) {
             </Paper>
           );
         })}
-      {props.variableOctave && (
-        <>
-          {octave < 6 && (
-            <IconButton
-              style={{
-                position: "absolute",
-                right: 0,
-                marginRight: -48,
-                top: "50%",
-                marginTop: -24,
-              }}
-              onClick={() => setOctaveState((prev) => prev + 1)}
-            >
-              <Icon>chevron_right</Icon>
-            </IconButton>
-          )}
-          {octave > 0 && (
-            <IconButton
-              style={{
-                position: "absolute",
-                left: 0,
-                marginLeft: -48,
-                top: "50%",
-                marginTop: -24,
-              }}
-              onClick={() => setOctaveState((prev) => prev - 1)}
-            >
-              <Icon>chevron_left</Icon>
-            </IconButton>
-          )}
-          <Typography
-            variant="overline"
-            style={{
-              position: "absolute",
-              bottom: 0,
-              marginBottom: -36,
-            }}
-          >
-            Octave: {octave + 1}
-          </Typography>
-        </>
-      )}
     </Paper>
   );
 }

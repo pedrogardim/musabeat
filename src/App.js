@@ -32,8 +32,7 @@ import HomePage from "./pages/HomePage";
 import SessionWorkspace from "./pages/SessionWorkspace";
 
 import SessionExplorer from "./components/SessionExplorer";
-import FileExplorer from "./components/FileExplorer";
-import PatchExplorer from "./components/PatchExplorer";
+import ListExplorer from "./components/ListExplorer";
 import FilePage from "./pages/FilePage";
 import PatchPage from "./pages/PatchPage";
 import UserPage from "./pages/UserPage";
@@ -356,7 +355,8 @@ function App() {
             />
           </Route>
           <Route exact path="/files">
-            <FileExplorer
+            <ListExplorer
+              type="files"
               explore
               user={user}
               handlePageNav={handlePageNav}
@@ -365,8 +365,9 @@ function App() {
             />
           </Route>
           <Route exact path="/userfiles">
-            <FileExplorer
-              userFiles
+            <ListExplorer
+              type="files"
+              userPage
               user={user}
               handlePageNav={handlePageNav}
               bottomScroll={bottomScroll}
@@ -378,8 +379,9 @@ function App() {
           </Route>
 
           <Route exact path="/instruments">
-            <PatchExplorer
+            <ListExplorer
               explore
+              type="instr"
               user={user}
               handlePageNav={handlePageNav}
               bottomScroll={bottomScroll}
@@ -387,8 +389,9 @@ function App() {
             />
           </Route>
           <Route exact path="/userinstruments">
-            <PatchExplorer
-              userPatches
+            <ListExplorer
+              userPage
+              type="instr"
               user={user}
               bottomScroll={bottomScroll}
               setBottomScroll={setBottomScroll}
@@ -399,8 +402,8 @@ function App() {
             <PatchPage user={user} handlePageNav={handlePageNav} />
           </Route>
           <Route exact path="/drumsets">
-            <PatchExplorer
-              isDrum
+            <ListExplorer
+              type="seq"
               explore
               user={user}
               handlePageNav={handlePageNav}
@@ -409,9 +412,9 @@ function App() {
             />
           </Route>
           <Route exact path="/userdrumsets">
-            <PatchExplorer
-              isDrum
-              userPatches
+            <ListExplorer
+              type="seq"
+              userPage
               user={user}
               handlePageNav={handlePageNav}
               bottomScroll={bottomScroll}
@@ -444,6 +447,17 @@ function App() {
 
           <Route exact path="/admin">
             {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && <Admin />}
+          </Route>
+
+          <Route exact path="/list">
+            <ListExplorer
+              explore
+              type="files"
+              user={user}
+              handlePageNav={handlePageNav}
+              bottomScroll={bottomScroll}
+              setBottomScroll={setBottomScroll}
+            />
           </Route>
           <Route>
             <NotFoundPage

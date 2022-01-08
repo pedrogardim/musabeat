@@ -441,7 +441,7 @@ function SessionWorkspace(props) {
 
         {params.selectedTrack !== null &&
           tracks[params.selectedTrack].type !== 2 && (
-            <PlayInterface playFn={playFn} />
+            <PlayInterface workspace playFn={playFn} />
           )}
 
         <TrackPicker
