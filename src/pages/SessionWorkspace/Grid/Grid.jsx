@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
-
-import * as Tone from "tone";
+import React, { useState, useRef, useContext } from "react";
 
 import "./style.css";
 
-import Draggable from "react-draggable";
-
-import { SessionWorkspaceContext } from "../../../context/SessionWorkspaceContext";
+import wsCtx from "../../../context/SessionWorkspaceContext";
 
 import Selection from "./Selection";
 import Cursor from "./Cursor";
 
-import { Box, Typography, IconButton, Icon } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 function Grid(props) {
   const gridRef = useRef(null);
@@ -19,7 +15,7 @@ function Grid(props) {
   const [gridPos, setGridPos] = useState(null);
   const [clickedTarget, setClickedTarget] = useState(null);
 
-  const { params } = useContext(SessionWorkspaceContext);
+  const { params } = useContext(wsCtx);
 
   const { zoomPosition, openSubPage, gridSize, selectedTrack } = params;
 

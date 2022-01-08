@@ -83,7 +83,11 @@ function Grid(props) {
       >
         <Box
           className={"ws-grid-cursor"}
-          sx={{ bgcolor: isRecording ? "pallete.secondary" : "text.primary" }}
+          sx={(theme) => ({
+            bgcolor: isRecording
+              ? theme.palette.secondary.main
+              : "text.primary",
+          })}
           style={{
             pointerEvents: clickedTarget !== null && "none",
           }}

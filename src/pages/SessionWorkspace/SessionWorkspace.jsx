@@ -187,7 +187,7 @@ function SessionWorkspace(props) {
 
   /*===================================PLAYING==============================================*/
 
-  const toggleRecording = (e) => {
+  const toggleRecording = () => {
     if (!params.isRecording) {
       if (isPlaying) action("pause");
 
@@ -280,6 +280,10 @@ function SessionWorkspace(props) {
   }, [params.sessionSize]);
 
   useEffect(() => {
+    if (params.isRecording) toggleRecording();
+  }, [params.selectedTrack]);
+
+  useEffect(() => {
     premiumMode && console.log("=====PREMIUM MODE ON=====");
   }, [premiumMode]);
 
@@ -347,7 +351,7 @@ function SessionWorkspace(props) {
                 {isPlaying ? "pause" : "play_arrow"}
               </Icon>
             </IconButton>
-            {params.editMode && (
+            {params.editMode && params.selectedTrack !== null && (
               <IconButton
                 size="large"
                 tabIndex="-1"
