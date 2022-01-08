@@ -42,6 +42,15 @@ function ClosedTrack(props) {
     setTrackRows(rows);
   };
 
+  const handleClick = (e) => {
+    if (
+      !e.target.className.includes("closed-track-button") &&
+      !e.target.className.includes("MuiIcon") &&
+      loaded
+    )
+      paramSetter("selectedTrack", trackIndex);
+  };
+
   /* ================================USEEFFECTS======================================== */
 
   useEffect(() => {
@@ -54,7 +63,7 @@ function ClosedTrack(props) {
     <Paper
       className="closed-track"
       ref={rowRef}
-      onClick={() => loaded && paramSetter("selectedTrack", trackIndex)}
+      onClick={handleClick}
       disabled
       sx={(theme) => ({
         bgcolor: colors[track.color][theme.palette.mode === "dark" ? 200 : 400],
@@ -110,6 +119,7 @@ function ClosedTrack(props) {
           color: colors[track.color][theme.palette.mode === "dark" ? 200 : 600],
         })}
         className={"closed-track-button"}
+        onClick={() => paramSetter("openDialog", "trackOpt" + trackIndex)}
       >
         <Icon>
           {track.type === 0

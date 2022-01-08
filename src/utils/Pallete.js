@@ -2,6 +2,7 @@ import * as MUIcolors from "@mui/material/colors";
 
 export const colors = [
   MUIcolors.red,
+  MUIcolors.pink,
   MUIcolors.purple,
   MUIcolors.deepPurple,
   MUIcolors.indigo,

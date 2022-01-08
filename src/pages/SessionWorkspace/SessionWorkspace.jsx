@@ -19,6 +19,7 @@ import Ruler from "./Ruler";
 import PlayInterface from "./PlayInterface";
 import OptionsBar from "./OptionsBar";
 import MobileCollapseButtons from "./MobileCollapseButtons";
+import TrackOptions from "./TrackOptions";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
 import LoadingScreen from "../../components/LoadingScreen";
@@ -69,6 +70,7 @@ function SessionWorkspace(props) {
     openSubPage: null,
     sessionSize: 0,
     isRecording: false,
+    deletingTrack: null,
   });
 
   const paramSetter = (key, value, key2, value2) =>
@@ -458,6 +460,11 @@ function SessionWorkspace(props) {
               setInstrumentsInfo
             )
           }
+        />
+
+        <TrackOptions
+          open={params.openDialog && params.openDialog.includes("trackOpt")}
+          onClose={() => paramSetter("openDialog", null)}
         />
 
         {sessionData && (
