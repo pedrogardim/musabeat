@@ -59,7 +59,7 @@ function TrackPicker(props) {
           : selectedType === 2
           ? { urls: {} }
           : "jSjo9Rzv3eg1vTkkEj1s",
-      color: Math.floor(Math.random() * 14.99),
+      color: Math.floor(Math.random() * 16),
       fx: [],
     };
 
