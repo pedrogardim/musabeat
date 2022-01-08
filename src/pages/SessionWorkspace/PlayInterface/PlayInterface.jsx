@@ -120,8 +120,8 @@ function PlayInterface(props) {
   }, [pressedKeys, playingOctave]);
 
   useEffect(() => {
-    //console.log(pressedKeys);
-  }, [pressedKeys]);
+    releaseAll();
+  }, [playingOctave, instrument]);
 
   return (
     <Box
@@ -200,6 +200,7 @@ function PlayInterface(props) {
                 }}
               >
                 <IconButton
+                  sx={{ height: 48 }}
                   onClick={() =>
                     setPlayingOctave((prev) => (prev < 6 ? prev + 1 : prev))
                   }
@@ -207,6 +208,7 @@ function PlayInterface(props) {
                   <Icon>navigate_next</Icon>
                 </IconButton>
                 <IconButton
+                  sx={{ height: 48 }}
                   onClick={() =>
                     setPlayingOctave((prev) => (prev > 0 ? prev - 1 : prev))
                   }

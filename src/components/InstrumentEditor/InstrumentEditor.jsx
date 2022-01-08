@@ -144,6 +144,8 @@ function InstrumentEditor(props) {
   const changeInstrumentType = async (e) => {
     let newType = typeof e === "string" ? e : e.target.value;
 
+    instrument.releaseAll();
+
     updateFilesStatsOnChange && updateFilesStatsOnChange();
 
     let patch =
@@ -855,14 +857,16 @@ function InstrumentEditor(props) {
           onFileClick={addFile}
         />
       )}
-      <IconButton
-        onClick={() => paramSetter("openSubPage", null)}
-        className="mp-closebtn"
-        color="primary"
-        sx={{ zIndex: 9 }}
-      >
-        <Icon>close</Icon>
-      </IconButton>
+      {workspace && (
+        <IconButton
+          onClick={() => paramSetter("openSubPage", null)}
+          className="mp-closebtn"
+          color="primary"
+          sx={{ zIndex: 9 }}
+        >
+          <Icon>close</Icon>
+        </IconButton>
+      )}
     </Box>
   );
 }
