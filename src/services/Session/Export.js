@@ -16,7 +16,8 @@ export const bounceSessionExport = async (
   sessionData,
   setIsReady,
   setExportProgress,
-  format
+  format,
+  scheduleAllTracks
 ) => {
   //var exportDuration = looprepeats * (60/sessionbpm) * 4 * props.length;
 
@@ -26,15 +27,13 @@ export const bounceSessionExport = async (
 
   let exportDuration = sessionSize * Tone.Time("1m").toSeconds();
 
-  let instrumentBuffers = tracks.map((track, i) =>
-    instruments[i].name === "Players" || instruments[i].name === "Sampler"
-      ? instruments[i]._buffers
-      : instruments[i].name === "Player"
-      ? instruments[i]._buffer
-      : instruments[i].name === "GrainPlayer"
-      ? instruments[i].buffer
-      : ""
+  let instrumentBuffers = instruments.map(
+    (instr, i) =>
+      (instr.name === "Players" || instr.name === "Sampler") &&
+      instr._buffers._buffers
   );
+
+  console.log(instrumentBuffers);
 
   let offlineInstruments = [];
   let offlineEffects = [];
@@ -58,8 +57,12 @@ export const bounceSessionExport = async (
         switch (track.type) {
           case 0:
             offlineInstruments[trackIndex] = new Tone.Players();
-            offlineInstruments[trackIndex]._buffers =
-              instrumentBuffers[trackIndex];
+            instrumentBuffers[trackIndex].forEach((val, key) =>
+              offlineInstruments[trackIndex].add(
+                key,
+                new Tone.ToneAudioBuffer(val)
+              )
+            );
             offlineInstruments[trackIndex].volume.value = track.volume;
 
             scheduleSampler(
@@ -74,8 +77,12 @@ export const bounceSessionExport = async (
             if (originalInstrument.name === "Sampler") {
               offlineInstruments[trackIndex] = new Tone.Sampler();
               offlineInstruments[trackIndex].set(originalInstrument.get());
-              offlineInstruments[trackIndex]._buffers =
-                instrumentBuffers[trackIndex];
+              instrumentBuffers[trackIndex].forEach((val, key) =>
+                offlineInstruments[trackIndex].add(
+                  key,
+                  new Tone.ToneAudioBuffer(val)
+                )
+              );
             } else {
               offlineInstruments[trackIndex] = new Tone[
                 originalInstrument.name
@@ -92,8 +99,12 @@ export const bounceSessionExport = async (
             break;
           case 2:
             offlineInstruments[trackIndex] = new Tone.Players();
-            offlineInstruments[trackIndex]._buffers =
-              instrumentBuffers[trackIndex];
+            instrumentBuffers[trackIndex].forEach((val, key) =>
+              offlineInstruments[trackIndex].add(
+                key,
+                new Tone.ToneAudioBuffer(val)
+              )
+            );
             offlineInstruments[trackIndex].volume.value = track.volume;
 
             scheduleAudioTrack(
@@ -126,10 +137,10 @@ export const bounceSessionExport = async (
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
     downloadURI(url, `${sessionData.name}.${format.toLowerCase()}`);
-    //rescheduleWorkspace && rescheduleWorkspace();
+    scheduleAllTracks && scheduleAllTracks();
     setIsReady(true);
 
-    offlineInstruments.map((e) => e && e.dispose());
+    offlineInstruments.map((e) => e.dispose());
     offlineEffects.map((me) => me.map((e) => e && e.dispose()));
     offlineLimiter.dispose();
     offlineContext.close();

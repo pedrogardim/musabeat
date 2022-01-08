@@ -15,8 +15,7 @@ function Exporter(props) {
   const [open, setOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
-  const tracks = props.tracks;
-  const sessionData = props.sessionData;
+  const { tracks, sessionData, scheduleAllTracks } = props;
 
   const handleDownload = (format) => {
     if (isReady) {
@@ -26,7 +25,8 @@ function Exporter(props) {
         sessionData,
         setIsReady,
         setExportProgress,
-        format
+        format,
+        scheduleAllTracks
       );
       setOpen(false);
     }

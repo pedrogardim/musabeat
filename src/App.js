@@ -70,8 +70,8 @@ function App() {
       createTheme({
         palette: {
           mode: prefersDarkMode ? "dark" : "light",
-          primary: { main: "#3F51B5" },
-          secondary: { main: "#ED254E" },
+          primary: { main: "#3F51B5", light: "#3F51B5", dark: "#3F51B5" },
+          secondary: { main: "#ED254E", light: "#ED254E", dark: "#ED254E" },
         },
         typography: {
           h4: {
