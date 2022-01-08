@@ -70,6 +70,7 @@ function SessionWorkspace(props) {
     openSubPage: null,
     sessionSize: 0,
     isRecording: false,
+    deletingTrack: null,
   });
 
   const paramSetter = (key, value, key2, value2) =>

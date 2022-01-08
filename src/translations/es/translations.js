@@ -137,7 +137,7 @@ export const TRANSLATIONS_ES = {
       },
 
       2: {
-        name: "Audio Track",
+        name: "Pista de audio",
         description: "Reproduce archivos de audios importados por el usuário",
       },
 
