@@ -117,7 +117,7 @@ function PlayInterface(props) {
 
   useEffect(() => {
     playFn.current = [playNote, releaseNote, releaseAll];
-  }, [pressedKeys, playingOctave]);
+  }, [pressedKeys, playingOctave, instrument]);
 
   useEffect(() => {
     releaseAll();
@@ -130,7 +130,6 @@ function PlayInterface(props) {
         [theme.breakpoints.down("md")]: {
           position: expanded && !expanded.instr && "fixed",
           bottom: expanded && !expanded.instr && "-128px",
-
           margin: "4px 0 0 0",
         },
       })}

@@ -12,6 +12,11 @@ body {
   /*   */
 }
 
+*:focus,
+*:active {
+  outline: none;
+}
+
 body *::-webkit-scrollbar {
   width: 8px; /* width of the entire scrollbar */
   height: 8px;

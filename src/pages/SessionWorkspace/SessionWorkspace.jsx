@@ -93,6 +93,7 @@ function SessionWorkspace(props) {
     action,
     isPlaying,
     scheduleTrack,
+    scheduleAllTracks,
   } = useSession({ id: sessionKey, paramSetter });
 
   const [premiumMode, setPremiumMode] = useState(false);
@@ -186,7 +187,7 @@ function SessionWorkspace(props) {
 
   /*===================================PLAYING==============================================*/
 
-  const toggleRecording = (e) => {
+  const toggleRecording = () => {
     if (!params.isRecording) {
       if (isPlaying) action("pause");
 
@@ -209,7 +210,8 @@ function SessionWorkspace(props) {
   /*=====================================KEYEVENTS==========================================*/
 
   const handleKeyDown = (e) => {
-    if (params.openDialog === null) e.preventDefault();
+    if (params.openDialog !== null) return;
+    else e.preventDefault();
     Tone.start();
     let key = e.keyCode;
     if (e.ctrlKey || e.metaKey) {
@@ -227,7 +229,8 @@ function SessionWorkspace(props) {
   };
 
   const handleKeyUp = (e) => {
-    if (params.openDialog === null) e.preventDefault();
+    if (params.openDialog !== null) return;
+    else e.preventDefault();
     let key = e.keyCode;
     if (key === 18) paramSetter("cursorMode", null);
     if (params.selectedTrack !== null && playFn.current) playFn.current[1](e);
@@ -275,6 +278,10 @@ function SessionWorkspace(props) {
     if (params.sessionSize || sessionData.size)
       setSessionData((prev) => ({ ...prev, size: params.sessionSize }));
   }, [params.sessionSize]);
+
+  useEffect(() => {
+    if (params.isRecording) toggleRecording();
+  }, [params.selectedTrack]);
 
   useEffect(() => {
     premiumMode && console.log("=====PREMIUM MODE ON=====");
@@ -344,7 +351,7 @@ function SessionWorkspace(props) {
                 {isPlaying ? "pause" : "play_arrow"}
               </Icon>
             </IconButton>
-            {params.editMode && (
+            {params.editMode && params.selectedTrack !== null && (
               <IconButton
                 size="large"
                 tabIndex="-1"
@@ -410,7 +417,7 @@ function SessionWorkspace(props) {
                     />
                   ))}
                 <IconButton
-                  style={{ width: 48, left: "50%" }}
+                  style={{ width: 48, height: 48, left: "50%" }}
                   tabIndex="-1"
                   onClick={() => paramSetter("openDialog", "trackPicker")}
                 >
@@ -422,7 +429,11 @@ function SessionWorkspace(props) {
         </div>
         {/* ================================================ */}
 
-        <OptionsBar areUnsavedChanges={areUnsavedChanges} save={save} />
+        <OptionsBar
+          areUnsavedChanges={areUnsavedChanges}
+          save={save}
+          scheduleAllTracks={scheduleAllTracks}
+        />
 
         <MobileCollapseButtons />
 
@@ -432,20 +443,22 @@ function SessionWorkspace(props) {
           tracks[params.selectedTrack].type !== 2 && (
             <PlayInterface workspace playFn={playFn} />
           )}
-        {params.openDialog === "trackPicker" && (
-          <TrackPicker
-            tabIndex={-1}
-            open={true}
-            onClose={() => paramSetter("openDialog", null)}
-            setTracks={setTracks}
-            loadNewTrackInstrument={(a, b, c) =>
-              loadInstrument(a, b, c, setInstruments, paramSetter)
-            }
-            tracks={tracks}
-            sessionSize={sessionData.size}
-            sessionData={sessionData}
-          />
-        )}
+
+        <TrackPicker
+          tabIndex={-1}
+          open={params.openDialog === "trackPicker"}
+          onClose={() => paramSetter("openDialog", null)}
+          loadNewTrackInstrument={(a, b) =>
+            loadInstrument(
+              a,
+              b,
+              null,
+              setInstruments,
+              setInstrumentsLoaded,
+              setInstrumentsInfo
+            )
+          }
+        />
 
         {sessionData && (
           <SessionSettings

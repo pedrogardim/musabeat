@@ -223,7 +223,7 @@ export const patchLoader = async (
       ? firebase.firestore().collection("patches").doc(input)
       : null;
 
-  let patch = patchRef ? (await patchRef.get()).data() : input;
+  let patch = typeof input === "string" ? (await patchRef.get()).data() : input;
 
   if (buffers) {
     let instrument = new Tone.Sampler().toDestination();
@@ -239,7 +239,7 @@ export const patchLoader = async (
     patch = demoInstrumentPatch;
   }
 
-  let options = patch.options;
+  let options = patch.options ? patch.options : patch;
 
   if (patch.base === "Sampler") {
     return await loadSamplerInstrument(
@@ -249,11 +249,15 @@ export const patchLoader = async (
       addNotification
     );
   } else {
+    let base = patch.base
+      ? patch.base
+      : options.filter
+      ? "Mono"
+      : options.modulationIndex
+      ? "FM"
+      : "AM";
     onLoad({ patch: patch });
-    return new Tone.PolySynth(
-      Tone[`${patch.base}Synth`],
-      options
-    ).toDestination();
+    return new Tone.PolySynth(Tone[`${base}Synth`], options).toDestination();
   }
 };
 

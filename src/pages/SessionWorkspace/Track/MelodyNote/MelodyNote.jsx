@@ -92,13 +92,6 @@ function MelodyNote(props) {
         return newNotes;
       });
     }
-
-    /*  setDrawingNote((note) => {
-      let newNote = { ...note };
-      newNote.time = Tone.Time(note.time).toSeconds();
-      console.log(newNote);
-      return newNote;
-    }); */
   };
 
   const deleteNote = () => {
@@ -163,19 +156,6 @@ function MelodyNote(props) {
       setIsMoving(false);
     }
   }, [isMouseDown]);
-
-  /* 
-
-  useEffect(() => {
-    console.log("isResizing", isResizing);
-  }, [isResizing]);
-
-  useEffect(() => {
-    console.log("isMoving", isMoving);
-  }, [isMoving]);
-
-
- */
 
   return (
     <div

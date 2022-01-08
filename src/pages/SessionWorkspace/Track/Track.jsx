@@ -560,18 +560,10 @@ function Track(props) {
                 <SamplerNote
                   key={noteIndex}
                   rowRef={rowRef}
-                  trackRows={trackRows}
                   note={note}
-                  track={track}
-                  sessionSize={sessionSize}
-                  gridSize={gridSize}
-                  deletableNote={deletableNote}
                   index={noteIndex}
-                  selectedTrack={selectedTrack}
-                  selectedNotes={selectedNotes}
-                  zoomPosition={zoomPosition}
-                  movingSelDelta={movingSelDelta}
                   a={rowRef.current}
+                  gridPos={gridPos}
                   exists={trackInstrument.has(note.note)}
                 />
               ) : trackType === 1 ? (
@@ -590,6 +582,7 @@ function Track(props) {
                 trackInstrument &&
                 trackInstrument.has(note.clip) && (
                   <AudioClip
+                    key={noteIndex}
                     rowRef={rowRef}
                     player={trackInstrument.player(note.clip)}
                     deletableNote={deletableNote}
@@ -606,17 +599,7 @@ function Track(props) {
           cursorMode === "edit" &&
           !deletableNote &&
           (trackType === 0 ? (
-            <SamplerNote
-              ghost
-              rowRef={rowRef}
-              trackRows={trackRows}
-              gridPos={gridPos}
-              track={track}
-              sessionSize={sessionSize}
-              gridSize={gridSize}
-              selectedTrack={selectedTrack}
-              zoomPosition={zoomPosition}
-            />
+            <SamplerNote ghost rowRef={rowRef} gridPos={gridPos} />
           ) : trackType === 1 ? (
             <MelodyNote
               ghost
