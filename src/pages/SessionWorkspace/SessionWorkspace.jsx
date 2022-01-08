@@ -413,7 +413,7 @@ function SessionWorkspace(props) {
                     />
                   ))}
                 <IconButton
-                  style={{ width: 48, left: "50%" }}
+                  style={{ width: 48, height: 48, left: "50%" }}
                   tabIndex="-1"
                   onClick={() => paramSetter("openDialog", "trackPicker")}
                 >
@@ -439,20 +439,22 @@ function SessionWorkspace(props) {
           tracks[params.selectedTrack].type !== 2 && (
             <PlayInterface playFn={playFn} />
           )}
-        {params.openDialog === "trackPicker" && (
-          <TrackPicker
-            tabIndex={-1}
-            open={true}
-            onClose={() => paramSetter("openDialog", null)}
-            setTracks={setTracks}
-            loadNewTrackInstrument={(a, b, c) =>
-              loadInstrument(a, b, c, setInstruments, paramSetter)
-            }
-            tracks={tracks}
-            sessionSize={sessionData.size}
-            sessionData={sessionData}
-          />
-        )}
+
+        <TrackPicker
+          tabIndex={-1}
+          open={params.openDialog === "trackPicker"}
+          onClose={() => paramSetter("openDialog", null)}
+          loadNewTrackInstrument={(a, b) =>
+            loadInstrument(
+              a,
+              b,
+              null,
+              setInstruments,
+              setInstrumentsLoaded,
+              setInstrumentsInfo
+            )
+          }
+        />
 
         {sessionData && (
           <SessionSettings

@@ -17,7 +17,7 @@ function useSession(options) {
   const [tracks, setTracks] = useState(null);
   const [sessionData, setSessionData] = useState({});
   const [instruments, setInstruments] = useState([]);
-  const [instrumentsLoaded, setInstrumentsLoaded] = useState([]);
+  const [instrumentsLoaded, setInstrumentsLoaded] = useState({});
   const [instrumentsInfo, setInstrumentsInfo] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
