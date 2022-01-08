@@ -247,11 +247,15 @@ export const patchLoader = async (
       addNotification
     );
   } else {
+    let base = patch.base
+      ? patch.base
+      : options.filter
+      ? "Mono"
+      : options.modulationIndex
+      ? "FM"
+      : "AM";
     onLoad({ patch: patch });
-    return new Tone.PolySynth(
-      Tone[`${patch.base}Synth`],
-      options
-    ).toDestination();
+    return new Tone.PolySynth(Tone[`${base}Synth`], options).toDestination();
   }
 };
 
