@@ -14,7 +14,7 @@ import { drumAbbreviations } from "../../../services/MiscData";
 import SamplerNote from "./SamplerNote";
 import MelodyNote from "./MelodyNote";
 import AudioClip from "./AudioClip";
-import FileEditor from "../../../components/InstrumentEditor/FileEditor";
+import FileInspector from "../../../components/InstrumentEditor/FileInspector";
 
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
@@ -611,7 +611,7 @@ function Track(props) {
       </Box>
 
       {trackType === 2 && (
-        <FileEditor
+        <FileInspector
           audioTrack
           open={openDialog === "addFile"}
           onClose={() => paramSetter("openDialog", null)}

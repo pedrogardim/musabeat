@@ -19,7 +19,7 @@ import {
 import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 import SynthEditor from "./SynthEditor";
-import FileEditor from "./FileEditor";
+import FileInspector from "./FileInspector";
 import ListExplorer from "../ListExplorer";
 
 import NameInput from "../dialogs/NameInput";
@@ -822,7 +822,7 @@ function InstrumentEditor(props) {
       )}
 
       {editingFile !== null && (
-        <FileEditor
+        <FileInspector
           open={editingFile !== null}
           onClose={() => setEditingFile(null)}
           exists={instrument._buffers._buffers.has(JSON.stringify(editingFile))}

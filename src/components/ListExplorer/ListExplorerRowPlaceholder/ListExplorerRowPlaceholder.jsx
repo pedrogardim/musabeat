@@ -14,7 +14,7 @@ import {
 import { Skeleton } from "@mui/material";
 
 function ListExplorerRowPlaceholder(props) {
-  const { fileEditor, explore, userPage, type } = props.explorerProps;
+  const { FileInspector, explore, userPage, type } = props.explorerProps;
 
   return (
     <TableRow style={{ height: 61 }}>
@@ -28,7 +28,7 @@ function ListExplorerRowPlaceholder(props) {
           <Skeleton variant="text" />
         </Typography>
       </TableCell>
-      {!fileEditor && (
+      {!FileInspector && (
         <TableCell className="fet-collapsable-column-667">
           <div className="fet-chip-cell">
             {["    ", "    ", "    "].map((chip, chipIndex) => (

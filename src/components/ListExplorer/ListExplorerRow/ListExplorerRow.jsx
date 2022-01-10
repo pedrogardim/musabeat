@@ -45,7 +45,7 @@ function ListExplorerRow(props) {
     setTagSelectionTarget,
     handleLike,
   } = props;
-  const { type, userPage, compact, fileEditor } = explorerProps;
+  const { type, userPage, compact, FileInspector } = explorerProps;
 
   const categories = type === "seq" ? drumCategories : instrumentsCategories;
 
@@ -174,7 +174,7 @@ function ListExplorerRow(props) {
           )}
         </div>
       </TableCell>
-      {!fileEditor && (
+      {!FileInspector && (
         <TableCell className="fet-collapsable-column-667">
           <div className="fet-chip-cell">
             {type === "files"

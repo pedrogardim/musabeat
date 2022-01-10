@@ -44,7 +44,7 @@ const tagTypeMapping = {
   19: 19,
 };
 
-function FileEditor(props) {
+function FileInspector(props) {
   const { t } = useTranslation();
 
   const {
@@ -104,7 +104,7 @@ function FileEditor(props) {
             <ListExplorer
               type="files"
               compact
-              fileEditor
+              FileInspector
               audioTrack={audioTrack}
               setInstrumentLoaded={setInstrumentLoaded}
               handlePageNav={handlePageNav}
@@ -237,4 +237,4 @@ function formatBytes(a, b = 2) {
   );
 }
 
-export default FileEditor;
+export default FileInspector;

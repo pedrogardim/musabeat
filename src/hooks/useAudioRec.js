@@ -45,8 +45,10 @@ function useAudioRec(onRecFinish) {
   useEffect(() => {
     initRec();
     return () => {
+      if (!recTools) return;
       recTools.userMedia.close();
       clearInterval(meterInterval);
+      Object.keys(recTools).forEach((e) => e.dispose());
     };
   }, []);
 
