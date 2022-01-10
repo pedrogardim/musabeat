@@ -459,83 +459,40 @@ function InstrumentEditor(props) {
       ? index
       : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
 
-    if (typeof track.instrument === "string") {
-      firebase
-        .firestore()
-        .collection(isDrum ? "drumpatches" : "patches")
-        .doc(track.instrument)
-        .get()
-        .then((r) => {
-          if (instrument.has(labelOnInstrument)) {
-            let newInstrument = new Tone.Players().toDestination();
+    if (instrument.name === "Players" && instrument.has(labelOnInstrument)) {
+      let newInstrument = new Tone.Players().toDestination();
 
-            instrument._buffers._buffers.forEach((value, key) => {
-              if (JSON.stringify(index) !== key) newInstrument.add(key, value);
-            });
-
-            newInstrument.add(
-              labelOnInstrument,
-              audiobuffer ? audiobuffer : fileUrl,
-              () => setInstrumentLoaded(true)
-            );
-
-            instrument.dispose();
-
-            setInstrument(newInstrument);
-          } else {
-            instrument.add(
-              labelOnInstrument,
-              audiobuffer ? audiobuffer : fileUrl,
-              () => setInstrumentLoaded(true)
-            );
-          }
-
-          setPatchInfo((prev) => {
-            let newPatch = { ...prev };
-            newPatch.filesInfo[labelOnInstrument] = data;
-            return newPatch;
-          });
-
-          onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
-        });
-    } else {
-      //console.log(Object.keys(track.instrument.urls), labelOnInstrument);
-
-      if (instrument.name === "Players" && instrument.has(labelOnInstrument)) {
-        let newInstrument = new Tone.Players().toDestination();
-
-        instrument._buffers._buffers.forEach((value, key) => {
-          if (JSON.stringify(index) !== key) newInstrument.add(key, value);
-        });
-
-        newInstrument.add(
-          labelOnInstrument,
-          audiobuffer ? audiobuffer : fileUrl,
-          () => setInstrumentLoaded(true)
-        );
-
-        instrument.dispose();
-
-        setInstrument(newInstrument);
-      } else {
-        instrument.add(
-          labelOnInstrument,
-          audiobuffer ? audiobuffer : fileUrl,
-          () => setInstrumentLoaded(true)
-        );
-      }
-
-      setPatchInfo((prev) => {
-        let a = { ...prev };
-        a.filesInfo[labelOnInstrument] = data;
-        return a;
+      instrument._buffers._buffers.forEach((value, key) => {
+        if (JSON.stringify(index) !== key) newInstrument.add(key, value);
       });
 
-      //console.log(instrument);
+      newInstrument.add(
+        labelOnInstrument,
+        audiobuffer ? audiobuffer : fileUrl,
+        () => setInstrumentLoaded(true)
+      );
 
-      onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
-      setEditingFile(null);
+      instrument.dispose();
+
+      setInstrument(newInstrument);
+    } else {
+      instrument.add(
+        labelOnInstrument,
+        audiobuffer ? audiobuffer : fileUrl,
+        () => setInstrumentLoaded(true)
+      );
     }
+
+    setPatchInfo((prev) => {
+      let a = { ...prev };
+      a.filesInfo[labelOnInstrument] = data;
+      return a;
+    });
+
+    //console.log(instrument);
+
+    onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
+    setEditingFile(null);
   };
 
   const updateFilesStatsOnChange = async () => {

@@ -20,6 +20,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import ListExplorer from "../../ListExplorer";
+import FileEditor from "./FileEditor";
 
 const tagTypeMapping = {
   0: 5,
@@ -56,32 +57,20 @@ function FileInspector(props) {
     onFileClick,
     setInstrumentLoaded,
     index,
-    handleFileDelete,
     buffer,
     fileInfo,
-    fileId,
     isDrum,
     handlePageNav,
   } = props;
 
   const [wavePath, setWavePath] = useState("");
 
-  const handleClick = (e) => {
-    if (exists) instrument.player(index).start();
-    /* if (
-      e.target.className.includes &&
-      !e.target.className.includes("Typography")
-    ) {
-      if (exists) instrument.player(index).start();
-    } */
-  };
+  const [editorOpen, setEditorOpen] = useState(null);
 
   useEffect(
     () => buffer && drawWave(buffer.toArray(), setWavePath),
     [buffer, exists, instrument]
   );
-
-  //console.log("exists", exists);
 
   return (
     <Dialog
@@ -98,6 +87,12 @@ function FileInspector(props) {
       maxWidth="lg"
       fullWidth
     >
+      {editorOpen && (
+        <FileEditor
+          inspectorProps={props}
+          onClose={() => setEditorOpen(false)}
+        />
+      )}
       {!(exists && instrument.name === "Sampler") && (
         <>
           <Box className="file-editor-column">
@@ -192,7 +187,7 @@ function FileInspector(props) {
           <Box>
             <Button onClick={() => {}}>Upload File</Button>
             {!audioTrack && (
-              <Button color="secondary" onClick={() => {}}>
+              <Button color="secondary" onClick={() => setEditorOpen(true)}>
                 Record
               </Button>
             )}

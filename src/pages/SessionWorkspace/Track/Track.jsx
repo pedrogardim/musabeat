@@ -32,7 +32,7 @@ function Track(props) {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const { recStart, recStop, meterLevel } = useAudioRec((a) => onRecFinish(a));
+  const { recStart, recStop, meterLevel } = useAudioRec();
 
   const {
     tracks,
@@ -50,7 +50,6 @@ function Track(props) {
     trackOptions,
     zoomPosition,
     gridSize,
-    sessionSize,
     isPlaying,
     isRecording,
     cursorMode,
@@ -58,15 +57,13 @@ function Track(props) {
     openDialog,
   } = params;
 
-  const { selectedNotes, movingSelDelta, scheduleTrack } = props;
+  const { scheduleTrack } = props;
 
   const zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
   const track = tracks[selectedTrack];
   const trackInstrument = instruments[selectedTrack];
   const trackType = track.type;
-
-  const instrumentInfo = instrumentsInfo[selectedTrack];
 
   const loadTrackRows = () => {
     if (!trackInstrument) return;
@@ -112,8 +109,6 @@ function Track(props) {
     }
     paramSetter("trackRows", rows);
   };
-
-  const onRecFinish = () => {};
 
   const toggleAudioRecording = () => {
     if (isRecording) {

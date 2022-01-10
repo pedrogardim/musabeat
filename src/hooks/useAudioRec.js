@@ -2,11 +2,21 @@ import { useEffect, useState } from "react";
 
 import * as Tone from "tone";
 
-function useAudioRec(onRecFinish) {
+import useInterval from "./useInterval";
+
+function useAudioRec() {
   const [recTools, setRecTools] = useState(null);
   const [meterLevel, setMeterLevel] = useState(0);
-  const [meterInterval, setMeterInterval] = useState();
   const [fileName, setFileName] = useState("Audio");
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingBuffer, setRecordingBuffer] = useState([]);
+
+  useInterval(() => {
+    if (!recTools) return;
+    if (isRecording)
+      setRecordingBuffer((prev) => [...prev, recTools.meter.getValue()]);
+    setMeterLevel(recTools.meter.getValue());
+  }, 16);
 
   const initRec = () => {
     const recorder = new Tone.Recorder();
@@ -15,20 +25,19 @@ function useAudioRec(onRecFinish) {
     userMedia.open();
     let tools = { recorder: recorder, userMedia: userMedia, meter: meter };
     setRecTools(tools);
-    let meterInterval = setInterval(() => {
-      setMeterLevel(meter.getValue());
-    }, 16);
-    setMeterInterval(meterInterval);
   };
 
   const recStart = (arg) => {
     if (!recTools) return;
+    setIsRecording(true);
     recTools.recorder.start();
     setFileName(arg);
   };
 
   const recStop = async (callback) => {
     if (!recTools) return;
+    setIsRecording(false);
+
     const blob = await recTools.recorder.stop();
 
     const file = new File([blob], fileName);
@@ -39,6 +48,8 @@ function useAudioRec(onRecFinish) {
       arrayBuffer
     );
 
+    setRecordingBuffer([]);
+
     callback(file, audioBuffer);
   };
 
@@ -47,15 +58,16 @@ function useAudioRec(onRecFinish) {
     return () => {
       if (!recTools) return;
       recTools.userMedia.close();
-      clearInterval(meterInterval);
       Object.keys(recTools).forEach((e) => e.dispose());
     };
   }, []);
 
   return {
+    isRecording,
     recStart,
     recStop,
     meterLevel,
+    recordingBuffer,
   };
 }
 
