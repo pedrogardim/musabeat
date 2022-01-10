@@ -7,6 +7,8 @@ import { Typography, Box } from "@mui/material";
 
 import "./style.css";
 
+import useAudioRec from "../../../hooks/useAudioRec";
+
 import { drumAbbreviations } from "../../../services/MiscData";
 
 import SamplerNote from "./SamplerNote";
@@ -30,8 +32,7 @@ function Track(props) {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const [recTools, setRecTools] = useState(null);
-  const [meterLevel, setMeterLevel] = useState(0);
+  const { recStart, recStop, meterLevel } = useAudioRec((a) => onRecFinish(a));
 
   const {
     tracks,
@@ -42,7 +43,6 @@ function Track(props) {
     paramSetter,
     instrumentsInfo,
     setInstrumentsInfo,
-    action,
   } = useContext(wsCtx);
 
   const {
@@ -113,8 +113,9 @@ function Track(props) {
     paramSetter("trackRows", rows);
   };
 
+  const onRecFinish = () => {};
+
   const toggleAudioRecording = () => {
-    if (!recTools) return;
     if (isRecording) {
       let newAudioIndex = 0;
       while (trackInstrument.has(newAudioIndex)) {
@@ -123,49 +124,34 @@ function Track(props) {
       let dn = { time: Tone.Transport.position, clip: newAudioIndex };
       setDrawingNote(dn);
 
-      //recTools.userMedia.open().then(() => recTools.recorder.start());
-      recTools.recorder.start();
-    } else {
-      recTools.recorder.stop().then((blob) => {
-        let filename =
-          (track.name ? track.name : "Audio") + "_" + drawingNote.clip + 1;
-        let file = new File([blob], filename);
-        blob.arrayBuffer().then((arrayBuffer) => {
-          Tone.getContext().rawContext.decodeAudioData(
-            arrayBuffer,
-            (audiobuffer) => {
-              //let finalFile = encodeAudioFile(audiobuffer, "mp3");
-              //console.log(drawingNote);
-              trackInstrument.add(drawingNote.clip, audiobuffer);
-              setPendingUploadFiles((prev) => [
-                ...prev,
-                { file: file, index: drawingNote.clip, track: selectedTrack },
-              ]);
-              /* setInstrumentsInfo(,(prev) => {
-                let newInfo = [...prev];
-                newInfo[selectedTrack].filesInfo[drawingNote.clip] =
-                  fileInfo;
-                return newInfo;
-              }); */
-              setTracks((prev) => {
-                let newTracks = [...prev];
-                let newNote = {
-                  ...drawingNote,
-                  duration: parseFloat(audiobuffer.duration.toFixed(3)),
-                  offset: 0,
-                };
+      let filename =
+        (track.name ? track.name : "Audio") + "_" + (newAudioIndex + 1);
 
-                newTracks[selectedTrack].score = [
-                  ...newTracks[selectedTrack].score,
-                  newNote,
-                ];
-                return newTracks;
-              });
-              setDrawingNote(null);
-              //recTools.userMedia.close();
-            }
-          );
+      recStart(filename);
+    } else {
+      recStop((file, audiobuffer) => {
+        console.log(file, audiobuffer);
+        trackInstrument.add(drawingNote.clip, audiobuffer);
+        setPendingUploadFiles((prev) => [
+          ...prev,
+          { file: file, index: drawingNote.clip, track: selectedTrack },
+        ]);
+
+        setTracks((prev) => {
+          let newTracks = [...prev];
+          let newNote = {
+            ...drawingNote,
+            duration: parseFloat(audiobuffer.duration.toFixed(3)),
+            offset: 0,
+          };
+
+          newTracks[selectedTrack].score = [
+            ...newTracks[selectedTrack].score,
+            newNote,
+          ];
+          return newTracks;
         });
+        setDrawingNote(null);
       });
     }
   };
@@ -456,19 +442,6 @@ function Track(props) {
 
   useEffect(() => {
     if (trackType === 2) {
-      const recorder = new Tone.Recorder();
-      const meter = new Tone.Meter({ normalRange: true });
-      const userMedia = new Tone.UserMedia().fan(recorder, meter);
-      userMedia.open();
-      let tools = { recorder: recorder, userMedia: userMedia, meter: meter };
-      setRecTools(tools);
-      let meterInterval = setInterval(() => {
-        setMeterLevel(meter.getValue());
-      }, 16);
-      return () => {
-        userMedia.close();
-        clearInterval(meterInterval);
-      };
     }
   }, []);
 

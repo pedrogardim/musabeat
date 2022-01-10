@@ -839,10 +839,6 @@ function InstrumentEditor(props) {
                 : editingFile
             ]
           }
-          setRenamingLabel={setRenamingLabel}
-          openFilePage={(ev) =>
-            handlePageNav("file", instrumentInfo.patch.urls[editingFile], ev)
-          }
           fileId={
             instrumentInfo &&
             instrumentInfo.patch.urls[

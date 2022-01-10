@@ -47,29 +47,46 @@ const tagTypeMapping = {
 function FileEditor(props) {
   const { t } = useTranslation();
 
+  const {
+    audioTrack,
+    open,
+    onClose,
+    exists,
+    instrument,
+    onFileClick,
+    setInstrumentLoaded,
+    index,
+    handleFileDelete,
+    buffer,
+    fileInfo,
+    fileId,
+    isDrum,
+    handlePageNav,
+  } = props;
+
   const [wavePath, setWavePath] = useState("");
 
   const handleClick = (e) => {
-    if (props.exists) props.instrument.player(props.index).start();
+    if (exists) instrument.player(index).start();
     /* if (
       e.target.className.includes &&
       !e.target.className.includes("Typography")
     ) {
-      if (props.exists) props.instrument.player(props.index).start();
+      if (exists) instrument.player(index).start();
     } */
   };
 
   useEffect(
-    () => props.buffer && drawWave(props.buffer.toArray(), setWavePath),
-    [props.buffer, props.exists, props.instrument]
+    () => buffer && drawWave(buffer.toArray(), setWavePath),
+    [buffer, exists, instrument]
   );
 
-  //console.log("props.exists", props.exists);
+  //console.log("exists", exists);
 
   return (
     <Dialog
-      open={props.open}
-      onClose={props.onClose}
+      open={open}
+      onClose={onClose}
       PaperProps={{
         style: {
           display: "flex",
@@ -81,31 +98,32 @@ function FileEditor(props) {
       maxWidth="lg"
       fullWidth
     >
-      {!(props.exists && props.instrument.name === "Sampler") && (
+      {!(exists && instrument.name === "Sampler") && (
         <>
           <Box className="file-editor-column">
             <ListExplorer
+              type="files"
               compact
               fileEditor
-              audioTrack={props.audioTrack}
-              setInstrumentLoaded={props.setInstrumentLoaded}
-              handlePageNav={props.handlePageNav}
+              audioTrack={audioTrack}
+              setInstrumentLoaded={setInstrumentLoaded}
+              handlePageNav={handlePageNav}
               tags={
-                !props.instrument.name === "Sampler" && props.isDrum
-                  ? [fileTags[tagTypeMapping[props.index]]]
+                !instrument.name === "Sampler" && isDrum
+                  ? [fileTags[tagTypeMapping[index]]]
                   : []
               }
-              instrument={props.instrument}
-              onFileClick={props.onFileClick}
-              onClose={props.onClose}
-              item={props.index}
+              instrument={instrument}
+              onFileClick={onFileClick}
+              onClose={onClose}
+              item={index}
             />
           </Box>
           <Divider flexItem orientation="vertical" />
         </>
       )}
       <Box className="file-editor-column">
-        {props.exists && (
+        {exists && (
           <>
             <Box
               className="drum-component-waveform"
@@ -132,12 +150,10 @@ function FileEditor(props) {
               </svg>
             </Box>
             <Typography variant="body1">
-              {props.exists
-                ? props.fileInfo.name +
-                  "." +
-                  fileExtentions[props.fileInfo.type]
-                : props.isDrum
-                ? drumMapping[props.index]
+              {exists
+                ? fileInfo.name + "." + fileExtentions[fileInfo.type]
+                : isDrum
+                ? drumMapping[index]
                 : "Empty"}
             </Typography>
             <Grid
@@ -150,44 +166,42 @@ function FileEditor(props) {
             >
               <div className="file-info-card">
                 <Typography variant="body1">
-                  {soundChannels[props.buffer.numberOfChannels] ||
-                    props.buffer.numberOfChannels ||
+                  {soundChannels[buffer.numberOfChannels] ||
+                    buffer.numberOfChannels ||
                     "Multichannel"}
                   <br />
-                  {props.buffer.sampleRate + " Hz"}
+                  {buffer.sampleRate + " Hz"}
                 </Typography>
               </div>
               <Divider orientation="vertical" flexItem />
 
               <div className="file-info-card">
                 <Typography variant="body1">
-                  {formatBytes(props.fileInfo.size)}
+                  {formatBytes(fileInfo.size)}
                 </Typography>
               </div>
               <Divider orientation="vertical" flexItem />
 
               <div className="file-info-card">
-                <Typography variant="body1">
-                  {props.fileInfo.dur + " s"}
-                </Typography>
+                <Typography variant="body1">{fileInfo.dur + " s"}</Typography>
               </div>
             </Grid>
           </>
         )}
-        {!(props.exists && props.instrument.name === "Sampler") && (
+        {!(exists && instrument.name === "Sampler") && (
           <Box>
             <Button onClick={() => {}}>Upload File</Button>
-            <Button color="secondary" onClick={() => {}}>
-              Record
-            </Button>
+            {!audioTrack && (
+              <Button color="secondary" onClick={() => {}}>
+                Record
+              </Button>
+            )}
+            <div className="break" />
+            <Typography>Or Drag and Drop It</Typography>
           </Box>
         )}
       </Box>
-      <IconButton
-        onClick={props.onClose}
-        className="mp-closebtn"
-        color="primary"
-      >
+      <IconButton onClick={onClose} className="mp-closebtn" color="primary">
         <Icon>close</Icon>
       </IconButton>
     </Dialog>
