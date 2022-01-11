@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 
+import * as Tone from "tone";
+
+import { encodeAudioFile } from "../../../../services/Audio";
+
 import { IconButton, Icon, Typography, Box, Paper } from "@mui/material";
+
+import { checkPremium } from "../../../../services/backendCheckers";
 
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@mui/styles";
@@ -32,6 +38,8 @@ function FileEditor(props) {
   const theme = useTheme();
 
   const [recordedFile, setRecordedFile] = useState(null);
+  const [trimPositions, setTrimPositions] = useState([0, 1]);
+  const [draggingHandle, setDraggingHandle] = useState(null);
 
   const { isRecording, recStart, recStop, meterLevel, recordingBuffer } =
     useAudioRec();
@@ -43,10 +51,41 @@ function FileEditor(props) {
   };
 
   const saveChanges = () => {
-    if (recordedFile)
-      uploadFile(...recordedFile, (id, data) => {
-        setFile(id, null, recordedFile[1], data);
+    const slicedTimes = trimPositions
+      .map((e) => e * (recordedFile[1] || buffer).duration)
+      .map((e) => parseFloat(e.toFixed(3)));
+
+    console.log(slicedTimes);
+
+    if (recordedFile) {
+      const trimmedFileBuffer = new Tone.ToneAudioBuffer(recordedFile[1])
+        .slice(...slicedTimes)
+        .get();
+      const finalFile = encodeAudioFile(
+        trimmedFileBuffer,
+        checkPremium() ? "wav" : "mp3"
+      );
+
+      uploadFile(finalFile, trimmedFileBuffer, (id, data) => {
+        setFile(id, null, trimmedFileBuffer, data);
       });
+    }
+  };
+
+  const onHandleDrag = (xPos) => {
+    let value =
+      (xPos - contRef.current.getBoundingClientRect().left) /
+      contRef.current.offsetWidth;
+
+    value = value > 1 ? 1 : value < 0 ? 0 : value;
+
+    setTrimPositions((prev) => {
+      let pos = [...prev];
+      pos[draggingHandle === "left" ? 0 : 1] = value;
+      return pos;
+    });
+
+    //console.log(value);
   };
 
   useEffect(() => {
@@ -92,9 +131,11 @@ function FileEditor(props) {
             <Icon>fiber_manual_record</Icon>
           </IconButton>
         </Box>
-        <IconButton onClick={saveChanges}>
-          <Icon>done</Icon>
-        </IconButton>
+        {(exists || recordedFile) && (
+          <IconButton onClick={saveChanges}>
+            <Icon>done</Icon>
+          </IconButton>
+        )}
       </Paper>
 
       <Box
@@ -121,16 +162,77 @@ function FileEditor(props) {
                 backgroundColor: "#3f51b5",
               }}
             /> */}
-            <canvas
+            {!isRecording && (exists || recordedFile) && (
+              <>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    height: "100%",
+                    left: 0,
+                    minWidth: 4,
+                    width: trimPositions[0] * 100 + "%",
+                    bgcolor: "#000000",
+                    opacity: 0.5,
+                  }}
+                >
+                  <Box
+                    className="ws-ruler-zoom-cont-handle"
+                    sx={{
+                      right: 0,
+                    }}
+                    onMouseDown={() => setDraggingHandle("left")}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    height: "100%",
+                    right: 0,
+                    minWidth: 4,
+                    bgcolor: "text.secondary.light",
+                    width: (1 - trimPositions[1]) * 100 + "%",
+                    bgcolor: "#000000",
+                    opacity: 0.5,
+                  }}
+                >
+                  <Box
+                    className="ws-ruler-zoom-cont-handle"
+                    sx={{
+                      left: 0,
+                    }}
+                    onMouseDown={() => setDraggingHandle("right")}
+                  />
+                </Box>
+              </>
+            )}
+            <Paper
               style={{
-                height: "100%",
                 flex: "1",
+                borderRadius: 0,
+                boxShadow: "none",
               }}
-              ref={canvasRef}
-            />
+              elevation={22}
+            >
+              <canvas
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+                ref={canvasRef}
+              />
+            </Paper>
           </>
         )}
       </Box>
+      {draggingHandle && (
+        <div
+          className="knob-backdrop"
+          style={{ cursor: "ew-resize" }}
+          onMouseMove={(e) => onHandleDrag(e.pageX)}
+          onMouseUp={() => setDraggingHandle(null)}
+          onMouseOut={() => setDraggingHandle(null)}
+        />
+      )}
     </Box>
   );
 }

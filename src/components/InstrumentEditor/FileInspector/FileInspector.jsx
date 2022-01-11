@@ -84,6 +84,7 @@ function FileInspector(props) {
           flexWrap: "nowrap",
           flexDirection: "row",
           height: "60%",
+          overflow: "hidden",
         },
       }}
       maxWidth="lg"
