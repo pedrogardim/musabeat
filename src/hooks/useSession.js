@@ -25,7 +25,7 @@ function useSession(options) {
 
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const { id, hidden, sessionObject, paramSetter } = options;
+  const { id, hidden, sessionObject, paramSetter, setNotifications } = options;
 
   const user = firebase.auth().currentUser;
 
@@ -45,7 +45,8 @@ function useSession(options) {
       setInstruments,
       setInstrumentsLoaded,
       setInstrumentsInfo,
-      paramSetter
+      paramSetter,
+      setNotifications
     );
   };
 

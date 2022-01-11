@@ -49,9 +49,6 @@ function FileUploader(props) {
 
   const [tagSelectionTarget, setTagSelectionTarget] = useState(null);
 
-  const fileTagDrumComponents = fileTags.filter((_, i) => i > 4 && i < 15);
-  const fileTagDrumGenres = fileTags.filter((_, i) => i > 14 && i < 19);
-
   const user = firebase.auth().currentUser;
 
   const userRef = firebase.firestore().collection("users").doc(user.uid);

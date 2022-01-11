@@ -14,13 +14,14 @@ function FileEditor(props) {
     audioTrack,
     exists,
     instrument,
-    onFileClick,
     setInstrumentLoaded,
     index,
     buffer,
     fileInfo,
     isDrum,
     handlePageNav,
+    uploadFile,
+    setFile,
   } = props.inspectorProps;
 
   const { onClose } = props;
@@ -30,12 +31,24 @@ function FileEditor(props) {
 
   const theme = useTheme();
 
+  const [recordedFile, setRecordedFile] = useState(null);
+
   const { isRecording, recStart, recStop, meterLevel, recordingBuffer } =
     useAudioRec();
 
   const toggleRec = () => {
-    isRecording ? recStop() : recStart();
+    isRecording
+      ? recStop((a, b) => setRecordedFile([a, b]))
+      : recStart("Audio");
   };
+
+  const saveChanges = () => {
+    if (recordedFile)
+      uploadFile(...recordedFile, (id, data) => {
+        setFile(id, null, recordedFile[1], data);
+      });
+  };
+
   useEffect(() => {
     if ((exists || isRecording) && canvasRef.current)
       drawClipWave(
@@ -67,7 +80,7 @@ function FileEditor(props) {
           justifyContent: "space-between",
         }}
       >
-        <IconButton style={{ left: 8 }} onClick={onClose}>
+        <IconButton onClick={onClose}>
           <Icon>chevron_left</Icon>
         </IconButton>
 
@@ -79,6 +92,9 @@ function FileEditor(props) {
             <Icon>fiber_manual_record</Icon>
           </IconButton>
         </Box>
+        <IconButton onClick={saveChanges}>
+          <Icon>done</Icon>
+        </IconButton>
       </Paper>
 
       <Box

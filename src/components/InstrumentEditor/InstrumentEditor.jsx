@@ -57,6 +57,7 @@ function InstrumentEditor(props) {
     setInstrumentsInfo,
     params,
     paramSetter,
+    uploadFile,
   } = workspace ? wsCtxData : props;
 
   const { selectedTrack } = workspace ? params : props;
@@ -450,20 +451,20 @@ function InstrumentEditor(props) {
     resetUndoHistory();
   }; */
 
-  const addFile = (fileId, fileUrl, audiobuffer, index, data) => {
+  const setFile = (fileId, fileUrl, audiobuffer, data) => {
     let isDrum = track.type === 0;
 
     setInstrumentLoaded(false);
 
     let labelOnInstrument = isDrum
-      ? index
+      ? editingFile
       : Tone.Frequency(detectPitch(audiobuffer)[0]).toNote();
 
     if (instrument.name === "Players" && instrument.has(labelOnInstrument)) {
       let newInstrument = new Tone.Players().toDestination();
 
       instrument._buffers._buffers.forEach((value, key) => {
-        if (JSON.stringify(index) !== key) newInstrument.add(key, value);
+        if (JSON.stringify(editingFile) !== key) newInstrument.add(key, value);
       });
 
       newInstrument.add(
@@ -807,7 +808,8 @@ function InstrumentEditor(props) {
           isDrum={isDrum}
           handlePageNav={handlePageNav}
           setInstrumentLoaded={setInstrumentLoaded}
-          onFileClick={addFile}
+          setFile={setFile}
+          uploadFile={uploadFile}
         />
       )}
       {workspace && (

@@ -13,10 +13,14 @@ function useAudioRec() {
 
   useInterval(() => {
     if (!recTools) return;
-    if (isRecording)
-      setRecordingBuffer((prev) => [...prev, recTools.meter.getValue()]);
     setMeterLevel(recTools.meter.getValue());
   }, 16);
+
+  useInterval(() => {
+    if (!recTools) return;
+    if (isRecording)
+      setRecordingBuffer((prev) => [...prev, recTools.meter.getValue()]);
+  }, 1);
 
   const initRec = () => {
     const recorder = new Tone.Recorder();

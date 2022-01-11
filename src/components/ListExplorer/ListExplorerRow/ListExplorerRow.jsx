@@ -39,13 +39,12 @@ function ListExplorerRow(props) {
     explorerProps,
     handlePageNav,
     setOpenDialog,
-    onItemClick,
     liked,
     setSearchTags,
     setTagSelectionTarget,
     handleLike,
   } = props;
-  const { type, userPage, compact, FileInspector } = explorerProps;
+  const { type, userPage, compact, FileInspector, onItemClick } = explorerProps;
 
   const categories = type === "seq" ? drumCategories : instrumentsCategories;
 
@@ -56,6 +55,10 @@ function ListExplorerRow(props) {
   //console.log(row);
 
   const user = firebase.auth().currentUser;
+
+  const handleRowClick = () => {
+    onItemClick(row.id, row.url, instrument && instrument.buffer, row.data);
+  };
 
   const playRow = () =>
     play(instrument, type, setIsPlaying, row, setInstrument, setIsLoading);
@@ -69,7 +72,7 @@ function ListExplorerRow(props) {
   }, []);
 
   return (
-    <TableRow onClick={compact && onItemClick}>
+    <TableRow onClick={compact && handleRowClick}>
       <TableCell style={{ width: 50 }}>
         {isLoading ? (
           <CircularProgress size={27} />

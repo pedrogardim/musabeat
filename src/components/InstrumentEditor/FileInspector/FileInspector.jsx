@@ -61,6 +61,8 @@ function FileInspector(props) {
     fileInfo,
     isDrum,
     handlePageNav,
+    setFile,
+    uploadFile,
   } = props;
 
   const [wavePath, setWavePath] = useState("");
@@ -109,7 +111,7 @@ function FileInspector(props) {
                   : []
               }
               instrument={instrument}
-              onFileClick={onFileClick}
+              onItemClick={setFile}
               onClose={onClose}
               item={index}
             />

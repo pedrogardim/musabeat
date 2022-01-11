@@ -78,7 +78,7 @@ export const loadInstrument = (
   setInstruments,
   setInstrumentsLoaded,
   setInstrumentsInfo,
-  paramSetter,
+  setNotifications,
   callBack
 ) => {
   const setInstrument = (r) =>
@@ -100,7 +100,7 @@ export const loadInstrument = (
   };
 
   const addNotification = (newNotification) => {
-    paramSetter("notifications", (prev) => [...prev, newNotification]);
+    setNotifications((prev) => [...prev, newNotification]);
   };
 
   setInstrumentLoaded(false);
@@ -147,7 +147,8 @@ export const playersLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    if (addNotification) addNotification(["patch", input, trackIndex]);
+    if (addNotification)
+      addNotification({ type: "patch", id: input, track: trackIndex });
     patch = demoDrumPatch;
   }
 
@@ -166,7 +167,11 @@ export const playersLoader = async (
         return await firebase.storage().ref(patch.urls[e]).getDownloadURL();
       } catch (er) {
         if (addNotification)
-          addNotification(["file", patch.urls[e], trackIndex]);
+          addNotification({
+            type: "file",
+            id: patch.urls[e],
+            track: trackIndex,
+          });
       }
     })
   );
@@ -186,7 +191,11 @@ export const playersLoader = async (
         ];
       } catch (er) {
         if (addNotification)
-          addNotification(["fileInfo", patch.urls[e], trackIndex]);
+          addNotification({
+            type: "fileInfo",
+            id: patch.urls[e],
+            track: trackIndex,
+          });
       }
     })
   );
@@ -235,7 +244,8 @@ export const patchLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    if (addNotification) addNotification(["patch", input, trackIndex]);
+    if (addNotification)
+      addNotification({ type: "patch", id: input, track: trackIndex });
     patch = demoInstrumentPatch;
   }
 
@@ -273,7 +283,11 @@ export const loadSamplerInstrument = async (
         return await firebase.storage().ref(input.urls[e]).getDownloadURL();
       } catch (er) {
         if (addNotification)
-          addNotification(["file", input.urls[e], trackIndex]);
+          addNotification({
+            type: "file",
+            id: input.urls[e],
+            track: trackIndex,
+          });
       }
     })
   );
@@ -293,7 +307,11 @@ export const loadSamplerInstrument = async (
         ];
       } catch (er) {
         if (addNotification)
-          addNotification(["fileInfo", input.urls[e], trackIndex]);
+          addNotification({
+            type: "fileInfo",
+            id: input.urls[e],
+            track: trackIndex,
+          });
       }
     })
   );
