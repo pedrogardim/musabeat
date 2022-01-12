@@ -16,6 +16,8 @@ import {
   SvgIcon,
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 import SynthEditor from "./SynthEditor";
@@ -32,11 +34,13 @@ import { FileDrop } from "react-file-drop";
 
 import { detectPitch } from "../../services/Audio";
 
-import { drumIcon } from "../../services/MiscData";
+import { drumIcon, drumAbbreviations } from "../../services/MiscData";
 
 import "./style.css";
 
 function InstrumentEditor(props) {
+  const { t } = useTranslation();
+
   const {
     workspace,
     resetUndoHistory,
@@ -95,6 +99,11 @@ function InstrumentEditor(props) {
   const checkCustomPatch = typeof track.instrument !== "string";
 
   const isDrum = trackType === 0 && instrumentInfo.patch.dr;
+
+  const newFileName =
+    (track.name || t(`trackPicker.types.${track.type}.name`)) + "_" + isDrum
+      ? drumAbbreviations[editingFile]
+      : editingFile;
 
   const setPatchInfo = (value) =>
     workspace
@@ -709,7 +718,7 @@ function InstrumentEditor(props) {
           <></>
         )}
       </div>
-      {draggingOver && instrument.name !== "PolySynth" && (
+      {/* draggingOver && instrument.name !== "PolySynth" && (
         <FileDrop
           onDragLeave={(e) => {
             setDraggingOver(false);
@@ -722,7 +731,7 @@ function InstrumentEditor(props) {
         >
           Drop your files here!
         </FileDrop>
-      )}
+      ) */}
 
       {patchExplorer && (
         <ListExplorer
@@ -781,6 +790,7 @@ function InstrumentEditor(props) {
 
       {editingFile !== null && (
         <FileInspector
+          instrumentEditor
           open={editingFile !== null}
           onClose={() => setEditingFile(null)}
           exists={instrument._buffers._buffers.has(JSON.stringify(editingFile))}
@@ -810,6 +820,7 @@ function InstrumentEditor(props) {
           setInstrumentLoaded={setInstrumentLoaded}
           setFile={setFile}
           uploadFile={uploadFile}
+          newFileName={newFileName}
         />
       )}
       {workspace && (

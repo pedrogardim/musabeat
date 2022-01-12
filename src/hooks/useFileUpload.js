@@ -54,8 +54,8 @@ function useFileUpload(opt) {
         const fileId = checkQuery.docs[0].id;
 
         setUploadState("duplicatedFound");
-        onIdGet(fileId, fileInfo);
-        onUpload(fileId, fileInfo);
+        onIdGet && onIdGet(fileId, fileInfo, audioBuffer);
+        onUpload && onUpload(fileId, fileInfo, audioBuffer);
 
         firebase
           .firestore()
@@ -70,7 +70,7 @@ function useFileUpload(opt) {
         const userData = (await userRef.get()).data();
         const checkPremium = userData.pr.seconds > ~~(+new Date() / 1000);
 
-        onIdGet(fileDBRef.id, fileInfo);
+        onIdGet && onIdGet(fileDBRef.id, fileInfo, audioBuffer);
 
         const finalFile =
           file.type !== "audio/mpeg" && !checkPremium
@@ -97,7 +97,7 @@ function useFileUpload(opt) {
             return;
           },
           () => {
-            onUpload(fileDBRef.id, fileInfo);
+            onUpload && onUpload(fileDBRef.id, fileInfo, audioBuffer);
             userRef.update({
               files: firebase.firestore.FieldValue.arrayUnion(fileDBRef.id),
               sp: firebase.firestore.FieldValue.increment(finalFile.size),

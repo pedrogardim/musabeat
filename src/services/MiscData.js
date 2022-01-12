@@ -333,6 +333,29 @@ export const keyboardMapping = {
   Semicolon: 40,
 };
 
+export const tagTypeMapping = {
+  0: 5,
+  1: 5,
+  2: 6,
+  3: 6,
+  4: 6,
+  5: 7,
+  6: 8,
+  7: 9,
+  8: 10,
+  9: 11,
+  10: 12,
+  11: 13,
+  12: 14,
+  13: 15,
+  14: 15,
+  15: 16,
+  16: 16,
+  17: 17,
+  18: 18,
+  19: 19,
+};
+
 export const waveformShapes = {
   viewBox: "0 0 200 81",
   sine: (

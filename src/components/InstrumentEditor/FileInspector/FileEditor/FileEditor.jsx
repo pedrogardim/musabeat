@@ -17,6 +17,7 @@ function FileEditor(props) {
   const { t } = useTranslation();
 
   const {
+    instrumentEditor,
     audioTrack,
     exists,
     instrument,
@@ -28,6 +29,7 @@ function FileEditor(props) {
     handlePageNav,
     uploadFile,
     setFile,
+    newFileName,
   } = props.inspectorProps;
 
   const { onClose } = props;
@@ -47,7 +49,7 @@ function FileEditor(props) {
   const toggleRec = () => {
     isRecording
       ? recStop((a, b) => setRecordedFile([a, b]))
-      : recStart("Audio");
+      : recStart(newFileName ? newFileName : "Audio");
   };
 
   const saveChanges = () => {
@@ -162,7 +164,7 @@ function FileEditor(props) {
                 backgroundColor: "#3f51b5",
               }}
             /> */}
-            {!isRecording && (exists || recordedFile) && (
+            {!isRecording && recordedFile && (
               <>
                 <Box
                   sx={{

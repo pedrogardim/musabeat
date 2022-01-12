@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import * as Tone from "tone";
 
 import { fileExtentions, soundChannels } from "../../../services/Audio";
 
-import { drumMapping, fileTags } from "../../../services/MiscData";
+import {
+  drumMapping,
+  fileTags,
+  tagTypeMapping,
+} from "../../../services/MiscData";
 
 import "./style.css";
 
@@ -19,31 +24,12 @@ import {
 
 import { useTranslation } from "react-i18next";
 
+import FileDrop from "../../FileDrop";
+
 import ListExplorer from "../../ListExplorer";
 import FileEditor from "./FileEditor";
 
-const tagTypeMapping = {
-  0: 5,
-  1: 5,
-  2: 6,
-  3: 6,
-  4: 6,
-  5: 7,
-  6: 8,
-  7: 9,
-  8: 10,
-  9: 11,
-  10: 12,
-  11: 13,
-  12: 14,
-  13: 15,
-  14: 15,
-  15: 16,
-  16: 16,
-  17: 17,
-  18: 18,
-  19: 19,
-};
+import Limit from "../../dialogs/Limit";
 
 function FileInspector(props) {
   const { t } = useTranslation();
@@ -68,11 +54,33 @@ function FileInspector(props) {
   const [wavePath, setWavePath] = useState("");
 
   const [editorOpen, setEditorOpen] = useState(null);
+  const [draggingOver, setDraggingOver] = useState(false);
+  const [fileLimitDurDialog, setFileLimitDurDialog] = useState(false);
+
+  const fileInputRef = useRef(null);
+
+  const handleLocalFilePick = async (file) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await Tone.getContext().rawContext.decodeAudioData(
+      arrayBuffer
+    );
+
+    if (!audioTrack && audioBuffer.duration > 16) {
+      setFileLimitDurDialog(true);
+      return;
+    }
+
+    uploadFile(file, audioBuffer, (id, info) => {
+      setFile(id, null, audioBuffer, info);
+    });
+  };
 
   useEffect(
     () => buffer && drawWave(buffer.toArray(), setWavePath),
     [buffer, exists, instrument]
   );
+
+  //useEffect(() => console.log(draggingOver), [draggingOver]);
 
   return (
     <Dialog
@@ -120,9 +128,22 @@ function FileInspector(props) {
           <Divider flexItem orientation="vertical" />
         </>
       )}
-      <Box className="file-editor-column">
+      <Box
+        className="file-editor-column"
+        onDragEnter={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setDraggingOver(true);
+        }}
+      >
         {exists && (
           <>
+            {draggingOver && (
+              <FileDrop
+                onClose={() => setDraggingOver(false)}
+                onDrop={(file) => handleLocalFilePick(file)}
+              />
+            )}
             <Box
               className="drum-component-waveform"
               style={{
@@ -187,8 +208,30 @@ function FileInspector(props) {
           </>
         )}
         {!(exists && instrument.name === "Sampler") && (
-          <Box>
-            <Button onClick={() => {}}>Upload File</Button>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              hidden
+              accept="audio/*"
+              type="file"
+              onChange={(e) => handleLocalFilePick(e.target.files[0])}
+            />
+
+            <Button
+              onClick={() => {
+                fileInputRef.current.click();
+              }}
+            >
+              Upload File
+            </Button>
+
             {!audioTrack && (
               <Button color="secondary" onClick={() => setEditorOpen(true)}>
                 Record
@@ -202,6 +245,10 @@ function FileInspector(props) {
       <IconButton onClick={onClose} className="mp-closebtn" color="primary">
         <Icon>close</Icon>
       </IconButton>
+      <Limit
+        open={fileLimitDurDialog}
+        onClose={() => setFileLimitDurDialog(false)}
+      />
     </Dialog>
   );
 }
