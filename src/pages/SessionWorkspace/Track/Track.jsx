@@ -81,7 +81,7 @@ function Track(props) {
         return {
           note: e,
           player: trackInstrument.has(e) ? trackInstrument.player(e) : null,
-          //wavepath: drawWave(trackInstrument.player(e).buffer.toArray()),
+          //wavepath: drawWave(trackInstrument.player(e).buffer.toArray(0)),
           lbl: drumAbbreviations[e],
         };
       });

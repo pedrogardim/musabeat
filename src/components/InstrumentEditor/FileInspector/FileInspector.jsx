@@ -76,7 +76,7 @@ function FileInspector(props) {
   };
 
   useEffect(
-    () => buffer && drawWave(buffer.toArray(), setWavePath),
+    () => buffer && drawWave(buffer.toArray(0), setWavePath),
     [buffer, exists, instrument]
   );
 
