@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import * as Tone from "tone";
 
 import useInterval from "./useInterval";
 
-function useAudioRec() {
+function useAudioRec(active) {
   const [recTools, setRecTools] = useState(null);
   const [meterLevel, setMeterLevel] = useState(0);
   const [fileName, setFileName] = useState("Audio");
   const [isRecording, setIsRecording] = useState(false);
   const [recordingBuffer, setRecordingBuffer] = useState([]);
+
+  const recToolsRef = useRef(null);
+
+  recToolsRef.current = recTools;
 
   useInterval(() => {
     if (!recTools) return;
@@ -26,20 +30,26 @@ function useAudioRec() {
     const recorder = new Tone.Recorder();
     const meter = new Tone.Meter({ normalRange: true });
     const userMedia = new Tone.UserMedia().fan(recorder, meter);
-    userMedia.open();
     let tools = { recorder: recorder, userMedia: userMedia, meter: meter };
     setRecTools(tools);
+    if (active) userMedia.open();
+
+    Tone.UserMedia.enumerateDevices().then((devices) => {
+      // print the device labels
+      //console.log(devices.map((device) => device.label));
+    });
   };
 
   const recStart = (arg) => {
     if (!recTools) return;
-    setIsRecording(true);
     recTools.recorder.start();
+    setIsRecording(true);
     setFileName(arg);
   };
 
   const recStop = async (callback) => {
     if (!recTools) return;
+
     setIsRecording(false);
 
     const blob = await recTools.recorder.stop();
@@ -55,16 +65,29 @@ function useAudioRec() {
     setRecordingBuffer([]);
 
     callback(file, audioBuffer);
+
+    recTools.userMedia.close();
+  };
+
+  const dispose = () => {
+    //console.log(recToolsRef.current, "recTools");
+    if (!recToolsRef.current) return;
+    recToolsRef.current.userMedia.close();
+    ["meter", "recorder", "userMedia"].forEach((e) =>
+      recToolsRef.current[e].dispose()
+    );
   };
 
   useEffect(() => {
     initRec();
     return () => {
-      if (!recTools) return;
-      recTools.userMedia.close();
-      Object.keys(recTools).forEach((e) => e.dispose());
+      dispose();
     };
   }, []);
+
+  useEffect(() => {
+    if (active && recTools) recTools.userMedia.open();
+  }, [active, recTools]);
 
   return {
     isRecording,

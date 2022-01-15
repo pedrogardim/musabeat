@@ -32,8 +32,6 @@ function Track(props) {
 
   const [isMouseDown, setIsMouseDown] = useState(false);
 
-  const { recStart, recStop, meterLevel } = useAudioRec();
-
   const {
     tracks,
     instruments,
@@ -64,6 +62,8 @@ function Track(props) {
   const track = tracks[selectedTrack];
   const trackInstrument = instruments[selectedTrack];
   const trackType = track.type;
+
+  const { recStart, recStop, meterLevel } = useAudioRec(trackType === 2);
 
   const loadTrackRows = () => {
     if (!trackInstrument) return;
@@ -125,7 +125,7 @@ function Track(props) {
       recStart(filename);
     } else {
       recStop((file, audiobuffer) => {
-        console.log(file, audiobuffer);
+        //console.log(file, audiobuffer);
         trackInstrument.add(drawingNote.clip, audiobuffer);
         setPendingUploadFiles((prev) => [
           ...prev,
@@ -434,11 +434,6 @@ function Track(props) {
   useEffect(() => {
     if (trackType === 2) toggleAudioRecording();
   }, [isRecording]);
-
-  useEffect(() => {
-    if (trackType === 2) {
-    }
-  }, []);
 
   /* ================================JSX=============================================== */
 

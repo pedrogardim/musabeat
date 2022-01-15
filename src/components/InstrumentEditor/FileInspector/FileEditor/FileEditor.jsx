@@ -43,8 +43,14 @@ function FileEditor(props) {
   const [trimPositions, setTrimPositions] = useState([0, 1]);
   const [draggingHandle, setDraggingHandle] = useState(null);
 
-  const { isRecording, recStart, recStop, meterLevel, recordingBuffer } =
-    useAudioRec();
+  const {
+    isRecording,
+    recStart,
+    recStop,
+    meterLevel,
+    recordingBuffer,
+    recOpen,
+  } = useAudioRec(true);
 
   const toggleRec = () => {
     isRecording

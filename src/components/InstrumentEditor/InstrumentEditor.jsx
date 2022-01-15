@@ -30,8 +30,6 @@ import Confirm from "../dialogs/Confirm";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
 
-import { FileDrop } from "react-file-drop";
-
 import { detectPitch } from "../../services/Audio";
 
 import { drumIcon, drumAbbreviations } from "../../services/MiscData";
