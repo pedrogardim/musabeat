@@ -4,6 +4,7 @@ import { Icon, IconButton, Box, Divider } from "@mui/material";
 
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
+import NotificationsList from "../../../components/NotificationsList";
 import Exporter from "../Exporter";
 
 function OptionsBar(props) {
@@ -13,7 +14,13 @@ function OptionsBar(props) {
   const { expanded, cursorMode, selectedTrack, openSubPage, trackOptions } =
     params;
 
-  const { save, areUnsavedChanges, scheduleAllTracks } = props;
+  const {
+    save,
+    areUnsavedChanges,
+    scheduleAllTracks,
+    notifications,
+    setNotifications,
+  } = props;
 
   return (
     <Box
@@ -56,6 +63,10 @@ function OptionsBar(props) {
         tracks={tracks}
         tracksInstruments={instruments}
         scheduleAllTracks={scheduleAllTracks}
+      />
+      <NotificationsList
+        notifications={notifications}
+        setNotifications={setNotifications}
       />
 
       {selectedTrack !== null && (

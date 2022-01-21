@@ -6,11 +6,13 @@ import firebase from "firebase";
 import { fileTypes, encodeAudioFile } from "../services/Audio";
 
 function useFileUpload(opt) {
-  const { setNotifications } = opt;
+  const { notifications, setNotifications } = opt;
 
-  const [uploadState, setUploadState] = useState(0);
-  const [index, setIndex] = useState(null);
-  const [info, setInfo] = useState({});
+  const [uploadState, setUploadState] = useState(null);
+  const [notificationIndex, setNotificationIndex] = useState(
+    notifications && notifications.length
+  );
+  const [info, setInfo] = useState(null);
 
   const user = firebase.auth().currentUser;
   const userRef =
@@ -20,6 +22,7 @@ function useFileUpload(opt) {
   const storageLim = { normal: 536870912, pr: 10737418240 };
 
   const uploadFile = async (file, buffer, onIdGet, onUpload) => {
+    setNotificationIndex(notifications && notifications.length);
     try {
       const arrayBuffer = await file.arrayBuffer();
 
@@ -88,7 +91,9 @@ function useFileUpload(opt) {
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            setUploadState(snapshot.bytesTransferred / snapshot.totalBytes);
+            setUploadState(
+              (snapshot.bytesTransferred * 100) / snapshot.totalBytes
+            );
           },
           (e) => {
             console.log(e);
@@ -112,12 +117,10 @@ function useFileUpload(opt) {
   };
 
   useEffect(() => {
-    if (setNotifications)
+    if (setNotifications && uploadState !== null && info !== null)
       setNotifications((prev) => {
-        if (!typeof index === "number") setIndex(prev.length);
-        const notIndex = typeof index === "number" ? index : prev.length;
         let newNotifications = [...prev];
-        newNotifications[notIndex] = {
+        newNotifications[notificationIndex] = {
           type: "upload",
           info: info,
           state: uploadState,

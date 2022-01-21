@@ -123,7 +123,7 @@ export const loadInstrument = (
 //Tone.js instrument for both Sequencer and Audio Track
 export const playersLoader = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification,
   buffers
@@ -148,7 +148,7 @@ export const playersLoader = async (
 
   if (patch === undefined) {
     if (addNotification)
-      addNotification({ type: "patch", id: input, track: trackIndex });
+      addNotification({ type: "patchNotFound", id: input, track: track });
     patch = demoDrumPatch;
   }
 
@@ -168,9 +168,9 @@ export const playersLoader = async (
       } catch (er) {
         if (addNotification)
           addNotification({
-            type: "file",
+            type: "fileNotFound",
             id: patch.urls[e],
-            track: trackIndex,
+            track: track,
           });
       }
     })
@@ -192,9 +192,9 @@ export const playersLoader = async (
       } catch (er) {
         if (addNotification)
           addNotification({
-            type: "fileInfo",
+            type: "fileInfoError",
             id: patch.urls[e],
-            track: trackIndex,
+            track: track,
           });
       }
     })
@@ -222,7 +222,7 @@ export const playersLoader = async (
 
 export const patchLoader = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification,
   buffers
@@ -245,19 +245,14 @@ export const patchLoader = async (
 
   if (patch === undefined) {
     if (addNotification)
-      addNotification({ type: "patch", id: input, track: trackIndex });
+      addNotification({ type: "patchNotFound", id: input, track: track });
     patch = demoInstrumentPatch;
   }
 
   let options = patch.options ? patch.options : patch;
 
   if (patch.base === "Sampler") {
-    return await loadSamplerInstrument(
-      input,
-      trackIndex,
-      onLoad,
-      addNotification
-    );
+    return await loadSamplerInstrument(input, track, onLoad, addNotification);
   } else {
     let base = patch.base
       ? patch.base
@@ -273,7 +268,7 @@ export const patchLoader = async (
 
 export const loadSamplerInstrument = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification
 ) => {
@@ -284,9 +279,9 @@ export const loadSamplerInstrument = async (
       } catch (er) {
         if (addNotification)
           addNotification({
-            type: "file",
+            type: "fileNotFound",
             id: input.urls[e],
-            track: trackIndex,
+            track: track,
           });
       }
     })
@@ -308,9 +303,9 @@ export const loadSamplerInstrument = async (
       } catch (er) {
         if (addNotification)
           addNotification({
-            type: "fileInfo",
+            type: "fileInfoError",
             id: input.urls[e],
-            track: trackIndex,
+            track: track,
           });
       }
     })

@@ -106,7 +106,7 @@ function SessionWorkspace(props) {
 
   const { user, handlePageNav, hidden } = props;
 
-  const { uploadFile } = useFileUpload({ setNotifications });
+  const { uploadFile } = useFileUpload({ notifications, setNotifications });
 
   const [Undo, Redo, updateUndoHistory, resetHistory] = useUndo(setTracks);
 
@@ -442,6 +442,8 @@ function SessionWorkspace(props) {
           areUnsavedChanges={areUnsavedChanges}
           save={save}
           scheduleAllTracks={scheduleAllTracks}
+          notifications={notifications}
+          setNotifications={setNotifications}
         />
 
         <MobileCollapseButtons />

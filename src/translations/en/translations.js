@@ -210,4 +210,21 @@ export const TRANSLATIONS_EN = {
     followers: "followers",
     userNotFound: "User Not Found",
   },
+  notifications: {
+    title: {
+      patchNotFound: "Instrument not found",
+      fileNotFound: "File not found",
+      fileInfoError: "File info not found",
+      upload: {
+        100: "Upload done",
+        uploadError: "Upload error",
+        duplicatedFound: "Identical file found",
+        importSmallerFile: "Import smaller file",
+        decodingError: "Decoding error",
+        noSpace: "No space available",
+        patchSizeLimit: "Instrument limit exceeded",
+        uploading: "Uploading...",
+      },
+    },
+  },
 };
