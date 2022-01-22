@@ -375,7 +375,10 @@ function SessionWorkspace(props) {
 
         {params.openSubPage !== "IE" && params.openSubPage !== "mixer" && (
           <>
-            <Transport />
+            <Transport
+              notifications={notifications}
+              setNotifications={setNotifications}
+            />
             <Ruler />
           </>
         )}
@@ -442,8 +445,6 @@ function SessionWorkspace(props) {
           areUnsavedChanges={areUnsavedChanges}
           save={save}
           scheduleAllTracks={scheduleAllTracks}
-          notifications={notifications}
-          setNotifications={setNotifications}
         />
 
         <MobileCollapseButtons />

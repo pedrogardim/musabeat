@@ -37,7 +37,7 @@ const notificationsIcons = {
 function NotificationsList(props) {
   const { t } = useTranslation();
 
-  const { notifications, setNotifications } = props;
+  const { notifications, setNotifications, sx } = props;
 
   const anchorRef = useRef(null);
 
@@ -57,7 +57,11 @@ function NotificationsList(props) {
   }, [open]);
   return (
     <>
-      <IconButton onClick={() => setOpen((prev) => !prev)} ref={anchorRef}>
+      <IconButton
+        onClick={() => setOpen((prev) => !prev)}
+        ref={anchorRef}
+        sx={{ ...sx }}
+      >
         {progressIndex === -1 ? (
           <Badge color="secondary" variant="dot" invisible={!areNew}>
             <Icon>notifications</Icon>

@@ -14,13 +14,7 @@ function OptionsBar(props) {
   const { expanded, cursorMode, selectedTrack, openSubPage, trackOptions } =
     params;
 
-  const {
-    save,
-    areUnsavedChanges,
-    scheduleAllTracks,
-    notifications,
-    setNotifications,
-  } = props;
+  const { save, areUnsavedChanges, scheduleAllTracks } = props;
 
   return (
     <Box
@@ -63,10 +57,6 @@ function OptionsBar(props) {
         tracks={tracks}
         tracksInstruments={instruments}
         scheduleAllTracks={scheduleAllTracks}
-      />
-      <NotificationsList
-        notifications={notifications}
-        setNotifications={setNotifications}
       />
 
       {selectedTrack !== null && (

@@ -7,12 +7,15 @@ import * as Tone from "tone";
 
 import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
 
+import NotificationsList from "../../../components/NotificationsList";
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
 function Transport(props) {
   const { t } = useTranslation();
 
   const boxRefs = [useRef(null), useRef(null), useRef(null)];
+
+  const { notifications, setNotifications } = props;
 
   const { params, paramSetter, setSessionData, sessionData } =
     useContext(wsCtx);
@@ -191,6 +194,11 @@ function Transport(props) {
               </>
             ))}
         </Box>
+        <NotificationsList
+          notifications={notifications}
+          setNotifications={setNotifications}
+          sx={{ width: 48, height: 48, mr: 2 }}
+        />
         <Box className="ws-transport-info" onClick={() => setExpanded(true)}>
           {sessionParams.map((e, i) => (
             <Box key={e.i}>
