@@ -10,7 +10,7 @@ import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
 import NotificationsList from "../../../components/NotificationsList";
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
-function Transport(props) {
+function TransportBar(props) {
   const { t } = useTranslation();
 
   const boxRefs = [useRef(null), useRef(null), useRef(null)];
@@ -289,4 +289,4 @@ function Transport(props) {
   );
 }
 
-export default Transport;
+export default TransportBar;

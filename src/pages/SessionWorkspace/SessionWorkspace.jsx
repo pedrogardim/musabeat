@@ -10,7 +10,7 @@ import "./style.css";
 import Track from "./Track";
 import ClosedTrack from "./Track/ClosedTrack";
 import Title from "./Title";
-import Transport from "./Transport";
+import TransportBar from "./TransportBar";
 import TrackPicker from "./TrackPicker";
 import SessionSettings from "./SessionSettings";
 import Mixer from "./Mixer";
@@ -375,7 +375,7 @@ function SessionWorkspace(props) {
 
         {params.openSubPage !== "IE" && params.openSubPage !== "mixer" && (
           <>
-            <Transport
+            <TransportBar
               notifications={notifications}
               setNotifications={setNotifications}
             />
