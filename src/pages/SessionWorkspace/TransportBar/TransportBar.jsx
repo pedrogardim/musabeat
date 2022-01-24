@@ -157,7 +157,8 @@ function TransportBar(props) {
 
   return (
     <>
-      <Box
+      <Grid
+        container
         className="ws-transport"
         tabIndex={-1}
         sx={(theme) => ({
@@ -167,7 +168,7 @@ function TransportBar(props) {
           },
         })}
       >
-        <Box style={{ width: 88 }}>
+        <Grid item xs={4} style={{ justifyContent: "flex-start" }}>
           {selectedTrack !== null && (
             <IconButton
               className="wstr-back"
@@ -177,9 +178,9 @@ function TransportBar(props) {
               <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
           )}
-        </Box>
+        </Grid>
 
-        <Box sx={{ typography: { fontSize: 40 }, margin: "auto" }}>
+        <Grid item xs={4} sx={{ typography: { fontSize: 40 }, margin: "auto" }}>
           {time[1] &&
             time[1].map((e, i) => (
               <>
@@ -193,41 +194,43 @@ function TransportBar(props) {
                 )}
               </>
             ))}
-        </Box>
-        <NotificationsList
-          notifications={notifications}
-          setNotifications={setNotifications}
-          sx={{ width: 48, height: 48, mr: 2 }}
-        />
-        <Box className="ws-transport-info" onClick={() => setExpanded(true)}>
-          {sessionParams.map((e, i) => (
-            <Box key={e.i}>
-              <Icon
-                sx={(theme) => ({
-                  color: "text.primary",
-                  fontSize: "1rem",
-                  [theme.breakpoints.down("md")]: {
-                    fontSize: 12,
-                  },
-                })}
-              >
-                {e.i}
-              </Icon>
-              <Typography
-                variant="body1"
-                color="textPrimary"
-                sx={(theme) => ({
-                  [theme.breakpoints.down("md")]: {
-                    fontSize: 8,
-                  },
-                })}
-              >
-                {paramsValue[i]}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
+        </Grid>
+        <Grid item xs={4} style={{ justifyContent: "flex-end" }}>
+          <NotificationsList
+            notifications={notifications}
+            setNotifications={setNotifications}
+            sx={{ width: 48, height: 48, mr: 2 }}
+          />
+          <Box className="ws-transport-info" onClick={() => setExpanded(true)}>
+            {sessionParams.map((e, i) => (
+              <Box key={e.i}>
+                <Icon
+                  sx={(theme) => ({
+                    color: "text.primary",
+                    fontSize: "1rem",
+                    [theme.breakpoints.down("md")]: {
+                      fontSize: 12,
+                    },
+                  })}
+                >
+                  {e.i}
+                </Icon>
+                <Typography
+                  variant="body1"
+                  color="textPrimary"
+                  sx={(theme) => ({
+                    [theme.breakpoints.down("md")]: {
+                      fontSize: 8,
+                    },
+                  })}
+                >
+                  {paramsValue[i]}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Grid>
+      </Grid>
       <Dialog
         open={expanded}
         onClose={() => setExpanded(false)}
