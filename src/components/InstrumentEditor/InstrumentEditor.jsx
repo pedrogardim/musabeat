@@ -461,7 +461,9 @@ function InstrumentEditor(props) {
   const setFile = (fileId, fileUrl, audiobuffer, data) => {
     let isDrum = track.type === 0;
 
-    setInstrumentLoaded(false);
+    //Only unload when file comes from url, when there is audiobuffer do nothing
+
+    if (!audiobuffer && fileUrl) setInstrumentLoaded(false);
 
     let labelOnInstrument = isDrum
       ? editingFile
