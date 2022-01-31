@@ -74,6 +74,10 @@ function TransportBar(props) {
 
     //console.log(selecting, valueDelta, value);
 
+    if (selecting === 2) {
+      Tone.Transport.bpm.value = bpm + valueDelta;
+    }
+
     if (
       value >= sessionParams[selecting].range[0] &&
       value <= sessionParams[selecting].range[1]

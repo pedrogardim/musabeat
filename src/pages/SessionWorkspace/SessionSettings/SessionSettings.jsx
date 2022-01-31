@@ -33,11 +33,6 @@ function SessionSettings(props) {
   const [newSessionData, setNewSessionData] = useState(props.sessionData);
   const [userDialog, setUserDialog] = useState(false);
 
-  const handleBpmChange = (field, value) => {
-    Tone.Transport.bpm.value = value;
-    handleInfoChange("bpm", value);
-  };
-
   const handleInfoChange = (field, value) => {
     setNewSessionData((prev) => {
       let a = { ...prev };
