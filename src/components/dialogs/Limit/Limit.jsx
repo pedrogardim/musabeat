@@ -11,7 +11,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 
-function LimitReachedDialog(props) {
+function Limit(props) {
   const inputRef = useRef(null);
   const { t } = useTranslation();
 
@@ -36,4 +36,4 @@ function LimitReachedDialog(props) {
   );
 }
 
-export default LimitReachedDialog;
+export default Limit;

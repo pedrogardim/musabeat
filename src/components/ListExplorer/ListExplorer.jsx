@@ -69,6 +69,7 @@ function ListExplorer(props) {
     selectedItem,
     saveUserPatch,
     handlePageNav,
+    onItemClick,
   } = props;
 
   const [items, setItems] = useState([]);
@@ -99,7 +100,11 @@ function ListExplorer(props) {
     userPage,
   });
 
-  const onItemClick = () => {};
+  const handleItemClick = () => {
+    if (type === "files") {
+      onItemClick();
+    }
+  };
 
   const handleFileSelect = (e, index) => {
     /*   if (compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -285,7 +290,7 @@ function ListExplorer(props) {
                   key={row.id}
                   row={row}
                   index={index}
-                  onItemClick={() => onItemClick(index)}
+                  handleItemClick={handleItemClick}
                   explorerProps={props}
                   setOpenDialog={setOpenDialog}
                   liked={userLikes.includes(row.id)}

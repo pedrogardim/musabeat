@@ -78,7 +78,7 @@ export const loadInstrument = (
   setInstruments,
   setInstrumentsLoaded,
   setInstrumentsInfo,
-  paramSetter,
+  setNotifications,
   callBack
 ) => {
   const setInstrument = (r) =>
@@ -100,7 +100,7 @@ export const loadInstrument = (
   };
 
   const addNotification = (newNotification) => {
-    paramSetter("notifications", (prev) => [...prev, newNotification]);
+    setNotifications((prev) => [...prev, newNotification]);
   };
 
   setInstrumentLoaded(false);
@@ -123,7 +123,7 @@ export const loadInstrument = (
 //Tone.js instrument for both Sequencer and Audio Track
 export const playersLoader = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification,
   buffers
@@ -147,7 +147,8 @@ export const playersLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    if (addNotification) addNotification(["patch", input, trackIndex]);
+    if (addNotification)
+      addNotification({ type: "patchNotFound", id: input, track: track });
     patch = demoDrumPatch;
   }
 
@@ -166,7 +167,11 @@ export const playersLoader = async (
         return await firebase.storage().ref(patch.urls[e]).getDownloadURL();
       } catch (er) {
         if (addNotification)
-          addNotification(["file", patch.urls[e], trackIndex]);
+          addNotification({
+            type: "fileNotFound",
+            id: patch.urls[e],
+            track: track,
+          });
       }
     })
   );
@@ -186,7 +191,11 @@ export const playersLoader = async (
         ];
       } catch (er) {
         if (addNotification)
-          addNotification(["fileInfo", patch.urls[e], trackIndex]);
+          addNotification({
+            type: "fileInfoError",
+            id: patch.urls[e],
+            track: track,
+          });
       }
     })
   );
@@ -213,7 +222,7 @@ export const playersLoader = async (
 
 export const patchLoader = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification,
   buffers
@@ -235,19 +244,15 @@ export const patchLoader = async (
   //patch not found
 
   if (patch === undefined) {
-    if (addNotification) addNotification(["patch", input, trackIndex]);
+    if (addNotification)
+      addNotification({ type: "patchNotFound", id: input, track: track });
     patch = demoInstrumentPatch;
   }
 
   let options = patch.options ? patch.options : patch;
 
   if (patch.base === "Sampler") {
-    return await loadSamplerInstrument(
-      input,
-      trackIndex,
-      onLoad,
-      addNotification
-    );
+    return await loadSamplerInstrument(input, track, onLoad, addNotification);
   } else {
     let base = patch.base
       ? patch.base
@@ -263,7 +268,7 @@ export const patchLoader = async (
 
 export const loadSamplerInstrument = async (
   input,
-  trackIndex,
+  track,
   onLoad,
   addNotification
 ) => {
@@ -273,7 +278,11 @@ export const loadSamplerInstrument = async (
         return await firebase.storage().ref(input.urls[e]).getDownloadURL();
       } catch (er) {
         if (addNotification)
-          addNotification(["file", input.urls[e], trackIndex]);
+          addNotification({
+            type: "fileNotFound",
+            id: input.urls[e],
+            track: track,
+          });
       }
     })
   );
@@ -293,7 +302,11 @@ export const loadSamplerInstrument = async (
         ];
       } catch (er) {
         if (addNotification)
-          addNotification(["fileInfo", input.urls[e], trackIndex]);
+          addNotification({
+            type: "fileInfoError",
+            id: input.urls[e],
+            track: track,
+          });
       }
     })
   );

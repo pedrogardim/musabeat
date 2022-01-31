@@ -4,6 +4,7 @@ import { Icon, IconButton, Box, Divider } from "@mui/material";
 
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
+import NotificationsList from "../../../components/NotificationsList";
 import Exporter from "../Exporter";
 
 function OptionsBar(props) {

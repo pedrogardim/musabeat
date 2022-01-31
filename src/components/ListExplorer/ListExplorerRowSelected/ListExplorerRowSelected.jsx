@@ -31,7 +31,7 @@ function ListExplorerRowSelected(props) {
           <Skeleton variant="text" />
         </Typography>
       </TableCell>
-      {!props.fileEditor && (
+      {!props.FileInspector && (
         <TableCell className="fet-collapsable-column-667">
           <div className="fet-chip-cell">
             {["    ", "    ", "    "].map((chip, chipIndex) => (

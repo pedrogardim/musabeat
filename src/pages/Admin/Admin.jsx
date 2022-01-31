@@ -10,9 +10,16 @@ import { encodeAudioFile } from "../../services/Audio";
 
 import { Button } from "@mui/material";
 
+import NotificationsList from "../../components/NotificationsList";
+
 function AdminDashboard(props) {
   const [value, setValue] = useState(0);
   const [testSynth, setTestSynth] = useState(null);
+  const [not, setNot] = useState([
+    { type: "upload", state: 100, info: { name: "text", type: 0 } },
+    { type: "upload", state: 40, info: { name: "text", type: 0 } },
+    { type: "fileNotFound", track: { name: "", type: 1 } },
+  ]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -276,6 +283,8 @@ function AdminDashboard(props) {
       </Button>
 
       <input type="file" onChange={(e) => convertAudio(e.target.files[0])} />
+
+      <NotificationsList notifications={not} setNotifications={setNot} />
     </div>
   );
 }

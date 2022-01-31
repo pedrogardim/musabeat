@@ -10,7 +10,7 @@ import "./style.css";
 import Track from "./Track";
 import ClosedTrack from "./Track/ClosedTrack";
 import Title from "./Title";
-import Transport from "./Transport";
+import TransportBar from "./TransportBar";
 import TrackPicker from "./TrackPicker";
 import SessionSettings from "./SessionSettings";
 import Mixer from "./Mixer";
@@ -32,6 +32,7 @@ import NotFoundPage from "../NotFoundPage";
 
 import useSession from "../../hooks/useSession";
 import useUndo from "../../hooks/useUndo";
+import useFileUpload from "../../hooks/useFileUpload";
 import useMetronome from "./hooks/useMetronome";
 import useCopyPaste from "./hooks/useCopyPaste";
 import useFirebaseConnection from "./hooks/useFirebaseConnection";
@@ -59,7 +60,6 @@ function SessionWorkspace(props) {
     selection: [],
     selNotes: [],
     movingSelDelta: null,
-    notifications: [],
     trackOptions: { showingAll: false },
     expanded: {
       btn: false,
@@ -102,10 +102,13 @@ function SessionWorkspace(props) {
   const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   const [editorProfiles, setEditorProfiles] = useState(null);
+  const [notifications, setNotifications] = useState([]);
   const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const { user, handlePageNav, hidden } = props;
+
+  const { uploadFile } = useFileUpload({ notifications, setNotifications });
 
   const [Undo, Redo, updateUndoHistory, resetHistory] = useUndo(setTracks);
 
@@ -138,6 +141,8 @@ function SessionWorkspace(props) {
     params,
     paramSetter,
     isLoaded,
+    setNotifications,
+    uploadFile,
   }));
 
   const [save, setSavingMode, areUnsavedChanges] =
@@ -251,6 +256,10 @@ function SessionWorkspace(props) {
   useEffect(() => {
     setSavingMode(sessionData.rte ? "rte" : "simple");
   }, [isLoaded]);
+
+  useEffect(() => {
+    console.log(notifications);
+  }, [notifications]);
 
   useEffect(() => {
     console.log(tracks);
@@ -368,7 +377,10 @@ function SessionWorkspace(props) {
 
         {params.openSubPage !== "IE" && params.openSubPage !== "mixer" && (
           <>
-            <Transport />
+            <TransportBar
+              notifications={notifications}
+              setNotifications={setNotifications}
+            />
             <Ruler />
           </>
         )}

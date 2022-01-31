@@ -100,7 +100,8 @@ export const loadSession = (
   setInstruments,
   setInstrumentsLoaded,
   setInstrumentsInfo,
-  WSparamSetter
+  WSparamSetter,
+  setNotifications
 ) => {
   const loadSessionInstruments = (tracks) => {
     let array = Array(tracks.length).fill(false);
@@ -114,7 +115,8 @@ export const loadSession = (
         setInstruments,
         setInstrumentsLoaded,
         setInstrumentsInfo,
-        WSparamSetter
+        WSparamSetter,
+        setNotifications
       )
     );
   };

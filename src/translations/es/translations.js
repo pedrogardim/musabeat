@@ -216,4 +216,21 @@ export const TRANSLATIONS_ES = {
     followers: "seguidores",
     userNotFound: "Usuário No Encontrado",
   },
+  notifications: {
+    title: {
+      patchNotFound: "Instrumento no encontrado",
+      fileNotFound: "Archivo no encontrado",
+      fileInfoError: "Info. no encontrada de:",
+      upload: {
+        100: "Archivo subido",
+        uploadError: "Error de subida",
+        duplicatedFound: "Archivo identico encontrado",
+        importSmallerFile: "Importe un audio más cordo",
+        decodingError: "Error de decodificación",
+        noSpace: "Límite de espacio alcanzado",
+        patchSizeLimit: "Límite de instrumento alcanzado",
+        uploading: "Subiendo archivo...",
+      },
+    },
+  },
 };
