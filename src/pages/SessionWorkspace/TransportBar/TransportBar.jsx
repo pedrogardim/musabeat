@@ -5,7 +5,16 @@ import { useHistory } from "react-router-dom";
 
 import * as Tone from "tone";
 
-import { Icon, IconButton, Box, Typography, Dialog, Grid } from "@mui/material";
+import {
+  Icon,
+  IconButton,
+  Box,
+  Typography,
+  Dialog,
+  Grid,
+  Card,
+  CardActionArea,
+} from "@mui/material";
 
 import NotificationsList from "../../../components/NotificationsList";
 import wsCtx from "../../../context/SessionWorkspaceContext";
@@ -205,34 +214,44 @@ function TransportBar(props) {
             setNotifications={setNotifications}
             sx={{ width: 48, height: 48, mr: 2 }}
           />
-          <Box className="ws-transport-info" onClick={() => setExpanded(true)}>
-            {sessionParams.map((e, i) => (
-              <Box key={e.i}>
-                <Icon
-                  sx={(theme) => ({
-                    color: "text.primary",
-                    fontSize: "1rem",
-                    [theme.breakpoints.down("md")]: {
-                      fontSize: 12,
-                    },
-                  })}
-                >
-                  {e.i}
-                </Icon>
-                <Typography
-                  variant="body1"
-                  color="textPrimary"
-                  sx={(theme) => ({
-                    [theme.breakpoints.down("md")]: {
-                      fontSize: 8,
-                    },
-                  })}
-                >
-                  {paramsValue[i]}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
+
+          <Card
+            className="ws-transport-info"
+            elevation={0}
+            onClick={() => setExpanded(true)}
+          >
+            <CardActionArea>
+              {sessionParams.map((e, i) => (
+                <Box key={e.i} className="ws-transport-info-item">
+                  <Icon
+                    className="ws-transport-info-text"
+                    sx={(theme) => ({
+                      color: "text.primary",
+                      fontSize: "1rem",
+                      [theme.breakpoints.down("md")]: {
+                        fontSize: 12,
+                        mr: 2,
+                      },
+                    })}
+                  >
+                    {e.i}
+                  </Icon>
+                  <Typography
+                    variant="body1"
+                    color="textPrimary"
+                    className="ws-transport-info-text"
+                    sx={(theme) => ({
+                      [theme.breakpoints.down("md")]: {
+                        fontSize: 8,
+                      },
+                    })}
+                  >
+                    {(i === 1 && "1/") + paramsValue[i]}
+                  </Typography>
+                </Box>
+              ))}
+            </CardActionArea>
+          </Card>
         </Grid>
       </Grid>
       <Dialog
@@ -269,7 +288,9 @@ function TransportBar(props) {
                   keyboard_arrow_up
                 </Icon>
                 <div className="break" />
-                <Typography variant="h4">{paramsValue[i]}</Typography>
+                <Typography variant="h4">
+                  {(i === 1 && "1/") + paramsValue[i]}
+                </Typography>
                 <div className="break" />
                 <Icon onClick={() => handleArrowClick(i, false)}>
                   keyboard_arrow_down

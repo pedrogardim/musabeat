@@ -62,18 +62,18 @@
 }
 
 .ws-transport-info {
-  flex-direction: column;
-  width: 88px;
+  flex-direction: column !important;
+  width: 64px !important;
 }
 
-.ws-transport-info > div {
-  height: 16px;
-  align-items: center;
-  display: flex;
+.ws-transport-info-item {
+  height: 16px !important;
+  align-items: center !important;
+  display: flex !important;
 }
 
-.ws-transport-info span {
-  margin-right: 8px;
+.ws-transport-info-text {
+  margin-right: 8px !important;
 }
 
 .ws-transport-box {
