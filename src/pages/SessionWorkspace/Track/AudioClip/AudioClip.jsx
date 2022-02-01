@@ -195,37 +195,36 @@ function AudioClip(props) {
 
   const handleResize = () => {
     if (isRecClip) return;
-    let note = {};
+    let tempNote = {};
     setDrawingNote(null);
     if (isResizing === "right") {
-      note.dur =
+      tempNote.dur =
         (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize -
         Tone.Time(noteTime).toSeconds();
       setNoteDuration(
-        note.dur < 0.1
+        tempNote.dur < 0.1
           ? 0.1
-          : note.dur > player.buffer.duration - note.offset
+          : tempNote.dur > player.buffer.duration - note.offset
           ? player.buffer.duration - note.offset
-          : note.dur
+          : tempNote.dur
       );
     }
     if (isResizing === "left") {
-      note.time = (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
+      tempNote.time = (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
 
-      if (note.time <= 0) return;
+      if (tempNote.time <= 0) return;
 
-      note.offset = note.time - Tone.Time(note.time).toSeconds();
+      tempNote.offset =
+        tempNote.time - Tone.Time(note.time).toSeconds() + note.offset;
 
-      note.dur =
-        Tone.Time(note.time).toSeconds() +
-        note.duration -
-        (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
+      tempNote.dur =
+        Tone.Time(note.time).toSeconds() + note.duration - tempNote.time;
 
-      if (note.dur > player.buffer.duration || note.dur < 0.1) return;
+      if (tempNote.dur > player.buffer.duration || tempNote.dur < 0.1) return;
 
-      setNoteTime(note.time < 0 ? 0 : note.time);
-      setNoteOffset(note.offset < 0 ? 0 : note.offset);
-      setNoteDuration(note.dur);
+      setNoteTime(tempNote.time < 0 ? 0 : tempNote.time);
+      setNoteOffset(tempNote.offset < 0 ? 0 : tempNote.offset);
+      setNoteDuration(tempNote.dur);
     }
   };
 
@@ -246,7 +245,7 @@ function AudioClip(props) {
         Tone.Time("1m").toSeconds() / gridSize
       )
         return;
-      setNoteOffset(note.offset + Tone.Time(note.time).toSeconds() - newTime);
+      setNoteOffset(note.offset - newTime);
       setNoteDuration(
         note.duration + Tone.Time(note.time).toSeconds() + newTime
       );
@@ -320,7 +319,9 @@ function AudioClip(props) {
   useEffect(() => {
     //watch to window resize to update clips position
     //console.log(clipWidth, clipHeight);
-    console.log(noteDuration, noteOffset, noteTime);
+
+    //console.log(noteDuration, noteOffset, noteTime);
+
     loaded &&
       drawClipWave(
         player.buffer,
