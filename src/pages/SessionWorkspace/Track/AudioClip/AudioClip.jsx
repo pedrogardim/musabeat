@@ -239,7 +239,19 @@ function AudioClip(props) {
 
     let maxTime = (zoomPosition[1] + 1) * Tone.Time("1m").toSeconds();
 
-    //if (newTime < 0) newTime = 0;
+    if (newTime < 0) {
+      setNoteTime(0);
+      if (
+        note.duration + Tone.Time(note.time).toSeconds() + newTime <
+        Tone.Time("1m").toSeconds() / gridSize
+      )
+        return;
+      setNoteOffset(note.offset + Tone.Time(note.time).toSeconds() - newTime);
+      setNoteDuration(
+        note.duration + Tone.Time(note.time).toSeconds() + newTime
+      );
+      return;
+    }
     //if (newTime + noteDuration > maxTime) newTime = maxTime - noteDuration;
 
     setNoteTime(Tone.Time(newTime).toBarsBeatsSixteenths());
@@ -262,6 +274,7 @@ function AudioClip(props) {
   useEffect(() => {
     setNoteTime((prev) => (note.time !== prev ? note.time : prev));
     setNoteDuration((prev) => (note.duration !== prev ? note.duration : prev));
+    setNoteOffset((prev) => (note.offset !== prev ? note.offset : prev));
   }, [note]);
 
   /*  useEffect(() => {
@@ -307,6 +320,7 @@ function AudioClip(props) {
   useEffect(() => {
     //watch to window resize to update clips position
     //console.log(clipWidth, clipHeight);
+    console.log(noteDuration, noteOffset, noteTime);
     loaded &&
       drawClipWave(
         player.buffer,
