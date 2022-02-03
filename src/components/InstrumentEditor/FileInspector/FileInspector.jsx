@@ -40,7 +40,6 @@ function FileInspector(props) {
     onClose,
     exists,
     instrument,
-    onFileClick,
     setInstrumentLoaded,
     index,
     buffer,

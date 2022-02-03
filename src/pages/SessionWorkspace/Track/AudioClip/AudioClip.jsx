@@ -16,6 +16,8 @@ function AudioClip(props) {
   const { tracks, setTracks, params, paramSetter, instrumentsInfo } =
     useContext(wsCtx);
 
+  const canvasRef = useRef(null);
+
   const { gridSize, selNotes, movingSelDelta, zoomPosition, selectedTrack } =
     params;
 
@@ -29,6 +31,7 @@ function AudioClip(props) {
     isRecClip,
     isMouseDown,
     setDrawingNote,
+    recordingBuffer,
   } = props;
 
   const fileInfo = instrumentsInfo[selectedTrack].filesInfo[index];
@@ -319,28 +322,20 @@ function AudioClip(props) {
   useEffect(() => {
     //watch to window resize to update clips position
     //console.log(clipWidth, clipHeight);
-
-    //console.log(noteDuration, noteOffset, noteTime);
-
-    loaded &&
-      drawClipWave(
-        player.buffer,
-        //clipHeight,
-        //clipWidth,
-        noteDuration,
-        noteOffset,
-        colors[track.color],
-        rowRef.current.offsetWidth,
-        noteRef.current.offsetWidth,
-        index
-      );
+    drawClipWave(
+      isRecClip ? recordingBuffer : player.buffer.toArray(0),
+      canvasRef,
+      colors[track.color][500]
+    );
   }, [
     rowRef.current,
+    canvasRef.current,
     player,
     player.buffer.loaded,
     zoomPosition,
     note,
     noteDuration,
+    recordingBuffer,
     noteOffset,
   ]);
 
@@ -391,13 +386,15 @@ function AudioClip(props) {
 
       <span className="audioclip-text up">{fileInfo && fileInfo.name}</span>
 
-      {!isRecClip && (
-        <canvas
-          className="sampler-audio-clip-wave"
-          id={`canvas-${index}`}
-          height={rowRef.current.scrollHeight / 2}
-        />
-      )}
+      <canvas
+        className="sampler-audio-clip-wave"
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          height: "100%",
+          width: "100%",
+        }}
+      />
 
       {isSelected && selNotes[selectedTrack].length === 1 && (
         <>
@@ -432,33 +429,20 @@ function AudioClip(props) {
   );
 }
 
-const drawClipWave = (
-  buffer,
-  duration,
-  offset,
-  color,
-  parentWidth,
-  noteWidth,
-  index
-) => {
+const drawClipWave = (waveArray, canvasRef, color) => {
   //if (clipHeight === 0 || clipWidth === 0) return;
-
-  const canvas = document.getElementById(`canvas-${index}`);
-  canvas.width = noteWidth;
-
+  const canvas = canvasRef.current;
+  canvas.height = canvas.offsetHeight;
+  canvas.width = canvas.offsetWidth;
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   //console.log(canvas.width);
 
-  let waveArray = buffer.slice(offset);
-
-  waveArray = waveArray.slice(0, duration).toArray(0);
-
   let xScale = waveArray.length / canvas.width;
-  let yScale = 2;
+  let yScale = 1;
 
-  ctx.fillStyle = color[900];
+  ctx.fillStyle = color;
 
   for (let x = 0; x < canvas.width; x++) {
     let rectHeight =

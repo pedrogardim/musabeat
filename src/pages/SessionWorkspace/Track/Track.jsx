@@ -63,7 +63,9 @@ function Track(props) {
   const trackInstrument = instruments[selectedTrack];
   const trackType = track.type;
 
-  const { recStart, recStop, meterLevel } = useAudioRec(trackType === 2);
+  const { recStart, recStop, meterLevel, recordingBuffer } = useAudioRec(
+    trackType === 2
+  );
 
   const loadTrackRows = () => {
     if (!trackInstrument) return;
@@ -151,7 +153,7 @@ function Track(props) {
     }
   };
 
-  const onFileClick = (fileId, fileUrl, audiobuffer, index, data) => {
+  const setFile = (fileId, fileUrl, audiobuffer, data) => {
     let newAudioIndex = 0;
     while (trackInstrument.has(newAudioIndex)) {
       newAudioIndex++;
@@ -594,6 +596,7 @@ function Track(props) {
                 note={drawingNote}
                 rowRef={rowRef}
                 player={{ buffer: { loaded: "" } }}
+                recordingBuffer={recordingBuffer}
               />
             )}
           </>
@@ -607,7 +610,7 @@ function Track(props) {
           onClose={() => paramSetter("openDialog", null)}
           exists={false}
           instrument={trackInstrument}
-          onFileClick={onFileClick}
+          setFile={setFile}
           setInstrumentLoaded={() => {}}
         />
       )}
