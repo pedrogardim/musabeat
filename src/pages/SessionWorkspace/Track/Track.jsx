@@ -36,7 +36,7 @@ function Track(props) {
     tracks,
     instruments,
     setTracks,
-    setPendingUploadFiles,
+    setUploadQueue,
     params,
     paramSetter,
     instrumentsInfo,
@@ -129,7 +129,7 @@ function Track(props) {
       recStop((file, audiobuffer) => {
         //console.log(file, audiobuffer);
         trackInstrument.add(drawingNote.clip, audiobuffer);
-        setPendingUploadFiles((prev) => [
+        setUploadQueue((prev) => [
           ...prev,
           { file: file, index: drawingNote.clip, track: selectedTrack },
         ]);
