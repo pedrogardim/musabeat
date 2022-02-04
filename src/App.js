@@ -131,7 +131,10 @@ function App() {
 
   const handlePageNav = (route, id, e) => {
     if (e && (e.metaKey || e.ctrlKey)) {
-      const win = window.open(`/#/${route}/${id}`, "_blank");
+      const win = window.open(
+        `${window.cordova && "/#"}/${route}/${id}`,
+        "_blank"
+      );
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
