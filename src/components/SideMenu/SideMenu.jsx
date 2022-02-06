@@ -24,6 +24,8 @@ function SideMenu(props) {
   const handleClick = (opt, e) => {
     opt === "newSession"
       ? props.setNewSessionDialog(true)
+      : opt === "darkmode"
+      ? props.setDarkMode((prev) => !prev)
       : props.handlePageNav(opt, "", e);
 
     props.setSideMenu(false);
@@ -46,8 +48,16 @@ function SideMenu(props) {
       </div>
       <Divider />
       <List className="side-menu-list">
-        {["newSession", "explore", "instruments", "drumsets", "files"].map(
-          (text, index) => (
+        {[
+          "newSession",
+          "explore",
+          "instruments",
+          "drumsets",
+          "files",
+          "darkmode",
+        ].map((text, index) => (
+          <>
+            {text === "darkmode" && <Divider />}
             <ListItem
               button
               onClick={(e) => {
@@ -65,13 +75,17 @@ function SideMenu(props) {
                     ? "piano"
                     : index === 3
                     ? "grid_on"
-                    : "description"}
+                    : index === 4
+                    ? "description"
+                    : props.darkMode
+                    ? "dark_mode"
+                    : "light_mode"}
                 </Icon>
               </ListItemIcon>
               <ListItemText primary={t(`sidemenu.${text}`)} />
             </ListItem>
-          )
-        )}
+          </>
+        ))}
       </List>
     </Drawer>
   );
