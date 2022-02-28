@@ -325,7 +325,7 @@ function AudioClip(props) {
     drawClipWave(
       isRecClip ? recordingBuffer : player.buffer.toArray(0),
       canvasRef,
-      colors[track.color][500]
+      colors[track.color][900]
     );
   }, [
     rowRef.current,
@@ -333,10 +333,10 @@ function AudioClip(props) {
     player,
     player.buffer.loaded,
     zoomPosition,
-    note,
-    noteDuration,
+    //note,
+    //noteDuration,
     recordingBuffer,
-    noteOffset,
+    //noteOffset,
   ]);
 
   return (
@@ -364,8 +364,9 @@ function AudioClip(props) {
           ? "#f50057"
           : colors[track.color][isSelected ? 800 : 300],
         outline: `solid 1px ${colors[track.color][800]}`,
-        borderRadius: 4,
-        zIndex: isSelected && 2,
+        //borderRadius: 4,
+        //zIndex: isSelected && 2,
+        overflow: "hidden",
         //margin: "-2px -2px 0 0",
       }}
     >
@@ -392,7 +393,12 @@ function AudioClip(props) {
         style={{
           position: "absolute",
           height: "100%",
-          width: "100%",
+          width:
+            (player.buffer.loaded / Tone.Time("1m").toSeconds()) *
+            (rowRef.current.offsetWidth / zoomSize),
+          left:
+            -(noteOffset / Tone.Time("1m").toSeconds()) *
+            (rowRef.current.offsetWidth / zoomSize),
         }}
       />
 

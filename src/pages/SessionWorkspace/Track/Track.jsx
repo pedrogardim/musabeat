@@ -105,7 +105,7 @@ function Track(props) {
       rows = [
         {
           note: 0,
-          lbl: "A",
+          lbl: "",
         },
       ];
     }
