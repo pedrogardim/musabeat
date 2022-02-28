@@ -394,7 +394,7 @@ function AudioClip(props) {
           position: "absolute",
           height: "100%",
           width:
-            (player.buffer.loaded / Tone.Time("1m").toSeconds()) *
+            (player.buffer.duration / Tone.Time("1m").toSeconds()) *
             (rowRef.current.offsetWidth / zoomSize),
           left:
             -(noteOffset / Tone.Time("1m").toSeconds()) *

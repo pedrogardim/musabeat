@@ -5,7 +5,7 @@ import wsCtx from "../../../../context/SessionWorkspaceContext";
 
 import { IconButton, Icon, Paper, CircularProgress } from "@mui/material";
 
-import Note from "./Note";
+import ClosedTrackNote from "./ClosedTrackNote";
 
 function ClosedTrack(props) {
   const rowRef = useRef(null);
@@ -23,13 +23,17 @@ function ClosedTrack(props) {
   const loaded = instrumentsLoaded[trackIndex];
   const selectedTrackNotes = selectedNotes[trackIndex];
 
+  const isAudioTrack = track.type === 2;
+
   const loadTrackRows = () => {
     let rows = [];
     if (!instrument) return;
 
-    let array = [...new Set(track.score.map((item) => item.note))].sort(
-      (a, b) => a - b
-    );
+    let array = [
+      ...new Set(
+        track.score.map((item) => item[isAudioTrack ? "clip" : "note"])
+      ),
+    ].sort((a, b) => a - b);
 
     rows = array.map((e, i) => {
       return {
@@ -97,16 +101,20 @@ function ClosedTrack(props) {
         {rowRef.current &&
           track.score.length > 0 &&
           track.score.map((note, noteIndex) => (
-            <Note
+            <ClosedTrackNote
               rowRef={rowRef}
               trackRows={trackRows}
               note={note}
               track={track}
-              sessionSize={sessionSize}
-              index={noteIndex}
               zoomPosition={zoomPosition}
               selected={
                 selectedTrackNotes && selectedTrackNotes.includes(noteIndex)
+              }
+              player={
+                isAudioTrack &&
+                loaded &&
+                instrument &&
+                instrument.player(note.clip)
               }
               key={noteIndex}
               gridSize={gridSize}
