@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
+import useFetchFeed from "../../hooks/useFetchFeed";
 
 import { useParams } from "react-router-dom";
 
@@ -31,10 +32,10 @@ const color = colors[2];
 function HomePage(props) {
   const { t } = useTranslation();
 
-  const waveformWrapper = useRef(null);
-
   const [stats, setStats] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
+
+  const { feedItems, fetchFeed } = useFetchFeed();
 
   const getStats = () => {
     firebase
@@ -53,6 +54,10 @@ function HomePage(props) {
           .then((r) => setUserInfo(r.data()))
       : setUserInfo(null);
   };
+
+  useEffect(() => {
+    if (userInfo !== null) fetchFeed(userInfo.feed);
+  }, [userInfo]);
 
   useEffect(() => {
     getStats();
