@@ -93,8 +93,7 @@ function ClosedTrack(props) {
               position: "absolute",
               left: "calc(50% - 20px)",
               top: "calc(50% - 20px)",
-              color:
-                colors[track.color][theme.palette.mode === "dark" ? 900 : 900],
+              color: colors[track.color][900],
             })}
           />
         )}

@@ -21,6 +21,7 @@ function ClosedTrackNote(props) {
   const canvasRef = useRef(null);
 
   const trackType = track.type;
+  const isAudioTrack = track.type === 2;
 
   let zoomSize = zoomPosition[1] - zoomPosition[0] + 1;
 
@@ -51,7 +52,7 @@ function ClosedTrackNote(props) {
           ((selected ? movingSelDelta / gridSize : 0) - zoomPosition[0]) *
             (rowRef.current.offsetWidth / zoomSize)
         }px,${
-          trackType === 2
+          isAudioTrack
             ? 0
             : trackRows
                 .sort((a, b) =>

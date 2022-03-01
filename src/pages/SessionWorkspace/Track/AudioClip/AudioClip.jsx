@@ -362,7 +362,7 @@ function AudioClip(props) {
         }px,${rowRef.current.scrollHeight / 4}px)`,
         backgroundColor: isRecClip
           ? "#f50057"
-          : colors[track.color][isSelected ? 800 : 300],
+          : colors[track.color][isSelected ? 500 : 300],
         outline: `solid 1px ${colors[track.color][800]}`,
         //borderRadius: 4,
         //zIndex: isSelected && 2,
