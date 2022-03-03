@@ -17,7 +17,7 @@ function useFetchFeed() {
   };
 
   useEffect(() => {
-    console.log(feedItems);
+    //console.log(feedItems);
   }, [feedItems]);
 
   return { feedItems, fetchFeed };

@@ -22,7 +22,7 @@ import { sessionTags } from "../../../services/MiscData";
 
 import { colors } from "../../../utils/Pallete";
 
-function SessionGalleryItem(props) {
+function SessionCard(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
 
@@ -56,14 +56,7 @@ function SessionGalleryItem(props) {
   }, [props.session]);
 
   return (
-    <Grid
-      item
-      xs={12}
-      sm={6}
-      md={3}
-      lg={!props.compact ? 2 : 3}
-      xl={!props.compact ? 2 : 3}
-    >
+    <Grid item xs={12} sm={12} md={12} lg={!props.compact ? 6 : 12} xl={6}>
       <Paper
         className={`session-gallery-item ${
           hovered && "session-gallery-item-hovered"
@@ -73,58 +66,55 @@ function SessionGalleryItem(props) {
         onMouseLeave={() => setHovered(false)}
       >
         <div className="session-gallery-item-title-cont">
-          <Tooltip placement={"top"} title={props.session.name}>
+          {!(props.isUser || props.compact) && (
+            <>
+              <Avatar
+                className="session-gallery-item-subtitle-avatar"
+                src={creatorInfo.photoURL}
+                onClick={(ev) =>
+                  props.handlePageNav("user", creatorInfo.username, ev)
+                }
+              />
+            </>
+          )}
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Typography
-              variant={"h5"}
-              style={{ fontSize: props.compact && "1.2rem" }}
-              className="session-gallery-item-title"
+              variant="body1"
+              sx={{
+                fontWeight: "bold",
+                //textTransform: "none",
+              }}
             >
               {props.session.name
                 ? props.session.name
                 : t("WSTitle.untitledSession")}
             </Typography>
-          </Tooltip>
-          {props.isUser && (
-            <IconButton
-              onClick={() => props.setRenameDialog(props.index)}
-              className="session-gallery-item-editname-button"
-            >
-              <Icon>edit</Icon>
-            </IconButton>
-          )}
-        </div>
-
-        {!(props.isUser || props.compact) && (
-          <div className="session-gallery-item-subtitle">
-            <Avatar
-              className="session-gallery-item-subtitle-avatar"
-              src={creatorInfo.photoURL}
-              onClick={(ev) =>
-                props.handlePageNav("user", creatorInfo.username, ev)
-              }
-            />
-            <Typography variant="overline">{creatorInfo.username}</Typography>
-          </div>
-        )}
-
-        <div className={"session-gallery-item-sessionInfo"}>
-          <Tooltip
-            title={
-              props.session.description && `"${props.session.description}"`
-            }
-          >
+            <div className="break" />
             <Typography
-              className={"session-gallery-item-sessionInfo-text"}
-              align={"center"}
-              style={{ color: "darkgray" }}
+              variant="body1"
+              sx={{
+                color: "gray",
+                textDecoration: "underline",
+                textTransform: "none",
+              }}
             >
-              {props.session.description ? (
-                `"${props.session.description}"`
-              ) : (
-                <i>No Description </i>
-              )}{" "}
+              {"@" + creatorInfo.username}
             </Typography>
-          </Tooltip>
+          </div>
+
+          <IconButton
+            onClick={() => props.setRenameDialog(props.index)}
+            className="session-gallery-item-actions-button"
+          >
+            <Icon>more_vert</Icon>
+          </IconButton>
         </div>
 
         {!props.compact &&
@@ -169,12 +159,8 @@ function SessionGalleryItem(props) {
                     {e.type === 0
                       ? "grid_on"
                       : e.type === 1
-                      ? "music_note"
-                      : e.type === 2
-                      ? "font_download"
-                      : e.type === 3
-                      ? "graphic_eq"
-                      : "piano"}
+                      ? "piano"
+                      : "graphic_eq"}
                   </Icon>
                 </Tooltip>
               </Paper>
@@ -255,4 +241,4 @@ function SessionGalleryItem(props) {
   );
 }
 
-export default SessionGalleryItem;
+export default SessionCard;
