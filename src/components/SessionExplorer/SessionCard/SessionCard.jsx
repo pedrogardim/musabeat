@@ -12,6 +12,9 @@ import {
   Tooltip,
   Grid,
   Chip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from "@mui/material";
 
 import "./style.css";
@@ -25,6 +28,7 @@ import { colors } from "../../../utils/Pallete";
 function SessionCard(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   const { t } = useTranslation();
 
@@ -51,6 +55,44 @@ function SessionCard(props) {
     dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
   };
 
+  /*   
+
+const getTimeDifferent = (current, previous) => {
+
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    var elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+         return Math.round(elapsed/1000) + ' seconds ago';   
+    }
+
+    else if (elapsed < msPerHour) {
+         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    }
+
+    else if (elapsed < msPerDay ) {
+         return Math.round(elapsed/msPerHour ) + ' hours ago';   
+    }
+
+    else if (elapsed < msPerMonth) {
+        return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+    }
+
+    else if (elapsed < msPerYear) {
+        return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+    }
+
+    else {
+        return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
+    }
+}
+
+ */
   useEffect(() => {
     fetchCreatorDisplayName();
   }, [props.session]);
@@ -110,7 +152,7 @@ function SessionCard(props) {
           </div>
 
           <IconButton
-            onClick={() => props.setRenameDialog(props.index)}
+            onClick={(e) => setMenuAnchorEl(e.target)}
             className="session-gallery-item-actions-button"
           >
             <Icon>more_vert</Icon>
@@ -225,18 +267,32 @@ function SessionCard(props) {
                 </IconButton>
               </div>
             </Tooltip>
-            {props.isUser && (
-              <Tooltip title="Delete Session">
-                <IconButton
-                  onClick={() => props.handleSessionDelete(props.index)}
-                >
-                  <Icon>delete</Icon>
-                </IconButton>
-              </Tooltip>
-            )}
           </div>
         )}
       </Paper>
+      <Menu open={Boolean(menuAnchorEl)} anchorEl={menuAnchorEl}>
+        <MenuItem
+          onClick={() => props.setNewSessionDialog(props.session)}
+          disabled={
+            !props.user ||
+            (props.user.uid !== props.session.creator && !props.session.alwcp)
+          }
+        >
+          <ListItemIcon>
+            <Icon>content_copy</Icon>
+          </ListItemIcon>
+          Create a copy
+        </MenuItem>
+        {props.isUser && (
+          <MenuItem onClick={() => props.handleSessionDelete(props.index)}>
+            <ListItemIcon>
+              {" "}
+              <Icon>delete</Icon>
+            </ListItemIcon>
+            Delete Session
+          </MenuItem>
+        )}
+      </Menu>
     </Grid>
   );
 }
