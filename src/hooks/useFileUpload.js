@@ -6,13 +6,13 @@ import firebase from "firebase";
 import { fileTypes, encodeAudioFile } from "../services/Audio";
 
 function useFileUpload(opt) {
-  const { notifications, setNotifications } = opt;
+  const { notifications, setNotifications, uploadingFiles, setUploadingFiles } =
+    opt;
 
-  const [uploadState, setUploadState] = useState(null);
-  const [notificationIndex, setNotificationIndex] = useState(
-    notifications && notifications.length
-  );
-  const [info, setInfo] = useState(null);
+  const [filesUploadState, setFilesUploadState] = useState([]);
+  const [notificationIndexes, setNotificationIndexes] = useState([]);
+  const [filesInfo, setFilesInfo] = useState([]);
+  const [filesId, setFilesId] = useState([]);
 
   const user = firebase.auth().currentUser;
   const userRef =
@@ -21,8 +21,18 @@ function useFileUpload(opt) {
 
   const storageLim = { normal: 536870912, pr: 10737418240 };
 
-  const uploadFile = async (file, buffer, onIdGet, onUpload) => {
-    setNotificationIndex(notifications && notifications.length);
+  const setFileUploadState = (state, index) => {
+    setFilesUploadState((prev) => {
+      let newState = [...prev];
+      newState[index] = state;
+      return newState;
+    });
+  };
+
+  const uploadFile = async (file, buffer, onIdGet, onUpload, index = 0) => {
+    setNotificationIndexes((prev) =>
+      notifications ? [...prev, notifications.length + index] : prev
+    );
     try {
       const arrayBuffer = await file.arrayBuffer();
 
@@ -44,7 +54,7 @@ function useFileUpload(opt) {
         upOn: firebase.firestore.FieldValue.serverTimestamp(),
       };
 
-      setInfo(fileInfo);
+      setFilesInfo((prev) => [...prev, fileInfo]);
 
       const checkQuery = await filesRef
         .where("dur", "==", fileInfo.dur)
@@ -56,9 +66,15 @@ function useFileUpload(opt) {
       if (!checkQuery.empty) {
         const fileId = checkQuery.docs[0].id;
 
-        setUploadState("duplicatedFound");
+        setFileUploadState("duplicatedFound", index);
         onIdGet && onIdGet(fileId, fileInfo, audioBuffer);
         onUpload && onUpload(fileId, fileInfo, audioBuffer);
+
+        setFilesId((prev) => {
+          let newIds = [...prev];
+          newIds[index] = fileId;
+          return newIds;
+        });
 
         firebase
           .firestore()
@@ -83,7 +99,7 @@ function useFileUpload(opt) {
           userData.sp + finalFile.size >
           (checkPremium ? storageLim.pr : storageLim.normal)
         ) {
-          setUploadState("noSpace");
+          setFileUploadState("noSpace", index);
           return;
         }
         const uploadTask = storageRef.put(finalFile);
@@ -91,14 +107,15 @@ function useFileUpload(opt) {
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            setUploadState(
-              (snapshot.bytesTransferred * 100) / snapshot.totalBytes
+            setFileUploadState(
+              (snapshot.bytesTransferred * 100) / snapshot.totalBytes,
+              index
             );
           },
           (e) => {
             console.log(e);
             filesRef.doc(fileDBRef.id).remove();
-            setUploadState("uploadError");
+            setFileUploadState("uploadError", index);
             return;
           },
           () => {
@@ -109,28 +126,46 @@ function useFileUpload(opt) {
             });
           }
         );
+
+        return uploadTask.then(() => fileDBRef.id);
       }
     } catch (e) {
       console.log(e);
-      setUploadState("decodingError");
+      setFileUploadState("decodingError", index);
     }
   };
 
+  const uploadFiles = async (files, callback) => {
+    //console.log("files", files);
+    Promise.all(files.map((e) => uploadFile(e.file))).then((ids) => {
+      callback && callback(ids);
+      setUploadingFiles([]);
+    });
+  };
+
   useEffect(() => {
-    if (setNotifications && uploadState !== null && info !== null)
+    if (uploadingFiles && uploadingFiles.length > 0)
+      uploadFiles(uploadingFiles);
+  }, [uploadingFiles]);
+
+  useEffect(() => {
+    if (setNotifications && filesUploadState.length > 0 && filesInfo !== null)
       setNotifications((prev) => {
         let newNotifications = [...prev];
-        newNotifications[notificationIndex] = {
-          type: "upload",
-          info: info,
-          state: uploadState,
-        };
+        notificationIndexes.forEach((e, i) => {
+          newNotifications[e] = {
+            type: "upload",
+            info: filesInfo[i],
+            state: filesUploadState[i],
+          };
+        });
         return newNotifications;
       });
-  }, [uploadState, info]);
+  }, [filesUploadState, filesInfo]);
 
   return {
     uploadFile,
+    uploadFiles,
   };
 }
 

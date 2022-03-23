@@ -36,9 +36,15 @@ const startApp = () => {
           // reset the state of your app so the error doesn't happen again
         }}
       >
-        <HashRouter>
-          <App />
-        </HashRouter>
+        {window.cordova ? (
+          <HashRouter>
+            <App />
+          </HashRouter>
+        ) : (
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        )}
       </ErrorBoundary>
     </>,
     document.getElementById("root")

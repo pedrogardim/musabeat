@@ -16,6 +16,8 @@ function AudioClip(props) {
   const { tracks, setTracks, params, paramSetter, instrumentsInfo } =
     useContext(wsCtx);
 
+  const canvasRef = useRef(null);
+
   const { gridSize, selNotes, movingSelDelta, zoomPosition, selectedTrack } =
     params;
 
@@ -29,6 +31,7 @@ function AudioClip(props) {
     isRecClip,
     isMouseDown,
     setDrawingNote,
+    recordingBuffer,
   } = props;
 
   const fileInfo = instrumentsInfo[selectedTrack].filesInfo[index];
@@ -195,37 +198,36 @@ function AudioClip(props) {
 
   const handleResize = () => {
     if (isRecClip) return;
-    let note = {};
+    let tempNote = {};
     setDrawingNote(null);
     if (isResizing === "right") {
-      note.dur =
+      tempNote.dur =
         (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize -
         Tone.Time(noteTime).toSeconds();
       setNoteDuration(
-        note.dur < 0.1
+        tempNote.dur < 0.1
           ? 0.1
-          : note.dur > player.buffer.duration - note.offset
+          : tempNote.dur > player.buffer.duration - note.offset
           ? player.buffer.duration - note.offset
-          : note.dur
+          : tempNote.dur
       );
     }
     if (isResizing === "left") {
-      note.time = (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
+      tempNote.time = (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
 
-      if (note.time <= 0) return;
+      if (tempNote.time <= 0) return;
 
-      note.offset = note.time - Tone.Time(note.time).toSeconds();
+      tempNote.offset =
+        tempNote.time - Tone.Time(note.time).toSeconds() + note.offset;
 
-      note.dur =
-        Tone.Time(note.time).toSeconds() +
-        note.duration -
-        (floatPos[1] * Tone.Time("1m").toSeconds()) / gridSize;
+      tempNote.dur =
+        Tone.Time(note.time).toSeconds() + note.duration - tempNote.time;
 
-      if (note.dur > player.buffer.duration || note.dur < 0.1) return;
+      if (tempNote.dur > player.buffer.duration || tempNote.dur < 0.1) return;
 
-      setNoteTime(note.time < 0 ? 0 : note.time);
-      setNoteOffset(note.offset < 0 ? 0 : note.offset);
-      setNoteDuration(note.dur);
+      setNoteTime(tempNote.time < 0 ? 0 : tempNote.time);
+      setNoteOffset(tempNote.offset < 0 ? 0 : tempNote.offset);
+      setNoteDuration(tempNote.dur);
     }
   };
 
@@ -239,7 +241,19 @@ function AudioClip(props) {
 
     let maxTime = (zoomPosition[1] + 1) * Tone.Time("1m").toSeconds();
 
-    //if (newTime < 0) newTime = 0;
+    if (newTime < 0) {
+      setNoteTime(0);
+      if (
+        note.duration + Tone.Time(note.time).toSeconds() + newTime <
+        Tone.Time("1m").toSeconds() / gridSize
+      )
+        return;
+      setNoteOffset(note.offset - newTime);
+      setNoteDuration(
+        note.duration + Tone.Time(note.time).toSeconds() + newTime
+      );
+      return;
+    }
     //if (newTime + noteDuration > maxTime) newTime = maxTime - noteDuration;
 
     setNoteTime(Tone.Time(newTime).toBarsBeatsSixteenths());
@@ -262,6 +276,7 @@ function AudioClip(props) {
   useEffect(() => {
     setNoteTime((prev) => (note.time !== prev ? note.time : prev));
     setNoteDuration((prev) => (note.duration !== prev ? note.duration : prev));
+    setNoteOffset((prev) => (note.offset !== prev ? note.offset : prev));
   }, [note]);
 
   /*  useEffect(() => {
@@ -307,26 +322,21 @@ function AudioClip(props) {
   useEffect(() => {
     //watch to window resize to update clips position
     //console.log(clipWidth, clipHeight);
-    loaded &&
-      drawClipWave(
-        player.buffer,
-        //clipHeight,
-        //clipWidth,
-        noteDuration,
-        noteOffset,
-        colors[track.color],
-        rowRef.current.offsetWidth,
-        noteRef.current.offsetWidth,
-        index
-      );
+    drawClipWave(
+      isRecClip ? recordingBuffer : player.buffer.toArray(0),
+      canvasRef,
+      colors[track.color][900]
+    );
   }, [
     rowRef.current,
+    canvasRef.current,
     player,
     player.buffer.loaded,
     zoomPosition,
-    note,
-    noteDuration,
-    noteOffset,
+    //note,
+    //noteDuration,
+    recordingBuffer,
+    //noteOffset,
   ]);
 
   return (
@@ -352,10 +362,11 @@ function AudioClip(props) {
         }px,${rowRef.current.scrollHeight / 4}px)`,
         backgroundColor: isRecClip
           ? "#f50057"
-          : colors[track.color][isSelected ? 800 : 300],
+          : colors[track.color][isSelected ? 500 : 300],
         outline: `solid 1px ${colors[track.color][800]}`,
-        borderRadius: 4,
-        zIndex: isSelected && 2,
+        //borderRadius: 4,
+        //zIndex: isSelected && 2,
+        overflow: "hidden",
         //margin: "-2px -2px 0 0",
       }}
     >
@@ -376,13 +387,20 @@ function AudioClip(props) {
 
       <span className="audioclip-text up">{fileInfo && fileInfo.name}</span>
 
-      {!isRecClip && (
-        <canvas
-          className="sampler-audio-clip-wave"
-          id={`canvas-${index}`}
-          height={rowRef.current.scrollHeight / 2}
-        />
-      )}
+      <canvas
+        className="sampler-audio-clip-wave"
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          height: "100%",
+          width:
+            (player.buffer.duration / Tone.Time("1m").toSeconds()) *
+            (rowRef.current.offsetWidth / zoomSize),
+          left:
+            -(noteOffset / Tone.Time("1m").toSeconds()) *
+            (rowRef.current.offsetWidth / zoomSize),
+        }}
+      />
 
       {isSelected && selNotes[selectedTrack].length === 1 && (
         <>
@@ -417,33 +435,20 @@ function AudioClip(props) {
   );
 }
 
-const drawClipWave = (
-  buffer,
-  duration,
-  offset,
-  color,
-  parentWidth,
-  noteWidth,
-  index
-) => {
+const drawClipWave = (waveArray, canvasRef, color) => {
   //if (clipHeight === 0 || clipWidth === 0) return;
-
-  const canvas = document.getElementById(`canvas-${index}`);
-  canvas.width = noteWidth;
-
+  const canvas = canvasRef.current;
+  canvas.height = canvas.offsetHeight;
+  canvas.width = canvas.offsetWidth;
   const ctx = canvas.getContext("2d");
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   //console.log(canvas.width);
 
-  let waveArray = buffer.slice(offset);
-
-  waveArray = waveArray.slice(0, duration).toArray(0);
-
   let xScale = waveArray.length / canvas.width;
-  let yScale = 2;
+  let yScale = 1;
 
-  ctx.fillStyle = color[900];
+  ctx.fillStyle = color;
 
   for (let x = 0; x < canvas.width; x++) {
     let rectHeight =

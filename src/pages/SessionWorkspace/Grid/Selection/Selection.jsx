@@ -60,7 +60,11 @@ function Selection(props) {
 
   const onGridPosChange = () => {
     //drag note input
-    if (clickedTarget !== null && !resizingHandle) {
+    if (
+      clickedTarget !== null &&
+      !clickedTarget.includes("track-score-note") &&
+      !resizingHandle
+    ) {
       if (cursorMode !== "edit") {
         if (isMovingSelected === false)
           paramSetter(

@@ -16,6 +16,7 @@ import {
   AppBar,
   Typography,
   Fade,
+  ListItemIcon,
   ThemeProvider,
   createTheme,
   useMediaQuery,
@@ -62,13 +63,15 @@ function App() {
   const { t, i18n } = useTranslation();
   const history = useHistory();
 
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  const darkModeMediaQuery = useMediaQuery("(prefers-color-scheme: dark)");
+
+  const [darkMode, setDarkMode] = useState(darkModeMediaQuery);
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? "dark" : "light",
+          mode: darkMode ? "dark" : "light",
           primary: { main: "#3F51B5", light: "#3F51B5", dark: "#3F51B5" },
           secondary: { main: "#ED254E", light: "#ED254E", dark: "#ED254E" },
         },
@@ -103,7 +106,7 @@ function App() {
           },
         },
       }),
-    [prefersDarkMode]
+    [darkMode]
   );
 
   const wrapperRef = useRef(null);
@@ -131,7 +134,10 @@ function App() {
 
   const handlePageNav = (route, id, e) => {
     if (e && (e.metaKey || e.ctrlKey)) {
-      const win = window.open(`/#/${route}/${id}`, "_blank");
+      const win = window.open(
+        `${window.cordova && "/#"}/${route}/${id}`,
+        "_blank"
+      );
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
@@ -181,6 +187,10 @@ function App() {
   useEffect(() => {
     //console.log(user);
   }, [user]);
+
+  useEffect(() => {
+    setDarkMode(darkModeMediaQuery);
+  }, [darkModeMediaQuery]);
 
   useEffect(() => {
     window.onbeforeunload = function (e) {
@@ -326,6 +336,8 @@ function App() {
           handlePageNav={handlePageNav}
           setSideMenu={setSideMenu}
           setNewSessionDialog={setNewSessionDialog}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
         />
 
         <Switch>

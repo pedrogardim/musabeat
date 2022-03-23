@@ -42,12 +42,14 @@ function useFirebaseConnection(ctx) {
     setSnackbarMessage,
     hidden,
     editMode,
-    pendingUploadFiles,
+    uploadQueue,
+    setUploadQueue,
     setUploadingFiles,
     setInstrumentsLoaded,
     setInstruments,
     setNotifications,
     setInstrumentsInfo,
+    uploadFiles,
   } = ctx;
 
   const DBSessionRef = firebase
@@ -58,13 +60,27 @@ function useFirebaseConnection(ctx) {
   const autoSaverTime = 5 * 60 * 1000;
 
   const triggerSave = (tracks, sessionData) => {
-    if (pendingUploadFiles.length > 0)
-      setUploadingFiles(
-        pendingUploadFiles.filter(
+    if (uploadQueue.length > 0)
+      uploadFiles(
+        uploadQueue.filter(
           (file) =>
             tracks[file.track].score.findIndex((e) => e.clip === file.index) !==
             -1
-        )
+        ),
+        (filesId) => {
+          setTracks((prev) => {
+            let newTracks = [...prev];
+            uploadQueue.forEach((file, index) => {
+              console.log("file" + index, file);
+              newTracks[file.track].instrument.urls[file.index] =
+                filesId[index];
+            });
+            return newTracks;
+          });
+
+          save(tracks, sessionData);
+          setUploadQueue([]);
+        }
       );
     else save(tracks, sessionData);
   };

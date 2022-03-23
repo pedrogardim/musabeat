@@ -105,8 +105,8 @@ function useSession(options) {
   };
 
   useEffect(() => {
-    Tone.Transport.pause();
-  }, [sessionData, instruments]);
+    action("pause");
+  }, [instruments]);
 
   useEffect(() => {
     let progress =

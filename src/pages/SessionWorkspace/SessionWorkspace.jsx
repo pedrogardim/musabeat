@@ -103,12 +103,17 @@ function SessionWorkspace(props) {
 
   const [editorProfiles, setEditorProfiles] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [pendingUploadFiles, setPendingUploadFiles] = useState([]);
+  const [uploadQueue, setUploadQueue] = useState([]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
 
   const { user, handlePageNav, hidden } = props;
 
-  const { uploadFile } = useFileUpload({ notifications, setNotifications });
+  const { uploadFile, uploadFiles } = useFileUpload({
+    notifications,
+    setNotifications,
+    uploadingFiles,
+    setUploadingFiles,
+  });
 
   const [Undo, Redo, updateUndoHistory, resetHistory] = useUndo(setTracks);
 
@@ -132,8 +137,8 @@ function SessionWorkspace(props) {
     premiumMode,
     setPremiumMode,
     handlePageNav,
-    pendingUploadFiles,
-    setPendingUploadFiles,
+    uploadQueue,
+    setUploadQueue,
     uploadingFiles,
     setUploadingFiles,
     hidden,
@@ -143,6 +148,7 @@ function SessionWorkspace(props) {
     isLoaded,
     setNotifications,
     uploadFile,
+    uploadFiles,
   }));
 
   const [save, setSavingMode, areUnsavedChanges] =
@@ -175,21 +181,6 @@ function SessionWorkspace(props) {
 
   const handleSnackbarClose = () => {
     setSnackbarMessage(null);
-  };
-
-  const onUploadFinish = (filesId) => {
-    console.log("ALL UPLOADED");
-    if (pendingUploadFiles.length > 0) {
-      setTracks((prev) => {
-        let newTracks = [...prev];
-        uploadingFiles.forEach((file, index) => {
-          newTracks[file.track].instrument.urls[file.index] = filesId[index];
-        });
-        return newTracks;
-      });
-    }
-    save(tracks, sessionData);
-    setPendingUploadFiles([]);
   };
 
   /*===================================PLAYING==============================================*/
@@ -491,7 +482,7 @@ function SessionWorkspace(props) {
           />
         )}
 
-        {user && uploadingFiles.length > 0 && (
+        {/* user && uploadingFiles.length > 0 && (
           <FileUploader
             workspace
             files={uploadingFiles}
@@ -501,7 +492,7 @@ function SessionWorkspace(props) {
             setTracks={setTracks}
             onUploadFinish={onUploadFinish}
           />
-        )}
+        ) */}
 
         {user === null && tracks !== null && (
           <Auth persistent authDialog={true} setUser={props.setUser} />

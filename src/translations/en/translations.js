@@ -29,6 +29,7 @@ export const TRANSLATIONS_EN = {
     instruments: "Instruments",
     drumsets: "Drum Sets",
     files: "Files",
+    darkmode: "Light / Dark Mode",
   },
   avatar: {
     profile: "Profile",
