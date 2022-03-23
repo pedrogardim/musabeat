@@ -132,6 +132,9 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
+  const [windowWidth, setWindowWidth] = useState(0);
+  const [windowHeight, setWindowHeight] = useState(0);
+
   const handlePageNav = (route, id, e) => {
     if (e && (e.metaKey || e.ctrlKey)) {
       const win = window.open(
@@ -178,10 +181,18 @@ function App() {
       setBottomScroll(true);
   };
 
+  const onWindowResize = () => {
+    setWindowWidth(window.innerWidth);
+    setWindowHeight(window.innerHeight);
+  };
+
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
     window.addEventListener("online", () => setIsOnline(true));
     window.addEventListener("offline", () => setIsOnline(false));
+    onWindowResize();
+    window.addEventListener("resize", onWindowResize);
+    return () => window.removeEventListener("resize", onWindowResize);
   }, []);
 
   useEffect(() => {

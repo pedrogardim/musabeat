@@ -49,10 +49,10 @@ function useUndo(setter) {
       });
   };
 
-  const resetHistory = (input) => {
+  const resetHistory = () => {
     setHistory({
       past: [],
-      present: deepCopy(input),
+      present: null,
       future: [],
     });
   };

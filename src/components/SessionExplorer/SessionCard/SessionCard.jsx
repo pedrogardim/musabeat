@@ -12,6 +12,9 @@ import {
   Tooltip,
   Grid,
   Chip,
+  Menu,
+  MenuItem,
+  ListItemIcon,
 } from "@mui/material";
 
 import "./style.css";
@@ -22,9 +25,10 @@ import { sessionTags } from "../../../services/MiscData";
 
 import { colors } from "../../../utils/Pallete";
 
-function SessionGalleryItem(props) {
+function SessionCard(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
   const [hovered, setHovered] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   const { t } = useTranslation();
 
@@ -51,19 +55,50 @@ function SessionGalleryItem(props) {
     dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
   };
 
+  /*   
+
+const getTimeDifferent = (current, previous) => {
+
+    var msPerMinute = 60 * 1000;
+    var msPerHour = msPerMinute * 60;
+    var msPerDay = msPerHour * 24;
+    var msPerMonth = msPerDay * 30;
+    var msPerYear = msPerDay * 365;
+
+    var elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+         return Math.round(elapsed/1000) + ' seconds ago';   
+    }
+
+    else if (elapsed < msPerHour) {
+         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+    }
+
+    else if (elapsed < msPerDay ) {
+         return Math.round(elapsed/msPerHour ) + ' hours ago';   
+    }
+
+    else if (elapsed < msPerMonth) {
+        return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+    }
+
+    else if (elapsed < msPerYear) {
+        return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+    }
+
+    else {
+        return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
+    }
+}
+
+ */
   useEffect(() => {
     fetchCreatorDisplayName();
   }, [props.session]);
 
   return (
-    <Grid
-      item
-      xs={12}
-      sm={6}
-      md={3}
-      lg={!props.compact ? 2 : 3}
-      xl={!props.compact ? 2 : 3}
-    >
+    <Grid item xs={12} sm={12} md={12} lg={!props.compact ? 6 : 12} xl={6}>
       <Paper
         className={`session-gallery-item ${
           hovered && "session-gallery-item-hovered"
@@ -73,58 +108,55 @@ function SessionGalleryItem(props) {
         onMouseLeave={() => setHovered(false)}
       >
         <div className="session-gallery-item-title-cont">
-          <Tooltip placement={"top"} title={props.session.name}>
+          {!(props.isUser || props.compact) && (
+            <>
+              <Avatar
+                className="session-gallery-item-subtitle-avatar"
+                src={creatorInfo.photoURL}
+                onClick={(ev) =>
+                  props.handlePageNav("user", creatorInfo.username, ev)
+                }
+              />
+            </>
+          )}
+          <div
+            style={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Typography
-              variant={"h5"}
-              style={{ fontSize: props.compact && "1.2rem" }}
-              className="session-gallery-item-title"
+              variant="body1"
+              sx={{
+                fontWeight: "bold",
+                //textTransform: "none",
+              }}
             >
               {props.session.name
                 ? props.session.name
                 : t("WSTitle.untitledSession")}
             </Typography>
-          </Tooltip>
-          {props.isUser && (
-            <IconButton
-              onClick={() => props.setRenameDialog(props.index)}
-              className="session-gallery-item-editname-button"
-            >
-              <Icon>edit</Icon>
-            </IconButton>
-          )}
-        </div>
-
-        {!(props.isUser || props.compact) && (
-          <div className="session-gallery-item-subtitle">
-            <Avatar
-              className="session-gallery-item-subtitle-avatar"
-              src={creatorInfo.photoURL}
-              onClick={(ev) =>
-                props.handlePageNav("user", creatorInfo.username, ev)
-              }
-            />
-            <Typography variant="overline">{creatorInfo.username}</Typography>
-          </div>
-        )}
-
-        <div className={"session-gallery-item-sessionInfo"}>
-          <Tooltip
-            title={
-              props.session.description && `"${props.session.description}"`
-            }
-          >
+            <div className="break" />
             <Typography
-              className={"session-gallery-item-sessionInfo-text"}
-              align={"center"}
-              style={{ color: "darkgray" }}
+              variant="body1"
+              sx={{
+                color: "gray",
+                textDecoration: "underline",
+                textTransform: "none",
+              }}
             >
-              {props.session.description ? (
-                `"${props.session.description}"`
-              ) : (
-                <i>No Description </i>
-              )}{" "}
+              {"@" + creatorInfo.username}
             </Typography>
-          </Tooltip>
+          </div>
+
+          <IconButton
+            onClick={(e) => setMenuAnchorEl(e.target)}
+            className="session-gallery-item-actions-button"
+          >
+            <Icon>more_vert</Icon>
+          </IconButton>
         </div>
 
         {!props.compact &&
@@ -169,12 +201,8 @@ function SessionGalleryItem(props) {
                     {e.type === 0
                       ? "grid_on"
                       : e.type === 1
-                      ? "music_note"
-                      : e.type === 2
-                      ? "font_download"
-                      : e.type === 3
-                      ? "graphic_eq"
-                      : "piano"}
+                      ? "piano"
+                      : "graphic_eq"}
                   </Icon>
                 </Tooltip>
               </Paper>
@@ -239,20 +267,34 @@ function SessionGalleryItem(props) {
                 </IconButton>
               </div>
             </Tooltip>
-            {props.isUser && (
-              <Tooltip title="Delete Session">
-                <IconButton
-                  onClick={() => props.handleSessionDelete(props.index)}
-                >
-                  <Icon>delete</Icon>
-                </IconButton>
-              </Tooltip>
-            )}
           </div>
         )}
       </Paper>
+      <Menu open={Boolean(menuAnchorEl)} anchorEl={menuAnchorEl}>
+        <MenuItem
+          onClick={() => props.setNewSessionDialog(props.session)}
+          disabled={
+            !props.user ||
+            (props.user.uid !== props.session.creator && !props.session.alwcp)
+          }
+        >
+          <ListItemIcon>
+            <Icon>content_copy</Icon>
+          </ListItemIcon>
+          Create a copy
+        </MenuItem>
+        {props.isUser && (
+          <MenuItem onClick={() => props.handleSessionDelete(props.index)}>
+            <ListItemIcon>
+              {" "}
+              <Icon>delete</Icon>
+            </ListItemIcon>
+            Delete Session
+          </MenuItem>
+        )}
+      </Menu>
     </Grid>
   );
 }
 
-export default SessionGalleryItem;
+export default SessionCard;
