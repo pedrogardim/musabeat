@@ -27,6 +27,7 @@ import { colors } from "../../../utils/Pallete";
 
 function SessionCard(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
+  //const [creationString, setCreationSting] = useState(null);
   const [hovered, setHovered] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -55,46 +56,59 @@ function SessionCard(props) {
     dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
   };
 
-  /*   
-
-const getTimeDifferent = (current, previous) => {
-
+  const getTimeDifferent = (date) => {
     var msPerMinute = 60 * 1000;
     var msPerHour = msPerMinute * 60;
     var msPerDay = msPerHour * 24;
     var msPerMonth = msPerDay * 30;
     var msPerYear = msPerDay * 365;
 
-    var elapsed = current - previous;
+    //console.log(new Date() - 0, date * 1000);
+
+    var elapsed = new Date() - date;
 
     if (elapsed < msPerMinute) {
-         return Math.round(elapsed/1000) + ' seconds ago';   
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / 1000) +
+        t("time.afterTextSec")
+      );
+    } else if (elapsed < msPerHour) {
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / msPerMinute) +
+        "time.afterTextMin"
+      );
+    } else if (elapsed < msPerDay) {
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / msPerHour) +
+        t("time.afterTextHrs")
+      );
+    } else if (elapsed < msPerMonth) {
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / msPerDay) +
+        t("time.afterTextDay")
+      );
+    } else if (elapsed < msPerYear) {
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / msPerMonth) +
+        t("time.afterTextMonth")
+      );
+    } else {
+      return (
+        t("time.beforeText") +
+        Math.round(elapsed / msPerYear) +
+        t("time.afterTextYear")
+      );
     }
+  };
 
-    else if (elapsed < msPerHour) {
-         return Math.round(elapsed/msPerMinute) + ' minutes ago';   
-    }
-
-    else if (elapsed < msPerDay ) {
-         return Math.round(elapsed/msPerHour ) + ' hours ago';   
-    }
-
-    else if (elapsed < msPerMonth) {
-        return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
-    }
-
-    else if (elapsed < msPerYear) {
-        return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
-    }
-
-    else {
-        return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
-    }
-}
-
- */
   useEffect(() => {
     fetchCreatorDisplayName();
+    //setCreationSting(getTimeDifferent(props.session.createdOn.seconds * 1000));
   }, [props.session]);
 
   return (
@@ -134,10 +148,22 @@ const getTimeDifferent = (current, previous) => {
                 //textTransform: "none",
               }}
             >
-              {props.session.name
+              {(props.session.name
                 ? props.session.name
-                : t("WSTitle.untitledSession")}
+                : t("WSTitle.untitledSession")) + "   "}
+
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: 10,
+                  textTransform: "none",
+                  opacity: 0.35,
+                }}
+              >
+                {getTimeDifferent(props.session.createdOn.seconds * 1000)}
+              </Typography>
             </Typography>
+
             <div className="break" />
             <Typography
               variant="body1"
@@ -244,7 +270,7 @@ const getTimeDifferent = (current, previous) => {
             {/*<IconButton>
           <Icon>share</Icon>
         </IconButton>*/}
-            <Tooltip
+            {/*  <Tooltip
               title={
                 !props.user
                   ? "Log in to be able to copy sessions"
@@ -266,7 +292,7 @@ const getTimeDifferent = (current, previous) => {
                   <Icon>content_copy</Icon>
                 </IconButton>
               </div>
-            </Tooltip>
+            </Tooltip> */}
           </div>
         )}
       </Paper>

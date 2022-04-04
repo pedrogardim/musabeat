@@ -35,7 +35,7 @@ function HomePage(props) {
   const [stats, setStats] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
-  const { feedItems, fetchFeed } = useFetchFeed();
+  const { feedItems, fetchFeed } = useFetchFeed(props.user && props.user.uid);
 
   const getStats = () => {
     firebase
