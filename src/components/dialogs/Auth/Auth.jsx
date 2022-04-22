@@ -145,6 +145,8 @@ function AuthDialog(props) {
                 likedFiles: [],
                 fllrs: 0,
                 fllwing: [],
+                sp: 0,
+                pr: null,
               };
               firebase
                 .firestore()
@@ -189,6 +191,10 @@ function AuthDialog(props) {
       likedDrumPatches: [],
       files: [],
       likedFiles: [],
+      fllrs: 0,
+      fllwing: [],
+      sp: 0,
+      pr: null,
     };
 
     if (user.metadata.creationTime === user.metadata.lastSignInTime) {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 import { useTranslation } from "react-i18next";
-import useFetchFeed from "../../hooks/useFetchFeed";
 
 import { useParams } from "react-router-dom";
 
@@ -21,7 +20,9 @@ import {
   Card,
 } from "@mui/material";
 
+import AvatarRow from "./AvatarRow";
 import AppLogo from "../../components/AppLogo";
+import SessionExplorer from "../../components/SessionExplorer";
 
 import "./style.css";
 
@@ -34,8 +35,7 @@ function HomePage(props) {
 
   const [stats, setStats] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-
-  const { feedItems, fetchFeed } = useFetchFeed(props.user && props.user.uid);
+  const [items, setItems] = useState(null);
 
   const getStats = () => {
     firebase
@@ -55,9 +55,9 @@ function HomePage(props) {
       : setUserInfo(null);
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (userInfo !== null) fetchFeed(userInfo.feed);
-  }, [userInfo]);
+  }, [userInfo]); */
 
   useEffect(() => {
     getStats();
@@ -73,9 +73,16 @@ function HomePage(props) {
         <AppLogo className="hp-card-logo" animated />
         <div className="break" />
         <Typography variant="h5">
-          {userInfo
-            ? t("home.userWelcome") + " " + userInfo.profile.username
-            : t("home.unloggedWelcome")}
+          {userInfo ? (
+            <span>
+              {t("home.userWelcome")}{" "}
+              <span style={{ fontStyle: "italic" }}>
+                {userInfo.profile.username}
+              </span>
+            </span>
+          ) : (
+            t("home.unloggedWelcome")
+          )}
         </Typography>
         <div className="break" />
         {props.user === null && (
@@ -139,6 +146,14 @@ function HomePage(props) {
           </Grid>
         </Grid>
       </Card>
+      <AvatarRow userInfo={userInfo} setItems={setItems} user={props.user} />
+      <div
+        className="home-page-card"
+        style={{ position: "relative", flexGrow: 1 }}
+      >
+        <SessionExplorer compact />
+      </div>
+
       <Fab
         className="home-page-new-session-btn"
         color="primary"

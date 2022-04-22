@@ -1,0 +1,22 @@
+.avatar-row {
+  overflow-y: hidden;
+  overflow-x: overlay;
+  max-width: 800px;
+  margin: 16px;
+  width: calc(100vw - 48px);
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  justify-content: flex-start;
+  padding: 8px;
+}
+
+.avatar-row-pic {
+  height: 56px !important;
+  min-width: 56px !important;
+  width: 56px !important;
+  margin-right: 16px;
+}
