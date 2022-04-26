@@ -12,6 +12,7 @@ import {
   Tooltip,
   Divider,
   Typography,
+  IconButton,
 } from "@mui/material";
 
 import AppLogo from "../../../components/AppLogo";
@@ -25,7 +26,7 @@ const color = colors[2];
 function AvatarRow(props) {
   const { t } = useTranslation();
 
-  const { user, setItems, userInfo } = props;
+  const { user, setSelectedUser, userInfo } = props;
 
   const [users, setUsers] = useState(null);
 
@@ -50,16 +51,21 @@ function AvatarRow(props) {
       style={{ overflowX: users ? "overlay" : "hidden" }}
     >
       {userInfo ? (
-        <Avatar
-          alt={userInfo.profile.username}
-          src={userInfo.profile.photoURL}
-          className="avatar-row-pic"
-          sx={{
-            bgcolor: colors.map((e) => Object.values(e)).flat()[
-              userInfo.profile.username.toUpperCase().charCodeAt(0) - 48
-            ],
-          }}
-        />
+        <IconButton
+          className="avatar-row-pic-btn"
+          onClick={() => setSelectedUser(user.uid)}
+        >
+          <Avatar
+            alt={userInfo.profile.username}
+            src={userInfo.profile.photoURL}
+            className="avatar-row-pic"
+            sx={{
+              bgcolor: colors.map((e) => Object.values(e)).flat()[
+                userInfo.profile.username.toUpperCase().charCodeAt(0) - 48
+              ],
+            }}
+          />
+        </IconButton>
       ) : (
         <Skeleton className="avatar-row-pic" variant="circular" />
       )}
@@ -68,18 +74,23 @@ function AvatarRow(props) {
         users.length === 0 ? (
           <Typography>Users you follow will appear here</Typography>
         ) : (
-          users.map((e) => (
+          users.map((e, i) => (
             <Tooltip title={e.profile.username}>
-              <Avatar
-                alt={e.profile.username}
-                src={e.profile.photoURL}
-                className="avatar-row-pic"
-                sx={{
-                  bgcolor: colors.map((e) => Object.values(e)).flat()[
-                    e.profile.username.toUpperCase().charCodeAt(0) - 48
-                  ],
-                }}
-              />
+              <IconButton
+                className="avatar-row-pic-btn"
+                onClick={() => setSelectedUser(userInfo.fllwing[i])}
+              >
+                <Avatar
+                  alt={e.profile.username}
+                  src={e.profile.photoURL}
+                  className="avatar-row-pic"
+                  sx={{
+                    bgcolor: colors.map((e) => Object.values(e)).flat()[
+                      e.profile.username.toUpperCase().charCodeAt(0) - 48
+                    ],
+                  }}
+                />
+              </IconButton>
             </Tooltip>
           ))
         )

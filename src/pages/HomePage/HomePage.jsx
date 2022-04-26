@@ -35,7 +35,7 @@ function HomePage(props) {
 
   const [stats, setStats] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [items, setItems] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const getStats = () => {
     firebase
@@ -146,18 +146,23 @@ function HomePage(props) {
           </Grid>
         </Grid>
       </Card>
-      <AvatarRow userInfo={userInfo} setItems={setItems} user={props.user} />
+      <AvatarRow
+        userInfo={userInfo}
+        setSelectedUser={setSelectedUser}
+        user={props.user}
+      />
       <div
         className="home-page-card"
         style={{ position: "relative", flexGrow: 1 }}
       >
-        <SessionExplorer compact />
+        <SessionExplorer compact target={selectedUser} />
       </div>
 
       <Fab
         className="home-page-new-session-btn"
         color="primary"
         variant="extended"
+        sx={{ zIndex: 2 }}
         onClick={() =>
           props.createNewSession(
             undefined,

@@ -18,5 +18,11 @@
   height: 56px !important;
   min-width: 56px !important;
   width: 56px !important;
-  margin-right: 16px;
+}
+
+.avatar-row-pic-btn {
+  height: 56px !important;
+  min-width: 56px !important;
+  width: 56px !important;
+  margin-right: 16px !important;
 }

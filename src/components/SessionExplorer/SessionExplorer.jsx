@@ -241,7 +241,7 @@ function SessionExplorer(props) {
   useEffect(() => {
     //console.log(searchValue, searchTags);
     getSessionList();
-  }, [searchValue, searchTags]);
+  }, [searchValue, searchTags, props.target]);
 
   useEffect(() => {
     setSessions([]);
