@@ -155,7 +155,11 @@ function HomePage(props) {
         className="home-page-card"
         style={{ position: "relative", flexGrow: 1 }}
       >
-        <SessionExplorer compact target={selectedUser} />
+        <SessionExplorer
+          compact
+          target={selectedUser}
+          handlePageNav={props.handlePageNav}
+        />
       </div>
 
       <Fab
