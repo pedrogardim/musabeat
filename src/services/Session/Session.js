@@ -44,8 +44,8 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
   };
 
   let clearStats = {
-    //name: session ? `Copy of ${session.name}` : "New Session";
-    name: session.name,
+    name: session ? `${session.name} (copy)` : "",
+    //name: session.name,
     copied: 0,
     opened: 0,
     played: 0,

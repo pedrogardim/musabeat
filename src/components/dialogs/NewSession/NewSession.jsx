@@ -224,6 +224,7 @@ function NewSessionDialog(props) {
                 handleInfoChange("name", e.target.value.slice(0, 63))
               }
               label={t("info.name")}
+              placeholder={session.name === "" ? t("sidemenu.newSession") : ""}
             />
           </Grid>
           <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>

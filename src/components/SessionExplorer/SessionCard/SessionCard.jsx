@@ -148,9 +148,9 @@ function SessionCard(props) {
                 //textTransform: "none",
               }}
             >
-              {(props.session.name
+              {props.session.name
                 ? props.session.name
-                : t("WSTitle.untitledSession")) + "   "}
+                : t("WSTitle.untitledSession")}
 
               <Typography
                 variant="body1"
