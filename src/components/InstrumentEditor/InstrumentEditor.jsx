@@ -677,7 +677,11 @@ function InstrumentEditor(props) {
           inputProps={{ readOnly: true }}
         >
           <MenuItem value={checkCustomPatch ? "Custom" : track.instrument}>
-            {checkCustomPatch ? "Custom" : selectedPatch}
+            {checkCustomPatch
+              ? "Custom"
+              : instrumentInfo.patch.name
+              ? instrumentInfo.patch.name
+              : ""}
           </MenuItem>
         </Select>
 
