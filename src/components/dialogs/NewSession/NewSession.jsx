@@ -65,7 +65,6 @@ const sessionTemplate = {
   bpm: 120,
   root: 0,
   scale: 0,
-  timeline: { on: false, size: 1 },
   tracks: [],
 };
 
@@ -130,10 +129,6 @@ function NewSessionDialog(props) {
     setSession((prev) => {
       let newSession = { ...prev };
       newSession.tracks = [...newSession.tracks, newTrack];
-      newSession.timeline = {
-        ...newSession.timeline,
-        [newTrack.id]: [...Array(2).keys()],
-      };
       return newSession;
     });
   };

@@ -17,8 +17,8 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     bpm: 120,
     root: 0,
     scale: 0,
-    timeline: { 0: [0], size: 1, on: false },
-    tracks: [
+    size: 4,
+    /*  tracks: [
       {
         id: 0,
         name: "",
@@ -40,11 +40,11 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
         volume: 0,
         muted: false,
       },
-    ],
+    ], */
   };
 
   let clearStats = {
-    name: session ? `${session.name} (copy)` : "",
+    name: session ? session.name : "",
     //name: session.name,
     copied: 0,
     opened: 0,

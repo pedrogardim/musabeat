@@ -146,11 +146,13 @@ function HomePage(props) {
           </Grid>
         </Grid>
       </Card>
-      <AvatarRow
-        userInfo={userInfo}
-        setSelectedUser={setSelectedUser}
-        user={props.user}
-      />
+      {props.user && (
+        <AvatarRow
+          userInfo={userInfo}
+          setSelectedUser={setSelectedUser}
+          user={props.user}
+        />
+      )}
       <div
         className="home-page-card"
         style={{ position: "relative", flexGrow: 1 }}
@@ -168,11 +170,13 @@ function HomePage(props) {
         variant="extended"
         sx={{ zIndex: 2 }}
         onClick={() =>
-          props.createNewSession(
-            undefined,
-            props.handlePageNav,
-            props.setOpenedSession
-          )
+          props.user
+            ? props.createNewSession(
+                undefined,
+                props.handlePageNav,
+                props.setOpenedSession
+              )
+            : props.setAuthDialog(true)
         }
       >
         <Icon style={{ marginRight: 8 }}>add_circle</Icon>
