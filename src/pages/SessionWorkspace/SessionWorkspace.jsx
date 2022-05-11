@@ -22,6 +22,7 @@ import MobileCollapseButtons from "./MobileCollapseButtons";
 import TrackOptions from "./TrackOptions";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
+import EffectsEditor from "../../components/EffectsEditor";
 import LoadingScreen from "../../components/LoadingScreen";
 import FileUploader from "../../components/FileUploader";
 
@@ -89,6 +90,8 @@ function SessionWorkspace(props) {
     setInstruments,
     instrumentsLoaded,
     setInstrumentsLoaded,
+    effects,
+    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     isLoaded,
@@ -129,6 +132,8 @@ function SessionWorkspace(props) {
     isLoaded,
     instrumentsLoaded,
     setInstrumentsLoaded,
+    effects,
+    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     action,
@@ -385,6 +390,7 @@ function SessionWorkspace(props) {
               setUploadingFiles={setUploadingFiles}
             />
           )}
+          {params.openSubPage === "fx" && <EffectsEditor workspace />}
           {params.openSubPage === "mixer" && (
             <Mixer
               tracks={tracks}

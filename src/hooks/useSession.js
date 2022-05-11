@@ -20,6 +20,8 @@ function useSession(options) {
   const [instrumentsLoaded, setInstrumentsLoaded] = useState({});
   const [instrumentsInfo, setInstrumentsInfo] = useState({});
 
+  const [effects, setEffects] = useState([]);
+
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
 
@@ -34,6 +36,7 @@ function useSession(options) {
     Tone.Transport.loopStart = 0;
     Tone.Transport.seconds = 0;
     instruments.forEach((e) => e.dispose());
+    effects.forEach((e) => e.dispose());
     loadSession(
       setSessionData,
       setTracks,
@@ -44,6 +47,7 @@ function useSession(options) {
       setIsLoaded,
       setInstruments,
       setInstrumentsLoaded,
+      setEffects,
       setInstrumentsInfo,
       paramSetter,
       setNotifications
@@ -145,6 +149,8 @@ function useSession(options) {
     setInstruments,
     instrumentsLoaded,
     setInstrumentsLoaded,
+    effects,
+    setEffects,
     isLoaded,
     action,
     isPlaying,

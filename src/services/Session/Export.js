@@ -4,7 +4,7 @@ import {
   scheduleAudioTrack,
 } from "../Session/Schedule";
 
-import { loadEffect } from "../Instruments";
+//import { loadEffect } from "../Instruments";
 
 import { encodeAudioFile } from "../Audio";
 
@@ -49,9 +49,9 @@ export const bounceSessionExport = async (
 
     tracks.map((track, trackIndex) => {
       let originalInstrument = instruments[trackIndex];
-      offlineEffects[trackIndex] = track.fx
+      offlineEffects[trackIndex] = /* track.fx
         ? track.fx.map((e) => (!!e ? loadEffect(e.type, e.options) : false))
-        : [];
+        : */ [];
 
       if (!track.muted) {
         switch (track.type) {
