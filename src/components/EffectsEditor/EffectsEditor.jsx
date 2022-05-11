@@ -102,17 +102,20 @@ function EffectsEditor(props) {
       <List sx={{ width: "192px", height: "100%" }}>
         {tracks[selectedTrack].fx.map((fx, i) => (
           <>
-            <ListItem onClick={() => setSelectedEffect(i)}>
-              {" "}
+            <ListItem
+              divider
+              button
+              onClick={() => setSelectedEffect(i)}
+              secondaryAction={
+                <IconButton edge="end" onClick={() => removeEffect(i)}>
+                  <Icon>delete</Icon>
+                </IconButton>
+              }
+            >
               <ListItemText
                 sx={{ color: "text.primary" }}
                 primary={fxParam[fx.ty].name}
               />
-              <ListItemButton onClick={() => removeEffect(i)} dense>
-                <ListItemIcon>
-                  <Icon tabIndex={-1}>delete</Icon>
-                </ListItemIcon>
-              </ListItemButton>
             </ListItem>
             <Divider flexItem />
           </>

@@ -115,13 +115,13 @@ export const loadInstrument = (
       buffers
     ).then((r) => {
       setInstrument(r);
-      loadEffects(r, track);
+      loadEffects(r, track, index, setEffects);
     });
   } else {
     patchLoader(track.instrument, index, onLoad, addNotification, buffers).then(
       (r) => {
         setInstrument(r);
-        loadEffects(r, track);
+        loadEffects(r, track, index, setEffects);
       }
     );
   } //load from obj

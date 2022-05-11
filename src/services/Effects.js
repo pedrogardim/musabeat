@@ -61,7 +61,8 @@ export const fxParam = {
   },
 };
 
-export const loadEffects = (instrument, track) => {
+export const loadEffects = (instrument, track, index, setEffects) => {
   let effects = track.fx.map((fx, i) => new Tone[fxParam[fx.ty].name](fx));
   instrument.chain(...effects, Tone.Destination);
+  setEffects((prev) => ({ ...prev, [index]: effects }));
 };
