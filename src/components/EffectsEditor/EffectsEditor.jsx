@@ -59,7 +59,7 @@ function EffectsEditor(props) {
     let newFX = new Tone[fxParam[type].name]();
     setTracks((prev) => {
       let newTracks = [...prev];
-      let fxData = { ty: type, ...newFX.get() };
+      let fxData = { ty: type, bp: false, ...newFX.get() };
       newTracks[selectedTrack].fx.push(fxData);
       return newTracks;
     });
@@ -67,15 +67,19 @@ function EffectsEditor(props) {
       let trackNewEffects = prev[selTrackId]
         ? [...prev[selTrackId], newFX]
         : [newFX];
-      console.log(instruments[selectedTrack], trackNewEffects);
-      instruments[selectedTrack].chain(...trackNewEffects, Tone.Destination);
+      /* console.log(instruments[selectedTrack], trackNewEffects);
+      instruments[selectedTrack].chain(
+        ...trackNewEffects.filter((fx, i) => !tracks[selectedTrack].fx[i].bp),
+        Tone.Destination
+      ); */
       return { ...prev, [selTrackId]: trackNewEffects };
     });
   };
 
   const removeEffect = (index) => {
+    let newTracks = [];
     setTracks((prev) => {
-      let newTracks = [...prev];
+      newTracks = [...prev];
       newTracks[selectedTrack].fx = newTracks[selectedTrack].fx.filter(
         (e, i) => i !== index
       );
@@ -84,8 +88,30 @@ function EffectsEditor(props) {
     setEffects((prev) => {
       prev[selTrackId][index].dispose();
       let trackNewEffects = prev[selTrackId].filter((e, i) => i !== index);
-      instruments[selectedTrack].chain(...trackNewEffects, Tone.Destination);
+      /* instruments[selectedTrack].chain(
+        ...trackNewEffects.filter(
+          (fx, i) => !newTracks[selectedTrack].fx[i].bp
+        ),
+        Tone.Destination
+      ); */
       return { ...prev, [selTrackId]: trackNewEffects };
+    });
+  };
+
+  const toggleBypassEffect = (index) => {
+    setTracks((prev) => {
+      let newTracks = [...prev];
+      newTracks[selectedTrack].fx[index].bp =
+        !newTracks[selectedTrack].fx[index].bp;
+
+      /* instruments[selectedTrack].chain(
+        ...effects[selTrackId].filter(
+          (fx, i) => !newTracks[selectedTrack].fx[i].bp
+        ),
+        Tone.Destination
+      ); */
+
+      return newTracks;
     });
   };
 
@@ -104,7 +130,8 @@ function EffectsEditor(props) {
           <>
             <ListItem
               divider
-              button
+              /* button*/
+              disabled={fx.bp}
               onClick={() => setSelectedEffect(i)}
               secondaryAction={
                 <IconButton edge="end" onClick={() => removeEffect(i)}>
@@ -112,12 +139,16 @@ function EffectsEditor(props) {
                 </IconButton>
               }
             >
+              <ListItemIcon>
+                <IconButton onClick={() => toggleBypassEffect(i)}>
+                  <Icon>power_settings_new</Icon>
+                </IconButton>
+              </ListItemIcon>
               <ListItemText
-                sx={{ color: "text.primary" }}
+                sx={{ color: fx.bp ? "text.disabled" : "text.primary" }}
                 primary={fxParam[fx.ty].name}
               />
             </ListItem>
-            <Divider flexItem />
           </>
         ))}
         <IconButton onClick={(e) => setMenuOpen(e.target)}>

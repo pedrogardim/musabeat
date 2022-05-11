@@ -113,6 +113,19 @@ function useSession(options) {
   }, [instruments]);
 
   useEffect(() => {
+    //REWIRE ALL INSTRUMENTS CONNECTIONS
+    //not the most efficient solution
+    if (!isLoaded) return;
+    tracks.forEach((track, trackIndex) => {
+      instruments[trackIndex].disconnect();
+      instruments[trackIndex].chain(
+        ...effects[track.id].filter((fx, fxIndex) => !track.fx[fxIndex].bp),
+        Tone.Destination
+      );
+    });
+  }, [tracks, instruments, effects]);
+
+  useEffect(() => {
     let progress =
       Object.values(instrumentsLoaded).filter((e) => e !== false).length /
       Object.values(instrumentsLoaded).length;
