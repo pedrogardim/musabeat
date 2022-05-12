@@ -468,6 +468,7 @@ function SessionWorkspace(props) {
               null,
               setInstruments,
               setInstrumentsLoaded,
+              setEffects,
               setInstrumentsInfo
             )
           }
