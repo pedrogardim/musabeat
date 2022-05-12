@@ -390,7 +390,9 @@ function SessionWorkspace(props) {
               setUploadingFiles={setUploadingFiles}
             />
           )}
-          {params.openSubPage === "fx" && <EffectsEditor workspace />}
+          {params.openSubPage === "fx" && params.selectedTrack !== null && (
+            <EffectsEditor workspace />
+          )}
           {params.openSubPage === "mixer" && (
             <Mixer
               tracks={tracks}

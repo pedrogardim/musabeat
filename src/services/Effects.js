@@ -21,14 +21,14 @@ export const fxParam = {
   },
   rv: {
     name: "Reverb",
-    decay: [0, 4, 0.01],
+    decay: [0.01, 4, 0.01],
     preDelay: [0, 0.065, 0.001],
     wet: [0, 1, 0.01],
   },
   dt: {
     name: "Distortion",
     distortion: [0, 1, 0.01],
-    oversample: [0, 4, 1],
+    //oversample: [0, 4, 1],
     wet: [0, 1, 0.01],
   },
   bc: {
@@ -63,9 +63,10 @@ export const fxParam = {
 
 export const loadEffects = (instrument, track, index, setEffects) => {
   let effects = track.fx.map((fx, i) => new Tone[fxParam[fx.ty].name](fx));
-  /* instrument.chain(
+  instrument.disconnect();
+  instrument.chain(
     ...effects.filter((fx, i) => !track.fx[i].bp),
     Tone.Destination
-  ); */
+  );
   setEffects((prev) => ({ ...prev, [index]: effects }));
 };

@@ -12,13 +12,15 @@ import {
   MenuItem,
   Divider,
   ListItemText,
-  ListItemButton,
   ListItemIcon,
+  ListItemButton,
 } from "@mui/material";
 
 import { useTranslation } from "react-i18next";
 
 import { fxParam } from "../../services/Effects";
+
+import GenericModule from "./GenericModule";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
 
@@ -104,13 +106,29 @@ function EffectsEditor(props) {
       newTracks[selectedTrack].fx[index].bp =
         !newTracks[selectedTrack].fx[index].bp;
 
-      /* instruments[selectedTrack].chain(
+      instruments[selectedTrack].disconnect();
+
+      instruments[selectedTrack].chain(
         ...effects[selTrackId].filter(
           (fx, i) => !newTracks[selectedTrack].fx[i].bp
         ),
         Tone.Destination
-      ); */
+      );
 
+      return newTracks;
+    });
+  };
+
+  const onEffectMod = () => {
+    let newFxOptions = effects[selTrackId][selectedEffect].get();
+    delete newFxOptions.context;
+
+    setTracks((prev) => {
+      let newTracks = [...prev];
+      newTracks[selectedTrack].fx[selectedEffect] = {
+        ...newTracks[selectedTrack].fx[selectedEffect],
+        ...newFxOptions,
+      };
       return newTracks;
     });
   };
@@ -130,24 +148,36 @@ function EffectsEditor(props) {
           <>
             <ListItem
               divider
-              /* button*/
+              /* button */
               disabled={fx.bp}
-              onClick={() => setSelectedEffect(i)}
               secondaryAction={
-                <IconButton edge="end" onClick={() => removeEffect(i)}>
+                <IconButton edge="end" onClick={(e) => removeEffect(i)}>
                   <Icon>delete</Icon>
                 </IconButton>
               }
             >
               <ListItemIcon>
-                <IconButton onClick={() => toggleBypassEffect(i)}>
+                <IconButton onClick={(e) => toggleBypassEffect(i)}>
                   <Icon>power_settings_new</Icon>
                 </IconButton>
               </ListItemIcon>
-              <ListItemText
-                sx={{ color: fx.bp ? "text.disabled" : "text.primary" }}
-                primary={fxParam[fx.ty].name}
-              />
+              <ListItemButton
+                onClick={() =>
+                  setSelectedEffect((prev) => (prev == i ? null : i))
+                }
+              >
+                <ListItemText
+                  sx={{
+                    color:
+                      selectedEffect === i
+                        ? "primary.light"
+                        : fx.bp
+                        ? "text.disabled"
+                        : "text.primary",
+                  }}
+                  primary={fxParam[fx.ty].name}
+                />
+              </ListItemButton>
             </ListItem>
           </>
         ))}
@@ -156,7 +186,12 @@ function EffectsEditor(props) {
         </IconButton>
       </List>
       <Divider orientation="vertical" flexItem />
-      <Box></Box>
+      {typeof selectedEffect === "number" && (
+        <GenericModule
+          selectedEffect={selectedEffect}
+          onEffectMod={onEffectMod}
+        />
+      )}
       <Menu
         open={Boolean(menuOpen)}
         anchorEl={menuOpen}

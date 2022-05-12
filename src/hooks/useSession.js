@@ -123,7 +123,7 @@ function useSession(options) {
         Tone.Destination
       );
     });
-  }, [tracks, instruments, effects]);
+  }, [instruments, effects]);
 
   useEffect(() => {
     let progress =
