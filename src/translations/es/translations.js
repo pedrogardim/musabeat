@@ -243,4 +243,15 @@ export const TRANSLATIONS_ES = {
     afterTextMonth: " meses",
     afterTextYear: " años",
   },
+
+  effects: {
+    eq: "Ecualizador",
+    cp: "Compresor",
+    rv: "Reverb",
+    dl: "Delay",
+    ch: "Chorus",
+    ph: "Phaser",
+    dt: "Distorsión",
+    bc: "BitCrusher",
+  },
 };

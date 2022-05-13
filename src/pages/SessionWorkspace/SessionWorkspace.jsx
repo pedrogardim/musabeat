@@ -288,6 +288,7 @@ function SessionWorkspace(props) {
 
   useEffect(() => {
     if (params.isRecording) toggleRecording();
+    paramSetter("openSubPage", null);
   }, [params.selectedTrack]);
 
   useEffect(() => {

@@ -175,7 +175,7 @@ function EffectsEditor(props) {
                         ? "text.disabled"
                         : "text.primary",
                   }}
-                  primary={fxParam[fx.ty].name}
+                  primary={t(`effects.${fx.ty}`)}
                 />
               </ListItemButton>
             </ListItem>
@@ -199,10 +199,19 @@ function EffectsEditor(props) {
       >
         {Object.values(fxParam).map((fx, i) => (
           <MenuItem onClick={() => addEffect(Object.keys(fxParam)[i])}>
-            {fx.name}
+            {t(`effects.${fx}`)}
           </MenuItem>
         ))}
       </Menu>
+
+      <IconButton
+        onClick={() => paramSetter("openSubPage", null)}
+        className="mp-closebtn"
+        color="primary"
+        sx={{ zIndex: 9 }}
+      >
+        <Icon>close</Icon>
+      </IconButton>
     </Box>
   );
 }
