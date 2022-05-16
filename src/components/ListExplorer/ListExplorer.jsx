@@ -87,7 +87,7 @@ function ListExplorer(props) {
 
   const user = firebase.auth().currentUser;
 
-  const patchSizeLimit = 5242880;
+  //const patchSizeLimit = 5242880;
 
   const { isLoading, isQueryEnd, queryItems } = useListQuery({
     searchValue,
@@ -100,11 +100,14 @@ function ListExplorer(props) {
     userPage,
   });
 
-  const handleItemClick = () => {
+  /*   const handleItemClick = () => {
     if (type === "files") {
       onItemClick();
     }
-  };
+    if (type === "seq" || type === "instr") {
+      onItemClick();
+    }
+  }; */
 
   const handleFileSelect = (e, index) => {
     /*   if (compact && !e.target.classList.contains("MuiIcon-root")) {
@@ -290,7 +293,6 @@ function ListExplorer(props) {
                   key={row.id}
                   row={row}
                   index={index}
-                  handleItemClick={handleItemClick}
                   explorerProps={props}
                   setOpenDialog={setOpenDialog}
                   liked={userLikes.includes(row.id)}

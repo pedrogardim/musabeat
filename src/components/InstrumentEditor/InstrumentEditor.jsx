@@ -14,6 +14,7 @@ import {
   Grid,
   Select,
   SvgIcon,
+  CircularProgress,
 } from "@mui/material";
 
 import { useTranslation } from "react-i18next";
@@ -29,6 +30,8 @@ import NoteInput from "../dialogs/NoteInput";
 import Confirm from "../dialogs/Confirm";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
+
+import { loadInstrument } from "../../services/Instruments";
 
 import { detectPitch } from "../../services/Audio";
 
@@ -52,24 +55,28 @@ function InstrumentEditor(props) {
   const {
     tracks,
     instruments,
+    instrumentsLoaded,
     setTracks,
     setInstruments,
     setInstrumentsLoaded,
+    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     params,
     paramSetter,
     uploadFile,
+    setNotifications,
   } = workspace ? wsCtxData : props;
 
   const { selectedTrack } = workspace ? params : props;
 
-  const track = workspace ? tracks[selectedTrack] : props.track;
-  const instrument = workspace ? instruments[selectedTrack] : props.instrument;
-  const instrumentInfo = workspace
-    ? instrumentsInfo[selectedTrack]
-    : props.patchInfo;
   const index = selectedTrack;
+
+  const track = workspace ? tracks[index] : props.track;
+  const instrument = workspace ? instruments[index] : props.instrument;
+  const instrumentInfo = workspace ? instrumentsInfo[index] : props.patchInfo;
+
+  const instrumentLoaded = instrumentsLoaded[index];
 
   const trackType = track.type;
 
@@ -546,9 +553,65 @@ function InstrumentEditor(props) {
         */
   };
 
-  let mainContent = "Nothing Here";
+  const handlePatchSelect = (patchId, _, buffer, patchData) => {
+    updateFilesStatsOnChange();
 
-  if (instrument) {
+    //increment "ld" & "in" counters for patch and files
+
+    firebase
+      .firestore()
+      .collection(isDrum ? "drumpatches" : "patches")
+      .doc(patchId)
+      .update({
+        ld: firebase.firestore.FieldValue.increment(1),
+        in: firebase.firestore.FieldValue.increment(1),
+      });
+
+    if (isDrum || patchData.base === "Sampler") {
+      firebase
+        .firestore()
+        .collection(isDrum ? "drumpatches" : "patches")
+        .doc(patchId)
+        .get((e) =>
+          Object.values(e.data().urls)
+            .map((e) => firebase.firestore().collection("files").doc(e))
+            .update({
+              ld: firebase.firestore.FieldValue.increment(1),
+              in: firebase.firestore.FieldValue.increment(1),
+            })
+        );
+    }
+
+    setTracks((prev) => {
+      let newTracks = [...prev];
+      newTracks[selectedTrack].instrument = patchId;
+      newTracks[selectedTrack].volume = patchData.volume;
+      loadInstrument(
+        newTracks[selectedTrack],
+        selectedTrack,
+        buffer ? buffer : null,
+        setInstruments,
+        setInstrumentsLoaded,
+        setEffects,
+        setInstrumentsInfo,
+        setNotifications
+      );
+      return newTracks;
+    });
+
+    setSelectedPatch(patchId);
+    setPatchExplorer(false);
+
+    //props.setIEOpen(false);
+  };
+
+  let mainContent = (
+    <div className="ie-synth-cont">
+      <CircularProgress />
+    </div>
+  );
+
+  if (instrument && instrumentLoaded) {
     if (track.type === 0) {
       //console.log(instrument);
 
@@ -592,7 +655,7 @@ function InstrumentEditor(props) {
         bufferObjects.push({ buffer: e, midi: i })
       );
       //console.log(instrument._buffers._buffers);
-      //console.log(bufferObjects, filesName);
+      //console.log(bufferObjects, instrumentInfo);
       mainContent = (
         <div className="ie-synth-cont" style={{ overflowY: "overlay" }}>
           <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
@@ -612,6 +675,7 @@ function InstrumentEditor(props) {
                     buffer={e.buffer}
                     fileInfo={
                       instrumentInfo &&
+                      instrumentInfo.filesInfo &&
                       instrumentInfo.filesInfo[
                         Tone.Frequency(e.midi, "midi").toNote()
                       ]
@@ -619,6 +683,8 @@ function InstrumentEditor(props) {
                     fileLabel={e.midi}
                     fileId={
                       instrumentInfo &&
+                      instrumentInfo.patch &&
+                      instrumentInfo.patch.urls &&
                       instrumentInfo.patch.urls[
                         Tone.Frequency(e.midi, "midi").toNote()
                       ]
@@ -747,6 +813,7 @@ function InstrumentEditor(props) {
           setInstrumentLoaded={setInstrumentLoaded}
           setInstrumentsLoaded={setInstrumentsLoaded}
           saveUserPatch={saveUserPatch}
+          onItemClick={handlePatchSelect}
           updateFilesStatsOnChange={updateFilesStatsOnChange}
         />
       )}

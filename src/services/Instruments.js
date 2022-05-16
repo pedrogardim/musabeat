@@ -93,10 +93,11 @@ export const loadInstrument = (
     setInstrumentsLoaded((prev) => ({ ...prev, [index]: state }));
 
   const onLoad = (instrInfo) => {
-    setInstrumentLoaded(true);
     setInstrumentsInfo((prev) =>
       instrInfo ? { ...prev, [index]: instrInfo } : prev
     );
+    setInstrumentLoaded(true);
+
     if (callBack) callBack();
   };
 
@@ -259,7 +260,7 @@ export const patchLoader = async (
   let options = patch.options ? patch.options : patch;
 
   if (patch.base === "Sampler") {
-    return await loadSamplerInstrument(input, track, onLoad, addNotification);
+    return await loadSamplerInstrument(patch, track, onLoad, addNotification);
   } else {
     let base = patch.base
       ? patch.base
@@ -279,6 +280,8 @@ export const loadSamplerInstrument = async (
   onLoad,
   addNotification
 ) => {
+  console.log(input);
+
   let urlArray = await Promise.all(
     Object.keys(input.urls).map(async (e, i) => {
       try {
