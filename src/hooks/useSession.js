@@ -118,10 +118,11 @@ function useSession(options) {
     if (!isLoaded) return;
     tracks.forEach((track, trackIndex) => {
       instruments[trackIndex].disconnect();
-      instruments[trackIndex].chain(
-        ...effects[track.id].filter((fx, fxIndex) => !track.fx[fxIndex].bp),
-        Tone.Destination
-      );
+      effects[track.id] &&
+        instruments[trackIndex].chain(
+          ...effects[track.id].filter((fx, fxIndex) => !track.fx[fxIndex].bp),
+          Tone.Destination
+        );
     });
   }, [instruments, effects]);
 

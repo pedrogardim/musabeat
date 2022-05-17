@@ -386,13 +386,13 @@ function SessionWorkspace(props) {
           {params.openSubPage === "IE" && (
             <InstrumentEditor
               workspace
-              resetUndoHistory={() => resetHistory()}
+              resetUndoHistory={resetHistory}
               handlePageNav={handlePageNav}
               setUploadingFiles={setUploadingFiles}
             />
           )}
           {params.openSubPage === "fx" && params.selectedTrack !== null && (
-            <EffectsEditor workspace />
+            <EffectsEditor workspace resetHistory={resetHistory} />
           )}
           {params.openSubPage === "mixer" && (
             <Mixer

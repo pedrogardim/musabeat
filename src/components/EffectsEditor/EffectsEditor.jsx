@@ -24,6 +24,8 @@ import GenericModule from "./GenericModule";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
 
+import Confirm from "../dialogs/Confirm";
+
 import "./style.css";
 
 function EffectsEditor(props) {
@@ -35,6 +37,7 @@ function EffectsEditor(props) {
   const [menuOpen, setMenuOpen] = useState(null);
 
   const [selectedEffect, setSelectedEffect] = useState(null);
+  const [deletingEffect, setDeletingEffect] = useState(null);
 
   const feWrapper = useRef(null);
 
@@ -52,6 +55,8 @@ function EffectsEditor(props) {
     effects,
     setEffects,
   } = props.workspace ? wsCtxData : props;
+
+  const { resetHistory } = props;
 
   const { selectedTrack } = params;
 
@@ -76,10 +81,15 @@ function EffectsEditor(props) {
       ); */
       return { ...prev, [selTrackId]: trackNewEffects };
     });
+
+    setMenuOpen(null);
   };
 
   const removeEffect = (index) => {
     let newTracks = [];
+
+    resetHistory();
+    setSelectedEffect(null);
     setTracks((prev) => {
       newTracks = [...prev];
       newTracks[selectedTrack].fx = newTracks[selectedTrack].fx.filter(
@@ -143,7 +153,12 @@ function EffectsEditor(props) {
       }}
       ref={feWrapper}
     >
-      <List sx={{ width: "192px", height: "100%" }}>
+      <List
+        sx={{
+          width: "192px",
+          height: "100%",
+        }}
+      >
         {tracks[selectedTrack].fx.map((fx, i) => (
           <>
             <ListItem
@@ -151,20 +166,21 @@ function EffectsEditor(props) {
               /* button */
               disabled={fx.bp}
               secondaryAction={
-                <IconButton edge="end" onClick={(e) => removeEffect(i)}>
+                <IconButton edge="end" onClick={() => setDeletingEffect(i)}>
                   <Icon>delete</Icon>
                 </IconButton>
               }
             >
-              <ListItemIcon>
-                <IconButton onClick={(e) => toggleBypassEffect(i)}>
-                  <Icon>power_settings_new</Icon>
-                </IconButton>
-              </ListItemIcon>
+              <IconButton onClick={(e) => toggleBypassEffect(i)}>
+                <Icon>power_settings_new</Icon>
+              </IconButton>
               <ListItemButton
                 onClick={() =>
                   setSelectedEffect((prev) => (prev == i ? null : i))
                 }
+                disableGutters
+                style={{ paddingRight: 8 }}
+                sx={{ px: 1 }}
               >
                 <ListItemText
                   sx={{
@@ -181,7 +197,10 @@ function EffectsEditor(props) {
             </ListItem>
           </>
         ))}
-        <IconButton onClick={(e) => setMenuOpen(e.target)}>
+        <IconButton
+          onClick={(e) => setMenuOpen(e.target)}
+          style={{ left: "50%", marginLeft: -24 }}
+        >
           <Icon>add</Icon>
         </IconButton>
       </List>
@@ -199,7 +218,7 @@ function EffectsEditor(props) {
       >
         {Object.values(fxParam).map((fx, i) => (
           <MenuItem onClick={() => addEffect(Object.keys(fxParam)[i])}>
-            {t(`effects.${fx}`)}
+            {t(`effects.${Object.keys(fxParam)[i]}`)}
           </MenuItem>
         ))}
       </Menu>
@@ -212,6 +231,13 @@ function EffectsEditor(props) {
       >
         <Icon>close</Icon>
       </IconButton>
+
+      <Confirm
+        delete
+        action={() => removeEffect(deletingEffect)}
+        open={typeof deletingEffect === "number"}
+        onClose={() => setDeletingEffect(null)}
+      />
     </Box>
   );
 }

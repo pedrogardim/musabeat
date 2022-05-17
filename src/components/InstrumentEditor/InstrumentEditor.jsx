@@ -44,7 +44,7 @@ function InstrumentEditor(props) {
 
   const {
     workspace,
-    resetUndoHistory,
+    resetHistory,
     handlePageNav,
     setUploadingFiles,
     setPagePatchInfo,
@@ -160,6 +160,8 @@ function InstrumentEditor(props) {
     let newType = typeof e === "string" ? e : e.target.value;
 
     instrument.releaseAll();
+
+    resetHistory && resetHistory();
 
     updateFilesStatsOnChange && updateFilesStatsOnChange();
 
@@ -449,7 +451,7 @@ function InstrumentEditor(props) {
           return newTracks;
         });
     }
-    resetUndoHistory && resetUndoHistory();
+    resetHistory && resetHistory();
   };
 
   /* const updateOnFileLoaded = (dur) => {
@@ -462,7 +464,7 @@ function InstrumentEditor(props) {
         );
       return newmodules;
     });
-    resetUndoHistory();
+    resetHistory();
   }; */
 
   const setFile = (fileId, fileUrl, audiobuffer, data) => {
@@ -601,6 +603,8 @@ function InstrumentEditor(props) {
 
     setSelectedPatch(patchId);
     setPatchExplorer(false);
+
+    resetHistory && resetHistory();
 
     //props.setIEOpen(false);
   };
