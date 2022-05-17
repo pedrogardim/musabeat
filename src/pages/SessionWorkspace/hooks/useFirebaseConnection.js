@@ -20,7 +20,6 @@ const userSubmitedSessionProps = [
   "rte",
   "scale",
   "tags",
-  "timeline",
 ];
 
 function useFirebaseConnection(ctx) {

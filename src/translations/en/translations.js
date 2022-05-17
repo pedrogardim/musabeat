@@ -228,4 +228,13 @@ export const TRANSLATIONS_EN = {
       },
     },
   },
+  time: {
+    beforeText: "",
+    afterTextSec: " seconds ago",
+    afterTextMin: " minutes ago",
+    afterTextHrs: " hours ago",
+    afterTextDay: " days ago",
+    afterTextMonth: " months ago",
+    afterTextYear: " years ago",
+  },
 };

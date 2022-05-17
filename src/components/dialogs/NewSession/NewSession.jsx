@@ -65,7 +65,6 @@ const sessionTemplate = {
   bpm: 120,
   root: 0,
   scale: 0,
-  timeline: { on: false, size: 1 },
   tracks: [],
 };
 
@@ -130,10 +129,6 @@ function NewSessionDialog(props) {
     setSession((prev) => {
       let newSession = { ...prev };
       newSession.tracks = [...newSession.tracks, newTrack];
-      newSession.timeline = {
-        ...newSession.timeline,
-        [newTrack.id]: [...Array(2).keys()],
-      };
       return newSession;
     });
   };
@@ -224,6 +219,7 @@ function NewSessionDialog(props) {
                 handleInfoChange("name", e.target.value.slice(0, 63))
               }
               label={t("info.name")}
+              placeholder={session.name === "" ? t("sidemenu.newSession") : ""}
             />
           </Grid>
           <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>

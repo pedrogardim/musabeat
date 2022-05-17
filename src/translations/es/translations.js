@@ -234,4 +234,13 @@ export const TRANSLATIONS_ES = {
       },
     },
   },
+  time: {
+    beforeText: "Hace ",
+    afterTextSec: " segundos",
+    afterTextMin: " minutos",
+    afterTextHrs: " horas",
+    afterTextDay: " días",
+    afterTextMonth: " meses",
+    afterTextYear: " años",
+  },
 };

@@ -71,8 +71,9 @@
   flex-grow: 1;
   width: 80%;
   /* margin: 16px; */
-  justify-content: center;
+  justify-content: flex-start;
   transition: background-color 0.1s;
+  overflow-y: overlay;
 }
 
 /* .session-gallery-item-compact > .session-gallery-item-track-cont {

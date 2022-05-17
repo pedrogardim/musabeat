@@ -266,7 +266,7 @@ function SessionWorkspace(props) {
   }, [sessionData]);
 
   useEffect(() => {
-    if (sessionData.editors && sessionData.editors.includes(user.uid))
+    if (user && sessionData.editors && sessionData.editors.includes(user.uid))
       paramSetter("editMode", true);
   }, [sessionData, user]);
 
@@ -494,9 +494,9 @@ function SessionWorkspace(props) {
           />
         ) */}
 
-        {user === null && tracks !== null && (
+        {/* user === null && tracks !== null && (
           <Auth persistent authDialog={true} setUser={props.setUser} />
-        )}
+        ) */}
 
         <Snackbar
           open={!!snackbarMessage}
