@@ -22,6 +22,7 @@ import MobileCollapseButtons from "./MobileCollapseButtons";
 import TrackOptions from "./TrackOptions";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
+import LoadingBar from "../../components/LoadingBar";
 import LoadingScreen from "../../components/LoadingScreen";
 import FileUploader from "../../components/FileUploader";
 
@@ -297,6 +298,12 @@ function SessionWorkspace(props) {
 
   return tracks !== undefined ? (
     <wsCtx.Provider value={ctxData}>
+      <LoadingBar
+        value={
+          Object.values(instrumentsLoaded).filter((e) => e).length /
+          Object.values(instrumentsLoaded).length
+        }
+      />
       <Box
         className="workspace"
         tabIndex={0}
@@ -311,6 +318,7 @@ function SessionWorkspace(props) {
         onKeyUp={handleKeyUp}
       >
         <LoadingScreen open={tracks === null} />
+
         <Box
           className="ws-header"
           sx={(theme) => ({
