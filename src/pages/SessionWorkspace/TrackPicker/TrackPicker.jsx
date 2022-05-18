@@ -52,6 +52,7 @@ function TrackPicker(props) {
       type: selectedType,
       score: [],
       volume: 0,
+      //pan: 0,
       muted: false,
       instrument:
         selectedType === 0

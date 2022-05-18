@@ -395,9 +395,6 @@ function SessionWorkspace(props) {
           )}
           {params.openSubPage === "mixer" && (
             <Mixer
-              tracks={tracks}
-              instruments={instruments}
-              setTracks={setTracks}
               setMixerOpen={() =>
                 paramSetter("openSubPage", (prev) =>
                   prev === "mixer" ? null : "mixer"
