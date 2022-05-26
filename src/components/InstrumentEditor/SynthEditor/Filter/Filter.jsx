@@ -93,10 +93,10 @@ function FilterEditor(props) {
       <svg
         width="128px"
         height="64px"
-        style={{ border: "1px solid #05386b", marginBottom: 8 }}
+        style={{ border: "1px solid #3F51B5", marginBottom: 8 }}
       >
         {/* filterState && <path d={filterFRWave} stroke="#05386b" fill="none" /> */}
-        <path d={filterFRWave} stroke="#05386b" fill="none" />
+        <path d={filterFRWave} stroke="#3F51B5" fill="none" />
       </svg>
       <div className="break" />
       <Knob
