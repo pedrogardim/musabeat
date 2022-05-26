@@ -101,6 +101,16 @@ function OptionsBar(props) {
               </IconButton>
             </>
           )}
+          <IconButton
+            color={openSubPage === "fx" ? "primary" : "default"}
+            onClick={() =>
+              paramSetter("openSubPage", (prev) =>
+                prev === "fx" ? null : "fx"
+              )
+            }
+          >
+            <Icon>blur_on</Icon>
+          </IconButton>
         </>
       )}
       <IconButton

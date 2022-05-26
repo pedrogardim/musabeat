@@ -99,6 +99,7 @@ export const loadSession = (
   setIsLoaded,
   setInstruments,
   setInstrumentsLoaded,
+  setEffects,
   setInstrumentsInfo,
   WSparamSetter,
   setNotifications
@@ -114,6 +115,7 @@ export const loadSession = (
         null,
         setInstruments,
         setInstrumentsLoaded,
+        setEffects,
         setInstrumentsInfo,
         WSparamSetter,
         setNotifications

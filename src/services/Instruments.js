@@ -2,7 +2,7 @@ import * as Tone from "tone";
 
 import firebase from "firebase";
 
-import { effectTypes } from "./Audio";
+import { loadEffects } from "./Effects";
 
 const demoInstrumentPatch = {
   categ: 1,
@@ -77,6 +77,7 @@ export const loadInstrument = (
   buffers,
   setInstruments,
   setInstrumentsLoaded,
+  setEffects,
   setInstrumentsInfo,
   setNotifications,
   callBack
@@ -92,10 +93,11 @@ export const loadInstrument = (
     setInstrumentsLoaded((prev) => ({ ...prev, [index]: state }));
 
   const onLoad = (instrInfo) => {
-    setInstrumentLoaded(true);
     setInstrumentsInfo((prev) =>
       instrInfo ? { ...prev, [index]: instrInfo } : prev
     );
+    setInstrumentLoaded(true);
+
     if (callBack) callBack();
   };
 
@@ -112,10 +114,16 @@ export const loadInstrument = (
       onLoad,
       addNotification,
       buffers
-    ).then((r) => setInstrument(r));
+    ).then((r) => {
+      setInstrument(r);
+      loadEffects(r, track, index, setEffects);
+    });
   } else {
     patchLoader(track.instrument, index, onLoad, addNotification, buffers).then(
-      (r) => setInstrument(r)
+      (r) => {
+        setInstrument(r);
+        loadEffects(r, track, index, setEffects);
+      }
     );
   } //load from obj
 };
@@ -252,7 +260,7 @@ export const patchLoader = async (
   let options = patch.options ? patch.options : patch;
 
   if (patch.base === "Sampler") {
-    return await loadSamplerInstrument(input, track, onLoad, addNotification);
+    return await loadSamplerInstrument(patch, track, onLoad, addNotification);
   } else {
     let base = patch.base
       ? patch.base
@@ -272,6 +280,8 @@ export const loadSamplerInstrument = async (
   onLoad,
   addNotification
 ) => {
+  console.log(input);
+
   let urlArray = await Promise.all(
     Object.keys(input.urls).map(async (e, i) => {
       try {
@@ -330,8 +340,9 @@ export const loadSamplerInstrument = async (
   return sampler;
 };
 
-export const loadEffect = (type, options) => {
+/* export const loadEffect = (type, options) => {
   //type as effects array index
   //console.log(options);
   return new Tone[effectTypes[type]](options);
 };
+ */
