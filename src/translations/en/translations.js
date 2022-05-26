@@ -28,7 +28,7 @@ export const TRANSLATIONS_EN = {
     explore: "Explore",
     instruments: "Instruments",
     drumsets: "Drum Sets",
-    files: "Files",
+    files: "Samples",
     darkmode: "Light / Dark Mode",
   },
   avatar: {
@@ -67,7 +67,7 @@ export const TRANSLATIONS_EN = {
   track: {
     options: {
       fullscreen: "Fullscreen",
-      loadFile: "Load audio file",
+      loadFile: "Load audio sample",
       instrument: "Instrument",
       settings: "Settings",
       effects: "Effects",
@@ -82,9 +82,9 @@ export const TRANSLATIONS_EN = {
   },
   instrumentEditor: {
     noFiles: "Empty Instrument",
-    addFile: "Add File",
+    addFile: "Add Sample",
     removingItemAlert:
-      "This sound will be removed from the instrument. The file will remain safe in your account.",
+      "This sound will be removed from the instrument. The sample will remain safe in your account.",
     types: {
       MonoSynth: "Filter",
       FMSynth: "FM Modulation",
@@ -155,7 +155,7 @@ export const TRANSLATIONS_EN = {
     patchNotFound: "Patch Not Found",
   },
   fileExplorer: {
-    fileNotFound: "File Not Found",
+    fileNotFound: "Sample Not Found",
   },
   misc: {
     createdOn: "Created on",
@@ -187,7 +187,7 @@ export const TRANSLATIONS_EN = {
     dupSession: "Create a copy of this session for your account?",
     limitReached: "Limit reached",
     filePatchLimit:
-      "File based instruments have a limit of 5 MB for a quicker loading time for all users. Try to pick a smaller file or removing current files.",
+      "Sample based instruments have a limit of 5 MB for a quicker loading time for all users. Try to pick a smaller sample or removing current sample.",
   },
   info: {
     name: "Name",
@@ -214,13 +214,13 @@ export const TRANSLATIONS_EN = {
   notifications: {
     title: {
       patchNotFound: "Instrument not found",
-      fileNotFound: "File not found",
-      fileInfoError: "File info not found",
+      fileNotFound: "Sample not found",
+      fileInfoError: "Sample info not found",
       upload: {
         100: "Upload done",
         uploadError: "Upload error",
-        duplicatedFound: "Identical file found",
-        importSmallerFile: "Import smaller file",
+        duplicatedFound: "Identical sample found",
+        importSmallerFile: "Import smaller sample",
         decodingError: "Decoding error",
         noSpace: "No space available",
         patchSizeLimit: "Instrument limit exceeded",

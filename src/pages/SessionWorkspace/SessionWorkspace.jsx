@@ -22,9 +22,10 @@ import MobileCollapseButtons from "./MobileCollapseButtons";
 import TrackOptions from "./TrackOptions";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
-import EffectsEditor from "../../components/EffectsEditor";
+import LoadingBar from "../../components/LoadingBar";
 import LoadingScreen from "../../components/LoadingScreen";
 import FileUploader from "../../components/FileUploader";
+import EffectsEditor from "../../components/EffectsEditor";
 
 import Confirm from "../../components/dialogs/Confirm";
 import Auth from "../../components/dialogs/Auth";
@@ -303,6 +304,12 @@ function SessionWorkspace(props) {
 
   return tracks !== undefined ? (
     <wsCtx.Provider value={ctxData}>
+      <LoadingBar
+        value={
+          Object.values(instrumentsLoaded).filter((e) => e).length /
+          Object.values(instrumentsLoaded).length
+        }
+      />
       <Box
         className="workspace"
         tabIndex={0}
@@ -317,6 +324,7 @@ function SessionWorkspace(props) {
         onKeyUp={handleKeyUp}
       >
         <LoadingScreen open={tracks === null} />
+
         <Box
           className="ws-header"
           sx={(theme) => ({
@@ -396,9 +404,6 @@ function SessionWorkspace(props) {
           )}
           {params.openSubPage === "mixer" && (
             <Mixer
-              tracks={tracks}
-              instruments={instruments}
-              setTracks={setTracks}
               setMixerOpen={() =>
                 paramSetter("openSubPage", (prev) =>
                   prev === "mixer" ? null : "mixer"

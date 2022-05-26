@@ -26,13 +26,13 @@ export const TRANSLATIONS_ES = {
     explore: "Explorar",
     instruments: "Instrumentos",
     drumsets: "Sets de batería",
-    files: "Archivos",
+    files: "Samples",
     darkmode: "Modo Claro / Oscuro",
   },
   avatar: {
     profile: "Perfil",
     userSessions: "Mis Sesiones",
-    userSamples: "Mis Archivos",
+    userSamples: "Mis Samples",
     userPatches: "Mis Patches",
     userDrumPatches: "Mis Sets de Batería",
     logOut: "Desconectar",
@@ -66,7 +66,7 @@ export const TRANSLATIONS_ES = {
   track: {
     options: {
       fullscreen: "Pantalla Completa",
-      loadFile: "Cargar archivo",
+      loadFile: "Cargar Sample",
       instrument: "Instrumento",
       settings: "Ajustes",
       effects: "Efectos",
@@ -81,9 +81,9 @@ export const TRANSLATIONS_ES = {
   },
   instrumentEditor: {
     noFiles: "Instrumento Vacío",
-    addFile: "Añadir archivo",
+    addFile: "Añadir sample",
     removingItemAlert:
-      "Este sonido será removido del instrumento. El archivo seguirá a salvo en tu cuenta.",
+      "Este sonido será removido del instrumento. El sample seguirá a salvo en tu cuenta.",
     types: {
       MonoSynth: "Filtro",
       FMSynth: "Modulación FM",
@@ -155,7 +155,7 @@ export const TRANSLATIONS_ES = {
     patchNotFound: "Instrumento no encontrado",
   },
   fileExplorer: {
-    fileNotFound: "Archivo no encontrado",
+    fileNotFound: "Sample no encontrado",
   },
   misc: {
     createdOn: "Creado el",
@@ -188,7 +188,7 @@ export const TRANSLATIONS_ES = {
     dupSession: "¿Crear una copia de esta sesión para tu cuenta?",
     limitReached: "Límite alcanzado",
     filePatchLimit:
-      "Los instrumentos basados en archivos de audio tienen un límite de 5 MB para un tiempo de carga más rápido para todos los usuários. Prueba elegir archivos más pequeños o quitar algunos archivos.",
+      "Los instrumentos basados en samples de audio tienen un límite de 5 MB para un tiempo de carga más rápido para todos los usuários. Prueba elegir samples más pequeños o quitar algunos samples.",
   },
   info: {
     name: "Nombre",
@@ -220,17 +220,17 @@ export const TRANSLATIONS_ES = {
   notifications: {
     title: {
       patchNotFound: "Instrumento no encontrado",
-      fileNotFound: "Archivo no encontrado",
+      fileNotFound: "Sample no encontrado",
       fileInfoError: "Info. no encontrada de:",
       upload: {
-        100: "Archivo subido",
+        100: "Sample subido",
         uploadError: "Error de subida",
-        duplicatedFound: "Archivo identico encontrado",
+        duplicatedFound: "Sample identico encontrado",
         importSmallerFile: "Importe un audio más cordo",
         decodingError: "Error de decodificación",
         noSpace: "Límite de espacio alcanzado",
         patchSizeLimit: "Límite de instrumento alcanzado",
-        uploading: "Subiendo archivo...",
+        uploading: "Subiendo sample...",
       },
     },
   },

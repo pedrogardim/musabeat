@@ -27,7 +27,9 @@ function OptionsBar(props) {
       })}
     >
       <IconButton
-        onClick={() => paramSetter("cursor", (prev) => (!prev ? "edit" : null))}
+        onClick={() =>
+          paramSetter("cursorMode", (prev) => (!prev ? "edit" : null))
+        }
       >
         <Icon style={{ transform: !cursorMode && "rotate(-45deg)" }}>
           {cursorMode ? "edit" : "navigation"}
