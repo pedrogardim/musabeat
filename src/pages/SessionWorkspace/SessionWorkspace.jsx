@@ -22,6 +22,7 @@ import MobileCollapseButtons from "./MobileCollapseButtons";
 import TrackOptions from "./TrackOptions";
 
 import InstrumentEditor from "../../components/InstrumentEditor";
+import EffectsEditor from "../../components/EffectsEditor";
 import LoadingScreen from "../../components/LoadingScreen";
 import FileUploader from "../../components/FileUploader";
 
@@ -89,6 +90,8 @@ function SessionWorkspace(props) {
     setInstruments,
     instrumentsLoaded,
     setInstrumentsLoaded,
+    effects,
+    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     isLoaded,
@@ -129,6 +132,8 @@ function SessionWorkspace(props) {
     isLoaded,
     instrumentsLoaded,
     setInstrumentsLoaded,
+    effects,
+    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     action,
@@ -283,6 +288,7 @@ function SessionWorkspace(props) {
 
   useEffect(() => {
     if (params.isRecording) toggleRecording();
+    paramSetter("openSubPage", null);
   }, [params.selectedTrack]);
 
   useEffect(() => {
@@ -380,10 +386,13 @@ function SessionWorkspace(props) {
           {params.openSubPage === "IE" && (
             <InstrumentEditor
               workspace
-              resetUndoHistory={() => resetHistory()}
+              resetUndoHistory={resetHistory}
               handlePageNav={handlePageNav}
               setUploadingFiles={setUploadingFiles}
             />
+          )}
+          {params.openSubPage === "fx" && params.selectedTrack !== null && (
+            <EffectsEditor workspace resetHistory={resetHistory} />
           )}
           {params.openSubPage === "mixer" && (
             <Mixer
@@ -460,6 +469,7 @@ function SessionWorkspace(props) {
               null,
               setInstruments,
               setInstrumentsLoaded,
+              setEffects,
               setInstrumentsInfo
             )
           }

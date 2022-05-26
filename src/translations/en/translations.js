@@ -237,4 +237,14 @@ export const TRANSLATIONS_EN = {
     afterTextMonth: " months ago",
     afterTextYear: " years ago",
   },
+  effects: {
+    eq: "EQ",
+    cp: "Compressor",
+    rv: "Reverb",
+    dl: "Delay",
+    ch: "Chorus",
+    ph: "Phaser",
+    dt: "Distortion",
+    bc: "BitCrusher",
+  },
 };
