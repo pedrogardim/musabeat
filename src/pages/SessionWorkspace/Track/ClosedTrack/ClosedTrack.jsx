@@ -97,6 +97,7 @@ function ClosedTrack(props) {
             })}
           />
         )}
+        {console.log(track.score)}
         {rowRef.current &&
           track.score.length > 0 &&
           track.score.map((note, noteIndex) => (

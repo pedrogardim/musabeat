@@ -296,7 +296,11 @@ function SessionCard(props) {
           </div>
         )}
       </Paper>
-      <Menu open={Boolean(menuAnchorEl)} anchorEl={menuAnchorEl}>
+      <Menu
+        open={Boolean(menuAnchorEl)}
+        anchorEl={menuAnchorEl}
+        onClose={() => setMenuAnchorEl(null)}
+      >
         <MenuItem
           onClick={() => props.setNewSessionDialog(props.session)}
           disabled={
@@ -310,7 +314,12 @@ function SessionCard(props) {
           Create a copy
         </MenuItem>
         {props.isUser && (
-          <MenuItem onClick={() => props.handleSessionDelete(props.index)}>
+          <MenuItem
+            onClick={() => {
+              props.handleSessionDelete(props.index);
+              setMenuAnchorEl(null);
+            }}
+          >
             <ListItemIcon>
               {" "}
               <Icon>delete</Icon>

@@ -53,6 +53,7 @@ function Track(props) {
     cursorMode,
     trackRows,
     openDialog,
+    editMode,
   } = params;
 
   const { scheduleTrack } = props;
@@ -461,6 +462,9 @@ function Track(props) {
         onMouseUp={handleMouseUp}
         disabled
         tabIndex={-1}
+        style={{
+          pointerEvents: !editMode && "none",
+        }}
       >
         {trackRows.map((row, rowIndex) => (
           <Box

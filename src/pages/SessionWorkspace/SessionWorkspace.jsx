@@ -214,7 +214,7 @@ function SessionWorkspace(props) {
   /*=====================================KEYEVENTS==========================================*/
 
   const handleKeyDown = (e) => {
-    if (params.openDialog !== null) return;
+    if (params.openDialog !== null || !params.editMode) return;
     else e.preventDefault();
     Tone.start();
     let key = e.keyCode;
@@ -233,7 +233,7 @@ function SessionWorkspace(props) {
   };
 
   const handleKeyUp = (e) => {
-    if (params.openDialog !== null) return;
+    if (params.openDialog !== null || !params.editMode) return;
     else e.preventDefault();
     let key = e.keyCode;
     if (key === 18) paramSetter("cursorMode", null);
@@ -241,6 +241,7 @@ function SessionWorkspace(props) {
   };
 
   const handleArrowKey = (e) => {
+    if (!params.editMode) return;
     let key = e.keyCode;
     if (key === 38) paramSetter("sessionSize", (p) => (p === 128 ? p : p + 1));
     if (key === 40) paramSetter("sessionSize", (p) => (p === 1 ? p : p - 1));
@@ -272,8 +273,9 @@ function SessionWorkspace(props) {
   }, [sessionData]);
 
   useEffect(() => {
-    if (user && sessionData.editors && sessionData.editors.includes(user.uid))
-      paramSetter("editMode", true);
+    let isEditor =
+      user && sessionData.editors && sessionData.editors.includes(user.uid);
+    paramSetter("editMode", isEditor);
   }, [sessionData, user]);
 
   useEffect(() => {
@@ -435,30 +437,35 @@ function SessionWorkspace(props) {
                       movingSelDelta={params.movingSelDelta}
                     />
                   ))}
-                <IconButton
-                  style={{ width: 48, height: 48, left: "50%" }}
-                  tabIndex="-1"
-                  onClick={() => paramSetter("openDialog", "trackPicker")}
-                >
-                  <Icon>add</Icon>
-                </IconButton>
+                {params.editMode && (
+                  <IconButton
+                    style={{ width: 48, height: 48, left: "50%" }}
+                    tabIndex="-1"
+                    onClick={() => paramSetter("openDialog", "trackPicker")}
+                  >
+                    <Icon>add</Icon>
+                  </IconButton>
+                )}
               </>
             )}
           </Grid>
         </div>
         {/* ================================================ */}
 
-        <OptionsBar
-          areUnsavedChanges={areUnsavedChanges}
-          save={save}
-          scheduleAllTracks={scheduleAllTracks}
-        />
+        {params.editMode && (
+          <OptionsBar
+            areUnsavedChanges={areUnsavedChanges}
+            save={save}
+            scheduleAllTracks={scheduleAllTracks}
+          />
+        )}
 
-        <MobileCollapseButtons />
+        {params.editMode && <MobileCollapseButtons />}
 
         {/* ================================================ */}
 
         {params.selectedTrack !== null &&
+          params.editMode &&
           tracks[params.selectedTrack].type !== 2 && (
             <PlayInterface workspace playFn={playFn} />
           )}

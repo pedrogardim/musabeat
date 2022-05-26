@@ -72,7 +72,9 @@ function AvatarRow(props) {
       <Divider orientation="vertical" sx={{ mr: 2 }} />
       {users ? (
         users.length === 0 ? (
-          <Typography>Users you follow will appear here</Typography>
+          <Typography color="textPrimary">
+            Users you follow will appear here
+          </Typography>
         ) : (
           users.map((e, i) => (
             <Tooltip title={e.profile.username}>

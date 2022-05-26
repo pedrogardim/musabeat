@@ -78,7 +78,7 @@ function Grid(props) {
                 {i % gridSize === 0 && !hiddenNumbers && (
                   <Typography
                     className="ws-grid-line-mesure-num"
-                    color="textPrimary"
+                    sx={{ color: "text.primary" }}
                   >
                     {i / gridSize + 1 + zoomPosition[0]}
                   </Typography>

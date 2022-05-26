@@ -40,7 +40,7 @@ function useFirebaseConnection(ctx) {
     isLoaded,
     setSnackbarMessage,
     hidden,
-    editMode,
+    params,
     uploadQueue,
     setUploadQueue,
     setUploadingFiles,
@@ -51,6 +51,8 @@ function useFirebaseConnection(ctx) {
     uploadFiles,
   } = ctx;
 
+  const { editMode } = params;
+
   const DBSessionRef = firebase
     .firestore()
     .collection("sessions")
@@ -59,6 +61,7 @@ function useFirebaseConnection(ctx) {
   const autoSaverTime = 5 * 60 * 1000;
 
   const triggerSave = (tracks, sessionData) => {
+    if (!editMode) return;
     if (uploadQueue.length > 0)
       uploadFiles(
         uploadQueue.filter(
