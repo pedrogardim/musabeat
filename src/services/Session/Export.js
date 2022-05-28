@@ -136,7 +136,12 @@ export const bounceSessionExport = async (
 
     //let promiseB = blob.then(function(result) {
     let url = window.URL.createObjectURL(blob);
-    downloadURI(url, `${sessionData.name}.${format.toLowerCase()}`);
+    downloadURI(
+      url,
+      `${
+        sessionData.name ? sessionData.name : "Bounce"
+      }.${format.toLowerCase()}`
+    );
     scheduleAllTracks && scheduleAllTracks();
     setIsReady(true);
 

@@ -57,7 +57,7 @@ function OptionsBar(props) {
         sessionSize={sessionData.size}
         sessionData={sessionData}
         tracks={tracks}
-        tracksInstruments={instruments}
+        instruments={instruments}
         scheduleAllTracks={scheduleAllTracks}
       />
 

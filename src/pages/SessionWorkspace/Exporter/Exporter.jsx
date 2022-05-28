@@ -15,13 +15,13 @@ function Exporter(props) {
   const [open, setOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
 
-  const { tracks, sessionData, scheduleAllTracks } = props;
+  const { tracks, sessionData, scheduleAllTracks, instruments } = props;
 
   const handleDownload = (format) => {
     if (isReady) {
       bounceSessionExport(
         tracks,
-        props.tracksInstruments,
+        instruments,
         sessionData,
         setIsReady,
         setExportProgress,
