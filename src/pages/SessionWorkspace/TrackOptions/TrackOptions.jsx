@@ -29,6 +29,7 @@ function TrackOptions(props) {
     setInstruments,
     setInstrumentsLoaded,
     isLoaded,
+    scheduleAllTracks,
   } = useContext(wsCtx);
 
   const index = open && parseInt(params.openDialog.replace("trackOpt", ""));
@@ -64,6 +65,7 @@ function TrackOptions(props) {
     setTracks((prev) => prev.filter((e, i) => i !== index));
     paramSetter("selectedTrack", null, "selNotes", []);
     setDeletingTrack(false);
+    scheduleAllTracks();
     onClose();
   };
 

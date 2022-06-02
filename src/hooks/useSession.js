@@ -36,6 +36,9 @@ function useSession(options) {
     Tone.Transport.loopStart = 0;
     Tone.Transport.seconds = 0;
     instruments.forEach((e) => e.dispose());
+    setInstruments([]);
+    setInstrumentsLoaded({});
+    setInstrumentsInfo({});
     tracks &&
       tracks.forEach(
         (e, i) =>
@@ -109,6 +112,7 @@ function useSession(options) {
   };
 
   const scheduleAllTracks = () => {
+    if (!tracks) return;
     tracks.forEach((track, TrackIndex) => scheduleTrack(TrackIndex, track));
   };
 
@@ -118,7 +122,6 @@ function useSession(options) {
 
   useEffect(() => {
     //REWIRE ALL INSTRUMENTS CONNECTIONS
-    //not the most efficient solution
     if (!isLoaded) return;
     tracks.forEach((track, trackIndex) => {
       if (!instruments[trackIndex] || !effects[track.id]) return;

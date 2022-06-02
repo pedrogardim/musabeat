@@ -155,6 +155,7 @@ function SessionWorkspace(props) {
     setNotifications,
     uploadFile,
     uploadFiles,
+    scheduleAllTracks,
   }));
 
   const [save, setSavingMode, areUnsavedChanges] =

@@ -77,11 +77,21 @@ function ListExplorerRow(props) {
         {isLoading ? (
           <CircularProgress size={27} />
         ) : isPlaying ? (
-          <IconButton onClick={stopRow}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              stopRow();
+            }}
+          >
             <Icon>stop</Icon>
           </IconButton>
         ) : (
-          <IconButton onClick={playRow}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              playRow();
+            }}
+          >
             <Icon>play_arrow</Icon>
           </IconButton>
         )}
@@ -171,7 +181,12 @@ function ListExplorerRow(props) {
             </Tooltip>
           )}
           {userPage && row.data.user === user.uid && (
-            <IconButton onClick={() => setOpenDialog(["rename", index])}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenDialog(["rename", index]);
+              }}
+            >
               <Icon>edit</Icon>
             </IconButton>
           )}
@@ -225,7 +240,12 @@ function ListExplorerRow(props) {
 
       <>
         <TableCell style={{ width: 50 }} align="center">
-          <IconButton onClick={() => handleLike(index)}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation();
+              handleLike(index);
+            }}
+          >
             <Icon color={liked ? "secondary" : "text.secondary"}>favorite</Icon>
             <Typography className="like-btn-label" variant="overline">
               {row.data.likes}
@@ -237,11 +257,16 @@ function ListExplorerRow(props) {
           <>
             <TableCell className="fet-collapsable-column-800" align="center">
               <Typography variant="overline">
-                {formatBytes(row.data.size)}
+                {formatTime(row.data.dur)}
               </Typography>
             </TableCell>
             <TableCell align="center">
-              <IconButton onClick={() => handleDownload(row)}>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(row);
+                }}
+              >
                 <Icon>file_download</Icon>
               </IconButton>
             </TableCell>
@@ -249,7 +274,12 @@ function ListExplorerRow(props) {
         )}
         {userPage && (
           <TableCell align="center">
-            <IconButton onClick={() => setOpenDialog(["delete", index])}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenDialog(["delete", index]);
+              }}
+            >
               <Icon>delete</Icon>
             </IconButton>
           </TableCell>
@@ -268,6 +298,10 @@ function formatBytes(a, b = 2) {
     " " +
     ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d]
   );
+}
+
+function formatTime(a) {
+  return a < 60 ? a.toFixed(2) + " s" : (a / 60).toFixed(2) + " min";
 }
 
 export default ListExplorerRow;

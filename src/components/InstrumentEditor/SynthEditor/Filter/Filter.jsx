@@ -106,7 +106,7 @@ function FilterEditor(props) {
         size={48}
         defaultValue={frequency}
         onChange={(v) => handleParameterChange("frequency", v)}
-        onChangeCommited={registerToSynth}
+        onChangeCommitted={registerToSynth}
         label={"Frequency"}
         style={{ margin: "0 16px" }}
       />
@@ -118,7 +118,7 @@ function FilterEditor(props) {
         size={48}
         defaultValue={filterQ}
         onChange={(v) => handleParameterChange("Q", v)}
-        onChangeCommited={registerToSynth}
+        onChangeCommitted={registerToSynth}
         label={"Reso"}
         style={{ margin: "0 16px" }}
       />
