@@ -158,6 +158,7 @@ function SessionCard(props) {
                   fontSize: 10,
                   textTransform: "none",
                   opacity: 0.35,
+                  ml: 1,
                 }}
               >
                 {getTimeDifferent(props.session.createdOn.seconds * 1000)}

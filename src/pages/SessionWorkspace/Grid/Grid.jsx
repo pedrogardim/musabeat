@@ -69,9 +69,9 @@ function Grid(props) {
                 style={{
                   opacity:
                     i % gridSize === 0
-                      ? 0.4
+                      ? 0.7
                       : i % gridSize === gridSize / 2
-                      ? 0.3
+                      ? 0.4
                       : 0.2,
                 }}
               >

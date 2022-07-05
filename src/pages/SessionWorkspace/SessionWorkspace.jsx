@@ -426,7 +426,7 @@ function SessionWorkspace(props) {
                 scheduleTrack={scheduleTrack}
               />
             ) : (
-              <>
+              <div style={{ height: "100%", overflowY: "overlay" }}>
                 {tracks &&
                   tracks.map((track, trackIndex) => (
                     <ClosedTrack
@@ -447,7 +447,7 @@ function SessionWorkspace(props) {
                     <Icon>add</Icon>
                   </IconButton>
                 )}
-              </>
+              </div>
             )}
           </Grid>
         </div>
