@@ -3,12 +3,13 @@ import React, { useContext } from "react";
 import { Icon, IconButton, Box, Divider } from "@mui/material";
 
 import wsCtx from "../../../context/SessionWorkspaceContext";
+import { generateRandomBeat } from "../../../services/Generators";
 
 import NotificationsList from "../../../components/NotificationsList";
 import Exporter from "../Exporter";
 
 function OptionsBar(props) {
-  const { params, paramSetter, tracks, sessionData, instruments } =
+  const { params, paramSetter, tracks, sessionData, instruments, setTracks } =
     useContext(wsCtx);
 
   const { expanded, cursorMode, selectedTrack, openSubPage, trackOptions } =
@@ -77,18 +78,39 @@ function OptionsBar(props) {
                 <Icon>piano</Icon>
               </IconButton>
               {tracks[selectedTrack].type === 0 && (
-                <IconButton
-                  onClick={() =>
-                    paramSetter("trackOptions", (prev) => ({
-                      ...prev,
-                      showingAll: !prev.showingAll,
-                    }))
-                  }
-                >
-                  <Icon>
-                    {trackOptions.showingAll ? "visibility_off" : "visibility"}
-                  </Icon>
-                </IconButton>
+                <>
+                  <IconButton
+                    onClick={() =>
+                      paramSetter("trackOptions", (prev) => ({
+                        ...prev,
+                        showingAll: !prev.showingAll,
+                      }))
+                    }
+                  >
+                    <Icon>
+                      {trackOptions.showingAll
+                        ? "visibility_off"
+                        : "visibility"}
+                    </Icon>
+                  </IconButton>
+                  {/*  <IconButton
+                    onClick={() => {
+                      setTracks((prev) => {
+                        let newTracks = [...prev];
+                        newTracks[selectedTrack].score = generateRandomBeat(
+                          4,
+                          8,
+                          [0, 2, 6],
+                          0.5,
+                          0
+                        );
+                        return newTracks;
+                      });
+                    }}
+                  >
+                    <Icon>casino</Icon>
+                  </IconButton> */}
+                </>
               )}
             </>
           ) : (
