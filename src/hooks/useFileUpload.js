@@ -87,7 +87,8 @@ function useFileUpload(opt) {
         const fileDBRef = await filesRef.add(fileInfo);
         const storageRef = firebase.storage().ref(fileDBRef.id);
         const userData = (await userRef.get()).data();
-        const checkPremium = userData.pr.seconds > ~~(+new Date() / 1000);
+        const checkPremium =
+          userData.pr && userData.pr.seconds > ~~(+new Date() / 1000);
 
         onIdGet && onIdGet(fileDBRef.id, fileInfo, audioBuffer);
 

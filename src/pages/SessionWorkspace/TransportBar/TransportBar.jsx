@@ -29,7 +29,7 @@ function TransportBar(props) {
   const { params, paramSetter, setSessionData, sessionData } =
     useContext(wsCtx);
 
-  const { gridSize, sessionSize, selectedTrack } = params;
+  const { gridSize, sessionSize, selectedTrack, editMode } = params;
 
   const { bpm } = sessionData ? sessionData : {};
 
@@ -209,18 +209,20 @@ function TransportBar(props) {
             ))}
         </Grid>
         <Grid item xs={4} style={{ justifyContent: "flex-end" }}>
-          <NotificationsList
-            notifications={notifications}
-            setNotifications={setNotifications}
-            sx={{ width: 48, height: 48, mr: 2 }}
-          />
+          {editMode && (
+            <NotificationsList
+              notifications={notifications}
+              setNotifications={setNotifications}
+              sx={{ width: 48, height: 48, mr: 2 }}
+            />
+          )}
 
           <Card
             className="ws-transport-info"
             elevation={0}
-            onClick={() => setExpanded(true)}
+            onClick={() => editMode && setExpanded(true)}
           >
-            <CardActionArea>
+            <CardActionArea disabled={!editMode}>
               {sessionParams.map((e, i) => (
                 <Box key={e.i} className="ws-transport-info-item">
                   <Icon

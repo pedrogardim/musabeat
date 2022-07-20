@@ -20,7 +20,7 @@ function useSession(options) {
   const [instrumentsLoaded, setInstrumentsLoaded] = useState({});
   const [instrumentsInfo, setInstrumentsInfo] = useState({});
 
-  const [effects, setEffects] = useState([]);
+  const [effects, setEffects] = useState({});
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -36,7 +36,14 @@ function useSession(options) {
     Tone.Transport.loopStart = 0;
     Tone.Transport.seconds = 0;
     instruments.forEach((e) => e.dispose());
-    effects.forEach((e) => e.dispose());
+    setInstruments([]);
+    setInstrumentsLoaded({});
+    setInstrumentsInfo({});
+    tracks &&
+      tracks.forEach(
+        (e, i) =>
+          effects[e.id] && effects[e.id].forEach((fx) => fx && fx.dispose())
+      );
     loadSession(
       setSessionData,
       setTracks,
@@ -72,8 +79,8 @@ function useSession(options) {
   const pause = () => {
     Tone.Transport.pause();
     isLoaded &&
-      instruments.forEach((e) =>
-        e.name === "Players" ? e.stopAll() : e.releaseAll()
+      instruments.forEach(
+        (e) => e && (e.name === "Players" ? e.stopAll() : e.releaseAll())
       );
     setIsPlaying(false);
   };
@@ -105,6 +112,7 @@ function useSession(options) {
   };
 
   const scheduleAllTracks = () => {
+    if (!tracks) return;
     tracks.forEach((track, TrackIndex) => scheduleTrack(TrackIndex, track));
   };
 
@@ -114,15 +122,14 @@ function useSession(options) {
 
   useEffect(() => {
     //REWIRE ALL INSTRUMENTS CONNECTIONS
-    //not the most efficient solution
     if (!isLoaded) return;
     tracks.forEach((track, trackIndex) => {
+      if (!instruments[trackIndex] || !effects[track.id]) return;
       instruments[trackIndex].disconnect();
-      effects[track.id] &&
-        instruments[trackIndex].chain(
-          ...effects[track.id].filter((fx, fxIndex) => !track.fx[fxIndex].bp),
-          Tone.Destination
-        );
+      instruments[trackIndex].chain(
+        ...effects[track.id].filter((fx, fxIndex) => !track.fx[fxIndex].bp),
+        Tone.Destination
+      );
     });
   }, [instruments, effects]);
 
@@ -152,7 +159,7 @@ function useSession(options) {
   useEffect(() => {
     initSession();
     return () => {};
-  }, []);
+  }, [id]);
 
   return {
     tracks,

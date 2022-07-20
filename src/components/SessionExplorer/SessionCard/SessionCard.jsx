@@ -158,6 +158,7 @@ function SessionCard(props) {
                   fontSize: 10,
                   textTransform: "none",
                   opacity: 0.35,
+                  ml: 1,
                 }}
               >
                 {getTimeDifferent(props.session.createdOn.seconds * 1000)}
@@ -296,7 +297,11 @@ function SessionCard(props) {
           </div>
         )}
       </Paper>
-      <Menu open={Boolean(menuAnchorEl)} anchorEl={menuAnchorEl}>
+      <Menu
+        open={Boolean(menuAnchorEl)}
+        anchorEl={menuAnchorEl}
+        onClose={() => setMenuAnchorEl(null)}
+      >
         <MenuItem
           onClick={() => props.setNewSessionDialog(props.session)}
           disabled={
@@ -310,7 +315,12 @@ function SessionCard(props) {
           Create a copy
         </MenuItem>
         {props.isUser && (
-          <MenuItem onClick={() => props.handleSessionDelete(props.index)}>
+          <MenuItem
+            onClick={() => {
+              props.handleSessionDelete(props.index);
+              setMenuAnchorEl(null);
+            }}
+          >
             <ListItemIcon>
               {" "}
               <Icon>delete</Icon>

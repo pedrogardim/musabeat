@@ -93,9 +93,8 @@ export const loadInstrument = (
     setInstrumentsLoaded((prev) => ({ ...prev, [index]: state }));
 
   const onLoad = (instrInfo) => {
-    setInstrumentsInfo((prev) =>
-      instrInfo ? { ...prev, [index]: instrInfo } : prev
-    );
+    instrInfo &&
+      setInstrumentsInfo((prev) => ({ ...prev, [index]: instrInfo }));
     setInstrumentLoaded(true);
 
     if (callBack) callBack();
@@ -163,7 +162,7 @@ export const playersLoader = async (
   //empty urls obj
 
   if (JSON.stringify(patch.urls) === "{}") {
-    onLoad();
+    onLoad({ filesInfo: {} });
     return new Tone.Players().toDestination();
   }
 

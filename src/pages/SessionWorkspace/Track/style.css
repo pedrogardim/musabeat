@@ -69,6 +69,8 @@
 
 .track-score-note {
   position: absolute;
+  min-width: 3px;
+  min-height: 6px !important;
 }
 
 .track-score-note-ghost {

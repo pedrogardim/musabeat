@@ -72,27 +72,31 @@ function AvatarRow(props) {
       <Divider orientation="vertical" sx={{ mr: 2 }} />
       {users ? (
         users.length === 0 ? (
-          <Typography>Users you follow will appear here</Typography>
+          <Typography color="textPrimary">
+            Users you follow will appear here
+          </Typography>
         ) : (
-          users.map((e, i) => (
-            <Tooltip title={e.profile.username}>
-              <IconButton
-                className="avatar-row-pic-btn"
-                onClick={() => setSelectedUser(userInfo.fllwing[i])}
-              >
-                <Avatar
-                  alt={e.profile.username}
-                  src={e.profile.photoURL}
-                  className="avatar-row-pic"
-                  sx={{
-                    bgcolor: colors.map((e) => Object.values(e)).flat()[
-                      e.profile.username.toUpperCase().charCodeAt(0) - 48
-                    ],
-                  }}
-                />
-              </IconButton>
-            </Tooltip>
-          ))
+          users
+            .filter((e) => e)
+            .map((e, i) => (
+              <Tooltip title={e.profile.username}>
+                <IconButton
+                  className="avatar-row-pic-btn"
+                  onClick={() => setSelectedUser(userInfo.fllwing[i])}
+                >
+                  <Avatar
+                    alt={e.profile.username}
+                    src={e.profile.photoURL}
+                    className="avatar-row-pic"
+                    sx={{
+                      bgcolor: colors.map((e) => Object.values(e)).flat()[
+                        e.profile.username.toUpperCase().charCodeAt(0) - 48
+                      ],
+                    }}
+                  />
+                </IconButton>
+              </Tooltip>
+            ))
         )
       ) : (
         Array(20)

@@ -392,7 +392,7 @@ function InstrumentEditor(props) {
       userRef.update(
         !trackType
           ? { patches: firebase.firestore.FieldValue.arrayUnion(r.id) }
-          : { drumPatches: firebase.firestore.FieldValue.arrayUnion(r.id) }
+          : { drumpatches: firebase.firestore.FieldValue.arrayUnion(r.id) }
       );
 
       setSelectedPatch(r.id);

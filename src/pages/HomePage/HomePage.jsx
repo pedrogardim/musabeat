@@ -121,8 +121,8 @@ function HomePage(props) {
           <Divider orientation="vertical" flexItem />
           <Grid item sm={3}>
             <Typography variant={"h6"}>
-              {userInfo && userInfo.patches && userInfo.drumPatches
-                ? userInfo.patches.length + userInfo.drumPatches.length
+              {userInfo && userInfo.patches && userInfo.drumpatches
+                ? userInfo.patches.length + userInfo.drumpatches.length
                 : stats
                 ? stats.patches + stats.drumpatches
                 : "..."}

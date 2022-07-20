@@ -53,6 +53,7 @@ function Track(props) {
     cursorMode,
     trackRows,
     openDialog,
+    editMode,
   } = params;
 
   const { scheduleTrack } = props;
@@ -153,20 +154,33 @@ function Track(props) {
     }
   };
 
-  const setFile = (fileId, fileUrl, audiobuffer, data) => {
+  const setFile = async (fileId, fileUrl, buffer, data) => {
     let newAudioIndex = 0;
     while (trackInstrument.has(newAudioIndex)) {
       newAudioIndex++;
     }
 
-    trackInstrument.add(newAudioIndex, audiobuffer);
+    let arrayBuffer = null;
+
+    if (!buffer) {
+      const file = await fetch(fileUrl);
+      console.log(file);
+      arrayBuffer = await file.arrayBuffer();
+      console.log(arrayBuffer);
+    }
+
+    const audioBuffer = buffer
+      ? buffer
+      : await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
+
+    trackInstrument.add(newAudioIndex, audioBuffer);
 
     setTracks((prev) => {
       let newTracks = [...prev];
       let newNote = {
         time: Tone.Transport.position,
         clip: newAudioIndex,
-        duration: parseFloat(audiobuffer.duration.toFixed(3)),
+        duration: parseFloat(audioBuffer.duration.toFixed(3)),
         offset: 0,
       };
 
@@ -461,6 +475,9 @@ function Track(props) {
         onMouseUp={handleMouseUp}
         disabled
         tabIndex={-1}
+        style={{
+          pointerEvents: !editMode && "none",
+        }}
       >
         {trackRows.map((row, rowIndex) => (
           <Box

@@ -66,6 +66,7 @@ const sessionTemplate = {
   root: 0,
   scale: 0,
   tracks: [],
+  size: 4,
 };
 
 function NewSessionDialog(props) {
@@ -88,22 +89,22 @@ function NewSessionDialog(props) {
           : Math.max(...session.tracks.map((e) => e.id)) + 1,
       name: "",
       type: trackType,
-      score:
-        trackType !== 2
+      score: [],
+      /* trackType !== 2
           ? []
           : createChordProgression(session.scale, session.root, 3, 2).map(
               (e, i) => {
                 return { notes: e, time: i, duration: 1, rhythm: [true] };
               }
-            ),
+            ), */
       volume: 0,
       muted: false,
       instrument:
         trackType === 0
           ? initialDrumPatch
-          : trackType === 3
+          : trackType === 2
           ? {
-              url: "",
+              urls: {},
             }
           : initialPatch,
       color: Math.floor(Math.random() * 14.99),

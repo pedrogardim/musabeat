@@ -34,7 +34,9 @@ function AudioClip(props) {
     recordingBuffer,
   } = props;
 
-  const fileInfo = instrumentsInfo[selectedTrack].filesInfo[index];
+  const fileInfo =
+    instrumentsInfo[selectedTrack] &&
+    instrumentsInfo[selectedTrack].filesInfo[index];
   const track = tracks[selectedTrack];
 
   const loaded = player.loaded;

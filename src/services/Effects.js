@@ -69,5 +69,5 @@ export const loadEffects = (instrument, track, index, setEffects) => {
     ...effects.filter((fx, i) => !track.fx[i].bp),
     Tone.Destination
   );
-  setEffects((prev) => ({ ...prev, [index]: effects }));
+  setEffects((prev) => ({ ...prev, [track.id]: effects }));
 };

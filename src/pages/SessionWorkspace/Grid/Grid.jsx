@@ -69,16 +69,16 @@ function Grid(props) {
                 style={{
                   opacity:
                     i % gridSize === 0
-                      ? 0.4
+                      ? 0.7
                       : i % gridSize === gridSize / 2
-                      ? 0.3
+                      ? 0.4
                       : 0.2,
                 }}
               >
                 {i % gridSize === 0 && !hiddenNumbers && (
                   <Typography
                     className="ws-grid-line-mesure-num"
-                    color="textPrimary"
+                    sx={{ color: "text.primary" }}
                   >
                     {i / gridSize + 1 + zoomPosition[0]}
                   </Typography>

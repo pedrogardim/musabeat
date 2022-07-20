@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import * as Tone from "tone";
 
 import { fileExtentions, soundChannels } from "../../../services/Audio";
@@ -31,6 +31,8 @@ import FileEditor from "./FileEditor";
 
 import Limit from "../../dialogs/Limit";
 
+import wsCtx from "../../../context/SessionWorkspaceContext";
+
 function FileInspector(props) {
   const { t } = useTranslation();
 
@@ -47,8 +49,11 @@ function FileInspector(props) {
     isDrum,
     handlePageNav,
     setFile,
-    uploadFile,
   } = props;
+
+  const wsCtxData = useContext(wsCtx);
+
+  const { uploadFile } = audioTrack ? wsCtxData : props;
 
   const [wavePath, setWavePath] = useState("");
 

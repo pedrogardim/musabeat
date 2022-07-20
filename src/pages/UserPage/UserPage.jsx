@@ -181,7 +181,7 @@ function UserPage(props) {
                 {t("sidemenu.drumsets")}
 
                 <br />
-                {userInfo.drumPatches.length}
+                {userInfo.drumpatches.length}
               </Typography>{" "}
             </div>
             <Divider orientation="vertical" flexItem />

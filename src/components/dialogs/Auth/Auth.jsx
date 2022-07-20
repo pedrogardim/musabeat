@@ -138,15 +138,17 @@ function AuthDialog(props) {
                 sessions: [],
                 likes: [],
                 patches: [],
-                likedPatches: [],
-                drumPatches: [],
-                likedDrumPatches: [],
+                likedpatches: [],
+                drumpatches: [],
+                likeddrumpatches: [],
                 files: [],
-                likedFiles: [],
+                likedfiles: [],
                 fllrs: 0,
                 fllwing: [],
                 sp: 0,
                 pr: null,
+                p: 0,
+                lvl: 1,
               };
               firebase
                 .firestore()
@@ -186,19 +188,21 @@ function AuthDialog(props) {
       sessions: [],
       likes: [],
       patches: [],
-      likedPatches: [],
-      drumPatches: [],
-      likedDrumPatches: [],
+      likedpatches: [],
+      drumpatches: [],
+      likeddrumpatches: [],
       files: [],
-      likedFiles: [],
+      likedfiles: [],
       fllrs: 0,
       fllwing: [],
       sp: 0,
       pr: null,
+      p: 0,
+      lvl: 1,
     };
 
     if (user.metadata.creationTime === user.metadata.lastSignInTime) {
-      userProfileRef.set({ profile: userProfile });
+      userProfileRef.set(userProfile);
       user.updateProfile({ displayName: userProfile.username });
     }
 
