@@ -33,7 +33,7 @@ export const bounceSessionExport = async (
       instr._buffers._buffers
   );
 
-  console.log(instrumentBuffers);
+  //console.log(instrumentBuffers);
 
   let offlineInstruments = [];
   let offlineEffects = [];
@@ -84,9 +84,14 @@ export const bounceSessionExport = async (
                 )
               );
             } else {
-              offlineInstruments[trackIndex] = new Tone[
-                originalInstrument.name
-              ](originalInstrument.get()).toDestination();
+              offlineInstruments[trackIndex] = new Tone.PolySynth(
+                Tone[originalInstrument._dummyVoice.name]
+              );
+              offlineInstruments[trackIndex].set(originalInstrument.get());
+              /* console.log(
+                originalInstrument.get(),
+                offlineInstruments[trackIndex].get()
+              ); */
             }
             offlineInstruments[trackIndex].volume.value = track.volume;
 

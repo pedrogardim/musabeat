@@ -47,7 +47,7 @@ function Exporter(props) {
           <CircularProgress
             size={24}
             color={"secondary"}
-            variant="determinate"
+            // variant="inderteminate"
             value={exportProgress}
           />
         )}
