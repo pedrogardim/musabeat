@@ -13,6 +13,11 @@
   align-items: center;
   user-select: none;
 }
+
+.keyboard-key > *{
+  pointer-events: none;
+}
+
 .keyboard-black-key {
   height: 60%;
   position: absolute !important;

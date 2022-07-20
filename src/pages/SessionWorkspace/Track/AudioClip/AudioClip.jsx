@@ -348,6 +348,7 @@ function AudioClip(props) {
       } ${track.type === 1 && "track-score-note-melody"}`}
       ref={noteRef}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleMouseDown}
       style={{
         height: rowRef.current.scrollHeight / 2,
         width:
@@ -377,13 +378,31 @@ function AudioClip(props) {
           <div
             className="track-score-note-handle"
             onMouseDown={() => setIsResizing("left")}
-            style={{ left: 0, cursor: "ew-resize" }}
-          />
+            onTouchStart={() => setIsResizing("leeft")}
+            style={{
+              left: 0,
+              cursor: "ew-resize",
+              backgroundColor: isSelected && colors[track.color][600],
+            }}
+          >
+            {isSelected && (
+              <div style={{ backgroundColor: colors[track.color][800] }} />
+            )}
+          </div>
           <div
             className="track-score-note-handle"
             onMouseDown={() => setIsResizing("right")}
-            style={{ right: 0, cursor: "ew-resize" }}
-          />
+            onTouchStart={() => setIsResizing("right")}
+            style={{
+              right: 0,
+              cursor: "ew-resize",
+              backgroundColor: isSelected && colors[track.color][600],
+            }}
+          >
+            {isSelected && (
+              <div style={{ backgroundColor: colors[track.color][800] }} />
+            )}
+          </div>
         </>
       )}
 
@@ -408,6 +427,7 @@ function AudioClip(props) {
         <>
           <IconButton
             onMouseDown={deleteNote}
+            onTouchStart={deleteNote}
             style={{
               position: "absolute",
               top: -48,

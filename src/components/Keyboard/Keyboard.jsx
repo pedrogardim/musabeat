@@ -7,6 +7,8 @@ import "./style.css";
 
 import { Typography, IconButton, Icon, Paper } from "@mui/material";
 
+import { detectTouchOut } from "../../services/Control";
+
 function Keyboard(props) {
   const [octaveState, setOctaveState] = useState(
     props.initialOctave
@@ -24,6 +26,47 @@ function Keyboard(props) {
   const handleKeyUp = (key) => {
     let note = key + 24;
     props.playFn && props.playFn.current[1](null, note);
+  };
+
+  const handleTouch = (e) => {
+    let touchedKeys = [
+      ...new Set(
+        Array(e.touches.length)
+          .fill(0)
+          .map((t, ti) =>
+            parseInt(
+              document
+                .elementFromPoint(
+                  e.touches.item(ti).clientX,
+                  e.touches.item(ti).clientY
+                )
+                .getAttribute("data-keyIndex")
+            )
+          )
+          .filter((e) => e !== null && e !== NaN)
+      ),
+    ];
+
+    let activeKeys =
+      props.activeNotes.length > 0
+        ? [
+            ...new Set(
+              props.activeNotes.map(
+                (n) => Tone.Frequency(n, "midi").toMidi() - 24 - octave * 12
+              )
+            ),
+          ]
+        : [];
+
+    let toPlay = [
+      ...new Set(touchedKeys.filter((obj) => activeKeys.indexOf(obj) == -1)),
+    ];
+    let toRelease = [
+      ...new Set(activeKeys.filter((obj) => touchedKeys.indexOf(obj) == -1)),
+    ];
+
+    toPlay.forEach((e) => handleKeyClick(e));
+    toRelease.forEach((e) => handleKeyUp(e));
   };
 
   const color = colors[typeof props.color === "number" ? props.color : 2];
@@ -49,6 +92,10 @@ function Keyboard(props) {
       onMouseDown={() => setIsMouseDown(true)}
       onMouseUp={() => setIsMouseDown(false)}
       onMouseLeave={() => setIsMouseDown(false)}
+      //onTouchStart={(e) => handleTouch(e)}
+      onTouchEnd={handleTouch}
+      onTouchStart={handleTouch}
+      onTouchMove={handleTouch}
     >
       {Array(Math.floor(octaves * 12))
         .fill(1)
@@ -67,11 +114,12 @@ function Keyboard(props) {
           return (
             <Paper
               onMouseDown={() => handleKeyClick(i)}
-              onMouseUp={() => handleKeyUp(i)}
               onMouseLeave={() => handleKeyUp(i)}
+              onMouseUp={() => handleKeyUp(i)}
               onMouseEnter={() => isMouseDown && handleKeyClick(i)}
               elevation={isBlackKey ? 24 : 8}
               key={i}
+              data-keyIndex={i}
               sx={(theme) => {
                 let dark = theme.palette.mode === "dark";
                 return {

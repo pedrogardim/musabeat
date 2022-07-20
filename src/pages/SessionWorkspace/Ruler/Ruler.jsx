@@ -23,7 +23,8 @@ function Ruler(props) {
   const handleZoomContMouseDown = (e) => {
     if (!e.target.className.includes("handle")) {
       setIsMoving(
-        ((e.pageX - rulerRef.current.getBoundingClientRect().left) /
+        (((e.touches ? e.touches[0].pageX : e.pageX) -
+          rulerRef.current.getBoundingClientRect().left) /
           rulerRef.current.offsetWidth) *
           sessionSize -
           zoomPosition[0]
@@ -120,6 +121,7 @@ function Ruler(props) {
       disabled
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
+      onTouchEnd={handleMouseUp}
       ref={rulerRef}
       sx={(theme) => ({
         [theme.breakpoints.down("md")]: {
@@ -131,6 +133,8 @@ function Ruler(props) {
         <div
           className="ws-ruler-zoom-cont"
           onMouseDown={handleZoomContMouseDown}
+          onTouchStart={handleZoomContMouseDown}
+          onTouchMove={(e) => handleHover(e.touches[0].pageX)}
           style={{
             width:
               (handlePosition[1] - handlePosition[0] + 1) *
@@ -144,11 +148,15 @@ function Ruler(props) {
           <div
             className="ws-ruler-zoom-cont-handle"
             onMouseDown={() => setResizingHandle("left")}
+            onTouchStart={() => setResizingHandle("left")}
+            onTouchMove={(e) => handleHover(e.touches[0].pageX)}
             style={{ left: 0 }}
           />
           <div
             className="ws-ruler-zoom-cont-handle"
             onMouseDown={() => setResizingHandle("right")}
+            onTouchStart={() => setResizingHandle("right")}
+            onTouchMove={(e) => handleHover(e.touches[0].pageX)}
             style={{ right: 0 }}
           />
         </div>
@@ -184,8 +192,10 @@ function Ruler(props) {
         <div
           className="knob-backdrop"
           onMouseMove={(e) => handleHover(e.pageX)}
+          onTouchMove={(e) => handleHover(e.touches[0].pageX)}
           onMouseUp={handleMouseUp}
           onMouseOut={handleMouseUp}
+          onTouchEnd={handleMouseUp}
         />
       )}
     </Box>

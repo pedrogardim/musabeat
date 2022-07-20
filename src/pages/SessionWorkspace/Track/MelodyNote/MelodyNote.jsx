@@ -163,6 +163,7 @@ function MelodyNote(props) {
         deletableNote && "track-score-note-deletable"
       } ${track.type === 1 && "track-score-note-melody"}`}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleMouseDown}
       style={{
         height: attr.parentHeight / trackRows.length - 1,
         width:
@@ -206,13 +207,20 @@ function MelodyNote(props) {
         <div
           className="track-score-note-handle"
           onMouseDown={() => setIsResizing(true)}
-        />
+          onTouchStart={() => setIsResizing(true)}
+          style={{ backgroundColor: isSelected && colors[track.color][600] }}
+        >
+          {isSelected && (
+            <div style={{ backgroundColor: colors[track.color][800] }} />
+          )}
+        </div>
       )}
 
       {isSelected && selNotes[selectedTrack].length === 1 && (
         <>
           <IconButton
             onMouseDown={deleteNote}
+            onTouchStart={deleteNote}
             style={{
               position: "absolute",
               top: -48,

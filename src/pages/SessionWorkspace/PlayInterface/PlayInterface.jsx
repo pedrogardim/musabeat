@@ -12,6 +12,8 @@ import {
   keyboardMapping,
 } from "../../../services/MiscData";
 
+import { detectTouchOut } from "../../../services/Control";
+
 import wsCtx from "../../../context/SessionWorkspaceContext";
 
 import Keyboard from "../../../components/Keyboard";
@@ -157,6 +159,8 @@ function PlayInterface(props) {
                     onMouseDown={() => playNote(null, i)}
                     onMouseLeave={() => releaseNote(null, i)}
                     onMouseUp={() => releaseNote(null, i)}
+                    onTouchStart={() => playNote(null, i)}
+                    onTouchEnd={() => releaseNote(null, i)}
                     elevation={
                       trackRows[i] && !instrument.has(trackRows[i].note) ? 1 : 4
                     }

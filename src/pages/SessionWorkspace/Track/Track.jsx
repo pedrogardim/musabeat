@@ -210,9 +210,12 @@ function Track(props) {
   /* =============================MOUSE EVENTS========================================= */
 
   const handleHover = (event) => {
+    let points = event.touches
+      ? [event.touches[0].pageY, event.touches[0].pageX]
+      : [event.pageY, event.pageX];
     let hoveredPos = [
-      event.pageY - rowRef.current.getBoundingClientRect().top,
-      event.pageX -
+      points[0] - rowRef.current.getBoundingClientRect().top,
+      points[1] -
         rowRef.current.getBoundingClientRect().left +
         (trackType === 0
           ? rowRef.current.offsetWidth / (zoomSize * gridSize * 2)
@@ -259,6 +262,48 @@ function Track(props) {
 
   const handleMouseDown = (e) => {
     //console.log(e && e.target.className);
+
+    //updata touch position: "absolute",
+    /* console.log(
+      e && e.touches
+        ? [e.touches[0].pageY, e.touches[0].pageX]
+        : [e.pageY, e.pageX]
+    ); */
+
+    if (e && e.touches) {
+      let points = [e.touches[0].pageY, e.touches[0].pageX];
+
+      let hoveredPos = [
+        points[0] - rowRef.current.getBoundingClientRect().top,
+        points[1] -
+          rowRef.current.getBoundingClientRect().left +
+          (trackType === 0
+            ? rowRef.current.offsetWidth / (zoomSize * gridSize * 2)
+            : 0),
+      ];
+
+      let pos = [
+        parseFloat(
+          Math.abs(
+            (hoveredPos[0] / rowRef.current.scrollHeight) * trackRows.length
+          ).toFixed(3)
+        ),
+        parseFloat(
+          Math.abs(
+            (hoveredPos[1] / rowRef.current.offsetWidth) * zoomSize * gridSize
+          ).toFixed(3)
+        ) +
+          zoomPosition[0] * gridSize,
+      ];
+
+      setFloatPos(pos);
+
+      let gridPos = pos.map((e) => Math.floor(e));
+
+      setGridPos((prev) =>
+        JSON.stringify(prev) === JSON.stringify(gridPos) ? prev : gridPos
+      );
+    }
 
     setIsMouseDown(true);
 
@@ -345,6 +390,8 @@ function Track(props) {
       newNote.duration = Tone.Time(duration).toBarsBeatsSixteenths();
 
       newNote.time = Tone.Time(newNote.time).toBarsBeatsSixteenths();
+
+      newNote.note = 108 - gridPos[0];
 
       setTracks((prev) => {
         let newTracks = [...prev];
@@ -473,6 +520,10 @@ function Track(props) {
         onMouseLeave={handleMouseUp}
         onClick={handleMouseUp}
         onMouseUp={handleMouseUp}
+        /* */
+        onTouchMove={handleHover}
+        onTouchStart={handleMouseDown}
+        onTouchEnd={handleMouseUp}
         disabled
         tabIndex={-1}
         style={{

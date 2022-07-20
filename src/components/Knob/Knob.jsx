@@ -143,6 +143,12 @@ function Knob(props) {
         onClick={(e) => e.detail === 2 && setInput(true)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
+        //
+        onTouchStart={() => setOpen(true)}
+        onTouchEnd={(e) => setOpen(false)}
+        onTouchMove={(e) =>
+          setMousePosition([e.touches[0].pageX, e.touches[0].pageY])
+        }
         ref={knobRef}
       >
         {(open || hovered) && !props.hideValue && (

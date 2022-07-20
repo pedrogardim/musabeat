@@ -85,6 +85,17 @@
   width: 6px;
   cursor: e-resize;
   user-select: none;
+
+}
+
+.track-score-note-handle > div {
+  position: absolute;
+  height:60%;
+  top:20%;
+  left:calc(50% - 1px);
+  width:2px;
+  pointer-events: none;
+  
 }
 
 .track-score-note-deletable:hover {
