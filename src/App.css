@@ -83,10 +83,11 @@ body *::-webkit-scrollbar-thumb {
 
 .app-log-beta-mark {
   position: absolute !important;
-  top: 8px !important;
-  right: -32px !important;
+  bottom: 16px !important;
+  right: -108px !important;
   font-size: 10px !important;
   line-height: 10px !important;
+  width: 100px;
 }
 
 .app-wrapper {
@@ -111,6 +112,11 @@ body *::-webkit-scrollbar-thumb {
   right: 32px !important;
   box-shadow: 0px 2px 1px -1px rgb(0 0 0 / 20%),
     0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%);
+}
+
+.login-button {
+  position: absolute !important;
+  right: 16px !important;
 }
 
 .side-menu-logo-cont {

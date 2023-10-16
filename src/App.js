@@ -15,12 +15,14 @@ import {
   Toolbar,
   AppBar,
   Typography,
-  Fade,
-  ListItemIcon,
   ThemeProvider,
   createTheme,
   useMediaQuery,
+  Button,
+  Link,
 } from "@mui/material";
+
+import CssBaseline from "@mui/material/CssBaseline";
 
 import * as Tone from "tone";
 
@@ -94,7 +96,7 @@ function App() {
                 h1: "h2",
                 h2: "h2",
                 h3: "h2",
-                h4: "span",
+                h4: "h4",
                 h5: "h2",
                 h6: "h2",
                 subtitle1: "h2",
@@ -193,56 +195,53 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppBar
-        sx={(theme) => ({
-          [theme.breakpoints.down("md")]: {
-            height: "40px",
-            maxHeight: "40px",
-            minHeight: "40px",
-          },
-        })}
-        position="sticky"
-      >
-        <Toolbar
-          className="app-bar"
-          sx={(theme) => ({
-            [theme.breakpoints.down("md")]: {
-              height: "40px",
-              maxHeight: "40px",
-              minHeight: "40px",
-            },
-          })}
-        >
-          <IconButton
+      <CssBaseline />
+      <AppBar position="sticky">
+        <Toolbar className="app-bar">
+          {/* <IconButton
             className="side-menu-icon"
             onClick={() => setSideMenu(true)}
           >
             <Icon>menu</Icon>
-          </IconButton>
+          </IconButton> */}
           <div className="app-logo-header">
             <AppLogo style={{ height: 30 }} src={logo} />
             <Typography variant="overline" className="app-log-beta-mark">
-              BETA
+              By{" "}
+              <Link href="https://pedrogardim.com" target="_blank">
+                Pedro Gardim
+              </Link>
             </Typography>
           </div>
           <IconButton
-            style={{ position: "absolute", right: 80 }}
+            style={{ position: "absolute", right: user ? 80 : 96 }}
             onClick={(e) => setLanguagePicker(e.currentTarget)}
           >
             <Icon style={{ color: "white" }}>language</Icon>
           </IconButton>
-          <IconButton className="main-avatar" onClick={handleAvatarClick}>
-            <Avatar
-              sx={(theme) => ({
-                [theme.breakpoints.down("md")]: {
-                  height: 32,
-                  width: 32,
-                },
-              })}
-              alt={user && user.displayName}
-              src={user && user.photoURL && user.photoURL}
-            />
-          </IconButton>
+          {user ? (
+            <IconButton className="main-avatar" onClick={handleAvatarClick}>
+              <Avatar
+                sx={(theme) => ({
+                  [theme.breakpoints.down("md")]: {
+                    height: 32,
+                    width: 32,
+                  },
+                })}
+                alt={user && user.displayName}
+                src={user && user.photoURL && user.photoURL}
+              />
+            </IconButton>
+          ) : (
+            <Button
+              className="login-button"
+              variant="contained"
+              color="primary"
+              onClick={() => setAuthDialog(true)}
+            >
+              Login
+            </Button>
+          )}
         </Toolbar>
         {currentRoute && (
           <Helmet>
@@ -257,26 +256,17 @@ function App() {
         sx={{ bgcolor: "background.default" }}
       >
         <Menu
-          style={{ marginTop: 48 }}
+          // style={{ marginTop: 48 }}
           anchorEl={userOption}
           keepMounted
           open={!!userOption}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={(e) => handlePageNav("user", user.displayName, e)}>
-            {t("avatar.profile")}
-          </MenuItem>
           <MenuItem onClick={(e) => handlePageNav("sessions", "", e)}>
             {t("avatar.userSessions")}
           </MenuItem>
           <MenuItem onClick={(e) => handlePageNav("userfiles", "", e)}>
             {t("avatar.userSamples")}
-          </MenuItem>
-          <MenuItem onClick={(e) => handlePageNav("userinstruments", "", e)}>
-            {t("avatar.userPatches")}
-          </MenuItem>
-          <MenuItem onClick={(e) => handlePageNav("userdrumsets", "", e)}>
-            {t("avatar.userDrumPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
         </Menu>
@@ -296,7 +286,7 @@ function App() {
           </MenuItem>
         </Menu>
 
-        <SideMenu
+        {/* <SideMenu
           open={sideMenu}
           setOpenedSession={setOpenedSession}
           handlePageNav={handlePageNav}
@@ -304,7 +294,7 @@ function App() {
           setNewSessionDialog={setNewSessionDialog}
           darkMode={darkMode}
           setDarkMode={setDarkMode}
-        />
+        /> */}
 
         <Switch>
           <Route exact path="/">
@@ -459,7 +449,6 @@ function App() {
           setUser={setUser}
         />
       )}
-
       <Confirm
         unsavedChanges
         open={Boolean(followingRoute)}

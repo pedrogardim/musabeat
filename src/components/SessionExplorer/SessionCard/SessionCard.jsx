@@ -11,7 +11,6 @@ import {
   Avatar,
   Tooltip,
   Grid,
-  Chip,
   Menu,
   MenuItem,
   ListItemIcon,
@@ -21,13 +20,10 @@ import "./style.css";
 
 import { useTranslation } from "react-i18next";
 
-import { sessionTags } from "../../../services/MiscData";
-
 import { colors } from "../../../utils/Pallete";
 
 function SessionCard(props) {
   const [creatorInfo, setCreatorInfo] = useState({});
-  //const [creationString, setCreationSting] = useState(null);
   const [hovered, setHovered] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -48,12 +44,14 @@ function SessionCard(props) {
       : setHovered(false);
   };
 
-  const fetchCreatorDisplayName = () => {
-    const dbRef = firebase
+  const fetchCreatorDisplayName = async () => {
+    const snapshot = await firebase
       .firestore()
       .collection("users")
-      .doc(props.session.creator);
-    dbRef.get().then((snapshot) => setCreatorInfo(snapshot.data().profile));
+      .doc(props.session.creator)
+      .get();
+
+    setCreatorInfo(snapshot.data().profile);
   };
 
   const getTimeDifferent = (date) => {
@@ -108,11 +106,10 @@ function SessionCard(props) {
 
   useEffect(() => {
     fetchCreatorDisplayName();
-    //setCreationSting(getTimeDifferent(props.session.createdOn.seconds * 1000));
   }, [props.session]);
 
   return (
-    <Grid item xs={12} sm={12} md={12} lg={!props.compact ? 6 : 12} xl={6}>
+    <Grid item xs={12} sm={6} md={6} lg={4}>
       <Paper
         className={`session-gallery-item ${
           hovered && "session-gallery-item-hovered"
@@ -122,17 +119,10 @@ function SessionCard(props) {
         onMouseLeave={() => setHovered(false)}
       >
         <div className="session-gallery-item-title-cont">
-          {!(props.isUser || props.compact) && (
-            <>
-              <Avatar
-                className="session-gallery-item-subtitle-avatar"
-                src={creatorInfo.photoURL}
-                onClick={(ev) =>
-                  props.handlePageNav("user", creatorInfo.username, ev)
-                }
-              />
-            </>
-          )}
+          <Avatar
+            className="session-gallery-item-subtitle-avatar"
+            src={creatorInfo.photoURL}
+          />
           <div
             style={{
               height: "100%",
@@ -151,7 +141,6 @@ function SessionCard(props) {
               {props.session.name
                 ? props.session.name
                 : t("WSTitle.untitledSession")}
-
               <Typography
                 variant="body1"
                 sx={{
@@ -186,7 +175,7 @@ function SessionCard(props) {
           </IconButton>
         </div>
 
-        {!props.compact &&
+        {/* {!props.compact &&
           props.session.tags &&
           !!props.session.tags.length && (
             <div className={"session-gallery-item-tags"}>
@@ -204,7 +193,7 @@ function SessionCard(props) {
                   )
               )}
             </div>
-          )}
+          )} */}
 
         <div className="session-gallery-item-track-cont">
           {props.session.tracks !== undefined &&
@@ -235,10 +224,7 @@ function SessionCard(props) {
               </Paper>
             ))
           ) : (
-            <Paper
-              className="session-gallery-item-track"
-              style={{ backgroundColor: "gray", opacity: 0.7 }}
-            >
+            <Paper className="" style={{ opacity: 0.7, margin: "auto" }}>
               No Tracks
             </Paper>
           )}

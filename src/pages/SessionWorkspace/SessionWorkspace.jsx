@@ -330,25 +330,12 @@ function SessionWorkspace(props) {
 
         <Box
           className="ws-header"
-          sx={(theme) => ({
-            [theme.breakpoints.down("md")]: {
-              height: "40px",
-            },
-          })}
+          // sx={(theme) => ({
+          //   [theme.breakpoints.down("md")]: {
+          //     height: "40px",
+          //   },
+          // })}
         >
-          {sessionKey && (
-            <Title
-              sessionData={sessionData}
-              setSessionData={setSessionData}
-              sessionKey={sessionKey}
-              user={user}
-              sessionSize={sessionData.size}
-              setPremiumMode={setPremiumMode}
-              handlePageNav={handlePageNav}
-              editorProfiles={editorProfiles}
-              setEditorProfiles={setEditorProfiles}
-            />
-          )}
           <div className="ws-commands" tabIndex="-1">
             <IconButton
               size="large"

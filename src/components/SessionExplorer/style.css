@@ -21,6 +21,7 @@
   max-width: 1200px;
   width: calc(100% - 32px);
   flex: 1 0;
+  padding-bottom: 128px;
 
   overflow-x: hidden;
   overflow-y: hidden;
@@ -33,12 +34,10 @@
 
   width: 100% !important;
   padding: 0 !important;
-
 }
 
 .session-explorer-compact > div {
   overflow-y: overlay;
-
 }
 
 .break {
