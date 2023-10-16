@@ -3,7 +3,13 @@ import { Helmet } from "react-helmet";
 
 import "./App.css";
 
-import { Switch, Route, withRouter, useHistory } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  withRouter,
+  useHistory,
+  Link as RouterLink,
+} from "react-router-dom";
 
 import {
   Box,
@@ -205,7 +211,9 @@ function App() {
             <Icon>menu</Icon>
           </IconButton> */}
           <div className="app-logo-header">
-            <AppLogo style={{ height: 30 }} src={logo} />
+            <RouterLink to="/">
+              <AppLogo style={{ height: 30 }} src={logo} />
+            </RouterLink>
             <Typography variant="overline" className="app-log-beta-mark">
               By{" "}
               <Link href="https://pedrogardim.com" target="_blank">
@@ -305,14 +313,6 @@ function App() {
               createNewSession={handleCreateNewSession}
             />
           </Route>
-          <Route exact path="/explore">
-            <SessionExplorer
-              createNewSession={() => setNewSessionDialog(true)}
-              handlePageNav={handlePageNav}
-              user={user}
-              setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
           <Route exact path="/sessions">
             <SessionExplorer
               isUser
@@ -320,16 +320,6 @@ function App() {
               handlePageNav={handlePageNav}
               user={user}
               setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
-          <Route exact path="/files">
-            <ListExplorer
-              type="files"
-              explore
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route exact path="/userfiles">
@@ -345,54 +335,6 @@ function App() {
           <Route exact path="/file/:key">
             <FilePage user={user} handlePageNav={handlePageNav} />
           </Route>
-
-          <Route exact path="/instruments">
-            <ListExplorer
-              explore
-              type="instr"
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/userinstruments">
-            <ListExplorer
-              userPage
-              type="instr"
-              user={user}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-              handlePageNav={handlePageNav}
-            />
-          </Route>
-          <Route exact path="/instrument/:key">
-            <PatchPage user={user} handlePageNav={handlePageNav} />
-          </Route>
-          <Route exact path="/drumsets">
-            <ListExplorer
-              type="seq"
-              explore
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/userdrumsets">
-            <ListExplorer
-              type="seq"
-              userPage
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/drumset/:key">
-            <PatchPage isDrum user={user} handlePageNav={handlePageNav} />
-          </Route>
-
           <Route exact path="/session/:key">
             <SessionWorkspace
               setOpenedSession={setOpenedSession}
@@ -403,28 +345,6 @@ function App() {
               setUnsavedChanges={setUnsavedChanges}
               setNewSessionDialog={setNewSessionDialog}
               handlePageNav={handlePageNav}
-            />
-          </Route>
-          <Route exact path="/user/:key">
-            <UserPage
-              handlePageNav={handlePageNav}
-              user={user}
-              setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
-
-          <Route exact path="/admin">
-            {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && <Admin />}
-          </Route>
-
-          <Route exact path="/list">
-            <ListExplorer
-              explore
-              type="files"
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route>
