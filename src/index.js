@@ -4,7 +4,6 @@ import "./index.css";
 import "./translations/i18n";
 
 import App from "./App";
-//import reportWebVitals from "./reportWebVitals";
 
 import firebase from "firebase";
 
@@ -23,57 +22,28 @@ const firebaseConfig = {
   measurementId: "G-4ZRP9FY1VG",
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 const startApp = () => {
-  //console.log(device.cordova);
   ReactDOM.render(
     <>
-      <ErrorBoundary
-        FallbackComponent={ErrorFallback}
-        onReset={() => {
-          // reset the state of your app so the error doesn't happen again
-        }}
-      >
-        {window.cordova ? (
-          <HashRouter>
-            <App />
-          </HashRouter>
-        ) : (
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        )}
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </ErrorBoundary>
     </>,
     document.getElementById("root")
   );
 };
 
-if (window.cordova) {
-  document.addEventListener(
-    "deviceready",
-    () => {
-      startApp();
-    },
-    false
-  );
-} else {
-  startApp();
-}
+startApp();
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-//reportWebVitals();
-
-function ErrorFallback({ error, resetErrorBoundary }) {
+function ErrorFallback({ error }) {
   return (
     <Dialog open={true}>
       <DialogTitle>Ooops.. Something went wrong</DialogTitle>
       <pre>{error.message}</pre>
-      {/* <button onClick={resetErrorBoundary}>Try again</button> */}
       <p>Please, refresh the page</p>
     </Dialog>
   );

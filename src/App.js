@@ -112,7 +112,6 @@ function App() {
   const wrapperRef = useRef(null);
 
   const [user, setUser] = useState(firebase.auth().currentUser);
-  const [isOnline, setIsOnline] = useState(true);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [languagePicker, setLanguagePicker] = useState(false);
@@ -132,15 +131,9 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(0);
-
   const handlePageNav = (route, id, e) => {
     if (e && (e.metaKey || e.ctrlKey)) {
-      const win = window.open(
-        `${window.cordova && "/#"}/${route}/${id}`,
-        "_blank"
-      );
+      const win = window.open(`/${route}/${id}`, "_blank");
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
@@ -181,23 +174,9 @@ function App() {
       setBottomScroll(true);
   };
 
-  const onWindowResize = () => {
-    setWindowWidth(window.innerWidth);
-    setWindowHeight(window.innerHeight);
-  };
-
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
-    window.addEventListener("online", () => setIsOnline(true));
-    window.addEventListener("offline", () => setIsOnline(false));
-    onWindowResize();
-    window.addEventListener("resize", onWindowResize);
-    return () => window.removeEventListener("resize", onWindowResize);
   }, []);
-
-  useEffect(() => {
-    //console.log(user);
-  }, [user]);
 
   useEffect(() => {
     setDarkMode(darkModeMediaQuery);
@@ -212,32 +191,8 @@ function App() {
     };
   }, [unsavedChanges]);
 
-  /*  useEffect(() => {
-    console.log(bottomScroll);
-  }, [bottomScroll]); */
-
-  /////TESTING
-
-  /* useEffect(() => {
-    console.log(createChordProgression(0, 0, 3, 4));
-  }, []); */
-
-  /////TESTING
-
   return (
     <ThemeProvider theme={theme}>
-      <Fade in={false /* !isOnline */}>
-        <div className="app-offline-screen">
-          <AppLogo
-            style={{ marginBottom: 32 }}
-            className="loading-screen-logo"
-            animated
-          />
-          <Typography align="center" variant="h5" style={{ padding: 64 }}>
-            {t("misc.offlineAlert")}
-          </Typography>
-        </div>
-      </Fade>
       <AppBar
         sx={(theme) => ({
           [theme.breakpoints.down("md")]: {
