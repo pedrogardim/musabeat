@@ -34,7 +34,7 @@ export const TRANSLATIONS_EN = {
   avatar: {
     profile: "Profile",
     userSessions: "My Sessions",
-    userSamples: "My Samples",
+    userSamples: "My Files",
     userPatches: "My Patches",
     userDrumPatches: "My Drumsets",
     logOut: "Log Out",
