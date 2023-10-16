@@ -192,7 +192,7 @@ function TransportBar(props) {
               <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
           ) : (
-            <Title sessionData={sessionData} />
+            <Title sessionData={sessionData} editMode={editMode} />
           )}
         </Grid>
 
