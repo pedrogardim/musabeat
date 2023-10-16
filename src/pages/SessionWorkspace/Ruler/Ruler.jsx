@@ -121,11 +121,11 @@ function Ruler(props) {
       onClick={handleMouseUp}
       onMouseUp={handleMouseUp}
       ref={rulerRef}
-      sx={(theme) => ({
-        [theme.breakpoints.down("md")]: {
-          height: "16px",
-        },
-      })}
+      // sx={(theme) => ({
+      //   [theme.breakpoints.down("md")]: {
+      //     height: "16px",
+      //   },
+      // })}
     >
       {rulerRef.current && (
         <div

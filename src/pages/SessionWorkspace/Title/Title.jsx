@@ -27,58 +27,50 @@ function WorkspaceTitle(props) {
   const [creationDateString, setCreationDateString] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const history = useHistory();
+  // const history = useHistory();
 
-  const getSessionTitleInfo = async () => {
-    let date = props.sessionData.createdOn
-      ? props.sessionData.createdOn.toDate()
-      : new Date();
+  // const getSessionTitleInfo = async () => {
+  //   let date = props.sessionData.createdOn
+  //     ? props.sessionData.createdOn.toDate()
+  //     : new Date();
 
-    let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
-      date.getMonth() + 1
-    }/${date.getFullYear()}`;
-    setCreationDateString(isNaN(date.getDate()) ? "" : creationDate);
+  //   let creationDate = `${t("misc.createdOn")} ${date.getDate()}/${
+  //     date.getMonth() + 1
+  //   }/${date.getFullYear()}`;
+  //   setCreationDateString(isNaN(date.getDate()) ? "" : creationDate);
 
-    const getEditorProfiles = async () => {
-      return Promise.all(
-        props.sessionData.editors.map(async (user) => {
-          let profile = (
-            await firebase.firestore().collection("users").doc(user).get()
-          ).data();
-          return [user, profile];
-        })
-      );
-    };
+  //   const getEditorProfiles = async () => {
+  //     return Promise.all(
+  //       props.sessionData.editors.map(async (user) => {
+  //         let profile = (
+  //           await firebase.firestore().collection("users").doc(user).get()
+  //         ).data();
+  //         return [user, profile];
+  //       })
+  //     );
+  //   };
 
-    props.user &&
-      props.sessionData.editors &&
-      getEditorProfiles().then((r) => {
-        r.map((e) => {
-          if (
-            props.user.uid === e[0] &&
-            e[0] === props.sessionData.creator &&
-            e[1].pr !== null &&
-            e[1].pr.seconds > ~~(+new Date() / 1000)
-          )
-            props.setPremiumMode(true);
-        });
-        props.setEditorProfiles(Object.fromEntries(r));
-        //check if user is one of the editors, and if its premium
-      });
-  };
+  //   props.user &&
+  //     props.sessionData.editors &&
+  //     getEditorProfiles().then((r) => {
+  //       r.map((e) => {
+  //         if (
+  //           props.user.uid === e[0] &&
+  //           e[0] === props.sessionData.creator &&
+  //           e[1].pr !== null &&
+  //           e[1].pr.seconds > ~~(+new Date() / 1000)
+  //         )
+  //           props.setPremiumMode(true);
+  //       });
+  //       props.setEditorProfiles(Object.fromEntries(r));
+  //       //check if user is one of the editors, and if its premium
+  //     });
+  // };
 
-  const handleTagDelete = (index) => {
-    props.setSessionData((prev) => {
-      let newSessionData = { ...prev };
-      newSessionData.tags = newSessionData.tags.filter((e, i) => i !== index);
-      return newSessionData;
-    });
-  };
-
-  useEffect(() => {
-    props.sessionData && getSessionTitleInfo();
-    setExpanded(false);
-  }, [props.sessionKey, props.user, props.sessionData]);
+  // useEffect(() => {
+  //   props.sessionData && getSessionTitleInfo();
+  //   setExpanded(false);
+  // }, [props.sessionKey, props.user, props.sessionData]);
 
   /* useEffect(() => {
     console.log(props.editorProfiles);
@@ -86,7 +78,7 @@ function WorkspaceTitle(props) {
 
   return (
     <div className="workspace-title">
-      <Helmet>
+      {/* <Helmet>
         <title>
           {props.sessionData &&
             props.editorProfiles !== null &&
@@ -98,7 +90,7 @@ function WorkspaceTitle(props) {
               props.editorProfiles[props.sessionData.creator].profile.username
             } `}
         </title>
-      </Helmet>
+      </Helmet> */}
       <span
         /* onClick={() => setExpanded((prev) => !prev)} */
         style={{
@@ -147,7 +139,7 @@ function WorkspaceTitle(props) {
 
       */}
 
-      <Tooltip
+      {/* <Tooltip
         title={
           props.editorProfiles &&
           props.editorProfiles[props.sessionData.creator].profile.username
@@ -156,10 +148,10 @@ function WorkspaceTitle(props) {
         <Avatar
           sx={(theme) => ({
             marginRight: 8,
-            [theme.breakpoints.down("md")]: {
-              height: 32,
-              width: 32,
-            },
+            // [theme.breakpoints.down("md")]: {
+            //   height: 32,
+            //   width: 32,
+            // },
           })}
           src={
             props.editorProfiles &&
@@ -178,7 +170,7 @@ function WorkspaceTitle(props) {
             )
           }
         />
-      </Tooltip>
+      </Tooltip> */}
 
       {/* props.editorProfiles !== null &&
       Object.values(props.editorProfiles).length > 0 ? (
@@ -209,7 +201,7 @@ function WorkspaceTitle(props) {
 
       {/* <div className="break" style={{ margin: 0 }} /> */}
 
-      {props.sessionData && expanded && (
+      {/* {props.sessionData && expanded && (
         <>
           <Typography variant="overline" style={{ fontSize: 10 }}>
             {`${
@@ -239,14 +231,14 @@ function WorkspaceTitle(props) {
                   key={props.index + e}
                   label={sessionTags[e]}
                   variant="outlined"
-                  /* onClick={() => handleTagClick(e)} */
+                  onClick={() => handleTagClick(e)} 
                   onDelete={() => handleTagDelete(i)}
                 />
               ))}
             </>
           )}
         </>
-      )}
+      )} */}
     </div>
   );
 }
