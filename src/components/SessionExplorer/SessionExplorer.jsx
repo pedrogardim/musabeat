@@ -135,41 +135,42 @@ function SessionExplorer(props) {
 
     //clear all files and patches stats first
 
-    sessions[index].tracks.forEach(async (e, i) => {
-      let instrobj =
-        typeof e.instrument === "string"
-          ? (
-              await firebase
-                .firestore()
-                .collection(e.type === 0 ? "drumpatches" : "patches")
-                .doc(e.instrument)
-                .get()
-            ).data()
-          : e.instrument;
+    sessions[index].tracks &&
+      sessions[index].tracks.forEach(async (e, i) => {
+        let instrobj =
+          typeof e.instrument === "string"
+            ? (
+                await firebase
+                  .firestore()
+                  .collection(e.type === 0 ? "drumpatches" : "patches")
+                  .doc(e.instrument)
+                  .get()
+              ).data()
+            : e.instrument;
 
-      typeof e.instrument === "string" &&
-        firebase
-          .firestore()
-          .collection(e.type === 0 ? "drumpatches" : "patches")
-          .doc(e.instrument)
-          .update({ in: firebase.firestore.FieldValue.increment(-1) });
+        typeof e.instrument === "string" &&
+          firebase
+            .firestore()
+            .collection(e.type === 0 ? "drumpatches" : "patches")
+            .doc(e.instrument)
+            .update({ in: firebase.firestore.FieldValue.increment(-1) });
 
-      if (instrobj.urls)
-        Object.values(instrobj.urls).forEach((e) =>
+        if (instrobj.urls)
+          Object.values(instrobj.urls).forEach((e) =>
+            firebase
+              .firestore()
+              .collection("files")
+              .doc(e)
+              .update({ in: firebase.firestore.FieldValue.increment(-1) })
+          );
+
+        if (instrobj.url)
           firebase
             .firestore()
             .collection("files")
-            .doc(e)
-            .update({ in: firebase.firestore.FieldValue.increment(-1) })
-        );
-
-      if (instrobj.url)
-        firebase
-          .firestore()
-          .collection("files")
-          .doc(instrobj.url)
-          .update({ in: firebase.firestore.FieldValue.increment(-1) });
-    });
+            .doc(instrobj.url)
+            .update({ in: firebase.firestore.FieldValue.increment(-1) });
+      });
 
     firebase
       .firestore()
