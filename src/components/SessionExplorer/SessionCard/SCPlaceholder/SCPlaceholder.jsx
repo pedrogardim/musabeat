@@ -5,7 +5,7 @@ import { Skeleton } from "@mui/material";
 
 function SCPlaceholder(props) {
   return (
-    <Grid item xs={12} sm={12} md={12} lg={!props.compact ? 6 : 12} xl={6}>
+    <Grid item xs={12} sm={6} md={6} lg={4}>
       <Paper className={"session-gallery-item"}>
         <div className="session-gallery-item-title-cont">
           <Avatar className="session-gallery-item-subtitle-avatar" />
