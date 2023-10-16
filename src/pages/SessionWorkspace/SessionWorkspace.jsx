@@ -3,7 +3,7 @@ import * as Tone from "tone";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Box } from "@mui/material";
+import { Icon, IconButton, Snackbar, Box, Fab } from "@mui/material";
 
 import "./style.css";
 
@@ -426,13 +426,20 @@ function SessionWorkspace(props) {
                     />
                   ))}
                 {params.editMode && (
-                  <IconButton
-                    style={{ width: 48, height: 48, left: "50%" }}
+                  <Fab
+                    style={{
+                      width: 48,
+                      height: 48,
+                      left: "50%",
+                      marginTop: 32,
+                    }}
                     tabIndex="-1"
+                    variant="contained"
+                    color="primary"
                     onClick={() => paramSetter("openDialog", "trackPicker")}
                   >
                     <Icon>add</Icon>
-                  </IconButton>
+                  </Fab>
                 )}
               </div>
             )}
