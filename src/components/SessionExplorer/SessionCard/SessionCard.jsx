@@ -29,6 +29,13 @@ function SessionCard(props) {
 
   const { t } = useTranslation();
 
+  const sessionName = props.session.name
+    ? props.session.name
+    : t("WSTitle.untitledSession");
+
+  const cardName =
+    sessionName.slice(0, 12) + (sessionName.length > 12 ? "..." : "");
+
   const handleClick = (event) => {
     !event.target.className.includes("MuiButtonBase-root") &&
       !event.target.className.includes("MuiIcon") &&
@@ -127,8 +134,10 @@ function SessionCard(props) {
             style={{
               height: "100%",
               display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              flex: 1,
             }}
           >
             <Typography
@@ -138,20 +147,17 @@ function SessionCard(props) {
                 //textTransform: "none",
               }}
             >
-              {props.session.name
-                ? props.session.name
-                : t("WSTitle.untitledSession")}
-              <Typography
-                variant="body1"
-                sx={{
-                  fontSize: 10,
-                  textTransform: "none",
-                  opacity: 0.35,
-                  ml: 1,
-                }}
-              >
-                {getTimeDifferent(props.session.createdOn.seconds * 1000)}
-              </Typography>
+              {cardName}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                fontSize: 10,
+                textTransform: "none",
+                opacity: 0.35,
+              }}
+            >
+              {getTimeDifferent(props.session.createdOn.seconds * 1000)}
             </Typography>
 
             <div className="break" />
@@ -167,12 +173,14 @@ function SessionCard(props) {
             </Typography>
           </div>
 
-          <IconButton
-            onClick={(e) => setMenuAnchorEl(e.target)}
-            className="session-gallery-item-actions-button"
-          >
-            <Icon>more_vert</Icon>
-          </IconButton>
+          {props.isUser && (
+            <IconButton
+              onClick={(e) => setMenuAnchorEl(e.target)}
+              className="session-gallery-item-actions-button"
+            >
+              <Icon>more_vert</Icon>
+            </IconButton>
+          )}
         </div>
 
         {/* {!props.compact &&
