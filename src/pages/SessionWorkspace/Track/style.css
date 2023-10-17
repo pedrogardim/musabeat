@@ -44,6 +44,11 @@
   right: 0;
   transition: all 0.2s;
   opacity: 0.9;
+  cursor: pointer;
+}
+
+.closed-track:hover {
+  filter: brightness(1.1);
 }
 .closed-track-button {
   position: absolute;

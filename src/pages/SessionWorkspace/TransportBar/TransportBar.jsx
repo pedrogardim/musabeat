@@ -18,6 +18,7 @@ import {
 
 import NotificationsList from "../../../components/NotificationsList";
 import wsCtx from "../../../context/SessionWorkspaceContext";
+import Title from "../Title";
 
 function TransportBar(props) {
   const { t } = useTranslation();
@@ -174,15 +175,15 @@ function TransportBar(props) {
         container
         className="ws-transport"
         tabIndex={-1}
-        sx={(theme) => ({
-          [theme.breakpoints.down("md")]: {
-            marginY: 1,
-            height: 32,
-          },
-        })}
+        // sx={(theme) => ({
+        //   [theme.breakpoints.down("md")]: {
+        //     marginY: 1,
+        //     height: 32,
+        //   },
+        // })}
       >
         <Grid item xs={4} style={{ justifyContent: "flex-start" }}>
-          {selectedTrack !== null && (
+          {selectedTrack !== null ? (
             <IconButton
               className="wstr-back"
               onClick={() => paramSetter("selectedTrack", null)}
@@ -190,6 +191,8 @@ function TransportBar(props) {
             >
               <Icon className="wstr-back">arrow_back</Icon>
             </IconButton>
+          ) : (
+            <Title sessionData={sessionData} editMode={editMode} />
           )}
         </Grid>
 
@@ -230,10 +233,10 @@ function TransportBar(props) {
                     sx={(theme) => ({
                       color: "text.primary",
                       fontSize: "1rem",
-                      [theme.breakpoints.down("md")]: {
-                        fontSize: 12,
-                        mr: 2,
-                      },
+                      // [theme.breakpoints.down("md")]: {
+                      //   fontSize: 12,
+                      //   mr: 2,
+                      // },
                     })}
                   >
                     {e.i}
@@ -242,11 +245,11 @@ function TransportBar(props) {
                     variant="body1"
                     color="textPrimary"
                     className="ws-transport-info-text"
-                    sx={(theme) => ({
-                      [theme.breakpoints.down("md")]: {
-                        fontSize: 8,
-                      },
-                    })}
+                    // sx={(theme) => ({
+                    //   [theme.breakpoints.down("md")]: {
+                    //     fontSize: 8,
+                    //   },
+                    // })}
                   >
                     {(i === 1 && "1/") + paramsValue[i]}
                   </Typography>

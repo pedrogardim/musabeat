@@ -49,7 +49,8 @@ function MelodyNote(props) {
   const attr = {
     parentHeight: rowRef.current.scrollHeight,
     //parentHeight2: trackRows.length * 17 * zoomY,
-    parentWidth: rowRef.current.offsetWidth,
+    // parentWidth: rowRef.current.offsetWidth,
+    parentWidth: rowRef.current.offsetWidth * 1.01,
   };
 
   //console.log(attr.parentHeight / (trackRows.length * zoomY));

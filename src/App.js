@@ -3,7 +3,13 @@ import { Helmet } from "react-helmet";
 
 import "./App.css";
 
-import { Switch, Route, withRouter, useHistory } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  withRouter,
+  useHistory,
+  Link as RouterLink,
+} from "react-router-dom";
 
 import {
   Box,
@@ -15,12 +21,14 @@ import {
   Toolbar,
   AppBar,
   Typography,
-  Fade,
-  ListItemIcon,
   ThemeProvider,
   createTheme,
   useMediaQuery,
+  Button,
+  Link,
 } from "@mui/material";
+
+import CssBaseline from "@mui/material/CssBaseline";
 
 import * as Tone from "tone";
 
@@ -94,7 +102,7 @@ function App() {
                 h1: "h2",
                 h2: "h2",
                 h3: "h2",
-                h4: "span",
+                h4: "h4",
                 h5: "h2",
                 h6: "h2",
                 subtitle1: "h2",
@@ -112,7 +120,6 @@ function App() {
   const wrapperRef = useRef(null);
 
   const [user, setUser] = useState(firebase.auth().currentUser);
-  const [isOnline, setIsOnline] = useState(true);
   const [authDialog, setAuthDialog] = useState(false);
   const [userOption, setUserOption] = useState(false);
   const [languagePicker, setLanguagePicker] = useState(false);
@@ -132,15 +139,9 @@ function App() {
 
   const [bottomScroll, setBottomScroll] = useState(false);
 
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(0);
-
   const handlePageNav = (route, id, e) => {
     if (e && (e.metaKey || e.ctrlKey)) {
-      const win = window.open(
-        `${window.cordova && "/#"}/${route}/${id}`,
-        "_blank"
-      );
+      const win = window.open(`/${route}/${id}`, "_blank");
       win.focus();
     } else {
       if (unsavedChanges && !followingRoute) {
@@ -181,23 +182,9 @@ function App() {
       setBottomScroll(true);
   };
 
-  const onWindowResize = () => {
-    setWindowWidth(window.innerWidth);
-    setWindowHeight(window.innerHeight);
-  };
-
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => setUser(user));
-    window.addEventListener("online", () => setIsOnline(true));
-    window.addEventListener("offline", () => setIsOnline(false));
-    onWindowResize();
-    window.addEventListener("resize", onWindowResize);
-    return () => window.removeEventListener("resize", onWindowResize);
   }, []);
-
-  useEffect(() => {
-    //console.log(user);
-  }, [user]);
 
   useEffect(() => {
     setDarkMode(darkModeMediaQuery);
@@ -212,82 +199,57 @@ function App() {
     };
   }, [unsavedChanges]);
 
-  /*  useEffect(() => {
-    console.log(bottomScroll);
-  }, [bottomScroll]); */
-
-  /////TESTING
-
-  /* useEffect(() => {
-    console.log(createChordProgression(0, 0, 3, 4));
-  }, []); */
-
-  /////TESTING
-
   return (
     <ThemeProvider theme={theme}>
-      <Fade in={false /* !isOnline */}>
-        <div className="app-offline-screen">
-          <AppLogo
-            style={{ marginBottom: 32 }}
-            className="loading-screen-logo"
-            animated
-          />
-          <Typography align="center" variant="h5" style={{ padding: 64 }}>
-            {t("misc.offlineAlert")}
-          </Typography>
-        </div>
-      </Fade>
-      <AppBar
-        sx={(theme) => ({
-          [theme.breakpoints.down("md")]: {
-            height: "40px",
-            maxHeight: "40px",
-            minHeight: "40px",
-          },
-        })}
-        position="sticky"
-      >
-        <Toolbar
-          className="app-bar"
-          sx={(theme) => ({
-            [theme.breakpoints.down("md")]: {
-              height: "40px",
-              maxHeight: "40px",
-              minHeight: "40px",
-            },
-          })}
-        >
-          <IconButton
+      <CssBaseline />
+      <AppBar position="sticky">
+        <Toolbar className="app-bar">
+          {/* <IconButton
             className="side-menu-icon"
             onClick={() => setSideMenu(true)}
           >
             <Icon>menu</Icon>
-          </IconButton>
+          </IconButton> */}
           <div className="app-logo-header">
-            <AppLogo style={{ height: 30 }} src={logo} />
+            <RouterLink to="/">
+              <AppLogo style={{ height: 30 }} src={logo} />
+            </RouterLink>
             <Typography variant="overline" className="app-log-beta-mark">
-              BETA
+              By{" "}
+              <Link href="https://pedrogardim.com" target="_blank">
+                Pedro Gardim
+              </Link>
             </Typography>
           </div>
           <IconButton
-            style={{ position: "absolute", right: 80 }}
+            style={{ position: "absolute", right: user ? 80 : 96 }}
             onClick={(e) => setLanguagePicker(e.currentTarget)}
           >
             <Icon style={{ color: "white" }}>language</Icon>
           </IconButton>
-          <IconButton className="main-avatar" onClick={handleAvatarClick}>
-            <Avatar
-              sx={(theme) => ({
-                [theme.breakpoints.down("md")]: {
-                  height: 32,
-                  width: 32,
-                },
-              })}
-              alt={user && user.displayName}
-              src={user && user.photoURL && user.photoURL}
-            />
-          </IconButton>
+          {user ? (
+            <IconButton className="main-avatar" onClick={handleAvatarClick}>
+              <Avatar
+                sx={(theme) => ({
+                  [theme.breakpoints.down("md")]: {
+                    height: 32,
+                    width: 32,
+                  },
+                })}
+                alt={user && user.displayName}
+                src={user && user.photoURL && user.photoURL}
+              />
+            </IconButton>
+          ) : (
+            <Button
+              className="login-button"
+              variant="contained"
+              color="primary"
+              onClick={() => setAuthDialog(true)}
+            >
+              Login
+            </Button>
+          )}
         </Toolbar>
         {currentRoute && (
           <Helmet>
@@ -302,26 +264,17 @@ function App() {
         sx={{ bgcolor: "background.default" }}
       >
         <Menu
-          style={{ marginTop: 48 }}
+          // style={{ marginTop: 48 }}
           anchorEl={userOption}
           keepMounted
           open={!!userOption}
           onClose={() => setUserOption(false)}
         >
-          <MenuItem onClick={(e) => handlePageNav("user", user.displayName, e)}>
-            {t("avatar.profile")}
-          </MenuItem>
           <MenuItem onClick={(e) => handlePageNav("sessions", "", e)}>
             {t("avatar.userSessions")}
           </MenuItem>
           <MenuItem onClick={(e) => handlePageNav("userfiles", "", e)}>
             {t("avatar.userSamples")}
-          </MenuItem>
-          <MenuItem onClick={(e) => handlePageNav("userinstruments", "", e)}>
-            {t("avatar.userPatches")}
-          </MenuItem>
-          <MenuItem onClick={(e) => handlePageNav("userdrumsets", "", e)}>
-            {t("avatar.userDrumPatches")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>{t("avatar.logOut")}</MenuItem>
         </Menu>
@@ -341,7 +294,7 @@ function App() {
           </MenuItem>
         </Menu>
 
-        <SideMenu
+        {/* <SideMenu
           open={sideMenu}
           setOpenedSession={setOpenedSession}
           handlePageNav={handlePageNav}
@@ -349,7 +302,7 @@ function App() {
           setNewSessionDialog={setNewSessionDialog}
           darkMode={darkMode}
           setDarkMode={setDarkMode}
-        />
+        /> */}
 
         <Switch>
           <Route exact path="/">
@@ -360,14 +313,6 @@ function App() {
               createNewSession={handleCreateNewSession}
             />
           </Route>
-          <Route exact path="/explore">
-            <SessionExplorer
-              createNewSession={() => setNewSessionDialog(true)}
-              handlePageNav={handlePageNav}
-              user={user}
-              setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
           <Route exact path="/sessions">
             <SessionExplorer
               isUser
@@ -375,16 +320,6 @@ function App() {
               handlePageNav={handlePageNav}
               user={user}
               setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
-          <Route exact path="/files">
-            <ListExplorer
-              type="files"
-              explore
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route exact path="/userfiles">
@@ -400,54 +335,6 @@ function App() {
           <Route exact path="/file/:key">
             <FilePage user={user} handlePageNav={handlePageNav} />
           </Route>
-
-          <Route exact path="/instruments">
-            <ListExplorer
-              explore
-              type="instr"
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/userinstruments">
-            <ListExplorer
-              userPage
-              type="instr"
-              user={user}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-              handlePageNav={handlePageNav}
-            />
-          </Route>
-          <Route exact path="/instrument/:key">
-            <PatchPage user={user} handlePageNav={handlePageNav} />
-          </Route>
-          <Route exact path="/drumsets">
-            <ListExplorer
-              type="seq"
-              explore
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/userdrumsets">
-            <ListExplorer
-              type="seq"
-              userPage
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
-            />
-          </Route>
-          <Route exact path="/drumset/:key">
-            <PatchPage isDrum user={user} handlePageNav={handlePageNav} />
-          </Route>
-
           <Route exact path="/session/:key">
             <SessionWorkspace
               setOpenedSession={setOpenedSession}
@@ -458,28 +345,6 @@ function App() {
               setUnsavedChanges={setUnsavedChanges}
               setNewSessionDialog={setNewSessionDialog}
               handlePageNav={handlePageNav}
-            />
-          </Route>
-          <Route exact path="/user/:key">
-            <UserPage
-              handlePageNav={handlePageNav}
-              user={user}
-              setNewSessionDialog={setNewSessionDialog}
-            />
-          </Route>
-
-          <Route exact path="/admin">
-            {user && user.uid === "jyWfwZsyKlg1NliBOIYNmWkc3Dr1" && <Admin />}
-          </Route>
-
-          <Route exact path="/list">
-            <ListExplorer
-              explore
-              type="files"
-              user={user}
-              handlePageNav={handlePageNav}
-              bottomScroll={bottomScroll}
-              setBottomScroll={setBottomScroll}
             />
           </Route>
           <Route>
@@ -504,7 +369,6 @@ function App() {
           setUser={setUser}
         />
       )}
-
       <Confirm
         unsavedChanges
         open={Boolean(followingRoute)}

@@ -32,7 +32,7 @@ export const TRANSLATIONS_ES = {
   avatar: {
     profile: "Perfil",
     userSessions: "Mis Sesiones",
-    userSamples: "Mis Samples",
+    userSamples: "Mis Archivos",
     userPatches: "Mis Patches",
     userDrumPatches: "Mis Sets de Batería",
     logOut: "Desconectar",

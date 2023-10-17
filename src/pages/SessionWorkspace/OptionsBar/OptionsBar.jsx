@@ -45,9 +45,6 @@ function OptionsBar(props) {
       >
         <Icon style={{ transform: "rotate(90deg)" }}>tune</Icon>
       </IconButton>
-      <IconButton onClick={() => paramSetter("openDialog", "options")}>
-        <Icon>settings</Icon>
-      </IconButton>
       <IconButton
         disabled={!areUnsavedChanges}
         onClick={() => save(tracks, sessionData)}

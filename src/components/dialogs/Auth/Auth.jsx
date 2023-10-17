@@ -286,7 +286,7 @@ function AuthDialog(props) {
             <div className="auth-dialog-btn-cont">
               <Button
                 className="auth-dialog-opt-btn"
-                variant="outlined"
+                variant="contained"
                 fullWidth={false}
                 onClick={handleGoogleLogin}
               >
@@ -295,8 +295,8 @@ function AuthDialog(props) {
               </Button>
               <Button
                 className="auth-dialog-opt-btn"
-                variant="outlined"
-                color={"primary"}
+                color="primary"
+                variant="contained"
                 fullWidth={false}
                 onClick={() => setEmailLogIn(true)}
               >

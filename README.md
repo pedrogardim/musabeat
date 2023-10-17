@@ -1,46 +1,67 @@
 # Musabeat
-## A web-based DAW
+
+## Web-Based Digital Audio Workstation (DAW)
 
 ![](https://user-images.githubusercontent.com/81443264/224987137-e1a61977-9b35-4c13-b9a2-88ca67447c9c.gif)
 
-[Try Musabeat!!](https://musamusicapp-c5d73.web.app)
+[🎵 Explore Musabeat Now! 🎵](https://musamusicapp-c5d73.web.app)
 
-### About this project
+### Overview
 
-Musabeat is a React web app that implements the core features of a DAW (Digital Audio Workstation), such as:
+Musabeat offers a dynamic web experience that brings the power and versatility of a DAW directly to your browser. Built with React, this app captures the essence of music production, allowing users to:
 
-- Instruments and audio tracks
-- Musical events scheduling
-- Sequencer and Piano Roll editor
-- Synthesis (Subtractive, FM, etc)
-- Sampling
-- Audio recording and playback
-- Sound effects and processors (Equivalent to Plug-ins / VSTs)
-- Mixing
+- Work with various instruments & audio tracks
+- Schedule musical events
+- Utilize Sequencer and Piano Roll editor
+- Engage in different synthesis techniques like Subtractive, FM, etc.
+- Incorporate sampling & audio recording
+- Integrate sound effects, processors, and more (akin to Plug-ins/VSTs)
+- Mix and master seamlessly
 
-In addition to that, it features:
+### Notable Features
 
-- Authentication
-- A "cloud" system (Users sessions, files and instruments patches are stored on a database, and can be accesed from anywhere)
-- Real-time collaborative music creation, users can edit and listen to the same session at the same time.
-- Basic social system (Likes, profiles, sharing)
-- Multilanguage
-- Dark / Light theme.
+- **User-Centric**: Secure authentication & profile management
+- **Cloud Integration**: Save sessions, files, and instrument patches in the cloud; accessible from any location.
+- **Engaging Community**: Social features including likes, profiles, and content sharing.
+- **Adaptable UI**: Multilingual support
 
-It relies on the WebAudio API (wrapped by ToneJS), React for the UI, and Firebase for database and storage.
+### Technical Stack 🛠
 
-**The project has been discontinued, so you may found some bugs :)**
+**Frontend 🖥**
 
-### Some Background
+- React
+- Material UI 5
+- WebAudio API (enhanced by ToneJS)
 
-This app was born as a challenge during my Audio Engineering VT (and ended up being my degree project), as an opportunity to improve and implement my web development skills in addition to my recent obtained digital audio knowledge. 
+**Backend ☁️**
 
-Looking back to the code almost two years after I started this project, I'm happy to see the progress I made both in React and general Javascript good practices. 
+- Firebase (Baas)
+  - Authentication
+  - Cloud Storage
+  - Firestore NoSQL DB
 
-### Future of the project
+🚧 **Note**: Musabeat is no longer actively maintained and may contain bugs.
 
-I'm not really working on Musabeat anymore. It would take some serious re-design for it to be a real commercial product. Features started to add up and the app ended up being a really complex product for beginners to use. Also, WebAudio performance started to be a problem when using too many tracks.
+### Musabeat: Its Genesis and future 🌀
 
-Nonetheless, in the future, I have plans of picking and improving some of its main features, and create a simpler and more minimalist app, with a better UX and focused on creativity and just creating music.
+Conceived during my Audio Engineering VT, Musabeat was more than just a degree project—it was an exploration into melding my web development prowess with my newfound passion for digital audio. Reflecting on the code, the journey of personal growth in React and JavaScript best practices is evident.
 
-[Try Musabeat!!](https://musamusicapp-c5d73.web.app)
+As of now, I am no longer actively working on it. Over time, features began to accumulate, and Musabeat evolved into a product that's quite intricate for beginners. Additionally, WebAudio's performance became a challenge when dealing with a large number of tracks. Transforming it into a commercial-grade product would demand a significant redesign. 
+
+Instead, I'm working on [Modulab](https://github.com/pedrogardim/modulab), a modular synthesis-inspired playground. It embodies a new direction and focus, and I invite everyone to check it out.
+
+Musabeat's repository remains available for those who wish to explore, learn from, or fork the code. ✌🏻
+
+
+
+### Acknowledged Problems 🐛
+
+Some parts of the codebase were written during early stages of learning and may not adhere to current best practices. I'm aware that the following is present in the code:
+
+- Lack of modularization (Large component files)
+- Lack of the DRY principle
+- Messy state management (Huge and over-complex context)
+- Styling inconsistency (CSS + MUI `sx` prop + inline styles)
+- Hardcoded values
+
+[🎶 Give Musabeat a Spin! 🎶](https://musamusicapp-c5d73.web.app)
