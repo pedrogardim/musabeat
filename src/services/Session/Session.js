@@ -70,12 +70,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     newSession.editors = [userId];
   }
 
-  if (!userId) {
-    setOpenedSession(newSession);
-    handlePageNav("session", "newSession");
-    return;
-  }
-
   const sessionsRef = firebase.firestore().collection("sessions");
   sessionsRef.add(newSession).then((ref) => {
     if (userId) {
@@ -160,8 +154,7 @@ export const loadSession = (
 
       Tone.Transport.bpm.value = data.bpm;
 
-      user &&
-        data.editors.includes(user.uid) &&
+      if ((user && data.editors.includes(user.uid)) || (!user && !data.creator))
         WSparamSetter("editMode", true);
     });
 
@@ -170,4 +163,19 @@ export const loadSession = (
       played: firebase.firestore.FieldValue.increment(1),
     });
   }
+};
+
+export const updateSessionCreator = async (sessionId, userId) => {
+  let sessionRef = firebase.firestore().collection("sessions").doc(sessionId);
+
+  const session = (await sessionRef.get()).data();
+
+  console.log(sessionId, userId, session);
+
+  session.creator = userId;
+  session.editors.push(userId);
+
+  sessionRef.update(session);
+
+  return session;
 };

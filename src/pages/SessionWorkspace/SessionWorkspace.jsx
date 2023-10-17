@@ -3,7 +3,7 @@ import * as Tone from "tone";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Box, Fab } from "@mui/material";
+import { Icon, IconButton, Snackbar, Box, Fab, Alert } from "@mui/material";
 
 import "./style.css";
 
@@ -44,6 +44,7 @@ import { loadInstrument } from "../../services/Instruments";
 import { deleteSelection } from "./services/Edition";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
+import { updateSessionCreator } from "../../services/Session/Session";
 
 function SessionWorkspace(props) {
   const sessionKey = useParams().key;
@@ -264,6 +265,14 @@ function SessionWorkspace(props) {
     console.log(tracks);
     tracks && updateUndoHistory(tracks);
   }, [tracks]);
+
+  useEffect(() => {
+    if (user && sessionData.bpm && !sessionData.creator) {
+      updateSessionCreator(sessionKey, user.uid).then((newSession) =>
+        setSessionData((p) => ({ ...p, ...newSession }))
+      );
+    }
+  }, [sessionData, user]);
 
   useEffect(() => {
     if (sessionData) {
@@ -535,6 +544,17 @@ function SessionWorkspace(props) {
             </IconButton>
           }
         />
+        {!user && !sessionData.creator && (
+          <Alert severity="warning" sx={{ textTransform: "none" }}>
+            Looks like you are not logged in. Please login to save your work.
+          </Alert>
+        )}
+        {!params.editMode && (
+          <Alert severity="info" sx={{ textTransform: "none" }}>
+            This session was created by another user. You can check it out but
+            not edit it.
+          </Alert>
+        )}
         <Confirm
           dupSession
           open={params.openDialog === "dupSession"}

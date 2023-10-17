@@ -310,7 +310,7 @@ function App() {
               user={user}
               setAuthDialog={setAuthDialog}
               handlePageNav={handlePageNav}
-              createNewSession={handleCreateNewSession}
+              createNewSession={() => setNewSessionDialog(true)}
             />
           </Route>
           <Route exact path="/sessions">

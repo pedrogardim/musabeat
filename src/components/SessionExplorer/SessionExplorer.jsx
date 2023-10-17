@@ -47,7 +47,10 @@ function SessionExplorer(props) {
     if (props.isUser && props.user === null) return;
 
     let queryRules = () => {
-      let rules = firebase.firestore().collection("sessions");
+      let rules = firebase
+        .firestore()
+        .collection("sessions")
+        .where("creator", "!=", null);
 
       if (searchValue) {
         //console.log("text");
@@ -70,6 +73,8 @@ function SessionExplorer(props) {
         rules = rules.startAfter(lastItem);
       } */
 
+      rules = rules.limit(30);
+
       return rules;
     };
 
@@ -81,8 +86,11 @@ function SessionExplorer(props) {
           setSessionKeys(null);
           setSessions(null);
         } else {
-          setSessionKeys(snapshot.docs.map((e) => e.id));
-          setSessions(snapshot.docs.map((e) => e.data()));
+          const filtered = snapshot.docs.filter(
+            (e) => e.data().tracks && e.data().tracks.length > 0
+          );
+          setSessionKeys(filtered.map((e) => e.id));
+          setSessions(filtered.map((e) => e.data()));
         }
       });
   };

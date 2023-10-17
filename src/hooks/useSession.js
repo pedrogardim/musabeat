@@ -44,21 +44,22 @@ function useSession(options) {
         (e, i) =>
           effects[e.id] && effects[e.id].forEach((fx) => fx && fx.dispose())
       );
-    loadSession(
-      setSessionData,
-      setTracks,
-      id,
-      hidden,
-      user,
-      sessionObject,
-      setIsLoaded,
-      setInstruments,
-      setInstrumentsLoaded,
-      setEffects,
-      setInstrumentsInfo,
-      paramSetter,
-      setNotifications
-    );
+    if (id !== "newSession")
+      loadSession(
+        setSessionData,
+        setTracks,
+        id,
+        hidden,
+        user,
+        sessionObject,
+        setIsLoaded,
+        setInstruments,
+        setInstrumentsLoaded,
+        setEffects,
+        setInstrumentsInfo,
+        paramSetter,
+        setNotifications
+      );
   };
 
   const action = (input) => {
