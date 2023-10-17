@@ -108,6 +108,11 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-content: space-evenly;
+  cursor: pointer;
+}
+
+.ie-synth-compact-item:hover {
+  filter: brightness(1.1);
 }
 
 .ie-synth-fs-item {
@@ -119,8 +124,12 @@
   align-items: center;
   flex-direction: row;
   flex-wrap: wrap;
-  align-content: space-evenly;
+  align-content: center;
   z-index: 10;
+}
+
+.ie-synth-fs-item > * {
+  margin: 16px 0;
 }
 
 .turnonoff-button {

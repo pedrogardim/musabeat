@@ -182,12 +182,13 @@ function Modifier(props) {
               : props.instrument.name
           }
           onChange={props.changeInstrumentType}
-          style={{ position: "absolute", top: 0 }}
+          // style={{ position: "absolute", top: 0 }}
         >
           {["MonoSynth", "FMSynth", "AMSynth"].map((e, i) => (
             <option value={e}>{t(`instrumentEditor.types.${e}`)}</option>
           ))}
         </Select>
+        <div className="break" />
         {mainContent}
       </Box>
     </Grow>
