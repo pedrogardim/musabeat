@@ -108,30 +108,6 @@ function FileInspector(props) {
           onClose={() => setEditorOpen(false)}
         />
       )}
-      {!(exists && instrument.name === "Sampler") && (
-        <>
-          <Box className="file-editor-column">
-            <ListExplorer
-              type="files"
-              compact
-              FileInspector
-              audioTrack={audioTrack}
-              setInstrumentLoaded={setInstrumentLoaded}
-              handlePageNav={handlePageNav}
-              tags={
-                !instrument.name === "Sampler" && isDrum
-                  ? [fileTags[tagTypeMapping[index]]]
-                  : []
-              }
-              instrument={instrument}
-              onItemClick={setFile}
-              onClose={onClose}
-              item={index}
-            />
-          </Box>
-          <Divider flexItem orientation="vertical" />
-        </>
-      )}
       <Box
         className="file-editor-column"
         onDragEnter={(e) => {

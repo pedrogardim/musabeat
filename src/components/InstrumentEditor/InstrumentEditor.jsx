@@ -3,52 +3,28 @@ import React, { useState, useRef, useContext } from "react";
 import * as Tone from "tone";
 import firebase from "firebase";
 
-import {
-  List,
-  Divider,
-  IconButton,
-  Icon,
-  MenuItem,
-  Tooltip,
-  Box,
-  Grid,
-  Select,
-  SvgIcon,
-  CircularProgress,
-} from "@mui/material";
+import { IconButton, Icon, Box, Grid, CircularProgress } from "@mui/material";
 
 import { useTranslation } from "react-i18next";
 
-import SamplerFileItem from "./SamplerFileItem";
 import DrumComponent from "./DrumComponent";
 import SynthEditor from "./SynthEditor";
 import FileInspector from "./FileInspector";
-import ListExplorer from "../ListExplorer";
 
-import NameInput from "../dialogs/NameInput";
-import NoteInput from "../dialogs/NoteInput";
 import Confirm from "../dialogs/Confirm";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
 
-import { loadInstrument } from "../../services/Instruments";
-
 import { detectPitch } from "../../services/Audio";
 
-import { drumIcon, drumAbbreviations } from "../../services/MiscData";
+import { drumAbbreviations } from "../../services/MiscData";
 
 import "./style.css";
 
 function InstrumentEditor(props) {
   const { t } = useTranslation();
 
-  const {
-    workspace,
-    resetHistory,
-    handlePageNav,
-    setUploadingFiles,
-    setPagePatchInfo,
-  } = props;
+  const { workspace, resetHistory, handlePageNav } = props;
 
   const wsCtxData = useContext(wsCtx);
 
@@ -59,13 +35,11 @@ function InstrumentEditor(props) {
     setTracks,
     setInstruments,
     setInstrumentsLoaded,
-    setEffects,
     instrumentsInfo,
     setInstrumentsInfo,
     params,
     paramSetter,
     uploadFile,
-    setNotifications,
   } = workspace ? wsCtxData : props;
 
   const { selectedTrack } = workspace ? params : props;
@@ -96,12 +70,7 @@ function InstrumentEditor(props) {
 
   const [patchSize, setPatchSize] = useState(0);
 
-  const oscColumn = useRef(null);
   const ieWrapper = useRef(null);
-
-  const patchSizeLimit = 5242880;
-
-  const checkCustomPatch = typeof track.instrument !== "string";
 
   const isDrum = trackType === 0 && instrumentInfo.patch.dr;
 
@@ -122,8 +91,7 @@ function InstrumentEditor(props) {
 
   const setInstrument = (newInstrument) =>
     workspace
-      ? //console.log("instrument set", newInstrument._dummyVoice);
-        setInstruments((prev) => {
+      ? setInstruments((prev) => {
           let newInstruments = [...prev];
           newInstruments[index].dispose();
           delete newInstruments[index];
@@ -139,22 +107,6 @@ function InstrumentEditor(props) {
     }));
 
   /* ================================= */
-
-  const updatePatchSize = (urlsObj) => {
-    let totalSize = 0;
-
-    Promise.all(
-      Object.keys(urlsObj).map(async (e, i) => {
-        let filedata = (
-          await firebase.firestore().collection("files").doc(urlsObj[e]).get()
-        ).data();
-        totalSize += filedata.size;
-        return filedata.size;
-      })
-    ).then((values) => {
-      setPatchSize(totalSize);
-    });
-  };
 
   const changeInstrumentType = async (e) => {
     let newType = typeof e === "string" ? e : e.target.value;
@@ -218,22 +170,7 @@ function InstrumentEditor(props) {
     });
   };
 
-  const toggleSamplerMode = () =>
-    setPatchInfo((prev) => ({ ...prev, dr: !prev.dr }));
-
-  const handleFileDrop = (files, event) => {
-    event.preventDefault();
-    Tone.Transport.pause();
-    //let file = files[0];
-    setDraggingOver(false);
-    setUploadingFiles(files);
-  };
-
   const handlePlayersFileDelete = (fileId, fileName, soundindex) => {
-    //temp solution, Tone.Players doesn't allow .remove()
-
-    //let filteredScore = track.score.map((msre)=>msre.map(beat=>beat.filter(el=>JSON.stringify(el)!==fileName)));
-
     let newInstrument = new Tone.Players().toDestination();
 
     instrument._buffers._buffers.forEach((value, key) => {
@@ -259,150 +196,7 @@ function InstrumentEditor(props) {
       .then((r) => setPatchSize((prev) => prev - r.data().size));
   };
 
-  const handleSamplerFileDelete = (fileId, fileName) => {
-    console.log(fileName, instrument._buffers._buffers);
-    let newInstrument = new Tone.Sampler().toDestination();
-
-    instrument._buffers._buffers.forEach((value, key) => {
-      if (key !== fileName) newInstrument.add(key, value);
-    });
-
-    instrument.dispose();
-
-    setInstrument(newInstrument);
-
-    console.log(newInstrument._buffers._buffers);
-
-    onInstrumentMod(
-      fileId,
-      Tone.Frequency(fileName, "midi").toNote(),
-      "",
-      true
-    );
-
-    firebase
-      .firestore()
-      .collection("files")
-      .doc(fileId)
-      .get()
-      .then((r) => setPatchSize((prev) => prev - r.data().size));
-  };
-
-  const changeSamplerNote = async (note, newNote) => {
-    let drumMap = instrument._buffers._buffers;
-    if (drumMap.has(newNote)) return;
-
-    //TODO:Handle instrument having newNote
-
-    drumMap.set(
-      JSON.stringify(Tone.Frequency(newNote).toMidi()),
-      drumMap.get(JSON.stringify(Tone.Frequency(note).toMidi()))
-    );
-
-    drumMap.delete(JSON.stringify(Tone.Frequency(note).toMidi()));
-
-    updateFilesStatsOnChange && updateFilesStatsOnChange();
-
-    let urlsObj =
-      typeof track.instrument === "string"
-        ? (
-            await firebase
-              .firestore()
-              .collection("patches")
-              .doc(track.instrument)
-              .get()
-          ).data().urls
-        : { ...track.instrument.urls };
-
-    urlsObj[newNote] = urlsObj[note];
-    delete urlsObj[note];
-
-    if (workspace) {
-      setTracks((prev) => {
-        let newTracks = [...prev];
-        newTracks[index].instrument = { urls: urlsObj };
-        return newTracks;
-      });
-    }
-    setPatchInfo((prev) => {
-      let newPatch = { ...prev };
-      newPatch.filesInfo[newNote] = newPatch.filesInfo[note];
-      delete newPatch.filesInfo[note];
-      newPatch.patch.urls = urlsObj;
-      return newPatch;
-    });
-
-    setRenamingLabel(null);
-  };
-
-  const saveUserPatch = (name, category) => {
-    //console.log(name, category);
-    let user = firebase.auth().currentUser;
-
-    let clearInfo = {
-      creator: user.uid,
-      categ: !!category || isNaN(category) ? category : 0,
-      volume: track.volume,
-      createdOn: firebase.firestore.FieldValue.serverTimestamp(),
-      in: 1,
-      likes: 0,
-    };
-
-    let patchInfo = !trackType
-      ? instrument.name === "Sampler"
-        ? {
-            base: "Sampler",
-            name: !!name ? name : "Untitled Patch",
-            urls: track.instrument.urls,
-          }
-        : {
-            base: instrument._dummyVoice.name.replace("Synth", ""),
-            name: !!name ? name : "Untitled Patch",
-            options: instrument.get(),
-          }
-      : {
-          name: !!name ? name : "Untitled Drum Patch",
-          urls: track.instrument.urls,
-        };
-
-    let patch = Object.assign({}, clearInfo, patchInfo);
-
-    if (typeof category === "number") patch.categ = parseInt(category);
-
-    const newPatchRef = firebase
-      .firestore()
-      .collection(!trackType ? "patches" : "drumpatches");
-
-    const userRef = firebase.firestore().collection("users").doc(user.uid);
-
-    newPatchRef.add(patch).then((r) => {
-      setTracks &&
-        setTracks((previous) =>
-          previous.map((track, i) => {
-            if (i === index) {
-              let newTrack = { ...track };
-              newTrack.instrument = r.id;
-              return newTrack;
-            } else {
-              return track;
-            }
-          })
-        );
-
-      userRef.update(
-        !trackType
-          ? { patches: firebase.firestore.FieldValue.arrayUnion(r.id) }
-          : { drumpatches: firebase.firestore.FieldValue.arrayUnion(r.id) }
-      );
-
-      setSelectedPatch(r.id);
-    });
-    setPatchExplorer(false);
-  };
-
   const onInstrumentMod = async (fileId, name, soundindex, isRemoving) => {
-    //update instrument info in track object
-
     if (track.type === 0 || instrument.name === "Sampler") {
       let patch =
         typeof track.instrument === "string"
@@ -454,19 +248,6 @@ function InstrumentEditor(props) {
     resetHistory && resetHistory();
   };
 
-  /* const updateOnFileLoaded = (dur) => {
-    //console.log(instrument);
-    setModules((previousModules) => {
-      let newmodules = [...previousModules];
-      if (instrument.buffer)
-        newmodules[index].score[0].duration = parseFloat(
-          (dur ? dur : instrument.buffer.duration).toFixed(2)
-        );
-      return newmodules;
-    });
-    resetHistory();
-  }; */
-
   const setFile = (fileId, fileUrl, audiobuffer, data) => {
     let isDrum = track.type === 0;
 
@@ -508,106 +289,11 @@ function InstrumentEditor(props) {
       return a;
     });
 
-    //console.log(instrument);
-
     onInstrumentMod(fileId, labelOnInstrument, labelOnInstrument);
     setEditingFile(null);
   };
 
-  const updateFilesStatsOnChange = async () => {
-    //when change the instrument, update file "in" stat by -1
-    /*
-
-    let instrobj =
-      typeof track.instrument === "string"
-        ? (
-            await firebase
-              .firestore()
-              .collection(track.type === 0 ? "drumpatches" : "patches")
-              .doc(track.instrument)
-              .get()
-          ).data()
-        : track.instrument;
-
-    typeof track.instrument === "string" &&
-      firebase
-        .firestore()
-        .collection(track.type === 0 ? "drumpatches" : "patches")
-        .doc(track.instrument)
-        .update({ in: firebase.firestore.FieldValue.increment(-1) });
-
-    if (instrobj.urls)
-      Object.values(instrobj.urls).forEach((e) =>
-        firebase
-          .firestore()
-          .collection("files")
-          .doc(e)
-          .update({ in: firebase.firestore.FieldValue.increment(-1) })
-      );
-
-    if (instrobj.url)
-      firebase
-        .firestore()
-        .collection("files")
-        .doc(instrobj.url)
-        .update({ in: firebase.firestore.FieldValue.increment(-1) });
-
-        */
-  };
-
-  const handlePatchSelect = (patchId, _, buffer, patchData) => {
-    updateFilesStatsOnChange();
-
-    //increment "ld" & "in" counters for patch and files
-
-    firebase
-      .firestore()
-      .collection(isDrum ? "drumpatches" : "patches")
-      .doc(patchId)
-      .update({
-        ld: firebase.firestore.FieldValue.increment(1),
-        in: firebase.firestore.FieldValue.increment(1),
-      });
-
-    if (isDrum || patchData.base === "Sampler") {
-      firebase
-        .firestore()
-        .collection(isDrum ? "drumpatches" : "patches")
-        .doc(patchId)
-        .get((e) =>
-          Object.values(e.data().urls)
-            .map((e) => firebase.firestore().collection("files").doc(e))
-            .update({
-              ld: firebase.firestore.FieldValue.increment(1),
-              in: firebase.firestore.FieldValue.increment(1),
-            })
-        );
-    }
-
-    setTracks((prev) => {
-      let newTracks = [...prev];
-      newTracks[selectedTrack].instrument = patchId;
-      newTracks[selectedTrack].volume = patchData.volume;
-      loadInstrument(
-        newTracks[selectedTrack],
-        selectedTrack,
-        buffer ? buffer : null,
-        setInstruments,
-        setInstrumentsLoaded,
-        setEffects,
-        setInstrumentsInfo,
-        setNotifications
-      );
-      return newTracks;
-    });
-
-    setSelectedPatch(patchId);
-    setPatchExplorer(false);
-
-    resetHistory && resetHistory();
-
-    //props.setIEOpen(false);
-  };
+  const updateFilesStatsOnChange = async () => {};
 
   let mainContent = (
     <div className="ie-synth-cont">
@@ -617,9 +303,6 @@ function InstrumentEditor(props) {
 
   if (instrument && instrumentLoaded) {
     if (track.type === 0) {
-      //console.log(instrument);
-
-      //bufferObjects.sort((a, b) => a[1] - b[1]);
       mainContent = (
         <Grid
           container
@@ -653,64 +336,6 @@ function InstrumentEditor(props) {
               ))}
         </Grid>
       );
-    } else if (instrument.name === "Sampler") {
-      let bufferObjects = [];
-      instrument._buffers._buffers.forEach((e, i, a) =>
-        bufferObjects.push({ buffer: e, midi: i })
-      );
-      //console.log(instrument._buffers._buffers);
-      //console.log(bufferObjects, instrumentInfo);
-      mainContent = (
-        <div className="ie-synth-cont" style={{ overflowY: "overlay" }}>
-          <List style={{ width: "100%", height: "calc(100% - 78px)" }}>
-            <div style={{ height: 48 }} />
-            {bufferObjects
-              .sort((a, b) => a[1] - b[1])
-              .map((e, i) => (
-                <>
-                  <SamplerFileItem
-                    exists={instrument._buffers._buffers.has(
-                      JSON.stringify(e.midi)
-                    )}
-                    key={i}
-                    index={e.midi}
-                    instrument={instrument}
-                    handleSamplerFileDelete={(a, b) => setDeletingItem([a, b])}
-                    buffer={e.buffer}
-                    fileInfo={
-                      instrumentInfo &&
-                      instrumentInfo.filesInfo &&
-                      instrumentInfo.filesInfo[
-                        Tone.Frequency(e.midi, "midi").toNote()
-                      ]
-                    }
-                    fileLabel={e.midi}
-                    fileId={
-                      instrumentInfo &&
-                      instrumentInfo.patch &&
-                      instrumentInfo.patch.urls &&
-                      instrumentInfo.patch.urls[
-                        Tone.Frequency(e.midi, "midi").toNote()
-                      ]
-                    }
-                    handlePageNav={handlePageNav}
-                    setRenamingLabel={setRenamingLabel}
-                    handleFileClick={() => setEditingFile(parseInt(e.midi))}
-                  />
-                  <Divider />
-                </>
-              ))}
-            <SamplerFileItem
-              empty
-              instrument={instrument}
-              handleSamplerFileDelete={(a, b) => setDeletingItem([a, b])}
-              handlePageNav={handlePageNav}
-              setRenamingLabel={setRenamingLabel}
-              handleFileClick={() => setEditingFile(9999)}
-            />
-          </List>
-        </div>
-      );
     } else {
       mainContent = (
         <SynthEditor
@@ -739,112 +364,10 @@ function InstrumentEditor(props) {
       ref={ieWrapper}
     >
       {mainContent}
-      <div className="ie-bottom-menu">
-        <Select
-          variant="standard"
-          value={checkCustomPatch ? "Custom" : track.instrument}
-          onMouseDown={() => setPatchExplorer(true)}
-          inputProps={{ readOnly: true }}
-        >
-          <MenuItem value={checkCustomPatch ? "Custom" : track.instrument}>
-            {checkCustomPatch
-              ? "Custom"
-              : instrumentInfo.patch.name
-              ? instrumentInfo.patch.name
-              : ""}
-          </MenuItem>
-        </Select>
-
-        {/* checkCustomPatch && (
-          <IconButton>
-            <Icon>save</Icon>
-          </IconButton>
-        ) */}
-        <Divider orientation="vertical" flexItem />
-        {trackType === 0 ? (
-          <>
-            <IconButton
-              color={isDrum ? "primary" : "default"}
-              onClick={toggleSamplerMode}
-            >
-              <SvgIcon viewBox="0 0 351 322.7">{drumIcon}</SvgIcon>
-            </IconButton>
-          </>
-        ) : trackType === 1 ? (
-          <>
-            <Tooltip
-              title={`Switch to ${
-                instrument.name === "Sampler" ? "Synth" : "Sampler"
-              }`}
-            >
-              <IconButton
-                style={{ width: 48 }}
-                color="default"
-                onClick={() => setIsSwitchingSampler(true)}
-              >
-                <Icon>
-                  {instrument.name === "Sampler" ? "cable" : "graphic_eq"}
-                </Icon>
-              </IconButton>
-            </Tooltip>
-          </>
-        ) : (
-          <></>
-        )}
-      </div>
-      {/* draggingOver && instrument.name !== "PolySynth" && (
-        <FileDrop
-          onDragLeave={(e) => {
-            setDraggingOver(false);
-          }}
-          onDrop={(files, event) => handleFileDrop(files, event)}
-          className={"file-drop"}
-          style={{
-            backgroundColor: "#3f51b5",
-          }}
-        >
-          Drop your files here!
-        </FileDrop>
-      ) */}
-
-      {patchExplorer && (
-        <ListExplorer
-          compact
-          type={isDrum ? "seq" : "instr"}
-          patchExplorer={patchExplorer}
-          index={index}
-          track={track}
-          setTracks={setTracks}
-          setPatchExplorer={setPatchExplorer}
-          instrument={instrument}
-          setInstruments={setInstruments}
-          setInstrumentLoaded={setInstrumentLoaded}
-          setInstrumentsLoaded={setInstrumentsLoaded}
-          saveUserPatch={saveUserPatch}
-          onItemClick={handlePatchSelect}
-          updateFilesStatsOnChange={updateFilesStatsOnChange}
-        />
-      )}
-
-      {renamingLabel && (
-        <NoteInput
-          open={true}
-          onClose={() => setRenamingLabel(null)}
-          note={renamingLabel}
-          onSubmit={(i) =>
-            changeSamplerNote(Tone.Frequency(renamingLabel, "midi").toNote(), i)
-          }
-        />
-      )}
-
       {deletingItem && (
         <Confirm
           instrumentEditor
-          action={() =>
-            instrument.name === "Sampler"
-              ? handleSamplerFileDelete(...deletingItem)
-              : handlePlayersFileDelete(...deletingItem)
-          }
+          action={() => handlePlayersFileDelete(...deletingItem)}
           open={deletingItem}
           onClose={() => setDeletingItem(null)}
         />
