@@ -61,7 +61,7 @@ function useFirebaseConnection(ctx) {
   const autoSaverTime = 5 * 60 * 1000;
 
   const triggerSave = (tracks, sessionData) => {
-    if (!editMode) return;
+    if (!editMode || !sessionData.creator) return;
     if (uploadQueue.length > 0)
       uploadFiles(
         uploadQueue.filter(
