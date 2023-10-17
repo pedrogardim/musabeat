@@ -38,20 +38,12 @@ const tracktypes = [
     icon: "grid_on",
   },
   {
-    name: "Melody Grid",
-    icon: "music_note",
-  },
-  {
-    name: "Chord Progression",
-    icon: "font_download",
-  },
-  {
-    name: "Player",
-    icon: "graphic_eq",
-  },
-  {
     name: "Piano Roll",
     icon: "piano",
+  },
+  {
+    name: "Audio Track",
+    icon: "graphic_eq",
   },
 ];
 
@@ -190,7 +182,7 @@ function NewSessionDialog(props) {
       open={true}
       onClose={() => props.setNewSessionDialog(false)}
       PaperProps={{ className: "session-settings-cont" }}
-      maxWidth={"md"}
+      maxWidth={"sm"}
       fullWidth
     >
       <Typography variant="h6" align="center">
@@ -202,236 +194,110 @@ function NewSessionDialog(props) {
         {t(`trackPicker.types.${selectedType}.description`)}
       </p> */}
 
-      <Grid container direction="row" wrap="wrap" spacing={2}>
-        <Grid
-          container
-          item
-          direction="row"
-          alignItems="stretch"
-          sm={6}
-          spacing={2}
-        >
-          <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
-            <TextField
-              variant="standard"
-              style={{ width: "100%" }}
-              value={session.name}
-              onChange={(e) =>
-                handleInfoChange("name", e.target.value.slice(0, 63))
-              }
-              label={t("info.name")}
-              placeholder={session.name === "" ? t("sidemenu.newSession") : ""}
-            />
-          </Grid>
-          <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
-            <TextField
-              variant="standard"
-              style={{ width: "100%" }}
-              value={session.description}
-              rows={2}
-              label={t("info.description")}
-              onChange={(e) =>
-                handleInfoChange("description", e.target.value.slice(0, 255))
-              }
-              multiline
-            />
-          </Grid>
-          <Grid item sm={12} md={12} xl={12} lg={12} xs={12}>
-            <Autocomplete
-              multiple
-              className={""}
-              options={Array(129)
-                .fill()
-                .map((e, i) => (e = i))}
-              renderInput={(params) => <TextField {...params} label={"Tags"} />}
-              onChange={(e, v) => handleInfoChange("tags", v)}
-              value={session.tags}
-              getOptionLabel={(e) => sessionTags[e]}
-            />
-          </Grid>
-
-          <Grid
-            className="session-settings-tabs-cont"
-            item
-            sm={12}
-            md={12}
-            xl={12}
-            lg={12}
-            xs={12}
-          >
-            {/* <Tooltip
-              title={
-                !props.premiumMode
-                  ? "Upgrade to Premium to use this feature"
-                  : "Session won't show up on explore"
-              }
-              interactive={!props.premiumMode}
-              placement="top-start"
-            > */}
-            <FormControlLabel
-              className="session-settings-checkbox-lbl"
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={session.hid}
-                  /* disabled={!props.premiumMode} */
-                  disabled={true}
-                  onChange={(e) => handleInfoChange("hid", e.target.checked)}
-                />
-              }
-              label={
-                t("workspace.options.hiddenSession") +
-                " " +
-                t("misc.comingSoon")
-              }
-              labelPlacement="end"
-            />
-            {/* </Tooltip>
-            <Tooltip
-             title={
-                !props.premiumMode
-                  ? "Upgrade to Premium to use this feature"
-                  : "Users won't be able to copy this session"
-              } 
-              interactive={!props.premiumMode}
-              placement="top-start"
-            > */}
-            <FormControlLabel
-              className="session-settings-checkbox-lbl"
-              control={
-                <Checkbox
-                  color="primary"
-                  checked={session.alwcp}
-                  /* disabled={!props.premiumMode} */
-                  disabled={true}
-                  onChange={(e) => handleInfoChange("alwcp", e.target.checked)}
-                />
-              }
-              label={
-                t("workspace.options.allowCopies") + " " + t("misc.comingSoon")
-              }
-              labelPlacement="end"
-            />
-            {/* </Tooltip> */}
-          </Grid>
+      <Grid
+        container
+        item
+        direction="column"
+        alignItems="stretch"
+        sm={12}
+        spacing={2}
+      >
+        <Grid item sm={12}>
+          <TextField
+            variant="standard"
+            style={{ width: "100%" }}
+            value={session.name}
+            onChange={(e) =>
+              handleInfoChange("name", e.target.value.slice(0, 63))
+            }
+            label={t("info.name")}
+            placeholder={session.name === "" ? t("sidemenu.newSession") : ""}
+          />
         </Grid>
-
-        <Grid container item direction="column" sm={6}>
-          <Grid item>
-            <Typography variant="overline">Tempo</Typography>
-            <Slider
-              min={40}
-              max={300}
-              defaultValue={session.bpm}
-              valueLabelDisplay="auto"
-              onChangeCommitted={(e, v) => handleInfoChange("bpm", v)}
-            />
-          </Grid>
-          <Grid item>
-            <Typography variant="overline">
-              {t("track.settings.sessionScale")}
-            </Typography>
-            <div className="break" />
-
-            <Select
-              variant="standard"
-              native
-              defaultValue={session.root}
-              onChange={(e) => handleInfoChange("root", e.target.value)}
-            >
-              {musicalNotes.map((note, noteIndex) => (
-                <option key={noteIndex} value={noteIndex}>
-                  {note}
-                </option>
-              ))}
-            </Select>
-            <Select
-              variant="standard"
-              native
-              defaultValue={session.scale}
-              onChange={(e) => handleInfoChange("scale", e.target.value)}
-            >
-              {scales.map((scale, scaleIndex) => (
-                <option key={scaleIndex} value={scaleIndex}>
-                  {t(`music.scales.${scaleIndex}`)}
-                </option>
-              ))}
-            </Select>
-          </Grid>
-          <Grid item>
-            <Typography variant="overline">
-              {/* t("track.settings.sessionScale") */}
-              {t("misc.initialTracks")}
-            </Typography>
-            <div className="break" />
-            {isCopy ? (
-              <div className="session-gallery-item-track-cont">
-                {session.tracks.map((e) => (
-                  <Paper
-                    className="session-gallery-item-track"
-                    style={{
-                      backgroundColor: colors[e.color][500],
-                      borderRadius: 0,
-                    }}
+        <Grid item sm={12}>
+          <Typography variant="overline">Tempo</Typography>
+          <Slider
+            min={40}
+            max={300}
+            defaultValue={session.bpm}
+            valueLabelDisplay="auto"
+            onChangeCommitted={(e, v) => handleInfoChange("bpm", v)}
+          />
+        </Grid>
+        <Grid item sm={12} alignSelf="center">
+          <Typography variant="overline">
+            {/* t("track.settings.sessionScale") */}
+            {t("misc.initialTracks")}
+          </Typography>
+          <div className="break" />
+          {isCopy ? (
+            <div className="session-gallery-item-track-cont">
+              {session.tracks.map((e) => (
+                <Paper
+                  className="session-gallery-item-track"
+                  style={{
+                    backgroundColor: colors[e.color][500],
+                    borderRadius: 0,
+                  }}
+                >
+                  <Tooltip
+                    title={
+                      e.name
+                        ? `"${e.name}"`
+                        : t(`trackPicker.types.${e.type}.name`)
+                    }
                   >
-                    <Tooltip
-                      title={
-                        e.name
-                          ? `"${e.name}"`
-                          : t(`trackPicker.types.${e.type}.name`)
-                      }
-                    >
-                      <Icon>
-                        {e.type === 0
-                          ? "grid_on"
-                          : e.type === 1
-                          ? "music_note"
-                          : e.type === 2
-                          ? "font_download"
-                          : e.type === 3
-                          ? "graphic_eq"
-                          : "piano"}
-                      </Icon>
-                    </Tooltip>
-                  </Paper>
-                ))}
-              </div>
-            ) : (
-              <ButtonGroup color="primary" style={{ margin: "auto" }}>
-                {tracktypes.map((e, i) => (
-                  <Tooltip title={t(`trackPicker.types.${i}.name`)}>
-                    <Button
-                      color="primary"
-                      variant={
-                        session.tracks.some((e) => e.type === i)
-                          ? "contained"
-                          : "outlined"
-                      }
-                      onClick={() =>
-                        session.tracks.some((e) => e.type === i)
-                          ? removeTrack(i)
-                          : addTrack(i)
-                      }
-                      key={e.name}
-                    >
-                      <Icon>{e.icon}</Icon>
-                    </Button>
+                    <Icon>
+                      {e.type === 0
+                        ? "grid_on"
+                        : e.type === 1
+                        ? "music_note"
+                        : e.type === 2
+                        ? "font_download"
+                        : e.type === 3
+                        ? "graphic_eq"
+                        : "piano"}
+                    </Icon>
                   </Tooltip>
-                ))}
-              </ButtonGroup>
-            )}
-          </Grid>
+                </Paper>
+              ))}
+            </div>
+          ) : (
+            <ButtonGroup color="primary" style={{ margin: "auto" }}>
+              {tracktypes.map((e, i) => (
+                <Tooltip title={t(`trackPicker.types.${i}.name`)}>
+                  <Button
+                    color="primary"
+                    variant={
+                      session.tracks.some((e) => e.type === i)
+                        ? "contained"
+                        : "outlined"
+                    }
+                    onClick={() =>
+                      session.tracks.some((e) => e.type === i)
+                        ? removeTrack(i)
+                        : addTrack(i)
+                    }
+                    key={e.name}
+                  >
+                    <Icon>{e.icon}</Icon>
+                  </Button>
+                </Tooltip>
+              ))}
+            </ButtonGroup>
+          )}
+        </Grid>
+        <Grid item sm={12} alignSelf="center">
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleCreateNewSession}
+          >
+            {t("sidemenu.newSession")}
+          </Button>
         </Grid>
       </Grid>
-      <div className="break" style={{ height: 16 }} />
 
-      <Button
-        color="primary"
-        variant="contained"
-        onClick={handleCreateNewSession}
-      >
-        {t("sidemenu.newSession")}
-      </Button>
       <IconButton
         onClick={() => props.setNewSessionDialog(false)}
         className="mp-closebtn"
