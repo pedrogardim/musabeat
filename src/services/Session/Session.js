@@ -70,12 +70,6 @@ export const createNewSession = (session, handlePageNav, setOpenedSession) => {
     newSession.editors = [userId];
   }
 
-  if (!userId) {
-    setOpenedSession(newSession);
-    handlePageNav("session", "newSession");
-    return;
-  }
-
   const sessionsRef = firebase.firestore().collection("sessions");
   sessionsRef.add(newSession).then((ref) => {
     if (userId) {
