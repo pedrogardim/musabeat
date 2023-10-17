@@ -14,6 +14,7 @@ import {
   ListItemText,
   ListItemIcon,
   ListItemButton,
+  Typography,
 } from "@mui/material";
 
 import { useTranslation } from "react-i18next";
@@ -210,6 +211,19 @@ function EffectsEditor(props) {
           selectedEffect={selectedEffect}
           onEffectMod={onEffectMod}
         />
+      )}
+      {typeof selectedEffect !== "number" && (
+        <Typography
+          sx={{
+            m: "auto",
+            fontSize: 16,
+            maxWidth: 200,
+            textAlign: "center",
+            textTransform: "none",
+          }}
+        >
+          Press the + on the side menu to add an effect!
+        </Typography>
       )}
       <Menu
         open={Boolean(menuOpen)}
