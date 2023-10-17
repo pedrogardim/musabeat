@@ -50,13 +50,11 @@ function HomePage(props) {
         variant="extended"
         sx={{ zIndex: 2 }}
         onClick={() =>
-          props.user
-            ? props.createNewSession(
-                undefined,
-                props.handlePageNav,
-                props.setOpenedSession
-              )
-            : props.setAuthDialog(true)
+          props.createNewSession(
+            undefined,
+            props.handlePageNav,
+            props.setOpenedSession
+          )
         }
       >
         <Icon style={{ marginRight: 8 }}>add_circle</Icon>

@@ -44,6 +44,7 @@ import { loadInstrument } from "../../services/Instruments";
 import { deleteSelection } from "./services/Edition";
 
 import wsCtx from "../../context/SessionWorkspaceContext";
+import { updateSessionCreator } from "../../services/Session/Session";
 
 function SessionWorkspace(props) {
   const sessionKey = useParams().key;
@@ -264,6 +265,14 @@ function SessionWorkspace(props) {
     console.log(tracks);
     tracks && updateUndoHistory(tracks);
   }, [tracks]);
+
+  useEffect(() => {
+    if (user && sessionData.bpm && !sessionData.creator) {
+      updateSessionCreator(sessionKey, user.uid).then((newSession) =>
+        setSessionData((p) => ({ ...p, ...newSession }))
+      );
+    }
+  }, [sessionData, user]);
 
   useEffect(() => {
     if (sessionData) {
