@@ -3,7 +3,7 @@ import * as Tone from "tone";
 
 import { useParams } from "react-router-dom";
 
-import { Icon, IconButton, Snackbar, Box, Fab } from "@mui/material";
+import { Icon, IconButton, Snackbar, Box, Fab, Alert } from "@mui/material";
 
 import "./style.css";
 
@@ -544,6 +544,17 @@ function SessionWorkspace(props) {
             </IconButton>
           }
         />
+        {!user && !sessionData.creator && (
+          <Alert severity="warning" sx={{ textTransform: "none" }}>
+            Looks like you are not logged in. Please login to save your work.
+          </Alert>
+        )}
+        {!params.editMode && (
+          <Alert severity="info" sx={{ textTransform: "none" }}>
+            This session was created by another user. You can check it out but
+            not edit it.
+          </Alert>
+        )}
         <Confirm
           dupSession
           open={params.openDialog === "dupSession"}
