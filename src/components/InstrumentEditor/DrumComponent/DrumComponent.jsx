@@ -39,6 +39,9 @@ function DrumComponent(props) {
   const [wavePath, setWavePath] = useState("");
 
   const handleClick = (e) => {
+    if (!exists) {
+      handleFileClick();
+    }
     if (
       ((e.target.className.includes &&
         !e.target.className.includes("audio-file-item-label")) ||
