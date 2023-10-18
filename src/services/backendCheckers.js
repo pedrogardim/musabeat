@@ -5,5 +5,5 @@ export const checkPremium = async () => {
   const userRef = firebase.firestore().collection("users").doc(user.uid);
   const userData = (await userRef.get()).data();
 
-  return userData.pr.seconds > ~~(+new Date() / 1000);
+  return (userData?.pr?.seconds || 0) > ~~(+new Date() / 1000);
 };
