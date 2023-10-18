@@ -130,14 +130,16 @@ function DrumComponent(props) {
             : "Empty"}
         </Typography>
 
-        <Tooltip title="Remove file from instrument">
-          <IconButton
-            className="remove-drum-component-button"
-            onClick={() => handleFileDelete(fileId, fileLabel, index)}
-          >
-            <Icon style={{ fontSize: 18 }}>close</Icon>
-          </IconButton>
-        </Tooltip>
+        {exists && (
+          <Tooltip title="Remove file from instrument">
+            <IconButton
+              className="remove-drum-component-button"
+              onClick={() => handleFileDelete(fileId, fileLabel, index)}
+            >
+              <Icon style={{ fontSize: 18 }}>close</Icon>
+            </IconButton>
+          </Tooltip>
+        )}
       </ButtonBase>
     </Grid>
   );
